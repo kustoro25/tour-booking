@@ -1,0 +1,187 @@
+// Prisma Schema for Tour Booking Website
+// Database: SQLite (for development), can switch to PostgreSQL/MySQL for production
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  role      String   @default("ADMIN") // SUPER_ADMIN, ADMIN, CONTENT_MANAGER
+  password  String
+  avatar    String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+model Tour {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  category      String   // OPEN_TRIP, PRIVATE_TRIP, HONEYMOON, CORPORATE
+  destination   String
+  destinationId String?  @map("destination_id")
+  duration      String   // e.g. "3 Hari 2 Malam"
+  priceAdult   Float    @map("price_adult")
+  priceChild   Float    @default(0) @map("price_child")
+  discount     Float    @default(0)
+  maxSlot      Int      @default(15) @map("max_slot")
+  minPax       Int      @default(2) @map("min_pax")
+  itinerary    String   @default("[]") // JSON array
+  includes     String   @default("[]") // JSON array
+  excludes     String   @default("[]") // JSON array
+  terms        String   @default("")  // Rich text / HTML
+  isActive     Boolean  @default(true) @map("is_active")
+  coverImg     String?  @map("cover_img")
+  sortOrder    Int      @default(0) @map("sort_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  gallery         GalleryImage[]
+  slots           TourSlot[]
+  orders          Order[]
+  reviews         Review[]
+  destinationRef  Destination? @relation(fields: [destinationId], references: [id])
+
+  @@map("tours")
+}
+
+model GalleryImage {
+  id        String   @id @default(cuid())
+  tourId    String   @map("tour_id")
+  imageUrl  String   @map("image_url")
+  altText   String   @default("") @map("alt_text")
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  tour Tour @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+  @@map("gallery")
+}
+
+model TourSlot {
+  id            String   @id @default(cuid())
+  tourId        String   @map("tour_id")
+  date          DateTime
+  quota         Int      @default(15)
+  bookedCount   Int      @default(0) @map("booked_count")
+  priceOverride Float?   @map("price_override")
+  isBlackout    Boolean  @default(false) @map("is_blackout")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  tour Tour @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+  @@unique([tourId, date])
+  @@map("tour_slots")
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  tourId        String   @map("tour_id")
+  invoiceNo     String   @unique @map("invoice_no")
+  customerName  String   @map("customer_name")
+  customerEmail String   @map("customer_email")
+  customerPhone String   @map("customer_phone")
+  tourDate      DateTime @map("tour_date")
+  adults        Int      @default(1)
+  children      Int      @default(0)
+  total         Float
+  status        String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED
+  paymentMethod String?  @map("payment_method")
+  paymentProof  String?  @map("payment_proof")
+  notes         String?
+  adminNotes    String?  @map("admin_notes")
+  reviewToken   String?  @unique @map("review_token")
+  reviewSentAt  DateTime? @map("review_sent_at")
+  expiryAt      DateTime @map("expiry_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  tour    Tour     @relation(fields: [tourId], references: [id])
+  invoice Invoice?
+  review  Review?
+
+  @@map("orders")
+}
+
+model Invoice {
+  id        String   @id @default(cuid())
+  orderId   String   @unique @map("order_id")
+  pdfUrl    String?  @map("pdf_url")
+  sentAt    DateTime? @map("sent_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("invoices")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  orderId    String   @unique @map("order_id")
+  tourId     String   @map("tour_id")
+  rating     Int      // 1-5
+  reviewText String   @map("review_text")
+  photos     String   @default("[]") // JSON array
+  status     String   @default("PENDING") // PENDING, APPROVED, HIDDEN
+  adminReply String?  @map("admin_reply")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  tour  Tour  @relation(fields: [tourId], references: [id])
+
+  @@map("reviews")
+}
+
+model Page {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  content   String   @default("{}") // JSON
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("pages")
+}
+
+model Destination {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  shortDescription String   @map("short_description")
+  description      String   // Rich text / HTML
+  location         String   // e.g. "Bali, Indonesia"
+  imageUrl         String   @map("image_url")
+  gallery          String   @default("[]") // JSON array of image URLs
+  rating           Float    @default(5.0)
+  reviewCount      Int      @default(0) @map("review_count")
+  bestTimeToVisit  String   @map("best_time_to_visit")
+  activities       String   @default("[]") // JSON array
+  highlight        Boolean  @default(false)
+  isActive         Boolean  @default(true) @map("is_active")
+  sortOrder        Int      @default(0) @map("sort_order")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  tours Tour[]
+
+  @@map("destinations")
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   // JSON string
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
