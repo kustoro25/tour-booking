@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/Skeleton';
+import ImageUpload from '@/components/ui/ImageUpload';
 
 type InvoiceTheme = 'classic' | 'modern' | 'minimal' | 'premium';
 
@@ -111,25 +112,14 @@ export default function AdminSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Icon Brand (teks atau URL gambar)</label>
-              <div className="flex gap-3 items-start">
-                <input
-                  type="text"
-                  value={form.companyIcon || ''}
-                  onChange={(e) => setForm({ ...form, companyIcon: e.target.value })}
-                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="JN (teks) atau https://... (gambar)"
-                />
-                <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                  {form.companyIcon ? (
-                    form.companyIcon.startsWith('http') ? (
-                      <img src={form.companyIcon} alt="icon" className="w-full h-full object-cover rounded-lg" />
-                    ) : (
-                      <span>{form.companyIcon.substring(0, 2).toUpperCase()}</span>
-                    )
-                  ) : 'JN'}
-                </div>
-              </div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Icon Brand (upload atau teks)</label>
+              <ImageUpload
+                value={form.companyIcon || ''}
+                onChange={(url) => setForm({ ...form, companyIcon: url })}
+                label=""
+                folder="tour-booking/brand"
+                placeholder="JN (teks) atau upload logo"
+              />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
