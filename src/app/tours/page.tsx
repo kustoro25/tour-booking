@@ -6,6 +6,7 @@ import Link from 'next/link';
 import StarRating from '@/components/ui/StarRating';
 import TourFilter from '@/components/tours/TourFilter';
 import Pagination from '@/components/ui/Pagination';
+import { Suspense } from 'react';
 
 export const dynamic = 'force-dynamic';
 
@@ -110,11 +111,13 @@ export default async function ToursPage({ searchParams }: PageProps) {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Filter Sidebar */}
         <aside className="md:col-span-1">
-          <TourFilter
-            currentDestination={currentDestination}
-            currentCategory={currentCategory}
-            currentSort={currentSort}
-          />
+          <Suspense fallback={<div className="h-10 bg-gray-100 rounded-2xl animate-pulse" />}>
+            <TourFilter
+              currentDestination={currentDestination}
+              currentCategory={currentCategory}
+              currentSort={currentSort}
+            />
+          </Suspense>
         </aside>
 
         {/* Tour Grid */}
