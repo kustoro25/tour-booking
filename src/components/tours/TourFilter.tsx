@@ -193,74 +193,128 @@ export default function TourFilter({ currentDestination, currentCategory, curren
       </div>
 
       {/* ========== MOBILE FILTER BAR ========== */}
-      <div className="md:hidden space-y-3">
-        {/* Compact filter bar */}
-        <div className="bg-white rounded-2xl shadow-card p-3 border border-gray-100">
+      <div className="md:hidden">
+        {/* Toggle button */}
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className={`w-full flex items-center justify-between bg-white rounded-2xl shadow-card p-4 border transition-all duration-200 ${
+            mobileOpen ? 'border-blue-400 shadow-md' : 'border-gray-100 hover:border-gray-200'
+          }`}
+        >
           <div className="flex items-center gap-2">
-            {/* Destination Dropdown */}
-            <select
-              value={currentDestination}
-              onChange={(e) => updateFilter('destination', e.target.value)}
-              className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer min-w-0 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke%3D%22%239ca3af%22%20stroke-width%3D%222%22%3E%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20d%3D%22M19%209l-7%207-7-7%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_8px_center] bg-no-repeat pr-8"
-            >
-              <option value="">📍 Destinasi</option>
-              {DESTINATIONS.map((d) => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
-
-            {/* Category Dropdown */}
-            <select
-              value={currentCategory}
-              onChange={(e) => updateFilter('category', e.target.value)}
-              className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer min-w-0 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke%3D%22%239ca3af%22%20stroke-width%3D%222%22%3E%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20d%3D%22M19%209l-7%207-7-7%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_8px_center] bg-no-repeat pr-8"
-            >
-              <option value="">📂 Kategori</option>
-              {(Object.keys(TourCategoryLabels) as TourCategory[]).map((cat) => (
-                <option key={cat} value={cat}>{TourCategoryLabels[cat]}</option>
-              ))}
-            </select>
-
-            {/* Duration Dropdown */}
-            <select
-              value={searchParams.get('duration') || ''}
-              onChange={(e) => updateFilter('duration', e.target.value)}
-              className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer min-w-0 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke%3D%22%239ca3af%22%20stroke-width%3D%222%22%3E%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20d%3D%22M19%209l-7%207-7-7%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_8px_center] bg-no-repeat pr-8"
-            >
-              <option value="">⏱️ Durasi</option>
-              {DURATION_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-
-            {/* Toggle expand */}
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-medium transition-all duration-200 ${
-                mobileOpen
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-              }`}
-              aria-label="Filter lainnya"
-            >
-              <svg
-                className={`w-4 h-4 transition-transform duration-300 ${mobileOpen ? 'rotate-180' : ''}`}
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
+            <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            <span className="font-semibold text-gray-800 text-sm">Filter & Sort</span>
+            {hasFilters && (
+              <span className="bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                {[
+                  currentDestination ? 1 : 0,
+                  currentCategory ? 1 : 0,
+                  searchParams.get('duration') ? 1 : 0,
+                  searchParams.get('search') ? 1 : 0,
+                ].reduce((a, b) => a + b, 0)}
+              </span>
+            )}
           </div>
-        </div>
+          <svg
+            className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${mobileOpen ? 'rotate-180' : ''}`}
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
 
         {/* Expanded panel */}
         <div
           className={`transition-all duration-300 ease-out overflow-hidden ${
-            mobileOpen ? 'max-h-[700px] opacity-100' : 'max-h-0 opacity-0'
+            mobileOpen ? 'max-h-[800px] opacity-100 mt-3' : 'max-h-0 opacity-0'
           }`}
         >
-          <div className="bg-white rounded-2xl shadow-card p-5 border border-gray-100">
-            {filterContent}
+          <div className="bg-white rounded-2xl shadow-card p-5 border border-gray-100 space-y-4">
+            {/* Search */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">🔍 Cari Paket</label>
+              <input
+                type="text"
+                placeholder="Ketik nama paket..."
+                defaultValue={searchParams.get('search') || ''}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') updateFilter('search', (e.target as HTMLInputElement).value);
+                }}
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+              />
+            </div>
+
+            {/* Destination */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">📍 Destinasi</label>
+              <select
+                value={currentDestination}
+                onChange={(e) => updateFilter('destination', e.target.value)}
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+              >
+                <option value="">Semua Destinasi</option>
+                {DESTINATIONS.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Category */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">📂 Kategori</label>
+              <select
+                value={currentCategory}
+                onChange={(e) => updateFilter('category', e.target.value)}
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+              >
+                <option value="">Semua Kategori</option>
+                {(Object.keys(TourCategoryLabels) as TourCategory[]).map((cat) => (
+                  <option key={cat} value={cat}>{TourCategoryLabels[cat]}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Duration */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">⏱️ Durasi</label>
+              <select
+                value={searchParams.get('duration') || ''}
+                onChange={(e) => updateFilter('duration', e.target.value)}
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+              >
+                <option value="">Semua Durasi</option>
+                {DURATION_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Sort */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">🔃 Urutkan</label>
+              <select
+                value={currentSort}
+                onChange={(e) => updateFilter('sort', e.target.value)}
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+              >
+                <option value="newest">🆕 Terbaru</option>
+                <option value="cheapest">💰 Harga Termurah</option>
+                <option value="expensive">💎 Harga Termahal</option>
+                <option value="rating">⭐ Rating Tertinggi</option>
+              </select>
+            </div>
+
+            {/* Reset */}
+            {hasFilters && (
+              <button
+                onClick={() => router.push('/tours')}
+                className="w-full text-center text-sm text-red-500 hover:text-red-700 hover:bg-red-50 font-medium py-2.5 rounded-xl transition-all duration-200 border border-red-100"
+              >
+                ✕ Reset Semua Filter
+              </button>
+            )}
           </div>
         </div>
       </div>
