@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import Button from '@/components/ui/Button';
+import BookingCalendar from '@/components/booking/BookingCalendar';
 
 interface Tour {
   id: string;
@@ -15,6 +16,13 @@ interface Tour {
   minPax: number;
   duration: string;
   destination: string;
+}
+
+interface SlotInfo {
+  quota: number;
+  bookedCount: number;
+  isBlackout: boolean;
+  priceOverride: number | null;
 }
 
 export default function BookingPage() {
@@ -38,6 +46,8 @@ export default function BookingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [bookingResult, setBookingResult] = useState<{ invoiceNo: string } | null>(null);
   const [uniqueCode, setUniqueCode] = useState(0);
+  const [slotInfo, setSlotInfo] = useState<SlotInfo | null>(null);
+  const [slotLoading, setSlotLoading] = useState(false);
 
   useEffect(() => {
     setUniqueCode(Math.floor(100 + Math.random() * 900));
@@ -61,6 +71,28 @@ export default function BookingPage() {
         delete next[field];
         return next;
       });
+    }
+  };
+
+  const handleDateSelect = async (date: string) => {
+    setSelectedDate(date);
+    setErrors({});
+    if (!tour?.id) return;
+
+    setSlotLoading(true);
+    try {
+      const res = await fetch(`/api/tours/${tour.id}/slots?month=${date.substring(0, 7)}`);
+      const data = await res.json();
+      if (data.success) {
+        const slot = (data.data || []).find(
+          (s: SlotInfo & { date: string }) => s.date.startsWith(date)
+        );
+        setSlotInfo(slot || null);
+      }
+    } catch {
+      setSlotInfo(null);
+    } finally {
+      setSlotLoading(false);
     }
   };
 
@@ -183,24 +215,116 @@ export default function BookingPage() {
       {step === 1 && (
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-1">Pilih Tanggal Keberangkatan</h2>
-          <p className="text-gray-500 text-sm mb-6">{tour.name} - {tour.duration}</p>
+          <p className="text-gray-500 text-sm mb-6">{tour.name} &bull; {tour.duration}</p>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Keberangkatan</label>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => {
-                setSelectedDate(e.target.value);
-                setErrors({});
-              }}
-              min={new Date().toISOString().split('T')[0]}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          {/* Calendar */}
+          <div className="max-w-md mx-auto">
+            <BookingCalendar
+              tourId={tour.id}
+              selectedDate={selectedDate}
+              onDateSelect={handleDateSelect}
             />
-            {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
           </div>
 
-          <div className="flex justify-end">
+          {/* Slot Info Card */}
+          {selectedDate && (
+            <div className="mt-4 max-w-md mx-auto">
+              {slotLoading ? (
+                <div className="flex items-center gap-2 text-sm text-gray-400 p-3">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-400 border-t-transparent" />
+                  Mengecek ketersediaan...
+                </div>
+              ) : (
+                <div
+                  className={`rounded-xl p-4 border ${
+                    slotInfo?.isBlackout
+                      ? 'bg-red-50 border-red-200'
+                      : slotInfo && slotInfo.bookedCount >= slotInfo.quota
+                      ? 'bg-red-50 border-red-200'
+                      : slotInfo && slotInfo.quota - slotInfo.bookedCount <= 3
+                      ? 'bg-amber-50 border-amber-200'
+                      : 'bg-green-50 border-green-200'
+                  }`}
+                >
+                  {slotInfo?.isBlackout ? (
+                    <>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xl">🚫</span>
+                        <span className="font-semibold text-red-700">Tanggal Tidak Tersedia</span>
+                      </div>
+                      <p className="text-sm text-red-600">
+                        Tanggal ini tidak menerima booking. Silakan pilih tanggal lain.
+                      </p>
+                    </>
+                  ) : slotInfo && slotInfo.bookedCount >= slotInfo.quota ? (
+                    <>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xl">😞</span>
+                        <span className="font-semibold text-red-700">Slot Penuh</span>
+                      </div>
+                      <p className="text-sm text-red-600">
+                        Semua {slotInfo.quota} kursi telah dipesan. Silakan pilih tanggal lain.
+                      </p>
+                    </>
+                  ) : slotInfo ? (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">
+                            {slotInfo.quota - slotInfo.bookedCount <= 3 ? '⚠️' : '✅'}
+                          </span>
+                          <div>
+                            <span className="font-semibold text-gray-900">
+                              {slotInfo.quota - slotInfo.bookedCount <= 3
+                                ? 'Hampir Penuh'
+                                : 'Tersedia'}
+                            </span>
+                            <p className="text-sm text-gray-600">
+                              {slotInfo.quota - slotInfo.bookedCount} dari {slotInfo.quota} kursi tersisa
+                            </p>
+                          </div>
+                        </div>
+                        {slotInfo.priceOverride && (
+                          <span className="text-sm font-semibold text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
+                            {formatCurrency(slotInfo.priceOverride)}
+                          </span>
+                        )}
+                      </div>
+                      {/* Progress bar */}
+                      <div className="mt-3 h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            slotInfo.quota - slotInfo.bookedCount <= 3
+                              ? 'bg-amber-500'
+                              : 'bg-green-500'
+                          }`}
+                          style={{
+                            width: `${(slotInfo.bookedCount / slotInfo.quota) * 100}%`,
+                          }}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xl">✅</span>
+                        <span className="font-semibold text-green-700">Kuota Default</span>
+                      </div>
+                      <p className="text-sm text-green-600">
+                        15 kursi tersedia — belum ada pemesanan untuk tanggal ini.
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {errors.date && (
+            <p className="text-red-500 text-sm text-center mt-3">{errors.date}</p>
+          )}
+
+          <div className="flex justify-end mt-6">
             <Button onClick={handleNext} variant="primary">
               Lanjutkan →
             </Button>
