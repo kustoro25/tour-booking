@@ -26,21 +26,6 @@ async function getCmsFaqs(): Promise<{ question: string; answer: string }[]> {
   ];
 }
 
-async function getCmsStats(): Promise<{ num: string; label: string }[]> {
-  try {
-    const page = await prisma.page.findUnique({ where: { slug: 'home-stats' } });
-    if (page?.content) {
-      const parsed = JSON.parse(page.content);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-  } catch { /* fallback */ }
-  return [
-    { num: '5000+', label: 'Wisatawan' },
-    { num: '50+', label: 'Destinasi' },
-    { num: '4.9', label: 'Rating ★' },
-  ];
-}
-
 async function getFeaturedTours() {
   const tours = await prisma.tour.findMany({
     where: { isActive: true },
@@ -135,22 +120,66 @@ async function getAllGalleryPhotos(): Promise<GalleryPhoto[]> {
   return result;
 }
 
+async function getCmsHero() {
+  try {
+    const page = await prisma.page.findUnique({ where: { slug: 'home-hero' } });
+    if (page?.content) return JSON.parse(page.content);
+  } catch { /* fallback */ }
+  return {
+    tagline: '🔥 Ribuan wisatawan telah berangkat bersama kami',
+    heading: 'Jelajahi Destinasi',
+    headingHighlight: 'Impian',
+    subheading: 'Paket tour terbaik dengan pelayanan premium, harga transparan, dan sistem booking instan. Pilih jadwalmu, amankan kursimu, dan bersiaplah untuk petualangan tak terlupakan.',
+    ctaText: '🚀 Lihat Paket Wisata',
+    ctaLink: '/tours',
+    cta2Text: 'Booking Sekarang',
+    cta2Link: '/contact',
+    stats: [
+      { num: '5000+', label: 'Wisatawan' },
+      { num: '50+', label: 'Destinasi' },
+      { num: '4.9', label: 'Rating ★' },
+    ],
+    bgImage: '/images/hero.png',
+  };
+}
+
+async function getCmsValue() {
+  try {
+    const page = await prisma.page.findUnique({ where: { slug: 'home-value' } });
+    if (page?.content) return JSON.parse(page.content);
+  } catch { /* fallback */ }
+  return {
+    valueHeading: 'Mengapa Memilih Kami?',
+    valueSubheading: 'Kami hadir untuk memberikan pengalaman booking tour terbaik dengan standar pelayanan premium.',
+    valueItems: [
+      { icon: '💰', title: 'Harga Transparan', desc: 'Tidak ada biaya tersembunyi.', color: 'from-green-500 to-emerald-600' },
+      { icon: '⚡', title: 'Booking Instan', desc: '3 langkah, 1 menit. Invoice langsung terbit.', color: 'from-blue-500 to-blue-600' },
+      { icon: '🎯', title: 'Guide Profesional', desc: 'Tim guide berpengalaman dan bersertifikat.', color: 'from-purple-500 to-purple-600' },
+      { icon: '🛡️', title: 'Garansi Keberangkatan', desc: 'Jadwal pasti sesuai kuota minimum.', color: 'from-orange-500 to-orange-600' },
+    ],
+  };
+}
+
 export default async function HomePage() {
-  const [tours, reviews, destinations, galleryPhotos, faqs, stats] = await Promise.all([
+  const [tours, reviews, destinations, galleryPhotos, faqs, hero, valueData] = await Promise.all([
     getFeaturedTours(),
     getLatestReviews(),
     getFeaturedDestinations(),
     getAllGalleryPhotos(),
     getCmsFaqs(),
-    getCmsStats(),
+    getCmsHero(),
+    getCmsValue(),
   ]);
+
+  const heroStats = hero.stats || [];
+  const bgImage = hero.bgImage || '/images/hero.png';
 
   return (
     <>
       {/* Hero Section */}
       <section
         className="relative text-white overflow-hidden bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/images/hero.png')" }}
+        style={{ backgroundImage: `url('${bgImage}')` }}
       >
         {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/80 via-blue-800/70 to-teal-900/80" />
@@ -163,14 +192,13 @@ export default async function HomePage() {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm mb-6 animate-fade-in">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse-soft" />
-              <span>🔥 Ribuan wisatawan telah berangkat bersama kami</span>
+              <span>{hero.tagline || '🔥 Ribuan wisatawan telah berangkat bersama kami'}</span>
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6 animate-fade-in-up drop-shadow-lg">
-              Jelajahi Destinasi <span className="text-orange-400">Impian</span> Anda Tanpa Ribet!
+              {hero.heading || 'Jelajahi Destinasi'} <span className="text-orange-400">{hero.headingHighlight || 'Impian'}</span> Anda Tanpa Ribet!
             </h1>
             <p className="text-base sm:text-xl text-white/90 mb-6 leading-relaxed animate-fade-in-up animate-delay-200 drop-shadow">
-              Paket tour terbaik dengan pelayanan premium, harga transparan, dan sistem booking instan.
-              Pilih jadwalmu, amankan kursimu, dan bersiaplah untuk petualangan tak terlupakan.
+              {hero.subheading || 'Paket tour terbaik dengan pelayanan premium, harga transparan, dan sistem booking instan.'}
             </p>
 
             {/* Search Bar */}
@@ -178,16 +206,16 @@ export default async function HomePage() {
               <HeroSearch />
             </div>
             <div className="flex flex-wrap gap-4 animate-fade-in-up animate-delay-300">
-              <Button href="/tours" variant="accent" size="lg">
-                🚀 Lihat Paket Wisata
+              <Button href={hero.ctaLink || '/tours'} variant="accent" size="lg">
+                {hero.ctaText || '🚀 Lihat Paket Wisata'}
               </Button>
-              <Button href="/contact" variant="outline" size="lg" className="!border-white !text-white hover:!bg-white/10">
-                Booking Sekarang
+              <Button href={hero.cta2Link || '/contact'} variant="outline" size="lg" className="!border-white !text-white hover:!bg-white/10">
+                {hero.cta2Text || 'Booking Sekarang'}
               </Button>
             </div>
             {/* Trust badges */}
             <div className="flex flex-wrap items-center gap-6 mt-10 pt-8 border-t border-white/15 animate-fade-in-up animate-delay-400">
-              {stats.map((stat) => (
+              {heroStats.map((stat: { num: string; label: string }) => (
                 <div key={stat.label}>
                   <p className="text-2xl sm:text-3xl font-bold">{stat.num}</p>
                   <p className="text-sm text-blue-200">{stat.label}</p>
@@ -202,18 +230,13 @@ export default async function HomePage() {
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Mengapa Memilih Kami?</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">Kami hadir untuk memberikan pengalaman booking tour terbaik dengan standar pelayanan premium.</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">{valueData.valueHeading || 'Mengapa Memilih Kami?'}</h2>
+            <p className="text-gray-500 max-w-2xl mx-auto">{valueData.valueSubheading || 'Kami hadir untuk memberikan pengalaman booking tour terbaik.'}</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
-            {[
-              { icon: '💰', title: 'Harga Transparan', desc: 'Tidak ada biaya tersembunyi. Apa yang Anda lihat, itulah yang Anda bayar.', color: 'from-green-500 to-emerald-600', bg: 'bg-green-50', text: 'text-green-600' },
-              { icon: '⚡', title: 'Booking Instan', desc: '3 langkah, 1 menit. Invoice langsung terbit dan masuk ke email Anda.', color: 'from-blue-500 to-blue-600', bg: 'bg-blue-50', text: 'text-blue-600' },
-              { icon: '🎯', title: 'Guide Profesional', desc: 'Tim guide kami berpengalaman dan bersertifikat resmi.', color: 'from-purple-500 to-purple-600', bg: 'bg-purple-50', text: 'text-purple-600' },
-              { icon: '🛡️', title: 'Garansi Keberangkatan', desc: 'Jadwal pasti berangkat sesuai kuota minimum yang realistis.', color: 'from-orange-500 to-orange-600', bg: 'bg-orange-50', text: 'text-orange-600' },
-            ].map((item, i) => (
+            {(valueData.valueItems || []).map((item: { icon: string; title: string; desc: string; color: string }, i: number) => (
               <div key={item.title} className="group bg-white rounded-xl p-3 sm:p-6 shadow-card hover-lift text-center border border-gray-100 hover:border-blue-100 transition-colors">
-                <div className={`w-10 h-10 sm:w-14 sm:h-14 mx-auto mb-2 sm:mb-4 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center text-xl sm:text-2xl shadow-md group-hover:scale-110 transition-transform duration-300`}>
+                <div className={`w-10 h-10 sm:w-14 sm:h-14 mx-auto mb-2 sm:mb-4 rounded-xl bg-gradient-to-br ${item.color || 'from-blue-500 to-blue-600'} flex items-center justify-center text-xl sm:text-2xl shadow-md group-hover:scale-110 transition-transform duration-300`}>
                   <span>{item.icon}</span>
                 </div>
                 <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">{item.title}</h3>
