@@ -129,6 +129,7 @@ async function getCmsHero() {
     tagline: '🔥 Ribuan wisatawan telah berangkat bersama kami',
     heading: 'Jelajahi Destinasi',
     headingHighlight: 'Impian',
+    headingAfter: 'Anda Tanpa Ribet!',
     subheading: 'Paket tour terbaik dengan pelayanan premium, harga transparan, dan sistem booking instan. Pilih jadwalmu, amankan kursimu, dan bersiaplah untuk petualangan tak terlupakan.',
     ctaText: '🚀 Lihat Paket Wisata',
     ctaLink: '/tours',
@@ -250,7 +251,7 @@ export default async function HomePage() {
               <span>{hero.tagline || '🔥 Ribuan wisatawan telah berangkat bersama kami'}</span>
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6 animate-fade-in-up drop-shadow-lg">
-              {hero.heading || 'Jelajahi Destinasi'} <span className="text-orange-400">{hero.headingHighlight || 'Impian'}</span> Anda Tanpa Ribet!
+              {hero.heading || 'Jelajahi Destinasi'} <span className="text-orange-400">{hero.headingHighlight || 'Impian'}</span> {hero.headingAfter || 'Anda Tanpa Ribet!'}
             </h1>
             <p className="text-base sm:text-xl text-white/90 mb-6 leading-relaxed animate-fade-in-up animate-delay-200 drop-shadow">
               {hero.subheading || 'Paket tour terbaik dengan pelayanan premium, harga transparan, dan sistem booking instan.'}

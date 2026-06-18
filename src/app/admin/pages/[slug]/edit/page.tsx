@@ -18,6 +18,7 @@ type PageData = {
   tagline?: string;
   heading?: string;
   headingHighlight?: string;
+  headingAfter?: string;
   subheading?: string;
   ctaText?: string;
   ctaLink?: string;
@@ -59,6 +60,7 @@ const defaultData: Record<string, PageData> = {
     tagline: '🔥 Ribuan wisatawan telah berangkat bersama kami',
     heading: 'Jelajahi Destinasi',
     headingHighlight: 'Impian',
+    headingAfter: 'Anda Tanpa Ribet!',
     subheading: 'Paket tour terbaik dengan pelayanan premium, harga transparan, dan sistem booking instan. Pilih jadwalmu, amankan kursimu, dan bersiaplah untuk petualangan tak terlupakan.',
     ctaText: '🚀 Lihat Paket Wisata',
     ctaLink: '/tours',
@@ -361,7 +363,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             </SectionCard>
 
             <SectionCard icon="📝" title="Heading Utama">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="text-xs text-gray-500 mb-1 block">Teks kiri</label>
                   <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
@@ -374,8 +376,14 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                     placeholder="Impian" />
                 </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Teks kanan</label>
+                  <input type="text" value={data.headingAfter || ''} onChange={e => update('headingAfter', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Anda Tanpa Ribet!" />
+                </div>
               </div>
-              <p className="text-xs text-gray-400 mt-2">Hasil: <strong>{data.heading || 'Jelajahi Destinasi'}</strong> <span className="text-orange-500 font-bold">{data.headingHighlight || 'Impian'}</span> Anda Tanpa Ribet!</p>
+              <p className="text-xs text-gray-400 mt-2">Hasil: <strong>{data.heading || 'Jelajahi Destinasi'}</strong> <span className="text-orange-500 font-bold">{data.headingHighlight || 'Impian'}</span> {data.headingAfter || 'Anda Tanpa Ribet!'}</p>
             </SectionCard>
 
             <SectionCard icon="💬" title="Subheading / Deskripsi">
