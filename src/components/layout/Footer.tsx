@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useToast } from '@/components/ui/Toast';
 
 function useCompanyInfo() {
-  const [info, setInfo] = useState({ email: 'info@jelajahnusantara.com', phone: '+62 812-3456-7890', address: 'Jl. Pariwisata No. 123, Jakarta Selatan', brandName: 'Jelajah Nusantara' });
+  const [info, setInfo] = useState({ email: 'info@jelajahnusantara.com', phone: '+62 812-3456-7890', address: 'Jl. Pariwisata No. 123, Jakarta Selatan', brandName: 'Jelajah Nusantara', brandIcon: 'JN' });
   useEffect(() => {
     fetch('/api/settings/public')
       .then(r => r.json())
@@ -98,7 +98,15 @@ export default function Footer() {
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
               <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-teal-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/20">
-                <span className="text-white font-bold text-sm">JN</span>
+                {info.brandIcon ? (
+                  info.brandIcon.startsWith('http') ? (
+                    <img src={info.brandIcon} alt="brand" className="w-full h-full object-cover rounded-xl" />
+                  ) : (
+                    <span className="text-white font-bold text-sm">{info.brandIcon.substring(0, 2).toUpperCase()}</span>
+                  )
+                ) : (
+                  <span className="text-white font-bold text-sm">JN</span>
+                )}
               </div>
               <span className="text-xl font-bold text-white">{info.brandName || 'Jelajah Nusantara'}</span>
             </div>

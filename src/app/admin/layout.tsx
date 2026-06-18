@@ -5,6 +5,14 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ToastProvider } from '@/components/ui/Toast';
 
+function BrandIcon({ icon, className }: { icon: string; className?: string }) {
+  if (!icon) return <div className={`${className} flex items-center justify-center text-sm font-bold`}>JN</div>;
+  if (icon.startsWith('http')) {
+    return <img src={icon} alt="brand" className={`${className} object-cover`} />;
+  }
+  return <div className={`${className} flex items-center justify-center text-sm font-bold`}>{icon.substring(0, 2).toUpperCase()}</div>;
+}
+
 const sidebarLinks = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: '📊' },
   { href: '/admin/tours', label: 'Paket Tour', icon: '🏝️' },
@@ -22,12 +30,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [brandName, setBrandName] = useState('Jelajah Nusantara');
+  const [brandIcon, setBrandIcon] = useState('JN');
 
   useEffect(() => {
     fetch('/api/settings/public')
       .then(r => r.json())
       .then(data => {
-        if (data.success && data.data?.brandName) setBrandName(data.data.brandName);
+        if (data.success && data.data) {
+          if (data.data.brandName) setBrandName(data.data.brandName);
+          if (data.data.brandIcon) setBrandIcon(data.data.brandIcon);
+        }
       })
       .catch(() => {});
   }, []);
@@ -60,7 +72,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white transform transition-transform lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-5 border-b border-gray-700">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-sm font-bold">JN</div>
+            <BrandIcon icon={brandIcon} className="w-8 h-8 bg-blue-600 rounded" />
             <div>
               <p className="font-semibold text-sm">{brandName}</p>
               <p className="text-xs text-gray-400">Admin Panel</p>
