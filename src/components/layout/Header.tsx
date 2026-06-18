@@ -6,10 +6,8 @@ import Button from '../ui/Button';
 
 const navLinks = [
   { href: '/', label: 'Beranda' },
-  { href: '/tours', label: 'Paket Wisata' },
   { href: '/destinations', label: 'Destinasi' },
   { href: '/about', label: 'Tentang Kami' },
-  { href: '/contact', label: 'Hubungi Kami' },
 ];
 
 export default function Header() {
