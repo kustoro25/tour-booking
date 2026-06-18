@@ -98,8 +98,18 @@ async function getLatestReviews() {
   return reviews;
 }
 
+async function getFeaturedDestinations() {
+  const destinations = await prisma.destination.findMany({
+    where: { isActive: true },
+    orderBy: [{ highlight: 'desc' }, { sortOrder: 'asc' }],
+    take: 6,
+    include: { _count: { select: { tours: true } } },
+  });
+  return destinations;
+}
+
 export default async function HomePage() {
-  const [tours, reviews] = await Promise.all([getFeaturedTours(), getLatestReviews()]);
+  const [tours, reviews, destinations] = await Promise.all([getFeaturedTours(), getLatestReviews(), getFeaturedDestinations()]);
 
   return (
     <>
@@ -178,6 +188,123 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Destination Showcase */}
+      {destinations.length > 0 && (
+        <section className="py-16 sm:py-20 bg-gradient-to-b from-gray-50 via-white to-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <div className="text-center mb-12">
+              <span className="inline-block text-orange-500 text-sm font-semibold tracking-wide uppercase mb-2">Eksplorasi</span>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Destinasi Impian,{' '}
+                <span className="gradient-text">Satu Klik Saja</span>
+              </h2>
+              <p className="text-gray-500 max-w-2xl mx-auto">
+                Dari pantai eksotis berpasir putih hingga puncak gunung megah berselimut kabut — setiap sudut
+                Nusantara menyimpan cerita yang menunggu untuk kamu buka.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {destinations.map((dest) => {
+                const activities: string[] = parseJsonSafe(dest.activities, []);
+                const tourCount = dest._count?.tours || 0;
+                return (
+                  <Link
+                    key={dest.id}
+                    href={`/destinations/${dest.slug}`}
+                    className="group relative bg-white rounded-2xl overflow-hidden shadow-card hover-lift border border-gray-100"
+                  >
+                    {/* Image */}
+                    <div className="relative h-56 sm:h-64 overflow-hidden">
+                      <img
+                        src={dest.imageUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600'}
+                        alt={dest.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        loading="lazy"
+                      />
+                      {/* Gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                      {/* Rating badge */}
+                      <div className="absolute top-3 right-3 glass backdrop-blur-md rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-sm">
+                        <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <span className="text-sm font-bold text-gray-900">{dest.rating.toFixed(1)}</span>
+                      </div>
+                      {/* Name & Location overlay */}
+                      <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
+                        <div className="flex items-center gap-1.5 text-white/80 text-xs mb-1">
+                          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          {dest.location}
+                        </div>
+                        <h3 className="text-xl sm:text-2xl font-bold text-white leading-tight group-hover:text-orange-300 transition-colors">
+                          {dest.name}
+                        </h3>
+                      </div>
+                      {/* Highlight badge */}
+                      {dest.highlight && (
+                        <span className="absolute top-3 left-3 bg-gradient-to-r from-orange-400 to-orange-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
+                          ⭐ Unggulan
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Card body */}
+                    <div className="p-4 sm:p-5">
+                      {/* Short description */}
+                      <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 mb-3">
+                        {dest.shortDescription || `Temukan keajaiban ${dest.name} — destinasi impian dengan segudang aktivitas seru yang siap kamu jelajahi.`}
+                      </p>
+
+                      {/* Activity tags */}
+                      {activities.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mb-4">
+                          {activities.slice(0, 3).map((act: string, i: number) => (
+                            <span
+                              key={i}
+                              className="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-medium border border-blue-100 hover:bg-blue-100 transition-colors"
+                            >
+                              {act}
+                            </span>
+                          ))}
+                          {activities.length > 3 && (
+                            <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-full">
+                              +{activities.length - 3} lainnya
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Bottom bar */}
+                      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <span className="text-xs text-gray-400">
+                          {tourCount > 0 ? `${tourCount} paket tour tersedia` : 'Segera hadir'}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 group-hover:gap-2 transition-all">
+                          Jelajahi Sekarang
+                          <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="text-center mt-10">
+              <Button href="/destinations" variant="primary" size="lg">
+                Lihat Semua Destinasi
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Featured Tours */}
       <section className="py-16 sm:py-20 bg-gray-50">
