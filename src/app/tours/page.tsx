@@ -85,7 +85,7 @@ export default async function ToursPage({ searchParams }: PageProps) {
   const currentSort = typeof params.sort === 'string' ? params.sort : 'newest';
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-12">
       {/* Header */}
       <div className="text-center mb-10">
         <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">Koleksi Kami</span>
@@ -95,9 +95,9 @@ export default async function ToursPage({ searchParams }: PageProps) {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Filter Sidebar */}
-        <aside className="lg:col-span-1">
+        <aside className="md:col-span-1">
           <TourFilter
             currentDestination={currentDestination}
             currentCategory={currentCategory}
@@ -106,7 +106,7 @@ export default async function ToursPage({ searchParams }: PageProps) {
         </aside>
 
         {/* Tour Grid */}
-        <div className="lg:col-span-3">
+        <div className="md:col-span-3">
           {tours.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-xl shadow-card">
               <div className="text-6xl mb-4">🔍</div>
@@ -114,7 +114,7 @@ export default async function ToursPage({ searchParams }: PageProps) {
               <p className="text-gray-500">Coba ubah filter atau kata kunci pencarian Anda.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {tours.map((tour) => (
                 <Link
                   key={tour.id}

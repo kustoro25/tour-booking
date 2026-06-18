@@ -115,13 +115,13 @@ export default async function HomePage() {
         <div className="absolute bottom-[-15%] left-[-5%] w-[350px] h-[350px] blob bg-white/5 animate-float" style={{ animationDelay: '1s' }} />
         <div className="absolute top-[30%] left-[60%] w-[200px] h-[200px] rounded-full bg-white/5 animate-pulse-soft" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-20 sm:py-28 md:py-36">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm mb-6 animate-fade-in">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse-soft" />
               <span>🔥 Ribuan wisatawan telah berangkat bersama kami</span>
             </div>
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 animate-fade-in-up drop-shadow-lg">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6 animate-fade-in-up drop-shadow-lg">
               Jelajahi Destinasi <span className="text-orange-400">Impian</span> Anda Tanpa Ribet!
             </h1>
             <p className="text-base sm:text-xl text-white/90 mb-8 leading-relaxed animate-fade-in-up animate-delay-200 drop-shadow">
@@ -155,12 +155,12 @@ export default async function HomePage() {
 
       {/* Value Proposition */}
       <section className="py-16 sm:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Mengapa Memilih Kami?</h2>
             <p className="text-gray-500 max-w-2xl mx-auto">Kami hadir untuk memberikan pengalaman booking tour terbaik dengan standar pelayanan premium.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { icon: '💰', title: 'Harga Transparan', desc: 'Tidak ada biaya tersembunyi. Apa yang Anda lihat, itulah yang Anda bayar.', color: 'from-green-500 to-emerald-600', bg: 'bg-green-50', text: 'text-green-600' },
               { icon: '⚡', title: 'Booking Instan', desc: '3 langkah, 1 menit. Invoice langsung terbit dan masuk ke email Anda.', color: 'from-blue-500 to-blue-600', bg: 'bg-blue-50', text: 'text-blue-600' },
@@ -181,7 +181,7 @@ export default async function HomePage() {
 
       {/* Featured Tours */}
       <section className="py-16 sm:py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center mb-12">
             <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">Paket Pilihan</span>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Paket Wisata Unggulan</h2>
@@ -190,7 +190,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {tours.map((tour) => (
               <Link
                 key={tour.id}
@@ -261,7 +261,7 @@ export default async function HomePage() {
       {/* Testimonial Preview */}
       {reviews.length > 0 && (
         <section className="py-16 sm:py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div className="text-center mb-12">
               <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">Testimoni</span>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -271,7 +271,7 @@ export default async function HomePage() {
                 Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka.
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {reviews.map((review) => (
                 <div key={review.id} className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 shadow-card hover-lift border border-gray-100">
                   <div className="text-4xl text-blue-200 mb-2 leading-none">&ldquo;</div>
@@ -297,7 +297,7 @@ export default async function HomePage() {
 
       {/* FAQ Section */}
       <section className="py-16 sm:py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center mb-12">
             <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">Bantuan</span>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -350,8 +350,8 @@ export default async function HomePage() {
         <div className="absolute top-[-30%] right-[-10%] w-[400px] h-[400px] blob bg-white/5 animate-float" />
         <div className="absolute bottom-[-20%] left-[-5%] w-[300px] h-[300px] blob bg-white/5 animate-float" style={{ animationDelay: '1.5s' }} />
         <div className="absolute top-[40%] left-[10%] w-[150px] h-[150px] rounded-full bg-white/5 animate-pulse-soft" />
-        <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4">
+        <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 md:px-8">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
             Siap untuk Petualangan Berikutnya?
           </h2>
           <p className="text-blue-100 mb-8 text-lg max-w-2xl mx-auto">

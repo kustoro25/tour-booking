@@ -57,7 +57,7 @@ export default async function TourDetailPage({ params }: PageProps) {
     : tour.gallery.map((g: { imageUrl: string }) => g.imageUrl);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-6 overflow-x-auto whitespace-nowrap pb-1">
         <a href="/" className="hover:text-blue-600">Beranda</a>
@@ -67,9 +67,9 @@ export default async function TourDetailPage({ params }: PageProps) {
         <span className="text-gray-800 truncate max-w-[200px] sm:max-w-none inline-block align-bottom">{tour.name}</span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="md:col-span-2 space-y-8">
           {/* Image Gallery */}
           <div className="bg-white rounded-xl overflow-hidden shadow-sm">
             {allImages.length > 0 ? (
@@ -228,8 +228,8 @@ export default async function TourDetailPage({ params }: PageProps) {
         </div>
 
         {/* Sidebar - Booking Card */}
-        <div className="lg:col-span-1">
-          <div className="space-y-4 sm:space-y-6 lg:sticky lg:top-20">
+        <div className="md:col-span-1">
+          <div className="space-y-4 sm:space-y-6 md:sticky md:top-20">
             {/* Price Card */}
             <div className="bg-white rounded-xl shadow-card p-6 border border-gray-100">
               {tour.discount > 0 && (

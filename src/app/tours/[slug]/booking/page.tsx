@@ -156,7 +156,7 @@ export default function BookingPage() {
   const grandTotal = total - total * (tour.discount / 100) + uniqueCode;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
       {/* Booking Steps Progress */}
       {step < 4 && (
         <div className="mb-8">

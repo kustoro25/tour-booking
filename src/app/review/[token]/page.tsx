@@ -110,7 +110,7 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 md:px-8 py-12">
       <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 text-center">
         Bagaimana Pengalaman Liburan Anda?
       </h1>

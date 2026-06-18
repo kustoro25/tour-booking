@@ -36,7 +36,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-12">
       <div className="text-center mb-12">
         <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">Kontak</span>
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Hubungi Kami</h1>
@@ -45,9 +45,9 @@ export default function ContactPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
         {/* Contact Info */}
-        <div className="lg:col-span-1 space-y-4">
+        <div className="md:col-span-1 space-y-4">
           {[
             { icon: '📞', title: 'WhatsApp', detail: '+62 812-3456-7890', color: 'from-green-500 to-green-600', bg: 'bg-green-50' },
             { icon: '📧', title: 'Email', detail: 'info@jelajahnusantara.com', color: 'from-blue-500 to-blue-600', bg: 'bg-blue-50' },
@@ -69,7 +69,7 @@ export default function ContactPage() {
         </div>
 
         {/* Contact Form */}
-        <div className="lg:col-span-2">
+        <div className="md:col-span-2">
           <div className="bg-white rounded-xl shadow-card p-5 sm:p-8 border border-gray-100">
             {success ? (
               <div className="text-center py-12">

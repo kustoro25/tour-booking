@@ -31,7 +31,7 @@ export default async function TestimonialsPage() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-12">
       <div className="text-center mb-12">
         <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">Testimoni</span>
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -69,7 +69,7 @@ export default async function TestimonialsPage() {
 
       {/* Reviews Grid */}
       {reviews.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {reviews.map((review) => (
             <div key={review.id} className="bg-white rounded-xl shadow-card p-6 border border-gray-100 hover-lift">
               <div className="text-4xl text-blue-200 mb-2 leading-none">&ldquo;</div>

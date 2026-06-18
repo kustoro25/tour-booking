@@ -18,7 +18,7 @@ export default async function DestinationsPage() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-12">
       {/* Hero Header */}
       <div className="text-center mb-12">
         <span className="inline-block text-teal-600 text-sm font-semibold tracking-wide uppercase mb-2">Jelajahi</span>
@@ -38,7 +38,7 @@ export default async function DestinationsPage() {
             <span className="w-8 h-8 bg-yellow-100 text-yellow-600 rounded-lg flex items-center justify-center text-sm">⭐</span>
             Destinasi Unggulan
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {destinations
               .filter((d) => d.highlight)
               .map((dest) => (
@@ -59,7 +59,7 @@ export default async function DestinationsPage() {
             <p className="text-gray-500">Belum ada destinasi yang tersedia.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {destinations.map((dest) => (
               <DestinationCard key={dest.id} destination={dest} />
             ))}

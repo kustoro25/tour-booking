@@ -57,17 +57,17 @@ export default async function DestinationDetailPage({
   return (
     <div>
       {/* Hero Banner */}
-      <div className="relative h-56 sm:h-80 lg:h-96 overflow-hidden">
+      <div className="relative h-56 sm:h-80 md:h-96 overflow-hidden">
         <img
           src={destination.imageUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200'}
           alt={destination.name}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 lg:p-10">
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 md:p-10">
           <div className="max-w-7xl mx-auto">
             <p className="text-blue-200 text-xs sm:text-sm mb-1 sm:mb-2">{destination.location}</p>
-            <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3">
+            <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3">
               {destination.name}
             </h1>
             <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
@@ -98,10 +98,10 @@ export default async function DestinationDetailPage({
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="md:col-span-2 space-y-8">
             {/* Description */}
             <div className="bg-white rounded-xl shadow-sm p-6 sm:p-8">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Tentang {destination.name}</h2>
@@ -151,7 +151,7 @@ export default async function DestinationDetailPage({
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6 lg:sticky lg:top-20">
+          <div className="space-y-6 md:sticky md:top-20">
             {/* Quick Info */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="font-semibold text-gray-900 mb-4">Informasi Destinasi</h3>
