@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface GalleryPhoto {
   url: string;
@@ -38,11 +39,12 @@ export default function GalleryCarousel({ photos }: GalleryCarouselProps) {
               className="flex-shrink-0 w-56 sm:w-64 md:w-72 mx-2 sm:mx-3 group/photo"
             >
               <div className="relative h-40 sm:h-48 rounded-xl overflow-hidden shadow-md transition-all duration-300 group-hover/photo:shadow-xl group-hover/photo:ring-2 group-hover/photo:ring-blue-400 group-hover/photo:ring-offset-2 group-hover/photo:ring-offset-white">
-                <img
+                <Image
                   src={photo.url}
                   alt={photo.alt}
-                  className="w-full h-full object-cover group-hover/photo:scale-110 transition-transform duration-500"
-                  loading="lazy"
+                  fill
+                  className="object-cover group-hover/photo:scale-110 transition-transform duration-500"
+                  sizes="(max-width: 640px) 224px, (max-width: 768px) 256px, 288px"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-3">
@@ -78,11 +80,12 @@ export default function GalleryCarousel({ photos }: GalleryCarouselProps) {
               className="flex-shrink-0 w-56 sm:w-64 md:w-72 mx-2 sm:mx-3 group/photo"
             >
               <div className="relative h-40 sm:h-48 rounded-xl overflow-hidden shadow-md transition-all duration-300 group-hover/photo:shadow-xl group-hover/photo:ring-2 group-hover/photo:ring-blue-400 group-hover/photo:ring-offset-2 group-hover/photo:ring-offset-white">
-                <img
+                <Image
                   src={photo.url}
                   alt={photo.alt}
-                  className="w-full h-full object-cover group-hover/photo:scale-110 transition-transform duration-500"
-                  loading="lazy"
+                  fill
+                  className="object-cover group-hover/photo:scale-110 transition-transform duration-500"
+                  sizes="(max-width: 640px) 224px, (max-width: 768px) 256px, 288px"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-3">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useToast } from '@/components/ui/Toast';
 
 interface GalleryImage {
@@ -201,8 +202,8 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
                   <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">Cover</span>
                   <span className="text-xs text-gray-500">Foto sampul paket tour</span>
                 </div>
-                <div className="w-full h-48 rounded-lg overflow-hidden bg-gray-200">
-                  <img src={coverImg} alt="Cover" className="w-full h-full object-cover"
+                <div className="w-full h-48 rounded-lg overflow-hidden bg-gray-200 relative">
+                  <Image src={coverImg} alt="Cover" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                 </div>
               </div>
@@ -226,11 +227,13 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
                   </div>
 
                   {/* Image */}
-                  <div className="aspect-[4/3]">
-                    <img
+                  <div className="aspect-[4/3] relative">
+                    <Image
                       src={img.imageUrl}
                       alt={img.altText || 'Gallery'}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150"><rect fill="%23f3f4f6" width="200" height="150"/><text x="100" y="80" text-anchor="middle" fill="%239ca3af" font-size="14">No Image</text></svg>';
                       }}

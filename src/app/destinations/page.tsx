@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { parseJsonSafe } from '@/lib/utils';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Metadata } from 'next';
 import Pagination from '@/components/ui/Pagination';
 
@@ -119,11 +120,12 @@ function DestinationCard({
     >
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
-        <img
+        <Image
           src={destination.imageUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600'}
           alt={destination.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         {featured && (

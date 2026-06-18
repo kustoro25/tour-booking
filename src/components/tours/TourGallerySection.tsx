@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import GalleryLightbox from './GalleryLightbox';
 
 interface TourGallerySectionProps {
@@ -36,12 +37,14 @@ export default function TourGallerySection({ images, tourName }: TourGallerySect
             <button
               key={i}
               onClick={() => openLightbox(i)}
-              className="min-w-[85vw] snap-center flex-shrink-0 relative group cursor-zoom-in"
+              className="min-w-[85vw] h-56 snap-center flex-shrink-0 relative group cursor-zoom-in"
             >
-              <img
+              <Image
                 src={img.url}
                 alt={img.alt}
-                className="w-full h-56 object-cover"
+                fill
+                className="object-cover"
+                sizes="85vw"
               />
               {/* Tap indicator */}
               <div className="absolute inset-0 bg-black/0 group-active:bg-black/10 transition-colors flex items-center justify-center">
@@ -64,10 +67,13 @@ export default function TourGallerySection({ images, tourName }: TourGallerySect
             onClick={() => openLightbox(0)}
             className="col-span-2 relative group cursor-zoom-in overflow-hidden"
           >
-            <img
+            <Image
               src={images[0].url}
               alt={images[0].alt}
-              className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-500"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              priority
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
               <span className="text-white font-semibold flex items-center gap-2 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-xl">
@@ -86,10 +92,12 @@ export default function TourGallerySection({ images, tourName }: TourGallerySect
               onClick={() => openLightbox(i + 1)}
               className="relative group cursor-zoom-in overflow-hidden"
             >
-              <img
+              <Image
                 src={img.url}
                 alt={img.alt}
-                className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-500"
+                sizes="(max-width: 1024px) 50vw, 25vw"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-all duration-300 flex items-center justify-center">
                 <svg

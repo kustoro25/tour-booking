@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { TourCategoryLabels } from '@/types';
 import type { TourCategory } from '@/types';
 
@@ -167,7 +168,7 @@ export default function AdminToursPage() {
             <div key={tour.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow group">
               <div className="relative h-40 bg-gray-200 overflow-hidden">
                 {tour.coverImg ? (
-                  <img src={tour.coverImg} alt={tour.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <Image src={tour.coverImg} alt={tour.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-3xl">🏝️</div>
                 )}

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import { formatCurrency, formatDate, parseJsonSafe } from '@/lib/utils';
 import type { ItineraryDay } from '@/types';
@@ -243,11 +244,12 @@ export default async function HomePage() {
                   >
                     {/* Image */}
                     <div className="relative h-56 sm:h-64 overflow-hidden">
-                      <img
+                      <Image
                         src={dest.imageUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600'}
                         alt={dest.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                        loading="lazy"
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       />
                       {/* Gradient overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -321,10 +323,12 @@ export default async function HomePage() {
               >
                 <div className="h-48 bg-gray-200 relative overflow-hidden">
                   {tour.coverImg ? (
-                    <img
+                    <Image
                       src={tour.coverImg}
                       alt={tour.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-teal-400">

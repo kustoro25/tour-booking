@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function EditDestinationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -224,11 +225,15 @@ export default function EditDestinationPage({ params }: { params: Promise<{ id: 
               required
             />
             {form.imageUrl && (
-              <img
-                src={form.imageUrl}
-                alt="Preview"
-                className="mt-2 w-40 h-28 object-cover rounded-lg border"
-              />
+              <div className="mt-2 w-40 h-28 relative rounded-lg border overflow-hidden">
+                <Image
+                  src={form.imageUrl}
+                  alt="Preview"
+                  fill
+                  className="object-cover"
+                  sizes="160px"
+                />
+              </div>
             )}
           </div>
 

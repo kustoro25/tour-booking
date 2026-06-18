@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Image from 'next/image';
 
 interface GalleryLightboxProps {
   images: { url: string; alt: string }[];
@@ -150,17 +151,17 @@ export default function GalleryLightbox({
         )}
 
         {/* Image */}
-        <img
-          src={currentImage.url}
-          alt={currentImage.alt}
-          onLoad={() => setLoaded(true)}
-          className={`max-w-full transition-all duration-300 select-none ${
-            zoom
-              ? 'max-h-none cursor-zoom-out scale-150'
-              : 'max-h-[75vh] sm:max-h-[80vh] object-contain cursor-zoom-in rounded-lg'
-          } ${loaded ? 'opacity-100' : 'opacity-0'}`}
-          draggable={false}
-        />
+        <div className={`relative max-w-[90vw] transition-all duration-300 ${zoom ? 'overflow-auto' : 'h-full'}`} style={{ aspectRatio: zoom ? 'auto' : undefined }}>
+          <Image
+            src={currentImage.url}
+            alt={currentImage.alt}
+            fill
+            onLoad={() => setLoaded(true)}
+            className={`select-none ${zoom ? 'object-cover' : 'object-contain'} cursor-${zoom ? 'zoom-out' : 'zoom-in'} rounded-lg ${loaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
+            sizes="90vw"
+            unoptimized
+          />
+        </div>
 
         {/* Next arrow */}
         {images.length > 1 && (
@@ -190,17 +191,19 @@ export default function GalleryLightbox({
               <button
                 key={i}
                 onClick={() => goTo(i)}
-                className={`flex-shrink-0 w-16 h-12 sm:w-20 sm:h-14 rounded-lg overflow-hidden border-2 transition-all duration-200 snap-center ${
+                className={`flex-shrink-0 w-16 h-12 sm:w-20 sm:h-14 rounded-lg overflow-hidden border-2 transition-all duration-200 snap-center relative ${
                   i === currentIndex
                     ? 'border-white shadow-lg scale-105'
                     : 'border-white/20 opacity-50 hover:opacity-80 hover:border-white/50'
                 }`}
               >
-                <img
+                <Image
                   src={img.url}
                   alt={img.alt}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
+                  fill
+                  className="object-cover"
+                  sizes="80px"
+                  unoptimized
                 />
               </button>
             ))}

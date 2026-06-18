@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function AdminDestinationsPage() {
   const [destinations, setDestinations] = useState<Record<string, unknown>[]>([]);
@@ -82,12 +83,14 @@ export default function AdminDestinationsPage() {
                 <tr key={dest.id as string} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0 relative">
                         {dest.imageUrl ? (
-                          <img
+                          <Image
                             src={dest.imageUrl as string}
                             alt={dest.name as string}
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover"
+                            sizes="40px"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">No img</div>

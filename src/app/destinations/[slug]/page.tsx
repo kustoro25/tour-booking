@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { parseJsonSafe, formatCurrency } from '@/lib/utils';
 import Link from 'next/link';
+import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import type { Metadata } from 'next';
 
@@ -58,10 +59,13 @@ export default async function DestinationDetailPage({
     <div>
       {/* Hero Banner */}
       <div className="relative h-56 sm:h-80 md:h-96 overflow-hidden">
-        <img
+        <Image
           src={destination.imageUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200'}
           alt={destination.name}
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 md:p-10">
@@ -117,12 +121,13 @@ export default async function DestinationDetailPage({
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Galeri Foto</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {gallery.map((url, i) => (
-                    <div key={i} className="aspect-[4/3] rounded-lg overflow-hidden">
-                      <img
+                    <div key={i} className="aspect-[4/3] rounded-lg overflow-hidden relative">
+                      <Image
                         src={url}
                         alt={`${destination.name} gallery ${i + 1}`}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
+                        fill
+                        className="object-cover hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 640px) 50vw, 33vw"
                       />
                     </div>
                   ))}
@@ -222,13 +227,14 @@ export default async function DestinationDetailPage({
                       href={`/tours/${tour.slug}`}
                       className="flex gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors group"
                     >
-                      <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-200">
+                      <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-200 relative">
                         {tour.coverImg && (
-                          <img
+                          <Image
                             src={tour.coverImg}
                             alt={tour.name}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
+                            fill
+                            className="object-cover"
+                            sizes="64px"
                           />
                         )}
                       </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function CreateDestinationPage() {
   const router = useRouter();
@@ -170,11 +171,15 @@ export default function CreateDestinationPage() {
               required
             />
             {form.imageUrl && (
-              <img
-                src={form.imageUrl}
-                alt="Preview"
-                className="mt-2 w-40 h-28 object-cover rounded-lg border"
-              />
+              <div className="mt-2 w-40 h-28 relative rounded-lg border overflow-hidden">
+                <Image
+                  src={form.imageUrl}
+                  alt="Preview"
+                  fill
+                  className="object-cover"
+                  sizes="160px"
+                />
+              </div>
             )}
           </div>
 

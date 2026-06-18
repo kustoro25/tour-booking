@@ -3,6 +3,7 @@ import { formatCurrency } from '@/lib/utils';
 import { TourCategoryLabels } from '@/types';
 import type { TourCategory } from '@/types';
 import Link from 'next/link';
+import Image from 'next/image';
 import StarRating from '@/components/ui/StarRating';
 import TourFilter from '@/components/tours/TourFilter';
 import Pagination from '@/components/ui/Pagination';
@@ -143,7 +144,7 @@ export default async function ToursPage({ searchParams }: PageProps) {
                   >
                     <div className="h-44 bg-gray-200 relative overflow-hidden">
                       {tour.coverImg ? (
-                        <img src={tour.coverImg} alt={tour.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                        <Image src={tour.coverImg} alt={tour.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-teal-400">
                           <span className="text-white text-3xl">🏝️</span>

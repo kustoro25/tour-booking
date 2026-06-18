@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { TourCategoryLabels } from '@/types';
 import type { TourCategory, ItineraryDay } from '@/types';
 import { useToast } from '@/components/ui/Toast';
@@ -194,8 +195,8 @@ export default function CreateTourPage() {
                     placeholder="https://example.com/image.jpg" />
                 </div>
                 {imgPreview && (
-                  <div className="w-24 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
-                    <img src={imgPreview} alt="Preview" className="w-full h-full object-cover"
+                  <div className="w-24 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0 relative">
+                    <Image src={imgPreview} alt="Preview" fill className="object-cover" sizes="96px"
                       onError={() => setImgPreview('')} />
                   </div>
                 )}
