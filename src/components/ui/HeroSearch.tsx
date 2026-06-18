@@ -49,7 +49,7 @@ export default function HeroSearch() {
     : SUGGESTIONS;
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-xl">
+    <div ref={containerRef} className="relative w-full max-w-xl z-30">
       <div
         className={`
           flex items-center bg-white rounded-2xl shadow-glow-blue overflow-hidden
