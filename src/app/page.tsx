@@ -187,8 +187,32 @@ async function getCmsGallery() {
   };
 }
 
+async function getCmsTours() {
+  try {
+    const page = await prisma.page.findUnique({ where: { slug: 'home-tours' } });
+    if (page?.content) return JSON.parse(page.content);
+  } catch { /* fallback */ }
+  return {
+    label: 'Paket Pilihan',
+    heading: 'Paket Wisata Unggulan',
+    subheading: 'Temukan paket tour terbaik kami ke destinasi paling menakjubkan di Indonesia',
+  };
+}
+
+async function getCmsDestinations() {
+  try {
+    const page = await prisma.page.findUnique({ where: { slug: 'home-destinations' } });
+    if (page?.content) return JSON.parse(page.content);
+  } catch { /* fallback */ }
+  return {
+    label: 'Eksplorasi',
+    heading: 'Destinasi Impian,',
+    subheading: 'Dari pantai eksotis berpasir putih hingga puncak gunung megah berselimut kabut — setiap sudut Nusantara menyimpan cerita yang menunggu untuk kamu buka.',
+  };
+}
+
 export default async function HomePage() {
-  const [tours, reviews, destinations, galleryPhotos, faqs, hero, valueData, ctaData, galleryData] = await Promise.all([
+  const [tours, reviews, destinations, galleryPhotos, faqs, hero, valueData, ctaData, galleryData, toursData, destinationsData] = await Promise.all([
     getFeaturedTours(),
     getLatestReviews(),
     getFeaturedDestinations(),
@@ -198,6 +222,8 @@ export default async function HomePage() {
     getCmsValue(),
     getCmsCta(),
     getCmsGallery(),
+    getCmsTours(),
+    getCmsDestinations(),
   ]);
 
   const heroStats = hero.stats || [];
@@ -281,14 +307,13 @@ export default async function HomePage() {
         <section className="py-16 sm:py-20 bg-gradient-to-b from-gray-50 via-white to-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div className="text-center mb-12">
-              <span className="inline-block text-orange-500 text-sm font-semibold tracking-wide uppercase mb-2">Eksplorasi</span>
+              <span className="inline-block text-orange-500 text-sm font-semibold tracking-wide uppercase mb-2">{destinationsData.label || 'Eksplorasi'}</span>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Destinasi Impian,{' '}
+                {destinationsData.heading || 'Destinasi Impian,'}{' '}
                 <span className="gradient-text">Satu Klik Saja</span>
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
-                Dari pantai eksotis berpasir putih hingga puncak gunung megah berselimut kabut — setiap sudut
-                Nusantara menyimpan cerita yang menunggu untuk kamu buka.
+                {destinationsData.subheading || 'Dari pantai eksotis berpasir putih hingga puncak gunung megah berselimut kabut — setiap sudut Nusantara menyimpan cerita yang menunggu untuk kamu buka.'}
               </p>
             </div>
 
@@ -365,10 +390,10 @@ export default async function HomePage() {
       <section className="py-16 sm:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">Paket Pilihan</span>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Paket Wisata Unggulan</h2>
+            <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">{toursData.label || 'Paket Pilihan'}</span>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">{toursData.heading || 'Paket Wisata Unggulan'}</h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Temukan paket tour terbaik kami ke destinasi paling menakjubkan di Indonesia
+              {toursData.subheading || 'Temukan paket tour terbaik kami ke destinasi paling menakjubkan di Indonesia'}
             </p>
           </div>
 

@@ -241,6 +241,16 @@ const defaultData: Record<string, PageData> = {
     heading: 'Sekilas Keindahan Nusantara',
     subheading: 'Dari sabana luas di timur hingga pantai eksotis di barat — lihat sendiri pesona destinasi impianmu.',
   },
+  'home-tours': {
+    label: 'Paket Pilihan',
+    heading: 'Paket Wisata Unggulan',
+    subheading: 'Temukan paket tour terbaik kami ke destinasi paling menakjubkan di Indonesia',
+  },
+  'home-destinations': {
+    label: 'Eksplorasi',
+    heading: 'Destinasi Impian, Satu Klik Saja',
+    subheading: 'Dari pantai eksotis berpasir putih hingga puncak gunung megah berselimut kabut — setiap sudut Nusantara menyimpan cerita yang menunggu untuk kamu buka.',
+  },
 };
 
 export default function AdminPageEditPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -263,7 +273,9 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
   const isFooter = slug === 'footer';
   const isCta = slug === 'home-cta';
   const isGallery = slug === 'home-gallery';
-  const isGeneric = !isHero && !isValue && !isFaq && !isStats && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta && !isGallery;
+  const isTours = slug === 'home-tours';
+  const isDestinations = slug === 'home-destinations';
+  const isGeneric = !isHero && !isValue && !isFaq && !isStats && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta && !isGallery && !isTours && !isDestinations;
 
   useEffect(() => { fetchPage(); }, [slug]);
 
@@ -688,6 +700,58 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                 <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                   placeholder="Dari sabana luas di timur..." />
+              </div>
+            </div>
+          </SectionCard>
+        )}
+
+        {/* ═══════════ HOME - TOURS ═══════════ */}
+        {isTours && (
+          <SectionCard icon="🏝️" title="Paket Wisata Unggulan Section">
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Label (atas)</label>
+                <input type="text" value={data.label || ''} onChange={e => update('label', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Paket Pilihan" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Heading</label>
+                <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Paket Wisata Unggulan" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Subheading</label>
+                <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Temukan paket tour terbaik..." />
+              </div>
+            </div>
+          </SectionCard>
+        )}
+
+        {/* ═══════════ HOME - DESTINATIONS ═══════════ */}
+        {isDestinations && (
+          <SectionCard icon="🗺️" title="Destinasi Impian Section">
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Label (atas)</label>
+                <input type="text" value={data.label || ''} onChange={e => update('label', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Eksplorasi" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Heading (bagian pertama)</label>
+                <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Destinasi Impian," />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Subheading</label>
+                <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Dari pantai eksotis..." />
               </div>
             </div>
           </SectionCard>

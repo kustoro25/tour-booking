@@ -19,6 +19,8 @@ const pageSlugs = [
   { slug: 'home-faq', title: 'Home - FAQ Section' },
   { slug: 'home-cta', title: 'Home - CTA (Siap Berpetualang?)' },
   { slug: 'home-gallery', title: 'Home - Jelajah Visual' },
+  { slug: 'home-tours', title: 'Home - Paket Wisata Unggulan' },
+  { slug: 'home-destinations', title: 'Home - Destinasi Impian' },
   { slug: 'about', title: 'About Us' },
   { slug: 'contact', title: 'Contact Us' },
   { slug: 'testimonials', title: 'Testimonials Header' },
