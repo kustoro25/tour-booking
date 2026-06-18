@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { TourCategoryLabels } from '@/types';
 import type { TourCategory, ItineraryDay } from '@/types';
 import { useToast } from '@/components/ui/Toast';
+import ImageUpload from '@/components/ui/ImageUpload';
 
 interface DestinationOption {
   id: string;
@@ -28,7 +28,6 @@ export default function CreateTourPage() {
   const [excludes, setExcludes] = useState<string[]>(['']);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [imgPreview, setImgPreview] = useState('');
 
   useEffect(() => {
     fetch('/api/admin/destinations')
@@ -43,7 +42,6 @@ export default function CreateTourPage() {
 
   const updateField = (field: string, value: string) => {
     setForm({ ...form, [field]: value });
-    if (field === 'coverImg') setImgPreview(value);
   };
 
   const handleDestinationSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -187,20 +185,12 @@ export default function CreateTourPage() {
                 placeholder="3 Hari 2 Malam" />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">URL Foto Sampul</label>
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <input type="text" value={form.coverImg} onChange={e => updateField('coverImg', e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"
-                    placeholder="https://example.com/image.jpg" />
-                </div>
-                {imgPreview && (
-                  <div className="w-24 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0 relative">
-                    <Image src={imgPreview} alt="Preview" fill className="object-cover" sizes="96px"
-                      onError={() => setImgPreview('')} />
-                  </div>
-                )}
-              </div>
+              <ImageUpload
+                value={form.coverImg}
+                onChange={(url) => updateField('coverImg', url)}
+                label="Foto Sampul"
+                folder="tour-booking/covers"
+              />
             </div>
           </div>
         </div>

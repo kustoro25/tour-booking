@@ -3,8 +3,8 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Skeleton } from '@/components/ui/Skeleton';
+import ImageUpload from '@/components/ui/ImageUpload';
 
 export default function EditDestinationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -223,25 +223,12 @@ export default function EditDestinationPage({ params }: { params: Promise<{ id: 
           <h2 className="font-semibold text-gray-900">Gambar</h2>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">URL Gambar Utama *</label>
-            <input
-              type="url"
+            <ImageUpload
               value={form.imageUrl}
-              onChange={(e) => updateField('imageUrl', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              required
+              onChange={(url) => updateField('imageUrl', url)}
+              label="Gambar Utama"
+              folder="tour-booking/destinations"
             />
-            {form.imageUrl && (
-              <div className="mt-2 w-40 h-28 relative rounded-lg border overflow-hidden">
-                <Image
-                  src={form.imageUrl}
-                  alt="Preview"
-                  fill
-                  className="object-cover"
-                  sizes="160px"
-                />
-              </div>
-            )}
           </div>
 
           <div>

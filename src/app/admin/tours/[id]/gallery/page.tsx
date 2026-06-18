@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useToast } from '@/components/ui/Toast';
 import { Skeleton } from '@/components/ui/Skeleton';
+import ImageUpload from '@/components/ui/ImageUpload';
 
 interface GalleryImage {
   id: string;
@@ -163,14 +164,11 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">URL Gambar *</label>
-            <input
-              type="url"
+            <ImageUpload
               value={newUrl}
-              onChange={e => setNewUrl(e.target.value)}
-              placeholder="https://example.com/image.jpg"
-              className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"
-              required
+              onChange={setNewUrl}
+              label="URL Gambar *"
+              folder="tour-booking/gallery"
             />
           </div>
           <div>

@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { TourCategoryLabels } from '@/types';
 import type { TourCategory, ItineraryDay } from '@/types';
 import { useToast } from '@/components/ui/Toast';
 import { Skeleton } from '@/components/ui/Skeleton';
+import ImageUpload from '@/components/ui/ImageUpload';
 
 interface DestinationOption {
   id: string;
@@ -33,7 +33,6 @@ export default function EditTourPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [imgPreview, setImgPreview] = useState('');
 
   useEffect(() => {
     fetch('/api/admin/destinations')
@@ -54,7 +53,7 @@ export default function EditTourPage() {
             discount: String(t.discount), maxSlot: String(t.maxSlot), minPax: String(t.minPax),
             coverImg: t.coverImg || '', terms: t.terms || '', isActive: t.isActive,
           });
-          if (t.coverImg) setImgPreview(t.coverImg);
+          if (t.coverImg) { /* preview handled by ImageUpload */ }
           const it = JSON.parse(t.itinerary || '[]');
           setItinerary(it.length > 0 ? it : [{ day: 1, title: '', description: '' }]);
           const inc = JSON.parse(t.includes || '[]');
@@ -68,7 +67,6 @@ export default function EditTourPage() {
 
   const updateField = (field: string, value: string | boolean) => {
     setForm({ ...form, [field]: value } as typeof form);
-    if (field === 'coverImg') setImgPreview(value as string);
   };
 
   const handleDestinationSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -225,19 +223,12 @@ export default function EditTourPage() {
               </select>
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">URL Foto Sampul</label>
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <input type="text" value={form.coverImg} onChange={e => updateField('coverImg', e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"
-                    placeholder="https://example.com/image.jpg" />
-                </div>
-                {imgPreview && (
-                  <div className="w-24 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0 relative">
-                    <Image src={imgPreview} alt="Preview" fill className="object-cover" sizes="96px" onError={() => setImgPreview('')} />
-                  </div>
-                )}
-              </div>
+              <ImageUpload
+                value={form.coverImg}
+                onChange={(url) => updateField('coverImg', url)}
+                label="Foto Sampul"
+                folder="tour-booking/covers"
+              />
             </div>
           </div>
         </div>
