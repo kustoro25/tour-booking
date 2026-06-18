@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ToastProvider } from '@/components/ui/Toast';
 import WhatsAppButton from '@/components/ui/WhatsAppButton';
+import ScrollToTop from '@/components/ui/ScrollToTop';
 import PublicLayout from '@/components/layout/PublicLayout';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -28,6 +29,7 @@ export default function RootLayout({
         <ToastProvider>
           <PublicLayout>{children}</PublicLayout>
           <WhatsAppButton />
+          <ScrollToTop />
         </ToastProvider>
       </body>
     </html>
