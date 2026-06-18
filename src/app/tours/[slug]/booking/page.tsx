@@ -37,6 +37,11 @@ export default function BookingPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [bookingResult, setBookingResult] = useState<{ invoiceNo: string } | null>(null);
+  const [uniqueCode, setUniqueCode] = useState(0);
+
+  useEffect(() => {
+    setUniqueCode(Math.floor(100 + Math.random() * 900));
+  }, []);
 
   useEffect(() => {
     fetch(`/api/tours/${slug}`)
@@ -147,12 +152,6 @@ export default function BookingPage() {
   }
 
   const total = tour.priceAdult * formData.adults + tour.priceChild * formData.children;
-  const [uniqueCode, setUniqueCode] = useState(0);
-
-  useEffect(() => {
-    setUniqueCode(Math.floor(100 + Math.random() * 900));
-  }, []);
-
   const grandTotal = total - total * (tour.discount / 100) + uniqueCode;
 
   return (
