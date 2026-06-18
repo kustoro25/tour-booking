@@ -175,8 +175,20 @@ async function getCmsCta() {
   };
 }
 
+async function getCmsGallery() {
+  try {
+    const page = await prisma.page.findUnique({ where: { slug: 'home-gallery' } });
+    if (page?.content) return JSON.parse(page.content);
+  } catch { /* fallback */ }
+  return {
+    label: 'Jelajah Visual',
+    heading: 'Sekilas Keindahan Nusantara',
+    subheading: 'Dari sabana luas di timur hingga pantai eksotis di barat — lihat sendiri pesona destinasi impianmu.',
+  };
+}
+
 export default async function HomePage() {
-  const [tours, reviews, destinations, galleryPhotos, faqs, hero, valueData, ctaData] = await Promise.all([
+  const [tours, reviews, destinations, galleryPhotos, faqs, hero, valueData, ctaData, galleryData] = await Promise.all([
     getFeaturedTours(),
     getLatestReviews(),
     getFeaturedDestinations(),
@@ -185,6 +197,7 @@ export default async function HomePage() {
     getCmsHero(),
     getCmsValue(),
     getCmsCta(),
+    getCmsGallery(),
   ]);
 
   const heroStats = hero.stats || [];
@@ -434,12 +447,12 @@ export default async function HomePage() {
         <section className="py-16 sm:py-20 bg-white overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mb-10">
             <div className="text-center">
-              <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">Jelajah Visual</span>
+              <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">{galleryData.label || 'Jelajah Visual'}</span>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Sekilas Keindahan Nusantara
+                {galleryData.heading || 'Sekilas Keindahan Nusantara'}
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
-                Dari sabana luas di timur hingga pantai eksotis di barat — lihat sendiri pesona destinasi impianmu.
+                {galleryData.subheading || 'Dari sabana luas di timur hingga pantai eksotis di barat — lihat sendiri pesona destinasi impianmu.'}
               </p>
             </div>
           </div>

@@ -43,13 +43,15 @@ type PageData = {
   whyUs?: { icon: string; title: string; desc: string; color: string }[];
   // contact
   infoCards?: { icon: string; title: string; detail: string; color: string }[];
+  // gallery
+  label?: string;
   // footer
   text?: string;
   copyright?: string;
   socialLinks?: { platform: string; url: string; icon: string }[];
   // generic fallback
   body?: string;
-  [key: string]: string | number | boolean | object | undefined | null | string[] | Record<string, unknown>[];
+  [key: string]: string | number | object | undefined | null | string[] | Record<string, unknown>[];
 };
 
 const defaultData: Record<string, PageData> = {
@@ -234,6 +236,11 @@ const defaultData: Record<string, PageData> = {
     cta2Text: 'Hubungi Kami',
     cta2Link: '/contact',
   },
+  'home-gallery': {
+    label: 'Jelajah Visual',
+    heading: 'Sekilas Keindahan Nusantara',
+    subheading: 'Dari sabana luas di timur hingga pantai eksotis di barat — lihat sendiri pesona destinasi impianmu.',
+  },
 };
 
 export default function AdminPageEditPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -255,7 +262,8 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
   const isTestimonials = slug === 'testimonials';
   const isFooter = slug === 'footer';
   const isCta = slug === 'home-cta';
-  const isGeneric = !isHero && !isValue && !isFaq && !isStats && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta;
+  const isGallery = slug === 'home-gallery';
+  const isGeneric = !isHero && !isValue && !isFaq && !isStats && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta && !isGallery;
 
   useEffect(() => { fetchPage(); }, [slug]);
 
@@ -278,7 +286,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
     finally { setLoading(false); }
   };
 
-  const update = (key: string, value: string | number | boolean | object | null | undefined | string[] | Record<string, unknown>[]) => setData({ ...data, [key]: value });
+  const update = (key: string, value: string | number | object | null | undefined | string[] | Record<string, unknown>[]) => setData({ ...data, [key]: value });
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -657,6 +665,32 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
               </div>
             </SectionCard>
           </>
+        )}
+
+        {/* ═══════════ HOME - GALLERY ═══════════ */}
+        {isGallery && (
+          <SectionCard icon="🖼️" title="Jelajah Visual Section">
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Label (atas)</label>
+                <input type="text" value={data.label || ''} onChange={e => update('label', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Jelajah Visual" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Heading</label>
+                <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Sekilas Keindahan Nusantara" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Subheading</label>
+                <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Dari sabana luas di timur..." />
+              </div>
+            </div>
+          </SectionCard>
         )}
 
         {/* ═══════════ Generic fallback ═══════════ */}
