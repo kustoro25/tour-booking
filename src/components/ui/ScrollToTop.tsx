@@ -25,7 +25,7 @@ export default function ScrollToTop() {
       onClick={scrollToTop}
       aria-label="Kembali ke atas"
       className={`
-        fixed bottom-6 right-6 z-50
+        fixed bottom-24 right-6 z-50
         w-11 h-11 sm:w-12 sm:h-12
         rounded-full
         bg-gradient-to-br from-blue-600 to-teal-600
