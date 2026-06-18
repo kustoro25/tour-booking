@@ -92,8 +92,96 @@ const defaultData: Record<string, PageData> = {
       { num: '4.9', label: 'Rating ★' },
     ],
   },
-  'privacy': { html: '' },
-  'terms': { html: '' },
+  'privacy': {
+    html: `<h2>1. Informasi yang Kami Kumpulkan</h2>
+<p>Saat Anda menggunakan layanan Jelajah Nusantara Tour, kami dapat mengumpulkan informasi berikut:</p>
+<ul><li><strong>Data Pribadi:</strong> Nama lengkap, alamat email, nomor telepon, dan informasi kontak lainnya yang Anda berikan saat booking.</li>
+<li><strong>Data Pemesanan:</strong> Detail paket tour yang dipesan, tanggal perjalanan, jumlah peserta, dan preferensi khusus.</li>
+<li><strong>Data Pembayaran:</strong> Informasi pembayaran diproses melalui payment gateway pihak ketiga. Kami tidak menyimpan data kartu kredit atau kredensial perbankan Anda.</li>
+<li><strong>Data Teknis:</strong> Alamat IP, tipe browser, sistem operasi, dan halaman yang dikunjungi untuk keperluan analitik.</li></ul>
+
+<h2>2. Penggunaan Informasi</h2>
+<p>Informasi yang kami kumpulkan digunakan untuk:</p>
+<ul><li>Memproses pemesanan dan pembayaran Anda.</li>
+<li>Mengirimkan invoice, e-ticket, dan konfirmasi pemesanan.</li>
+<li>Memberikan informasi tentang perubahan jadwal atau pembaruan tour.</li>
+<li>Mengirimkan permintaan review setelah tour selesai.</li>
+<li>Meningkatkan kualitas layanan dan pengalaman pengguna website.</li>
+<li>Mengirimkan informasi promosi dan penawaran khusus (dengan persetujuan Anda).</li></ul>
+
+<h2>3. Perlindungan Data</h2>
+<p>Kami menerapkan langkah-langkah keamanan teknis dan organisasional yang memadai untuk melindungi data pribadi Anda dari akses tidak sah, perubahan, pengungkapan, atau penghancuran. Ini termasuk enkripsi data, firewall, dan kontrol akses yang ketat.</p>
+
+<h2>4. Berbagi Data dengan Pihak Ketiga</h2>
+<p>Kami tidak menjual, memperdagangkan, atau menyewakan data pribadi Anda kepada pihak ketiga. Kami dapat membagikan data Anda dalam kondisi berikut:</p>
+<ul><li><strong>Payment Gateway:</strong> Data pembayaran diproses oleh Midtrans/Xendit sesuai kebijakan privasi mereka.</li>
+<li><strong>Partner Tour:</strong> Data peserta (nama) dibagikan kepada guide dan operator tour untuk keperluan operasional.</li>
+<li><strong>Kewajiban Hukum:</strong> Jika diwajibkan oleh hukum atau perintah pengadilan yang sah.</li></ul>
+
+<h2>5. Cookie</h2>
+<p>Website kami menggunakan cookie untuk meningkatkan pengalaman browsing Anda. Cookie adalah file kecil yang disimpan di perangkat Anda. Kami menggunakan cookie untuk: mengingat preferensi Anda, analisis trafik website, dan menjaga sesi login admin.</p>
+
+<h2>6. Penyimpanan Data</h2>
+<p>Kami menyimpan data pribadi Anda selama diperlukan untuk tujuan pengumpulannya, atau sesuai dengan ketentuan hukum yang berlaku. Data pemesanan disimpan minimal 5 tahun untuk keperluan akuntansi dan pajak.</p>
+
+<h2>7. Hak Anda</h2>
+<ul><li>Hak untuk mengakses data pribadi Anda.</li>
+<li>Hak untuk mengoreksi data yang tidak akurat.</li>
+<li>Hak untuk meminta penghapusan data (right to be forgotten).</li>
+<li>Hak untuk menarik persetujuan pemrosesan data kapan saja.</li>
+<li>Hak untuk mengajukan keluhan ke otoritas perlindungan data.</li></ul>
+
+<h2>8. Perubahan Kebijakan Privasi</h2>
+<p>Kami dapat memperbarui Kebijakan Privasi ini sewaktu-waktu. Perubahan akan diumumkan melalui website dan, untuk perubahan signifikan, kami akan mengirimkan pemberitahuan melalui email.</p>
+
+<h2>9. Hubungi Kami</h2>
+<p>Jika Anda memiliki pertanyaan terkait Kebijakan Privasi ini, silakan hubungi kami melalui halaman Hubungi Kami atau kirim email ke privacy@jelajahnusantara.com.</p>`
+  },
+  'terms': {
+    html: `<h2>1. Umum</h2>
+<p>Dengan menggunakan layanan Jelajah Nusantara Tour ("Kami"), Anda ("Tamu" atau "Pelanggan") dianggap telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan yang berlaku.</p>
+
+<h2>2. Pemesanan (Booking)</h2>
+<ul><li>Booking dianggap sah apabila tamu telah menyelesaikan form pemesanan dan menerima nomor invoice.</li>
+<li>Tamu wajib mengisi data diri dengan lengkap dan benar.</li>
+<li>Setiap booking bersifat mengikat dan tidak dapat dipindahtangankan.</li>
+<li>Ketersediaan slot bersifat real-time.</li></ul>
+
+<h2>3. Pembayaran</h2>
+<ul><li>Pembayaran harus dilakukan dalam waktu 24 jam sejak invoice diterbitkan.</li>
+<li>Pembayaran dapat dilakukan melalui transfer bank atau e-wallet yang tercantum di invoice.</li>
+<li>Jika pembayaran tidak diterima dalam batas waktu, pesanan akan otomatis dibatalkan.</li>
+<li>Semua harga sudah termasuk pajak dan biaya layanan.</li></ul>
+
+<h2>4. Pembatalan & Refund</h2>
+<table><tr><th>Waktu Pembatalan</th><th>Refund</th></tr>
+<tr><td>H-14 atau lebih</td><td>80%</td></tr>
+<tr><td>H-7 sampai H-13</td><td>50%</td></tr>
+<tr><td>H-3 sampai H-6</td><td>25%</td></tr>
+<tr><td>Kurang dari H-3</td><td>Tidak ada refund</td></tr></table>
+<p>Refund diproses dalam 7-14 hari kerja.</p>
+
+<h2>5. Perubahan Jadwal</h2>
+<ul><li>Permintaan perubahan tanggal maksimal H-7 sebelum keberangkatan.</li>
+<li>Perubahan tanggal bergantung pada ketersediaan slot.</li>
+<li>Biaya tambahan mungkin dikenakan jika harga di tanggal baru berbeda.</li></ul>
+
+<h2>6. Tanggung Jawab</h2>
+<ul><li>Kami bertanggung jawab atas pelaksanaan tour sesuai itinerary.</li>
+<li>Kami tidak bertanggung jawab atas force majeure.</li>
+<li>Tamu bertanggung jawab atas barang bawaan pribadi.</li>
+<li>Kami menyarankan tamu memiliki asuransi perjalanan.</li></ul>
+
+<h2>7. Kode Etik Tamu</h2>
+<ul><li>Tamu wajib menghormati budaya dan adat setempat.</li>
+<li>Kami berhak mengeluarkan tamu tanpa refund jika melanggar kode etik.</li></ul>
+
+<h2>8. Perubahan Ketentuan</h2>
+<p>Kami berhak mengubah syarat dan ketentuan ini sewaktu-waktu. Perubahan berlaku efektif sejak publikasi.</p>
+
+<h2>9. Hubungi Kami</h2>
+<p>Jika ada pertanyaan, hubungi kami melalui halaman Hubungi Kami atau email support@jelajahnusantara.com.</p>`
+  },
   'about': {
     storyTitle: 'Cerita Kami',
     story: 'Jelajah Nusantara Tour adalah perusahaan jasa perjalanan wisata yang berkomitmen memberikan pengalaman liburan tak terlupakan dengan pelayanan personal dan harga transparan.\n\nBerdiri sejak 2018, kami telah melayani ribuan wisatawan domestik dan mancanegara dengan paket-paket tour pilihan ke destinasi terbaik di Indonesia. Dari Bali hingga Raja Ampat, dari Bromo hingga Danau Toba — kami ada untuk mewujudkan liburan impian Anda.\n\nKami percaya bahwa setiap perjalanan adalah cerita yang berharga. Itulah mengapa kami merancang setiap paket tour dengan detail dan penuh perhatian, memastikan setiap momen perjalanan Anda menjadi kenangan yang tak terlupakan.',
