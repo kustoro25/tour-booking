@@ -49,18 +49,18 @@ export default function HeroSearch() {
     : SUGGESTIONS;
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-xl z-30">
+    <div ref={containerRef} className="relative w-full max-w-md sm:max-w-xl z-30">
       <div
         className={`
-          flex items-center bg-white rounded-2xl shadow-glow-blue overflow-hidden
+          flex items-center bg-white rounded-xl sm:rounded-2xl shadow-glow-blue overflow-hidden
           border-2 transition-all duration-300
           ${showSuggestions ? 'border-blue-400 shadow-lg shadow-blue-500/20' : 'border-white/50 hover:border-blue-300'}
         `}
       >
         {/* Search Icon */}
-        <div className="pl-4 sm:pl-5 flex-shrink-0">
+        <div className="pl-3 sm:pl-5 flex-shrink-0">
           <svg
-            className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500"
+            className="w-4 h-4 sm:w-6 sm:h-6 text-blue-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -84,17 +84,21 @@ export default function HeroSearch() {
           }}
           onKeyDown={handleKeyDown}
           onFocus={() => setShowSuggestions(true)}
-          placeholder="Cari destinasi impianmu..."
-          className="flex-1 px-3 sm:px-4 py-3 sm:py-4 text-gray-800 placeholder-gray-400 bg-transparent outline-none text-sm sm:text-base"
+          placeholder="Cari destinasi..."
+          className="flex-1 px-2 sm:px-4 py-2.5 sm:py-4 text-gray-800 placeholder-gray-400 bg-transparent outline-none text-sm sm:text-base min-w-0"
         />
 
         {/* Search Button */}
         <button
           type="button"
           onClick={() => handleSearch(query)}
-          className="mr-1.5 sm:mr-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl text-sm sm:text-base hover:from-blue-700 hover:to-blue-800 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-200 active:scale-95 flex-shrink-0"
+          className="mr-1 sm:mr-2 px-2.5 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg sm:rounded-xl text-xs sm:text-base hover:from-blue-700 hover:to-blue-800 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-200 active:scale-95 flex-shrink-0 flex items-center gap-1"
+          aria-label="Cari destinasi"
         >
-          Cari
+          <svg className="w-3.5 h-3.5 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <span className="hidden sm:inline">Cari</span>
         </button>
       </div>
 
