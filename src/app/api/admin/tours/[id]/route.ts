@@ -38,6 +38,7 @@ export async function PUT(
         ...(body.name !== undefined && { name: body.name }),
         ...(body.category !== undefined && { category: body.category }),
         ...(body.destination !== undefined && { destination: body.destination }),
+        ...(body.destinationId !== undefined && { destinationId: body.destinationId || null }),
         ...(body.duration !== undefined && { duration: body.duration }),
         ...(body.priceAdult !== undefined && { priceAdult: parseFloat(body.priceAdult) }),
         ...(body.priceChild !== undefined && { priceChild: parseFloat(body.priceChild) }),

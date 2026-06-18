@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     await requireAdmin();
     const body = await request.json();
     const {
-      name, category, destination, duration,
+      name, category, destination, destinationId, duration,
       priceAdult, priceChild, discount, maxSlot, minPax,
       itinerary, includes, excludes, terms, isActive, coverImg,
     } = body;
@@ -37,6 +37,7 @@ export async function POST(request: NextRequest) {
         slug,
         category: category || 'OPEN_TRIP',
         destination: destination || '',
+        destinationId: destinationId || null,
         duration: duration || '',
         priceAdult: parseFloat(priceAdult) || 0,
         priceChild: parseFloat(priceChild) || 0,
