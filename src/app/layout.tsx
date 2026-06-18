@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ToastProvider } from '@/components/ui/Toast';
-import WhatsAppButton from '@/components/ui/WhatsAppButton';
-import ScrollToTop from '@/components/ui/ScrollToTop';
+import FloatingActions from '@/components/ui/FloatingActions';
 import PublicLayout from '@/components/layout/PublicLayout';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -28,8 +27,7 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased bg-gray-50 text-gray-800 min-h-screen flex flex-col selection:bg-blue-100 selection:text-blue-900`}>
         <ToastProvider>
           <PublicLayout>{children}</PublicLayout>
-          <WhatsAppButton />
-          <ScrollToTop />
+          <FloatingActions />
         </ToastProvider>
       </body>
     </html>
