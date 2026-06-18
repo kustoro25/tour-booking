@@ -9,7 +9,6 @@ const navLinks = [
   { href: '/tours', label: 'Paket Wisata' },
   { href: '/destinations', label: 'Destinasi' },
   { href: '/about', label: 'Tentang Kami' },
-  { href: '/testimonials', label: 'Testimoni' },
   { href: '/contact', label: 'Hubungi Kami' },
 ];
 
