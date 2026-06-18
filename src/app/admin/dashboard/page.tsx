@@ -109,8 +109,14 @@ export default function AdminDashboardPage() {
         <Link href="/admin/tours/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
           + Tambah Paket Tour
         </Link>
+        <Link href="/admin/blog/create" className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700">
+          + Tulis Artikel
+        </Link>
         <Link href="/admin/bookings" className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50">
           Lihat Semua Booking
+        </Link>
+        <Link href="/admin/pages" className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50">
+          Kelola Halaman CMS
         </Link>
       </div>
 
