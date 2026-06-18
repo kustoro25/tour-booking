@@ -49,17 +49,17 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
   };
 
   const getDayClass = (date: Date, isCurrentMonth: boolean): string => {
-    if (!isCurrentMonth) return 'text-gray-300 cursor-default pointer-events-none';
+    if (!isCurrentMonth) return 'text-gray-400 cursor-default pointer-events-none';
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (date < today) return 'text-gray-300 cursor-not-allowed opacity-40';
+    if (date < today) return 'text-gray-400 cursor-not-allowed';
 
     const slot = getSlotForDate(date);
     const dateStr = date.toISOString().split('T')[0];
     const isSelected = selectedDate === dateStr;
 
-    if (slot?.isBlackout) return 'bg-red-50 text-red-300 cursor-not-allowed';
-    if (slot && slot.bookedCount >= slot.quota) return 'bg-red-50 text-red-300 cursor-not-allowed';
+    if (slot?.isBlackout) return 'bg-red-100 text-red-500 cursor-not-allowed';
+    if (slot && slot.bookedCount >= slot.quota) return 'bg-red-100 text-red-500 cursor-not-allowed';
     if (isSelected) return 'bg-blue-600 text-white font-bold cursor-pointer shadow-md ring-2 ring-blue-300';
 
     const remaining = slot ? slot.quota - slot.bookedCount : 15;
@@ -160,7 +160,7 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
               <span>Hampir Penuh</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-4 h-4 bg-red-50 border border-red-200 rounded flex-shrink-0" />
+              <div className="w-4 h-4 bg-red-100 border border-red-300 rounded flex-shrink-0" />
               <span>Penuh</span>
             </div>
           </div>
