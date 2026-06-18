@@ -136,18 +136,26 @@ export default async function ToursPage({ searchParams }: PageProps) {
                   <Link
                     key={tour.id}
                     href={`/tours/${tour.slug}`}
-                    className="group bg-white rounded-xl overflow-hidden shadow-card hover-lift"
+                    className="group bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100"
                   >
                     <div className="h-44 bg-gray-200 relative overflow-hidden">
                       {tour.coverImg ? (
-                        <img src={tour.coverImg} alt={tour.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <img src={tour.coverImg} alt={tour.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-teal-400">
                           <span className="text-white text-3xl">🏝️</span>
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      <span className="absolute top-2 left-2 bg-white/95 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-blue-900/70 via-blue-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-4">
+                        <span className="text-white text-sm font-semibold flex items-center gap-1 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                          Lihat Detail
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                      </div>
+                      <span className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
                         {TourCategoryLabels[tour.category as TourCategory] || tour.category}
                       </span>
                     </div>
@@ -172,7 +180,12 @@ export default async function ToursPage({ searchParams }: PageProps) {
                           <span className="text-xs text-gray-400">Mulai dari</span>
                           <p className="text-lg font-bold text-blue-600">{formatCurrency(tour.priceAdult)}</p>
                         </div>
-                        <span className="text-sm font-medium text-blue-600 group-hover:translate-x-1 transition-transform duration-200">Detail →</span>
+                        <span className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 opacity-0 group-hover:opacity-100 translate-x-0 group-hover:translate-x-0 transition-all duration-300">
+                          Pesan
+                          <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </span>
                       </div>
                     </div>
                   </Link>
