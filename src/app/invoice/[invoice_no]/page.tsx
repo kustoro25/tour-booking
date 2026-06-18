@@ -4,6 +4,7 @@ import { formatCurrency, formatDateTime } from '@/lib/utils';
 import { OrderStatusLabels } from '@/types';
 import CopyButton from '@/components/ui/CopyButton';
 import InvoiceActions from '@/components/booking/InvoiceActions';
+import { getBrandName } from '@/lib/brand';
 
 export const dynamic = 'force-dynamic';
 
@@ -103,7 +104,9 @@ export default async function InvoicePage({ params }: PageProps) {
     // fallback to default
   }
 
-  const companyName = 'Jelajah Nusantara Tour';
+  const brandName = await getBrandName();
+
+  const companyName = brandName;
   const companyAddress = 'Jl. Pariwisata No. 123, Jakarta Selatan';
   const companyPhone = '+62 812-3456-7890';
   const companyEmail = 'info@jelajahnusantara.com';

@@ -4,13 +4,19 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Button from '../ui/Button';
 
+function BrandIcon({ icon, className }: { icon?: string; className?: string }) {
+  if (!icon) return <span className="text-white font-bold text-sm">JN</span>;
+  if (icon.startsWith('http')) return <img src={icon} alt="brand" className={`${className} object-cover`} />;
+  return <span className="text-white font-bold text-sm">{icon.substring(0, 2).toUpperCase()}</span>;
+}
+
 const navLinks = [
   { href: '/', label: 'Beranda' },
   { href: '/destinations', label: 'Destinasi' },
   { href: '/about', label: 'Tentang Kami' },
 ];
 
-export default function Header() {
+export default function Header({ brandName, brandIcon }: { brandName?: string; brandIcon?: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -33,10 +39,10 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-teal-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/30 group-hover:shadow-lg group-hover:shadow-blue-500/40 transition-shadow duration-300">
-              <span className="text-white font-bold text-sm">JN</span>
+              <BrandIcon icon={brandIcon} className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold bg-gradient-to-br from-blue-600 to-teal-600 shadow-md" />
             </div>
             <span className="text-base sm:text-xl font-bold text-gray-900">
-              <span className="gradient-text">Jelajah Nusantara</span>
+              <span className="gradient-text">{brandName || 'Jelajah Nusantara'}</span>
             </span>
           </Link>
 

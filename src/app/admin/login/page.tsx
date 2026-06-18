@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function AdminLoginPage() {
@@ -9,6 +9,17 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const [brandName, setBrandName] = useState('Jelajah Nusantara Tour');
+
+  useEffect(() => {
+    fetch('/api/settings/public')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.data?.brandName) setBrandName(data.data.brandName);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +53,7 @@ export default function AdminLoginPage() {
             <span className="text-white font-bold text-xl">JN</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Admin Login</h1>
-          <p className="text-sm text-gray-500 mt-1">Jelajah Nusantara Tour</p>
+          <p className="text-sm text-gray-500 mt-1">{brandName}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
