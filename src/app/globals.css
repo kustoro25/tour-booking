@@ -294,3 +294,12 @@ img { image-rendering: auto; }
   /* Hide interactive elements */
   .invoice-document button { display: none !important; }
 }
+
+/* Hide scrollbar for gallery lightbox thumbnails */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

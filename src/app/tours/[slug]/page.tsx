@@ -6,6 +6,7 @@ import type { ItineraryDay, TourCategory } from '@/types';
 import Button from '@/components/ui/Button';
 import StarRating from '@/components/ui/StarRating';
 import BookingCalendar from '@/components/booking/BookingCalendar';
+import TourGallerySection from '@/components/tours/TourGallerySection';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,6 +57,11 @@ export default async function TourDetailPage({ params }: PageProps) {
     ? [tour.coverImg, ...tour.gallery.map((g: { imageUrl: string }) => g.imageUrl)]
     : tour.gallery.map((g: { imageUrl: string }) => g.imageUrl);
 
+  const galleryImages = allImages.map((url: string, i: number) => ({
+    url,
+    alt: `${tour.name} - Foto ${i + 1}`,
+  }));
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
       {/* Breadcrumb */}
@@ -70,47 +76,8 @@ export default async function TourDetailPage({ params }: PageProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Main Content */}
         <div className="md:col-span-2 space-y-8">
-          {/* Image Gallery */}
-          <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-            {allImages.length > 0 ? (
-              <>
-                {/* Mobile: horizontal scroll */}
-                <div className="flex overflow-x-auto snap-x snap-mandatory gap-1 sm:hidden">
-                  {allImages.slice(0, 5).map((img, i) => (
-                    <div key={i} className="min-w-[85vw] snap-center flex-shrink-0">
-                      <img
-                        src={img}
-                        alt={`${tour.name} ${i + 1}`}
-                        className="w-full h-56 object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
-                {/* Desktop: grid layout */}
-                <div className="hidden sm:grid grid-cols-2 gap-1">
-                  <div className="col-span-2">
-                    <img
-                      src={allImages[0]}
-                      alt={tour.name}
-                      className="w-full h-96 object-cover"
-                    />
-                  </div>
-                  {allImages.slice(1, 5).map((img, i) => (
-                    <img
-                      key={i}
-                      src={img}
-                      alt={`${tour.name} ${i + 2}`}
-                      className="w-full h-48 object-cover"
-                    />
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="w-full h-56 sm:h-96 bg-gradient-to-br from-blue-400 to-teal-400 flex items-center justify-center">
-                <span className="text-white text-5xl sm:text-6xl">🏝️</span>
-              </div>
-            )}
-          </div>
+          {/* Image Gallery with Lightbox */}
+          <TourGallerySection images={galleryImages} tourName={tour.name} />
 
           {/* Tour Info */}
           <div className="bg-white rounded-xl shadow-card p-4 sm:p-6">
