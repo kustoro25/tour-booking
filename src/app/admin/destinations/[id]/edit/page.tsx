@@ -234,15 +234,16 @@ export default function EditDestinationPage({ params }: { params: Promise<{ id: 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Galeri Foto</label>
             {gallery.map((url, i) => (
-              <div key={i} className="flex gap-2 mb-2">
-                <input
-                  type="url"
-                  value={url}
-                  onChange={(e) => updateGallery(i, e.target.value)}
-                  placeholder={`URL foto ${i + 1}`}
-                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                />
-                <button type="button" onClick={() => removeGallery(i)} className="text-red-500 hover:text-red-700 px-2">✕</button>
+              <div key={i} className="flex gap-2 mb-2 items-start">
+                <div className="flex-1">
+                  <ImageUpload
+                    value={url}
+                    onChange={(newUrl) => updateGallery(i, newUrl)}
+                    folder="tour-booking/destinations/gallery"
+                    placeholder={`URL foto ${i + 1}`}
+                  />
+                </div>
+                <button type="button" onClick={() => removeGallery(i)} className="text-red-500 hover:text-red-700 px-2 mt-2">✕</button>
               </div>
             ))}
             <button type="button" onClick={addGalleryItem} className="text-sm text-blue-600 hover:text-blue-700">
