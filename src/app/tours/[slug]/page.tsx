@@ -1,4 +1,6 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import { formatCurrency, parseJsonSafe } from '@/lib/utils';
 import { TourCategoryLabels } from '@/types';
@@ -43,6 +45,50 @@ async function getTour(slug: string) {
   };
 }
 
+async function getSimilarTours(currentSlug: string, destination: string, category: string) {
+  // Priority 1: same destination + same category (best match)
+  // Priority 2: same destination
+  // Priority 3: same category
+  // Exclude current tour, fetch up to 4
+
+  const similar = await prisma.tour.findMany({
+    where: {
+      slug: { not: currentSlug },
+      isActive: true,
+      OR: [{ destination }, { category }],
+    },
+    select: {
+      slug: true,
+      name: true,
+      coverImg: true,
+      category: true,
+      destination: true,
+      duration: true,
+      priceAdult: true,
+      discount: true,
+    },
+    take: 8, // fetch extra so we can sort client-side and pick best 4
+    orderBy: { sortOrder: 'asc' },
+  });
+
+  // Score each tour: destination+category match = 0, destination match = 1, category match = 2, none = 3
+  const scored = similar.map((t) => ({
+    ...t,
+    _score:
+      t.destination === destination && t.category === category
+        ? 0
+        : t.destination === destination
+          ? 1
+          : t.category === category
+            ? 2
+            : 3,
+  }));
+
+  // Sort by score then return top 4
+  scored.sort((a, b) => a._score - b._score);
+  return scored.slice(0, 4);
+}
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
@@ -52,6 +98,8 @@ export default async function TourDetailPage({ params }: PageProps) {
   const tour = await getTour(slug);
 
   if (!tour) notFound();
+
+  const similarTours = await getSimilarTours(slug, tour.destination, tour.category);
 
   const allImages: string[] = tour.coverImg
     ? [tour.coverImg, ...tour.gallery.map((g: { imageUrl: string }) => g.imageUrl)]
@@ -192,6 +240,71 @@ export default async function TourDetailPage({ params }: PageProps) {
               <p className="text-gray-500 text-sm">Belum ada ulasan untuk paket ini.</p>
             )}
           </div>
+
+          {/* Similar Tours */}
+          {similarTours.length > 0 && (
+            <div className="bg-white rounded-xl shadow-card p-4 sm:p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-sm">🔗</span>
+                Tour Serupa
+              </h2>
+              <p className="text-sm text-gray-500 mb-5">
+                Rekomendasi paket wisata yang mungkin Anda sukai
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {similarTours.map((similar) => (
+                  <Link
+                    key={similar.slug}
+                    href={`/tours/${similar.slug}`}
+                    className="group flex gap-3 bg-gray-50 rounded-xl p-3 hover:bg-blue-50 hover:shadow-md transition-all duration-300 border border-transparent hover:border-blue-100"
+                  >
+                    {/* Thumbnail */}
+                    <div className="w-24 h-20 sm:w-28 sm:h-24 rounded-lg overflow-hidden flex-shrink-0 bg-gray-200 relative">
+                      {similar.coverImg ? (
+                        <Image
+                          src={similar.coverImg}
+                          alt={similar.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          sizes="112px"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-teal-400">
+                          <span className="text-white text-xl">🏝️</span>
+                        </div>
+                      )}
+                      {/* Discount badge */}
+                      {similar.discount > 0 && (
+                        <span className="absolute top-1 left-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                          -{similar.discount}%
+                        </span>
+                      )}
+                    </div>
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <span className="inline-block text-[10px] font-semibold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded-full mb-1">
+                        {TourCategoryLabels[similar.category as TourCategory] || similar.category}
+                      </span>
+                      <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
+                        {similar.name}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-1 text-[11px] text-gray-400">
+                        <span className="flex items-center gap-0.5"><span>🕐</span> {similar.duration}</span>
+                        <span>•</span>
+                        <span className="flex items-center gap-0.5"><span>📍</span> {similar.destination}</span>
+                      </div>
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200">
+                        <p className="text-sm font-bold text-blue-600">{formatCurrency(similar.priceAdult)}</p>
+                        <span className="text-[11px] text-blue-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          Lihat →
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar - Booking Card */}
