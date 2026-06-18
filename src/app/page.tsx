@@ -11,57 +11,27 @@ const faqs = [
   {
     question: 'Bagaimana cara melakukan booking?',
     answer:
-      'Caranya sangat mudah! Cukup pilih paket tour yang Anda inginkan di halaman Paket Wisata, pilih tanggal keberangkatan dari kalender interaktif, isi data diri dan jumlah peserta, lalu klik "Booking Sekarang". Invoice akan langsung terbit dan dikirim ke email Anda.',
+      'Caranya sangat mudah! Pilih paket tour yang Anda inginkan, tentukan tanggal keberangkatan dari kalender interaktif, isi data diri dan jumlah peserta, lalu klik "Booking Sekarang". Invoice akan langsung terbit dan dikirim ke email Anda.',
   },
   {
-    question: 'Apakah saya bisa mengganti tanggal keberangkatan?',
+    question: 'Metode pembayaran apa saja yang tersedia?',
     answer:
-      'Ya, Anda bisa mengajukan perubahan tanggal keberangkatan maksimal H-7 sebelum keberangkatan. Silakan hubungi tim kami melalui WhatsApp atau email untuk proses perubahan. Perubahan tanggal bergantung pada ketersediaan slot di tanggal yang baru.',
+      'Kami menerima transfer bank (BCA, Mandiri, BRI, BNI) dan e-wallet (OVO, Dana, GoPay, ShopeePay). Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan. Jika melebihi batas waktu, pesanan akan otomatis dibatalkan.',
   },
   {
-    question: 'Bagaimana metode pembayaran yang tersedia?',
+    question: 'Bagaimana kebijakan pembatalan dan refund?',
     answer:
-      'Kami menerima pembayaran melalui transfer bank (BCA, Mandiri, BRI, BNI) dan e-wallet (OVO, Dana, GoPay, ShopeePay). Detail rekening dan instruksi pembayaran akan tercantum di invoice yang Anda terima setelah booking.',
-  },
-  {
-    question: 'Berapa lama batas waktu pembayaran?',
-    answer:
-      'Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan. Jika pembayaran tidak dilakukan dalam batas waktu tersebut, pesanan akan otomatis dibatalkan oleh sistem dan slot akan dilepas kembali. Anda akan menerima email pengingat sebelum batas waktu berakhir.',
-  },
-  {
-    question: 'Apakah saya akan menerima e-ticket?',
-    answer:
-      'Ya, setelah pembayaran Anda terkonfirmasi, sistem akan mengirimkan E-Ticket ke email Anda. E-Ticket berisi detail lengkap perjalanan Anda: nama paket, tanggal, itinerary, dan kontak guide yang akan mendampingi.',
-  },
-  {
-    question: 'Apakah ada minimal peserta untuk setiap tour?',
-    answer:
-      'Ya, setiap paket tour memiliki minimal peserta yang berbeda-beda (umumnya 2 orang). Informasi ini tercantum di halaman detail masing-masing paket tour. Jika kuota minimal tidak terpenuhi, tim kami akan menghubungi Anda untuk opsi alternatif.',
-  },
-  {
-    question: 'Bagaimana jika tour dibatalkan oleh pihak penyelenggara?',
-    answer:
-      'Jika tour terpaksa dibatalkan oleh kami karena force majeure atau kuota minimal tidak terpenuhi, Anda akan mendapatkan refund 100% dari jumlah yang telah dibayarkan. Tim kami akan menghubungi Anda untuk proses pengembalian dana.',
-  },
-  {
-    question: 'Apakah bisa melakukan refund jika saya membatalkan?',
-    answer:
-      'Kebijakan refund kami: Pembatalan H-14 sebelum keberangkatan: refund 80%. Pembatalan H-7 sebelum keberangkatan: refund 50%. Pembatalan H-3 sebelum keberangkatan: refund 25%. Pembatalan kurang dari H-3: tidak ada refund. Silakan baca Syarat & Ketentuan untuk detail lengkap.',
+      'Pembatalan H-14: refund 80%. H-7: refund 50%. H-3: refund 25%. Kurang dari H-3: tidak ada refund. Jika tour dibatalkan oleh kami karena force majeure atau kuota minimal tidak terpenuhi, Anda mendapat refund 100%.',
   },
   {
     question: 'Apakah harga sudah termasuk tiket pesawat?',
     answer:
-      'Umumnya harga paket tour tidak termasuk tiket pesawat, kecuali disebutkan secara eksplisit di deskripsi paket. Fasilitas yang termasuk dan tidak termasuk tercantum dengan jelas di halaman detail setiap paket tour.',
+      'Umumnya harga paket belum termasuk tiket pesawat, kecuali disebutkan secara eksplisit di deskripsi paket. Fasilitas yang termasuk dan tidak termasuk tercantum dengan jelas di halaman detail setiap paket tour.',
   },
   {
-    question: 'Apakah anak-anak dikenakan biaya?',
+    question: 'Apakah ada minimal peserta untuk setiap tour?',
     answer:
-      'Ya, tersedia harga khusus untuk anak-anak (biasanya usia 3-10 tahun) yang lebih terjangkau. Detail harga dewasa dan anak tercantum di setiap halaman paket tour. Untuk anak di bawah 3 tahun umumnya gratis (tanpa fasilitas tambahan).',
-  },
-  {
-    question: 'Bagaimana cara memberikan review setelah tour selesai?',
-    answer:
-      'Setelah tour selesai, Anda akan menerima email berisi link khusus untuk menulis review dan memberikan rating. Link ini berlaku satu kali dan hanya untuk tamu yang telah menyelesaikan tour. Review Anda sangat berarti bagi kami dan calon wisatawan lainnya!',
+      'Ya, setiap paket tour memiliki minimal peserta (umumnya 2 orang). Informasi ini tercantum di halaman detail masing-masing paket. Jika kuota minimal tidak terpenuhi, tim kami akan menghubungi Anda untuk opsi alternatif.',
   },
 ];
 
