@@ -15,6 +15,7 @@ export default function AdminSettingsPage() {
     companyName: '',
     companyEmail: '',
     companyPhone: '',
+    companyAddress: '',
     invoiceTheme: 'modern' as InvoiceTheme,
   });
 
@@ -28,6 +29,7 @@ export default function AdminSettingsPage() {
             companyName: data.data.company_name || '',
             companyEmail: data.data.company_email || '',
             companyPhone: data.data.company_phone || '',
+            companyAddress: data.data.company_address || '',
             invoiceTheme: data.data.invoice_theme || 'modern',
           }));
         }
@@ -48,6 +50,7 @@ export default function AdminSettingsPage() {
           company_name: form.companyName,
           company_email: form.companyEmail,
           company_phone: form.companyPhone,
+          company_address: form.companyAddress,
           invoice_theme: form.invoiceTheme,
         }),
       });
@@ -124,6 +127,16 @@ export default function AdminSettingsPage() {
                   placeholder="+62 812-3456-7890"
                 />
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Alamat Perusahaan</label>
+              <input
+                type="text"
+                value={form.companyAddress}
+                onChange={(e) => setForm({ ...form, companyAddress: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Jl. Pariwisata No. 123, Jakarta Selatan"
+              />
             </div>
           </div>
         </div>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useToast } from '@/components/ui/Toast';
 
 function useCompanyInfo() {
-  const [info, setInfo] = useState({ email: 'info@jelajahnusantara.com', phone: '+62 812-3456-7890' });
+  const [info, setInfo] = useState({ email: 'info@jelajahnusantara.com', phone: '+62 812-3456-7890', address: 'Jl. Pariwisata No. 123, Jakarta Selatan' });
   useEffect(() => {
     fetch('/api/settings/public')
       .then(r => r.json())
@@ -82,7 +82,7 @@ export default function Footer() {
             <div className="space-y-1.5 text-sm text-gray-400 mb-4">
               <p className="flex items-start gap-2">
                 <span className="mt-0.5 flex-shrink-0">📍</span>
-                <span>{'Jl. Pariwisata No. 123, Jakarta Selatan'}</span>
+                <span>{info.address || 'Jl. Pariwisata No. 123, Jakarta Selatan'}</span>
               </p>
               <p className="flex items-center gap-2">
                 <span className="flex-shrink-0">📞</span>

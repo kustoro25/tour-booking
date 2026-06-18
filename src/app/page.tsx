@@ -10,28 +10,36 @@ import HeroSearch from '@/components/ui/HeroSearch';
 
 export const dynamic = 'force-dynamic';
 
-const faqs = [
-  {
-    question: 'Bagaimana cara melakukan booking?',
-    answer:
-      'Caranya sangat mudah! Pilih paket tour yang Anda inginkan, tentukan tanggal keberangkatan dari kalender interaktif, isi data diri dan jumlah peserta, lalu klik "Booking Sekarang". Invoice akan langsung terbit dan dikirim ke email Anda.',
-  },
-  {
-    question: 'Metode pembayaran apa saja yang tersedia?',
-    answer:
-      'Kami menerima transfer bank (BCA, Mandiri, BRI, BNI) dan e-wallet (OVO, Dana, GoPay, ShopeePay). Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan. Jika melebihi batas waktu, pesanan akan otomatis dibatalkan.',
-  },
-  {
-    question: 'Bagaimana kebijakan pembatalan dan refund?',
-    answer:
-      'Pembatalan H-14: refund 80%. H-7: refund 50%. H-3: refund 25%. Kurang dari H-3: tidak ada refund. Jika tour dibatalkan oleh kami karena force majeure atau kuota minimal tidak terpenuhi, Anda mendapat refund 100%.',
-  },
-  {
-    question: 'Apakah ada minimal peserta untuk setiap tour?',
-    answer:
-      'Ya, setiap paket tour memiliki minimal peserta (umumnya 2 orang). Informasi ini tercantum di halaman detail masing-masing paket. Jika kuota minimal tidak terpenuhi, tim kami akan menghubungi Anda untuk opsi alternatif.',
-  },
-];
+async function getCmsFaqs(): Promise<{ question: string; answer: string }[]> {
+  try {
+    const page = await prisma.page.findUnique({ where: { slug: 'home-faq' } });
+    if (page?.content) {
+      const parsed = JSON.parse(page.content);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch { /* fallback to hardcoded */ }
+  return [
+    { question: 'Bagaimana cara melakukan booking?', answer: 'Caranya sangat mudah! Pilih paket tour yang Anda inginkan, tentukan tanggal keberangkatan dari kalender interaktif, isi data diri dan jumlah peserta, lalu klik "Booking Sekarang". Invoice akan langsung terbit dan dikirim ke email Anda.' },
+    { question: 'Metode pembayaran apa saja yang tersedia?', answer: 'Kami menerima transfer bank (BCA, Mandiri, BRI, BNI) dan e-wallet (OVO, Dana, GoPay, ShopeePay). Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan. Jika melebihi batas waktu, pesanan akan otomatis dibatalkan.' },
+    { question: 'Bagaimana kebijakan pembatalan dan refund?', answer: 'Pembatalan H-14: refund 80%. H-7: refund 50%. H-3: refund 25%. Kurang dari H-3: tidak ada refund. Jika tour dibatalkan oleh kami karena force majeure atau kuota minimal tidak terpenuhi, Anda mendapat refund 100%.' },
+    { question: 'Apakah ada minimal peserta untuk setiap tour?', answer: 'Ya, setiap paket tour memiliki minimal peserta (umumnya 2 orang). Informasi ini tercantum di halaman detail masing-masing paket. Jika kuota minimal tidak terpenuhi, tim kami akan menghubungi Anda untuk opsi alternatif.' },
+  ];
+}
+
+async function getCmsStats(): Promise<{ num: string; label: string }[]> {
+  try {
+    const page = await prisma.page.findUnique({ where: { slug: 'home-stats' } });
+    if (page?.content) {
+      const parsed = JSON.parse(page.content);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch { /* fallback */ }
+  return [
+    { num: '5000+', label: 'Wisatawan' },
+    { num: '50+', label: 'Destinasi' },
+    { num: '4.9', label: 'Rating ★' },
+  ];
+}
 
 async function getFeaturedTours() {
   const tours = await prisma.tour.findMany({
@@ -128,11 +136,13 @@ async function getAllGalleryPhotos(): Promise<GalleryPhoto[]> {
 }
 
 export default async function HomePage() {
-  const [tours, reviews, destinations, galleryPhotos] = await Promise.all([
+  const [tours, reviews, destinations, galleryPhotos, faqs, stats] = await Promise.all([
     getFeaturedTours(),
     getLatestReviews(),
     getFeaturedDestinations(),
     getAllGalleryPhotos(),
+    getCmsFaqs(),
+    getCmsStats(),
   ]);
 
   return (
@@ -177,11 +187,7 @@ export default async function HomePage() {
             </div>
             {/* Trust badges */}
             <div className="flex flex-wrap items-center gap-6 mt-10 pt-8 border-t border-white/15 animate-fade-in-up animate-delay-400">
-              {[
-                { num: '5000+', label: 'Wisatawan' },
-                { num: '50+', label: 'Destinasi' },
-                { num: '4.9', label: 'Rating ★' },
-              ].map((stat) => (
+              {stats.map((stat) => (
                 <div key={stat.label}>
                   <p className="text-2xl sm:text-3xl font-bold">{stat.num}</p>
                   <p className="text-sm text-blue-200">{stat.label}</p>

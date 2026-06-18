@@ -15,9 +15,13 @@ interface CmsPage {
 const pageSlugs = [
   { slug: 'home-hero', title: 'Home - Hero Section' },
   { slug: 'home-value', title: 'Home - Value Proposition' },
+  { slug: 'home-stats', title: 'Home - Statistik (5000+, 50+, 4.9)' },
+  { slug: 'home-faq', title: 'Home - FAQ Section' },
   { slug: 'about', title: 'About Us' },
   { slug: 'contact', title: 'Contact Us' },
   { slug: 'testimonials', title: 'Testimonials Header' },
+  { slug: 'privacy', title: 'Privacy Policy' },
+  { slug: 'terms', title: 'Terms & Conditions' },
   { slug: 'footer', title: 'Footer' },
 ];
 
