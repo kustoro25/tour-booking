@@ -163,7 +163,7 @@ export default async function HomePage() {
             </p>
 
             {/* Search Bar */}
-            <div className="mb-8 animate-fade-in-up animate-delay-250">
+            <div className="mb-8 animate-fade-in-up animate-delay-250 relative z-10">
               <HeroSearch />
             </div>
             <div className="flex flex-wrap gap-4 animate-fade-in-up animate-delay-300">
