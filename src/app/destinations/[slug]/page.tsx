@@ -31,7 +31,7 @@ export default async function DestinationDetailPage({
   const destination = await prisma.destination.findUnique({
     where: { slug },
     include: {
-      _count: { select: { tours: true } },
+      _count: { select: { tours: { where: { isActive: true } } } },
       tours: {
         where: { isActive: true },
         select: { id: true, name: true, slug: true, priceAdult: true, duration: true, coverImg: true },
