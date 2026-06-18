@@ -28,6 +28,8 @@ export default function CreateTourPage() {
   const [excludes, setExcludes] = useState<string[]>(['']);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [customCategory, setCustomCategory] = useState('');
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
 
   useEffect(() => {
     fetch('/api/admin/destinations')
@@ -42,6 +44,18 @@ export default function CreateTourPage() {
 
   const updateField = (field: string, value: string) => {
     setForm({ ...form, [field]: value });
+  };
+
+  const handleCategorySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (val === '__custom__') {
+      setShowCustomCategory(true);
+      setCustomCategory('');
+      updateField('category', '');
+    } else {
+      setShowCustomCategory(false);
+      updateField('category', val);
+    }
   };
 
   const handleDestinationSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -154,12 +168,22 @@ export default function CreateTourPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
-              <select value={form.category} onChange={e => updateField('category', e.target.value)}
+              <select value={showCustomCategory ? '__custom__' : form.category} onChange={handleCategorySelect}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 outline-none">
                 {(Object.keys(TourCategoryLabels) as TourCategory[]).map(cat => (
                   <option key={cat} value={cat}>{TourCategoryLabels[cat]}</option>
                 ))}
+                <option value="__custom__">➕ Custom (manual)</option>
               </select>
+              {showCustomCategory && (
+                <input
+                  type="text"
+                  value={customCategory}
+                  onChange={e => { setCustomCategory(e.target.value); updateField('category', e.target.value); }}
+                  placeholder="Nama kategori custom..."
+                  className="w-full mt-2 px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow text-sm"
+                />
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Destinasi</label>
