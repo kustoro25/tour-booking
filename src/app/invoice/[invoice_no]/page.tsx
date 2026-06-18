@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
 import { OrderStatusLabels } from '@/types';
@@ -547,7 +546,8 @@ function InvoiceDocument({
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
               <div className="w-full sm:w-16 h-14 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 relative">
                 {order.tour.coverImg ? (
-                  <Image src={order.tour.coverImg} alt={order.tour.name} fill className="object-cover" sizes="64px" />
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={order.tour.coverImg} alt={order.tour.name} className="absolute inset-0 w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-2xl">🏝️</div>
                 )}
