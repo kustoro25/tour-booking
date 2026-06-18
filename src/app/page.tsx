@@ -152,10 +152,10 @@ async function getCmsValue() {
     valueHeading: 'Mengapa Memilih Kami?',
     valueSubheading: 'Kami hadir untuk memberikan pengalaman booking tour terbaik dengan standar pelayanan premium.',
     valueItems: [
-      { icon: '💰', title: 'Harga Transparan', desc: 'Tidak ada biaya tersembunyi.', color: 'from-green-500 to-emerald-600' },
-      { icon: '⚡', title: 'Booking Instan', desc: '3 langkah, 1 menit. Invoice langsung terbit.', color: 'from-blue-500 to-blue-600' },
-      { icon: '🎯', title: 'Guide Profesional', desc: 'Tim guide berpengalaman dan bersertifikat.', color: 'from-purple-500 to-purple-600' },
-      { icon: '🛡️', title: 'Garansi Keberangkatan', desc: 'Jadwal pasti sesuai kuota minimum.', color: 'from-orange-500 to-orange-600' },
+      { icon: '💰', title: 'Harga Transparan', desc: 'Tidak ada biaya tersembunyi. Apa yang Anda lihat, itulah yang Anda bayar.', color: 'from-green-500 to-emerald-600' },
+      { icon: '⚡', title: 'Booking Instan', desc: '3 langkah, 1 menit. Invoice langsung terbit dan masuk ke email Anda.', color: 'from-blue-500 to-blue-600' },
+      { icon: '🎯', title: 'Guide Profesional', desc: 'Tim guide kami berpengalaman dan bersertifikat resmi.', color: 'from-purple-500 to-purple-600' },
+      { icon: '🛡️', title: 'Garansi Keberangkatan', desc: 'Jadwal pasti berangkat sesuai kuota minimum yang realistis.', color: 'from-orange-500 to-orange-600' },
     ],
   };
 }
