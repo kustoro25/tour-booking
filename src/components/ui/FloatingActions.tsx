@@ -25,15 +25,46 @@ export default function FloatingActions() {
   );
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex items-end gap-3">
-      {/* WhatsApp Button */}
-      <div
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+      {/* Scroll to Top Button */}
+      <button
+        type="button"
+        onClick={scrollToTop}
+        aria-label="Kembali ke atas"
         className={`
-          flex flex-col items-end gap-2
+          w-11 h-11 sm:w-12 sm:h-12
+          rounded-full
+          bg-gradient-to-br from-blue-600 to-teal-600
+          text-white
+          shadow-lg shadow-blue-500/30
+          hover:shadow-xl hover:shadow-blue-500/40 hover:scale-110
+          active:scale-95
+          flex items-center justify-center
+          flex-shrink-0
           transition-all duration-400 ease-out
-          ${scrolled ? 'translate-x-0' : 'translate-x-0'}
+          ${scrolled
+            ? 'translate-y-0 opacity-100 scale-100 pointer-events-auto'
+            : 'translate-y-4 opacity-0 scale-75 pointer-events-none'
+          }
         `}
       >
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2.5}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M5 15l7-7 7 7"
+          />
+        </svg>
+      </button>
+
+      {/* WhatsApp Button */}
+      <div className="flex flex-col items-end gap-2">
         {/* Tooltip */}
         {showWaTooltip && (
           <div className="bg-white shadow-lg rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 animate-fade-in whitespace-nowrap">
@@ -62,43 +93,6 @@ export default function FloatingActions() {
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white" />
         </a>
       </div>
-
-      {/* Scroll to Top Button */}
-      <button
-        type="button"
-        onClick={scrollToTop}
-        aria-label="Kembali ke atas"
-        className={`
-          w-11 h-11 sm:w-12 sm:h-12
-          rounded-full
-          bg-gradient-to-br from-blue-600 to-teal-600
-          text-white
-          shadow-lg shadow-blue-500/30
-          hover:shadow-xl hover:shadow-blue-500/40 hover:scale-110
-          active:scale-95
-          flex items-center justify-center
-          flex-shrink-0
-          transition-all duration-400 ease-out
-          ${scrolled
-            ? 'translate-x-0 opacity-100 scale-100 pointer-events-auto'
-            : 'translate-x-4 opacity-0 scale-75 pointer-events-none'
-          }
-        `}
-      >
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2.5}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M5 15l7-7 7 7"
-          />
-        </svg>
-      </button>
     </div>
   );
 }
