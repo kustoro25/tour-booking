@@ -1,24 +1,19 @@
-import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
+'use client';
 
-async function getCompanyInfo() {
-  try {
-    const [emailSetting, phoneSetting] = await Promise.all([
-      prisma.setting.findUnique({ where: { key: 'company_email' } }),
-      prisma.setting.findUnique({ where: { key: 'company_phone' } }),
-    ]);
-    return {
-      email: emailSetting ? JSON.parse(emailSetting.value) : 'info@jelajahnusantara.com',
-      phone: phoneSetting ? JSON.parse(phoneSetting.value) : '+62 812-3456-7890',
-      address: 'Jl. Pariwisata No. 123, Jakarta Selatan',
-    };
-  } catch {
-    return {
-      email: 'info@jelajahnusantara.com',
-      phone: '+62 812-3456-7890',
-      address: 'Jl. Pariwisata No. 123, Jakarta Selatan',
-    };
-  }
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+
+function useCompanyInfo() {
+  const [info, setInfo] = useState({ email: 'info@jelajahnusantara.com', phone: '+62 812-3456-7890' });
+  useEffect(() => {
+    fetch('/api/settings/public')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.data) setInfo(data.data);
+      })
+      .catch(() => {});
+  }, []);
+  return info;
 }
 
 const footerLinks = {
@@ -36,8 +31,8 @@ const footerLinks = {
   ],
 };
 
-export default async function Footer() {
-  const info = await getCompanyInfo();
+export default function Footer() {
+  const info = useCompanyInfo();
   return (
     <footer className="bg-gray-900 text-gray-300 relative">
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-teal-500 to-orange-500" />
@@ -58,7 +53,7 @@ export default async function Footer() {
             <div className="space-y-1.5 text-sm text-gray-400 mb-4">
               <p className="flex items-start gap-2">
                 <span className="mt-0.5 flex-shrink-0">📍</span>
-                <span>{info.address}</span>
+                <span>{'Jl. Pariwisata No. 123, Jakarta Selatan'}</span>
               </p>
               <p className="flex items-center gap-2">
                 <span className="flex-shrink-0">📞</span>
