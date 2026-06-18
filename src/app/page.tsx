@@ -160,8 +160,23 @@ async function getCmsValue() {
   };
 }
 
+async function getCmsCta() {
+  try {
+    const page = await prisma.page.findUnique({ where: { slug: 'home-cta' } });
+    if (page?.content) return JSON.parse(page.content);
+  } catch { /* fallback */ }
+  return {
+    heading: 'Siap untuk Petualangan Berikutnya?',
+    subheading: 'Pilih paket tour favorit Anda dan booking dalam hitungan menit. Mudah, cepat, dan transparan.',
+    ctaText: 'Jelajahi Paket Tour',
+    ctaLink: '/tours',
+    cta2Text: 'Hubungi Kami',
+    cta2Link: '/contact',
+  };
+}
+
 export default async function HomePage() {
-  const [tours, reviews, destinations, galleryPhotos, faqs, hero, valueData] = await Promise.all([
+  const [tours, reviews, destinations, galleryPhotos, faqs, hero, valueData, ctaData] = await Promise.all([
     getFeaturedTours(),
     getLatestReviews(),
     getFeaturedDestinations(),
@@ -169,6 +184,7 @@ export default async function HomePage() {
     getCmsFaqs(),
     getCmsHero(),
     getCmsValue(),
+    getCmsCta(),
   ]);
 
   const heroStats = hero.stats || [];
@@ -525,17 +541,17 @@ export default async function HomePage() {
         <div className="absolute top-[40%] left-[10%] w-[150px] h-[150px] rounded-full bg-white/5 animate-pulse-soft" />
         <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 md:px-8">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
-            Siap untuk Petualangan Berikutnya?
+            {ctaData.heading || 'Siap untuk Petualangan Berikutnya?'}
           </h2>
           <p className="text-blue-100 mb-8 text-lg max-w-2xl mx-auto">
-            Pilih paket tour favorit Anda dan booking dalam hitungan menit. Mudah, cepat, dan transparan.
+            {ctaData.subheading || 'Pilih paket tour favorit Anda dan booking dalam hitungan menit.'}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button href="/tours" variant="accent" size="lg">
-              Jelajahi Paket Tour
+            <Button href={ctaData.ctaLink || '/tours'} variant="accent" size="lg">
+              {ctaData.ctaText || 'Jelajahi Paket Tour'}
             </Button>
-            <Button href="/contact" variant="outline" size="lg" className="!border-white !text-white hover:!bg-white/10">
-              Hubungi Kami
+            <Button href={ctaData.cta2Link || '/contact'} variant="outline" size="lg" className="!border-white !text-white hover:!bg-white/10">
+              {ctaData.cta2Text || 'Hubungi Kami'}
             </Button>
           </div>
         </div>

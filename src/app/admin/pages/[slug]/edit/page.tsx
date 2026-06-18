@@ -216,6 +216,14 @@ const defaultData: Record<string, PageData> = {
     subheading: 'Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka yang sudah merasakan serunya liburan tanpa beban bersama Jelajah Nusantara.',
   },
   'footer': { text: 'Platform booking tour terpercaya untuk menjelajahi destinasi terbaik di Indonesia.' },
+  'home-cta': {
+    heading: 'Siap untuk Petualangan Berikutnya?',
+    subheading: 'Pilih paket tour favorit Anda dan booking dalam hitungan menit. Mudah, cepat, dan transparan.',
+    ctaText: 'Jelajahi Paket Tour',
+    ctaLink: '/tours',
+    cta2Text: 'Hubungi Kami',
+    cta2Link: '/contact',
+  },
 };
 
 export default function AdminPageEditPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -236,7 +244,8 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
   const isContact = slug === 'contact';
   const isTestimonials = slug === 'testimonials';
   const isFooter = slug === 'footer';
-  const isGeneric = !isHero && !isValue && !isFaq && !isStats && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter;
+  const isCta = slug === 'home-cta';
+  const isGeneric = !isHero && !isValue && !isFaq && !isStats && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta;
 
   useEffect(() => { fetchPage(); }, [slug]);
 
@@ -578,6 +587,38 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
               placeholder="Deskripsi singkat di footer..." />
           </SectionCard>
+        )}
+
+        {/* ═══════════ HOME - CTA ═══════════ */}
+        {isCta && (
+          <>
+            <SectionCard icon="📝" title="Heading & Subheading">
+              <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-2"
+                placeholder="Siap untuk Petualangan Berikutnya?" />
+              <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                placeholder="Pilih paket tour favorit Anda..." />
+            </SectionCard>
+            <SectionCard icon="🔗" title="Tombol CTA">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Tombol 1 (oranye)</label>
+                  <input type="text" value={data.ctaText || ''} onChange={e => update('ctaText', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-2" placeholder="Jelajahi Paket Tour" />
+                  <input type="text" value={data.ctaLink || ''} onChange={e => update('ctaLink', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="/tours" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Tombol 2 (outline putih)</label>
+                  <input type="text" value={data.cta2Text || ''} onChange={e => update('cta2Text', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-2" placeholder="Hubungi Kami" />
+                  <input type="text" value={data.cta2Link || ''} onChange={e => update('cta2Link', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="/contact" />
+                </div>
+              </div>
+            </SectionCard>
+          </>
         )}
 
         {/* ═══════════ Generic fallback ═══════════ */}
