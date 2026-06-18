@@ -192,19 +192,19 @@ export default async function HomePage() {
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Mengapa Memilih Kami?</h2>
             <p className="text-gray-500 max-w-2xl mx-auto">Kami hadir untuk memberikan pengalaman booking tour terbaik dengan standar pelayanan premium.</p>
           </div>
-          <div className="grid grid-cols-4 gap-1.5 sm:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             {[
               { icon: '💰', title: 'Harga Transparan', desc: 'Tidak ada biaya tersembunyi. Apa yang Anda lihat, itulah yang Anda bayar.', color: 'from-green-500 to-emerald-600', bg: 'bg-green-50', text: 'text-green-600' },
               { icon: '⚡', title: 'Booking Instan', desc: '3 langkah, 1 menit. Invoice langsung terbit dan masuk ke email Anda.', color: 'from-blue-500 to-blue-600', bg: 'bg-blue-50', text: 'text-blue-600' },
               { icon: '🎯', title: 'Guide Profesional', desc: 'Tim guide kami berpengalaman dan bersertifikat resmi.', color: 'from-purple-500 to-purple-600', bg: 'bg-purple-50', text: 'text-purple-600' },
               { icon: '🛡️', title: 'Garansi Keberangkatan', desc: 'Jadwal pasti berangkat sesuai kuota minimum yang realistis.', color: 'from-orange-500 to-orange-600', bg: 'bg-orange-50', text: 'text-orange-600' },
             ].map((item, i) => (
-              <div key={item.title} className="group bg-white rounded-xl p-1.5 sm:p-6 shadow-card hover-lift text-center border border-gray-100 hover:border-blue-100 transition-colors">
-                <div className={`w-7 h-7 sm:w-14 sm:h-14 mx-auto mb-1 sm:mb-4 rounded-lg sm:rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center text-sm sm:text-2xl shadow-md group-hover:scale-110 transition-transform duration-300`}>
+              <div key={item.title} className="group bg-white rounded-xl p-3 sm:p-6 shadow-card hover-lift text-center border border-gray-100 hover:border-blue-100 transition-colors">
+                <div className={`w-10 h-10 sm:w-14 sm:h-14 mx-auto mb-2 sm:mb-4 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center text-xl sm:text-2xl shadow-md group-hover:scale-110 transition-transform duration-300`}>
                   <span>{item.icon}</span>
                 </div>
-                <h3 className="text-[10px] sm:text-lg font-semibold text-gray-900 mb-0.5 sm:mb-2 leading-tight">{item.title}</h3>
-                <p className="text-gray-500 text-[8px] sm:text-sm leading-tight sm:leading-relaxed">{item.desc}</p>
+                <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">{item.title}</h3>
+                <p className="text-gray-500 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
