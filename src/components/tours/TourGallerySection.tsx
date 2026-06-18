@@ -65,7 +65,7 @@ export default function TourGallerySection({ images, tourName }: TourGallerySect
           {/* Main large image */}
           <button
             onClick={() => openLightbox(0)}
-            className="col-span-2 relative group cursor-zoom-in overflow-hidden"
+            className="col-span-2 relative group cursor-zoom-in overflow-hidden aspect-[16/9]"
           >
             <Image
               src={images[0].url}
@@ -90,7 +90,7 @@ export default function TourGallerySection({ images, tourName }: TourGallerySect
             <button
               key={i}
               onClick={() => openLightbox(i + 1)}
-              className="relative group cursor-zoom-in overflow-hidden"
+              className="relative group cursor-zoom-in overflow-hidden aspect-[4/3]"
             >
               <Image
                 src={img.url}
