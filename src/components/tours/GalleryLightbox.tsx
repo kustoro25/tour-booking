@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import Image from 'next/image';
 
 interface GalleryLightboxProps {
   images: { url: string; alt: string }[];
@@ -17,15 +16,14 @@ export default function GalleryLightbox({
   onClose,
 }: GalleryLightboxProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  const [zoom, setZoom] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const thumbnailsRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
-  // Reset to initialIndex when opened
   useEffect(() => {
     if (isOpen) {
       setCurrentIndex(initialIndex);
-      setZoom(false);
       setLoaded(false);
       document.body.style.overflow = 'hidden';
     } else {
@@ -39,7 +37,6 @@ export default function GalleryLightbox({
   const goTo = useCallback(
     (index: number) => {
       setLoaded(false);
-      setZoom(false);
       setCurrentIndex((index + images.length) % images.length);
     },
     [images.length],
@@ -53,22 +50,16 @@ export default function GalleryLightbox({
     if (!isOpen) return;
     const handler = (e: KeyboardEvent) => {
       switch (e.key) {
-        case 'Escape':
-          onClose();
-          break;
-        case 'ArrowRight':
-          goNext();
-          break;
-        case 'ArrowLeft':
-          goPrev();
-          break;
+        case 'Escape': onClose(); break;
+        case 'ArrowRight': goNext(); break;
+        case 'ArrowLeft': goPrev(); break;
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [isOpen, onClose, goNext, goPrev]);
 
-  // Scroll active thumbnail into view
+  // Scroll thumbnail into view
   useEffect(() => {
     if (thumbnailsRef.current) {
       const active = thumbnailsRef.current.children[currentIndex] as HTMLElement | undefined;
@@ -78,136 +69,138 @@ export default function GalleryLightbox({
     }
   }, [currentIndex]);
 
-  if (!isOpen) return null;
+  // Touch swipe handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    touchEndX.current = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX.current;
+    if (Math.abs(diff) > 60) {
+      if (diff > 0) goNext();
+      else goPrev();
+    }
+  };
 
-  const currentImage = images[currentIndex];
+  if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex flex-col bg-black/95 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-[9999] flex flex-col bg-black animate-fade-in"
       role="dialog"
       aria-modal="true"
       aria-label="Galeri foto"
     >
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 flex-shrink-0">
-        <span className="text-white/70 text-sm font-medium">
+      {/* ═══ TOP BAR ═══ */}
+      <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 flex-shrink-0 bg-gradient-to-b from-black/60 to-transparent z-10">
+        <span className="text-white/70 text-sm font-medium tabular-nums">
           {currentIndex + 1} / {images.length}
         </span>
         <div className="flex items-center gap-2">
-          {/* Zoom toggle */}
-          <button
-            onClick={() => setZoom(!zoom)}
-            className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
-            aria-label={zoom ? 'Perkecil' : 'Perbesar'}
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              {zoom ? (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" />
-              )}
-            </svg>
-          </button>
           {/* Close */}
           <button
             onClick={onClose}
-            className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all"
             aria-label="Tutup galeri"
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
       </div>
 
-      {/* Main image area */}
+      {/* ═══ MAIN IMAGE AREA ═══ */}
       <div
-        className="flex-1 flex items-center justify-center min-h-0 px-2 sm:px-12 relative"
-        onClick={() => setZoom(false)}
+        className="flex-1 flex items-center justify-center min-h-0 px-4 sm:px-16 py-4 relative select-none"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
-        {/* Loading spinner */}
+        {/* Loading indicator */}
         {!loaded && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-10 h-10 border-3 border-white/20 border-t-white rounded-full animate-spin" />
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div className="w-10 h-10 border-[3px] border-white/20 border-t-white rounded-full animate-spin" />
           </div>
         )}
 
-        {/* Previous arrow */}
+        {/* Previous button */}
         {images.length > 1 && (
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              goPrev();
-            }}
-            className="absolute left-2 sm:left-4 z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all backdrop-blur-sm"
+            onClick={(e) => { e.stopPropagation(); goPrev(); }}
+            className="absolute left-2 sm:left-4 z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition-all backdrop-blur-sm shadow-lg"
             aria-label="Foto sebelumnya"
           >
-            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
         )}
 
-        {/* Image */}
-        <div className={`relative max-w-[90vw] transition-all duration-300 ${zoom ? 'overflow-auto' : 'h-full'}`} style={{ aspectRatio: zoom ? 'auto' : undefined }}>
-          <Image
-            src={currentImage.url}
-            alt={currentImage.alt}
-            fill
-            onLoad={() => setLoaded(true)}
-            className={`select-none ${zoom ? 'object-cover' : 'object-contain'} cursor-${zoom ? 'zoom-out' : 'zoom-in'} rounded-lg ${loaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
-            sizes="90vw"
-            unoptimized
-          />
-        </div>
+        {/* The actual image — using plain img for reliable sizing */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={images[currentIndex].url}
+          alt={images[currentIndex].alt}
+          onLoad={() => setLoaded(true)}
+          className={`max-w-full max-h-full object-contain rounded-lg transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          draggable={false}
+        />
 
-        {/* Next arrow */}
+        {/* Next button */}
         {images.length > 1 && (
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              goNext();
-            }}
-            className="absolute right-2 sm:right-4 z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all backdrop-blur-sm"
+            onClick={(e) => { e.stopPropagation(); goNext(); }}
+            className="absolute right-2 sm:right-4 z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition-all backdrop-blur-sm shadow-lg"
             aria-label="Foto berikutnya"
           >
-            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </button>
         )}
       </div>
 
-      {/* Thumbnail strip */}
+      {/* ═══ THUMBNAIL STRIP ═══ */}
       {images.length > 1 && (
-        <div className="flex-shrink-0 py-3 sm:py-4 px-2 sm:px-4">
+        <div className="flex-shrink-0 py-3 sm:py-4 px-2 sm:px-4 bg-gradient-to-t from-black/80 to-transparent z-10">
           <div
             ref={thumbnailsRef}
-            className="flex gap-2 overflow-x-auto px-2 sm:px-4 scrollbar-none snap-x snap-mandatory"
+            className="flex gap-1.5 sm:gap-2 overflow-x-auto px-2 sm:px-4 scrollbar-none snap-x snap-mandatory"
           >
             {images.map((img, i) => (
               <button
                 key={i}
                 onClick={() => goTo(i)}
-                className={`flex-shrink-0 w-16 h-12 sm:w-20 sm:h-14 rounded-lg overflow-hidden border-2 transition-all duration-200 snap-center relative ${
+                className={`flex-shrink-0 w-14 h-10 sm:w-20 sm:h-14 rounded-lg overflow-hidden border-2 transition-all duration-200 snap-center relative ${
                   i === currentIndex
-                    ? 'border-white shadow-lg scale-105'
-                    : 'border-white/20 opacity-50 hover:opacity-80 hover:border-white/50'
+                    ? 'border-white shadow-lg scale-105 ring-2 ring-white/30'
+                    : 'border-white/15 opacity-50 hover:opacity-80 hover:border-white/40'
                 }`}
               >
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={img.url}
                   alt={img.alt}
-                  fill
-                  className="object-cover"
-                  sizes="80px"
-                  unoptimized
+                  className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* ═══ SWIPE HINT (mobile only) ═══ */}
+      {images.length > 1 && (
+        <div className="sm:hidden absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+          {images.map((_, i) => (
+            <div
+              key={i}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                i === currentIndex ? 'bg-white scale-125' : 'bg-white/40'
+              }`}
+            />
+          ))}
         </div>
       )}
     </div>
