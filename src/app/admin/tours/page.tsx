@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { TourCategoryLabels } from '@/types';
 import type { TourCategory } from '@/types';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 interface Tour {
   id: string;
@@ -82,7 +83,23 @@ export default function AdminToursPage() {
   const paginatedTours = filteredTours.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE);
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-10 w-10 border-2 border-blue-600 border-t-transparent" /></div>;
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <Skeleton className="h-40 w-full rounded-none" />
+            <div className="p-4 space-y-3">
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-3 w-1/2" />
+              <div className="flex justify-between">
+                <Skeleton className="h-5 w-24" />
+                <Skeleton className="h-8 w-16 rounded-lg" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   }
 
   return (

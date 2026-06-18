@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 interface TourSlot {
   id: string;
@@ -248,8 +249,13 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
 
             {/* Calendar Grid */}
             {loading ? (
-              <div className="flex justify-center py-16">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent" />
+              <div className="grid grid-cols-7 gap-px">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <Skeleton key={`hdr-${i}`} className="h-8 w-full rounded-none" />
+                ))}
+                {Array.from({ length: 35 }).map((_, i) => (
+                  <Skeleton key={i} className="aspect-square w-full rounded-none" />
+                ))}
               </div>
             ) : (
               <div className="grid grid-cols-7">

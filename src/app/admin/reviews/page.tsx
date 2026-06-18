@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import StarRating from '@/components/ui/StarRating';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 interface Review {
   id: string;
@@ -55,7 +56,18 @@ export default function AdminReviewsPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-10 w-10 border-2 border-blue-600 border-t-transparent" /></div>
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-xl shadow-sm p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-16 rounded-full" />
+              </div>
+              <Skeleton className="h-4 w-full mb-1" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="space-y-4">
           {reviews.map(review => (

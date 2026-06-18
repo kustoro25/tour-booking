@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 interface Slot {
   date: string;
@@ -114,8 +115,13 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-48">
-          <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent" />
+        <div className="grid grid-cols-7 gap-1">
+          {Array.from({ length: 7 }).map((_, i) => (
+            <Skeleton key={`hdr-${i}`} className="h-6 w-full rounded" />
+          ))}
+          {Array.from({ length: 35 }).map((_, i) => (
+            <Skeleton key={i} className="aspect-square w-full rounded" />
+          ))}
         </div>
       ) : (
         <>

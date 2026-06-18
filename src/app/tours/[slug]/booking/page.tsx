@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import BookingCalendar from '@/components/booking/BookingCalendar';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 interface Tour {
   id: string;
@@ -168,8 +169,15 @@ export default function BookingPage() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-20 text-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-blue-600 border-t-transparent mx-auto" />
+      <div className="max-w-3xl mx-auto px-4 py-12">
+        <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+          <Skeleton className="h-8 w-64 mx-auto" />
+          <Skeleton className="h-5 w-48 mx-auto" />
+          <div className="max-w-md mx-auto">
+            <Skeleton className="h-64 w-full rounded-xl" />
+          </div>
+          <Skeleton className="h-10 w-40 ml-auto" />
+        </div>
       </div>
     );
   }

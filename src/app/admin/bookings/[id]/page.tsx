@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { OrderStatusLabels } from '@/types';
 import type { OrderStatus } from '@/types';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 export default function BookingDetailPage() {
   const params = useParams();
@@ -29,7 +30,21 @@ export default function BookingDetailPage() {
 
   const formatCurrency = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-10 w-10 border-2 border-blue-600 border-t-transparent" /></div>;
+  if (loading) return (
+    <div className="max-w-4xl mx-auto">
+      <Skeleton className="h-8 w-48 mb-6" />
+      <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+        <Skeleton className="h-8 w-64" />
+        <div className="grid grid-cols-2 gap-4">
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+        </div>
+        <Skeleton className="h-24 w-full" />
+      </div>
+    </div>
+  );
   if (!booking) return <div className="text-center py-12 text-gray-500">Booking tidak ditemukan</div>;
 
   return (

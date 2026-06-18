@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import StarRating from '@/components/ui/StarRating';
 import Button from '@/components/ui/Button';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 interface ReviewInfo {
   customerName: string;
@@ -74,9 +75,20 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
 
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-        <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
-        <p className="text-gray-500">Memuat halaman review...</p>
+      <div className="max-w-2xl mx-auto px-4 py-12">
+        <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+          <Skeleton className="h-8 w-64 mx-auto" />
+          <Skeleton className="h-20 w-full rounded-lg" />
+          <div className="space-y-4">
+            <div className="flex gap-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-8 w-8 rounded" />
+              ))}
+            </div>
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+          </div>
+        </div>
       </div>
     );
   }

@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 export default function EditDestinationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -134,8 +135,14 @@ export default function EditDestinationPage({ params }: { params: Promise<{ id: 
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-blue-600 border-t-transparent" />
+      <div className="max-w-4xl">
+        <Skeleton className="h-8 w-48 mb-6" />
+        <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-32 w-full" />
+        </div>
       </div>
     );
   }

@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { TourCategoryLabels } from '@/types';
 import type { TourCategory, ItineraryDay } from '@/types';
 import { useToast } from '@/components/ui/Toast';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 interface DestinationOption {
   id: string;
@@ -138,7 +139,31 @@ export default function EditTourPage() {
     finally { setSaving(false); }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-10 w-10 border-2 border-blue-600 border-t-transparent" /></div>;
+  if (loading) {
+    return (
+      <div className="max-w-4xl">
+        <Skeleton className="h-8 w-48 mb-6" />
+        <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <div className="grid grid-cols-2 gap-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <Skeleton className="h-32 w-full" />
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-6 mt-4 space-y-4">
+          <Skeleton className="h-6 w-24" />
+          <div className="grid grid-cols-3 gap-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 type InvoiceTheme = 'classic' | 'modern' | 'minimal' | 'premium';
 
@@ -68,10 +69,10 @@ export default function AdminSettingsPage() {
     return (
       <div className="max-w-2xl">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Pengaturan</h1>
-        <div className="bg-white rounded-xl shadow-sm p-6 animate-pulse space-y-4">
-          <div className="h-5 bg-gray-200 rounded w-1/3" />
-          <div className="h-10 bg-gray-200 rounded" />
-          <div className="h-10 bg-gray-200 rounded" />
+        <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+          <Skeleton className="h-5 w-1/3" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
         </div>
       </div>
     );
