@@ -1,32 +1,53 @@
 import { prisma } from '@/lib/prisma';
 import StarRating from '@/components/ui/StarRating';
 import Button from '@/components/ui/Button';
+import Pagination from '@/components/ui/Pagination';
 
 export const dynamic = 'force-dynamic';
 
-async function getReviews() {
-  const reviews = await prisma.review.findMany({
-    where: { status: 'APPROVED' },
-    orderBy: { createdAt: 'desc' },
-    include: {
-      order: { select: { customerName: true } },
-      tour: { select: { name: true, slug: true } },
-    },
-  });
+const PER_PAGE = 9;
 
-  const avgRating =
-    reviews.length > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      : 0;
-
-  return { reviews, avgRating: Math.round(avgRating * 10) / 10, total: reviews.length };
+interface PageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function TestimonialsPage() {
-  const { reviews, avgRating, total } = await getReviews();
+async function getReviews(page: number, limit: number) {
+  const skip = (page - 1) * limit;
+
+  const [reviews, total, allRatings] = await Promise.all([
+    prisma.review.findMany({
+      where: { status: 'APPROVED' },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+      include: {
+        order: { select: { customerName: true } },
+        tour: { select: { name: true, slug: true } },
+      },
+    }),
+    prisma.review.count({ where: { status: 'APPROVED' } }),
+    prisma.review.findMany({
+      where: { status: 'APPROVED' },
+      select: { rating: true },
+    }),
+  ]);
+
+  const avgRating =
+    allRatings.length > 0
+      ? allRatings.reduce((sum, r) => sum + r.rating, 0) / allRatings.length
+      : 0;
+
+  return { reviews, total, avgRating: Math.round(avgRating * 10) / 10, allRatings };
+}
+
+export default async function TestimonialsPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const page = typeof params.page === 'string' ? Math.max(1, parseInt(params.page) || 1) : 1;
+  const { reviews, total, avgRating, allRatings } = await getReviews(page, PER_PAGE);
+  const totalPages = Math.ceil(total / PER_PAGE);
 
   const distribution = [5, 4, 3, 2, 1].map((star) => {
-    const count = reviews.filter((r) => r.rating === star).length;
+    const count = allRatings.filter((r) => r.rating === star).length;
     return { star, count, percentage: total > 0 ? (count / total) * 100 : 0 };
   });
 
@@ -69,24 +90,35 @@ export default async function TestimonialsPage() {
 
       {/* Reviews Grid */}
       {reviews.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {reviews.map((review) => (
-            <div key={review.id} className="bg-white rounded-xl shadow-card p-6 border border-gray-100 hover-lift">
-              <div className="text-4xl text-blue-200 mb-2 leading-none">&ldquo;</div>
-              <StarRating rating={review.rating} size="sm" />
-              <p className="text-gray-600 mt-3 text-sm leading-relaxed">
-                {review.reviewText}
-              </p>
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <p className="font-semibold text-gray-900 text-sm">{review.order.customerName}</p>
-                <p className="text-xs text-gray-500">{review.tour.name}</p>
-                <p className="text-xs text-gray-400 mt-1">
-                  {new Date(review.createdAt).toLocaleDateString('id-ID')}
+        <>
+          <p className="text-sm text-gray-500 mb-4">
+            Menampilkan {reviews.length} dari {total} testimoni
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {reviews.map((review) => (
+              <div key={review.id} className="bg-white rounded-xl shadow-card p-6 border border-gray-100 hover-lift">
+                <div className="text-4xl text-blue-200 mb-2 leading-none">&ldquo;</div>
+                <StarRating rating={review.rating} size="sm" />
+                <p className="text-gray-600 mt-3 text-sm leading-relaxed">
+                  {review.reviewText}
                 </p>
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <p className="font-semibold text-gray-900 text-sm">{review.order.customerName}</p>
+                  <p className="text-xs text-gray-500">{review.tour.name}</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {new Date(review.createdAt).toLocaleDateString('id-ID')}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            basePath="/testimonials"
+          />
+        </>
       ) : (
         <div className="text-center py-16 bg-white rounded-xl shadow-card border border-gray-100">
           <div className="text-6xl mb-4">📝</div>

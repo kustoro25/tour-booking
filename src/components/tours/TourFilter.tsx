@@ -26,7 +26,7 @@ export default function TourFilter({ currentDestination, currentCategory, curren
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-5 space-y-6 lg:sticky lg:top-20">
+    <div className="bg-white rounded-xl shadow-sm p-5 space-y-6 md:sticky md:top-20">
       <h3 className="font-semibold text-gray-900 text-lg">Filter</h3>
 
       {/* Search */}

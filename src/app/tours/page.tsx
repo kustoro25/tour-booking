@@ -5,14 +5,17 @@ import type { TourCategory } from '@/types';
 import Link from 'next/link';
 import StarRating from '@/components/ui/StarRating';
 import TourFilter from '@/components/tours/TourFilter';
+import Pagination from '@/components/ui/Pagination';
 
 export const dynamic = 'force-dynamic';
+
+const PER_PAGE = 9;
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-async function getTours(searchParams: { [key: string]: string | string[] | undefined }) {
+async function getTours(searchParams: { [key: string]: string | string[] | undefined }, page: number, limit: number) {
   const destination = typeof searchParams.destination === 'string' ? searchParams.destination : '';
   const category = typeof searchParams.category === 'string' ? searchParams.category : '';
   const minPrice = typeof searchParams.minPrice === 'string' ? parseFloat(searchParams.minPrice) : undefined;
@@ -36,53 +39,62 @@ async function getTours(searchParams: { [key: string]: string | string[] | undef
     where.priceAdult = priceFilter;
   }
 
-  // Duration filter
-  if (duration) {
-    const durMap: Record<string, number[]> = {
-      '1-2': [1, 2],
-      '3-4': [3, 4],
-      '5-7': [5, 6, 7],
-      '8+': [8, 99],
-    };
-    // Simplified: filter by duration string pattern
-  }
-
   const orderBy: Record<string, string> = {};
   switch (sort) {
     case 'cheapest': orderBy.priceAdult = 'asc'; break;
     case 'expensive': orderBy.priceAdult = 'desc'; break;
-    case 'rating': orderBy.createdAt = 'desc'; break; // Simplified
+    case 'rating': orderBy.createdAt = 'desc'; break;
     default: orderBy.createdAt = 'desc';
   }
 
-  const tours = await prisma.tour.findMany({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    where: where as any,
-    orderBy,
-    include: {
-      _count: { select: { orders: true, reviews: true } },
-      reviews: { select: { rating: true } },
-    },
-  });
+  const skip = (page - 1) * limit;
 
-  return tours.map((tour) => {
-    const avgRating =
-      tour.reviews.length > 0
-        ? tour.reviews.reduce((sum, r) => sum + r.rating, 0) / tour.reviews.length
-        : 0;
-    return {
-      ...tour,
-      avgRating: Math.round(avgRating * 10) / 10,
-    };
-  });
+  const [tours, total] = await Promise.all([
+    prisma.tour.findMany({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      where: where as any,
+      orderBy,
+      skip,
+      take: limit,
+      include: {
+        _count: { select: { orders: true, reviews: true } },
+        reviews: { select: { rating: true } },
+      },
+    }),
+    prisma.tour.count({ where: where as any }),
+  ]);
+
+  return {
+    tours: tours.map((tour) => {
+      const avgRating =
+        tour.reviews.length > 0
+          ? tour.reviews.reduce((sum, r) => sum + r.rating, 0) / tour.reviews.length
+          : 0;
+      return {
+        ...tour,
+        avgRating: Math.round(avgRating * 10) / 10,
+      };
+    }),
+    total,
+  };
 }
 
 export default async function ToursPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const tours = await getTours(params);
+  const page = typeof params.page === 'string' ? Math.max(1, parseInt(params.page) || 1) : 1;
+  const { tours, total } = await getTours(params, page, PER_PAGE);
+  const totalPages = Math.ceil(total / PER_PAGE);
   const currentDestination = typeof params.destination === 'string' ? params.destination : '';
   const currentCategory = typeof params.category === 'string' ? params.category : '';
   const currentSort = typeof params.sort === 'string' ? params.sort : 'newest';
+
+  // Build search params for pagination (exclude page itself)
+  const paginationParams: Record<string, string> = {};
+  if (currentDestination) paginationParams.destination = currentDestination;
+  if (currentCategory) paginationParams.category = currentCategory;
+  if (currentSort && currentSort !== 'newest') paginationParams.sort = currentSort;
+  const search = typeof params.search === 'string' ? params.search : '';
+  if (search) paginationParams.search = search;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-12">
@@ -114,53 +126,66 @@ export default async function ToursPage({ searchParams }: PageProps) {
               <p className="text-gray-500">Coba ubah filter atau kata kunci pencarian Anda.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {tours.map((tour) => (
-                <Link
-                  key={tour.id}
-                  href={`/tours/${tour.slug}`}
-                  className="group bg-white rounded-xl overflow-hidden shadow-card hover-lift"
-                >
-                  <div className="h-44 bg-gray-200 relative overflow-hidden">
-                    {tour.coverImg ? (
-                      <img src={tour.coverImg} alt={tour.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-teal-400">
-                        <span className="text-white text-3xl">🏝️</span>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <span className="absolute top-2 left-2 bg-white/95 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
-                      {TourCategoryLabels[tour.category as TourCategory] || tour.category}
-                    </span>
-                  </div>
-                  <div className="p-5">
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-                      <span className="flex items-center gap-1"><span>🕐</span> {tour.duration}</span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1"><span>📍</span> {tour.destination}</span>
-                    </div>
-                    <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">
-                      {tour.name}
-                    </h3>
-                    <div className="flex items-center gap-2 mb-2">
-                      {tour.avgRating !== undefined && tour.avgRating > 0 ? (
-                        <StarRating rating={tour.avgRating} size="sm" />
+            <>
+              {/* Result count */}
+              <p className="text-sm text-gray-500 mb-4">
+                Menampilkan {tours.length} dari {total} paket wisata
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {tours.map((tour) => (
+                  <Link
+                    key={tour.id}
+                    href={`/tours/${tour.slug}`}
+                    className="group bg-white rounded-xl overflow-hidden shadow-card hover-lift"
+                  >
+                    <div className="h-44 bg-gray-200 relative overflow-hidden">
+                      {tour.coverImg ? (
+                        <img src={tour.coverImg} alt={tour.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       ) : (
-                        <span className="text-xs text-gray-400">Belum ada review</span>
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-teal-400">
+                          <span className="text-white text-3xl">🏝️</span>
+                        </div>
                       )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <span className="absolute top-2 left-2 bg-white/95 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
+                        {TourCategoryLabels[tour.category as TourCategory] || tour.category}
+                      </span>
                     </div>
-                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                      <div>
-                        <span className="text-xs text-gray-400">Mulai dari</span>
-                        <p className="text-lg font-bold text-blue-600">{formatCurrency(tour.priceAdult)}</p>
+                    <div className="p-5">
+                      <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                        <span className="flex items-center gap-1"><span>🕐</span> {tour.duration}</span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1"><span>📍</span> {tour.destination}</span>
                       </div>
-                      <span className="text-sm font-medium text-blue-600 group-hover:translate-x-1 transition-transform duration-200">Detail →</span>
+                      <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">
+                        {tour.name}
+                      </h3>
+                      <div className="flex items-center gap-2 mb-2">
+                        {tour.avgRating !== undefined && tour.avgRating > 0 ? (
+                          <StarRating rating={tour.avgRating} size="sm" />
+                        ) : (
+                          <span className="text-xs text-gray-400">Belum ada review</span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <div>
+                          <span className="text-xs text-gray-400">Mulai dari</span>
+                          <p className="text-lg font-bold text-blue-600">{formatCurrency(tour.priceAdult)}</p>
+                        </div>
+                        <span className="text-sm font-medium text-blue-600 group-hover:translate-x-1 transition-transform duration-200">Detail →</span>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                  </Link>
+                ))}
+              </div>
+
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                basePath="/tours"
+                searchParams={paginationParams}
+              />
+            </>
           )}
         </div>
       </div>

@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { parseJsonSafe } from '@/lib/utils';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import Pagination from '@/components/ui/Pagination';
 
 export const metadata: Metadata = {
   title: 'Destinasi Wisata',
@@ -10,12 +11,29 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function DestinationsPage() {
-  const destinations = await prisma.destination.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: 'asc' },
-    include: { _count: { select: { tours: true } } },
-  });
+const PER_PAGE = 12;
+
+interface PageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function DestinationsPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const page = typeof params.page === 'string' ? Math.max(1, parseInt(params.page) || 1) : 1;
+  const skip = (page - 1) * PER_PAGE;
+
+  const [destinations, total] = await Promise.all([
+    prisma.destination.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: 'asc' },
+      skip,
+      take: PER_PAGE,
+      include: { _count: { select: { tours: true } } },
+    }),
+    prisma.destination.count({ where: { isActive: true } }),
+  ]);
+
+  const totalPages = Math.ceil(total / PER_PAGE);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-12">
@@ -52,18 +70,29 @@ export default async function DestinationsPage() {
       <div>
         <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-sm">🗺️</span>
-          Semua Destinasi ({destinations.length})
+          Semua Destinasi ({total})
         </h2>
         {destinations.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-xl shadow-card">
             <p className="text-gray-500">Belum ada destinasi yang tersedia.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {destinations.map((dest) => (
-              <DestinationCard key={dest.id} destination={dest} />
-            ))}
-          </div>
+          <>
+            <p className="text-sm text-gray-500 mb-4">
+              Menampilkan {destinations.length} dari {total} destinasi
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {destinations.map((dest) => (
+                <DestinationCard key={dest.id} destination={dest} />
+              ))}
+            </div>
+
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              basePath="/destinations"
+            />
+          </>
         )}
       </div>
     </div>
