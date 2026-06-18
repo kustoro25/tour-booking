@@ -95,12 +95,19 @@ img { image-rendering: auto; }
 .animate-delay-500 { animation-delay: 0.5s; }
 
 /* ============ CAROUSEL SCROLL ============ */
-@keyframes scroll {
+@keyframes scroll-left {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
-.animate-scroll {
-  animation: scroll var(--scroll-duration, 40s) linear infinite;
+@keyframes scroll-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.animate-scroll-left {
+  animation: scroll-left var(--scroll-duration, 22s) linear infinite;
+}
+.animate-scroll-right {
+  animation: scroll-right var(--scroll-duration, 22s) linear infinite;
 }
 
 /* ============ ENHANCED SHADOWS ============ */
