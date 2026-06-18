@@ -207,8 +207,6 @@ export default async function HomePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {destinations.map((dest) => {
-                const activities: string[] = parseJsonSafe(dest.activities, []);
-                const tourCount = dest._count?.tours || 0;
                 return (
                   <Link
                     key={dest.id}
@@ -241,9 +239,18 @@ export default async function HomePage() {
                           </svg>
                           {dest.location}
                         </div>
-                        <h3 className="text-xl sm:text-2xl font-bold text-white leading-tight group-hover:text-orange-300 transition-colors">
+                        <h3 className="text-xl sm:text-2xl font-bold text-white leading-tight group-hover:text-orange-300 transition-colors pr-16">
                           {dest.name}
                         </h3>
+                      </div>
+                      {/* View button */}
+                      <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span className="inline-flex items-center gap-1.5 bg-white/95 backdrop-blur-sm text-blue-600 text-sm font-semibold px-4 py-2 rounded-full shadow-lg hover:bg-white transition-colors">
+                          View
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                          </svg>
+                        </span>
                       </div>
                       {/* Highlight badge */}
                       {dest.highlight && (
@@ -251,46 +258,6 @@ export default async function HomePage() {
                           ⭐ Unggulan
                         </span>
                       )}
-                    </div>
-
-                    {/* Card body */}
-                    <div className="p-4 sm:p-5">
-                      {/* Short description */}
-                      <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 mb-3">
-                        {dest.shortDescription || `Temukan keajaiban ${dest.name} — destinasi impian dengan segudang aktivitas seru yang siap kamu jelajahi.`}
-                      </p>
-
-                      {/* Activity tags */}
-                      {activities.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mb-4">
-                          {activities.slice(0, 3).map((act: string, i: number) => (
-                            <span
-                              key={i}
-                              className="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-medium border border-blue-100 hover:bg-blue-100 transition-colors"
-                            >
-                              {act}
-                            </span>
-                          ))}
-                          {activities.length > 3 && (
-                            <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-full">
-                              +{activities.length - 3} lainnya
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Bottom bar */}
-                      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                        <span className="text-xs text-gray-400">
-                          {tourCount > 0 ? `${tourCount} paket tour tersedia` : 'Segera hadir'}
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 group-hover:gap-2 transition-all">
-                          Jelajahi Sekarang
-                          <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                          </svg>
-                        </span>
-                      </div>
                     </div>
                   </Link>
                 );
