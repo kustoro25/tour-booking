@@ -35,9 +35,19 @@ type PageData = {
   landingStats?: StatItem[];
   // privacy / terms
   html?: string;
-  // about / contact / testimonials / footer
+  // about
+  storyTitle?: string;
+  story?: string;
+  vision?: string;
+  mission?: string[];
+  whyUs?: { icon: string; title: string; desc: string; color: string }[];
+  // contact
+  infoCards?: { icon: string; title: string; detail: string; color: string }[];
+  // footer
+  text?: string;
+  // generic fallback
   body?: string;
-  [key: string]: unknown;
+  [key: string]: string | number | boolean | object | undefined | null | string[] | Record<string, unknown>[];
 };
 
 const defaultData: Record<string, PageData> = {
@@ -84,10 +94,40 @@ const defaultData: Record<string, PageData> = {
   },
   'privacy': { html: '' },
   'terms': { html: '' },
-  'about': { body: '' },
-  'contact': { body: '' },
-  'testimonials': { body: '' },
-  'footer': { body: '' },
+  'about': {
+    storyTitle: 'Cerita Kami',
+    story: 'Jelajah Nusantara Tour adalah perusahaan jasa perjalanan wisata yang berkomitmen memberikan pengalaman liburan tak terlupakan dengan pelayanan personal dan harga transparan.\n\nBerdiri sejak 2018, kami telah melayani ribuan wisatawan domestik dan mancanegara dengan paket-paket tour pilihan ke destinasi terbaik di Indonesia. Dari Bali hingga Raja Ampat, dari Bromo hingga Danau Toba — kami ada untuk mewujudkan liburan impian Anda.\n\nKami percaya bahwa setiap perjalanan adalah cerita yang berharga. Itulah mengapa kami merancang setiap paket tour dengan detail dan penuh perhatian, memastikan setiap momen perjalanan Anda menjadi kenangan yang tak terlupakan.',
+    vision: 'Menjadi platform booking tour yang paling mudah, transparan, dan terpercaya bagi wisatawan domestik maupun mancanegara.',
+    mission: [
+      'Menyediakan paket tour berkualitas dengan harga transparan',
+      'Memberikan pelayanan personal dan profesional',
+      'Mempermudah proses booking dengan teknologi modern',
+      'Mendukung pariwisata lokal dan komunitas setempat',
+    ],
+    whyUs: [
+      { icon: '🎯', title: 'Guide Profesional', desc: 'Tim guide kami berpengalaman, bersertifikat, dan ramah.', color: 'bg-blue-50 text-blue-600' },
+      { icon: '💰', title: 'Harga Transparan', desc: 'Tidak ada biaya tersembunyi. Semua jelas di awal.', color: 'bg-green-50 text-green-600' },
+      { icon: '⚡', title: 'Booking Instan', desc: 'Sistem booking modern, invoice langsung terbit.', color: 'bg-purple-50 text-purple-600' },
+      { icon: '🔄', title: 'Fleksibel', desc: 'Jadwal private trip yang bisa disesuaikan.', color: 'bg-teal-50 text-teal-600' },
+      { icon: '🛡️', title: 'Terpercaya', desc: 'Ribuan tamu puas telah menggunakan layanan kami.', color: 'bg-orange-50 text-orange-600' },
+      { icon: '🌿', title: 'Responsible Travel', desc: 'Kami mendukung ekowisata dan pemberdayaan masyarakat lokal.', color: 'bg-emerald-50 text-emerald-600' },
+    ],
+  },
+  'contact': {
+    heading: 'Hubungi Kami',
+    subheading: 'Punya pertanyaan atau butuh bantuan memilih paket? Tim kami siap membantu!',
+    infoCards: [
+      { icon: '📞', title: 'WhatsApp', detail: '+62 812-3456-7890', color: 'from-green-500 to-green-600' },
+      { icon: '📧', title: 'Email', detail: 'info@jelajahnusantara.com', color: 'from-blue-500 to-blue-600' },
+      { icon: '🕐', title: 'Jam Operasional', detail: 'Senin – Jumat, 09.00 – 18.00 WIB', color: 'from-purple-500 to-purple-600' },
+      { icon: '📍', title: 'Alamat', detail: 'Jl. Pariwisata No. 123, Jakarta Selatan', color: 'from-orange-500 to-orange-600' },
+    ],
+  },
+  'testimonials': {
+    heading: 'Cerita dari Mereka yang Telah Berpetualang',
+    subheading: 'Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka yang sudah merasakan serunya liburan tanpa beban bersama Jelajah Nusantara.',
+  },
+  'footer': { text: 'Platform booking tour terpercaya untuk menjelajahi destinasi terbaik di Indonesia.' },
 };
 
 export default function AdminPageEditPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -104,7 +144,11 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
   const isFaq = slug === 'home-faq';
   const isStats = slug === 'home-stats';
   const isHtml = slug === 'privacy' || slug === 'terms';
-  const isGeneric = !isHero && !isValue && !isFaq && !isStats && !isHtml;
+  const isAbout = slug === 'about';
+  const isContact = slug === 'contact';
+  const isTestimonials = slug === 'testimonials';
+  const isFooter = slug === 'footer';
+  const isGeneric = !isHero && !isValue && !isFaq && !isStats && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter;
 
   useEffect(() => { fetchPage(); }, [slug]);
 
@@ -127,7 +171,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
     finally { setLoading(false); }
   };
 
-  const update = (key: string, value: unknown) => setData({ ...data, [key]: value });
+  const update = (key: string, value: string | number | boolean | object | null | undefined | string[] | Record<string, unknown>[]) => setData({ ...data, [key]: value });
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -343,7 +387,112 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
           </SectionCard>
         )}
 
-        {/* ═══════════ Generic (about, contact, testimonials, footer) ═══════════ */}
+        {/* ═══════════ ABOUT ═══════════ */}
+        {isAbout && (
+          <>
+            <SectionCard icon="📖" title="Cerita Kami">
+              <input type="text" value={data.storyTitle || ''} onChange={e => update('storyTitle', e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-3" placeholder="Judul section" />
+              <textarea value={data.story || ''} onChange={e => update('story', e.target.value)} rows={6}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Cerita perusahaan..." />
+            </SectionCard>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <SectionCard icon="🎯" title="Visi">
+                <textarea value={data.vision || ''} onChange={e => update('vision', e.target.value)} rows={3}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+              </SectionCard>
+              <SectionCard icon="🚀" title="Misi">
+                <div className="space-y-2">
+                  {(data.mission as string[] || []).map((m: string, i: number) => (
+                    <div key={i} className="flex gap-2">
+                      <span className="text-teal-500 mt-2 flex-shrink-0">✓</span>
+                      <input type="text" value={m} onChange={e => {
+                        const arr = [...(data.mission as string[] || [])]; arr[i] = e.target.value; update('mission', arr);
+                      }} className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                      {(data.mission as string[] || []).length > 1 && (
+                        <button type="button" onClick={() => update('mission', (data.mission as string[]).filter((_, j) => j !== i))}
+                          className="text-red-400 hover:text-red-600 text-xs">✕</button>
+                      )}
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => update('mission', [...(data.mission as string[] || []), ''])}
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium">+ Tambah Misi</button>
+                </div>
+              </SectionCard>
+            </div>
+            <SectionCard icon="⭐" title="Mengapa Memilih Kami?">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {(data.whyUs as Array<{icon:string;title:string;desc:string;color:string}> || []).map((item, i) => (
+                  <div key={i} className="flex gap-3 p-3 bg-gray-50 rounded-xl">
+                    <input type="text" value={item.icon} onChange={e => {
+                      const arr = [...(data.whyUs as Array<{icon:string;title:string;desc:string;color:string}> || [])]; arr[i] = { ...arr[i], icon: e.target.value }; update('whyUs', arr);
+                    }} className="w-12 text-center border rounded px-1 py-0.5 text-sm" placeholder="🎯" />
+                    <div className="flex-1 space-y-1">
+                      <input type="text" value={item.title} onChange={e => {
+                        const arr = [...(data.whyUs as Array<{icon:string;title:string;desc:string;color:string}> || [])]; arr[i] = { ...arr[i], title: e.target.value }; update('whyUs', arr);
+                      }} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="Judul" />
+                      <input type="text" value={item.desc} onChange={e => {
+                        const arr = [...(data.whyUs as Array<{icon:string;title:string;desc:string;color:string}> || [])]; arr[i] = { ...arr[i], desc: e.target.value }; update('whyUs', arr);
+                      }} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="Deskripsi" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </SectionCard>
+          </>
+        )}
+
+        {/* ═══════════ CONTACT ═══════════ */}
+        {isContact && (
+          <>
+            <SectionCard icon="📝" title="Header">
+              <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-2" />
+              <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+            </SectionCard>
+            <SectionCard icon="📞" title="Info Cards">
+              <div className="space-y-3">
+                {(data.infoCards as Array<{icon:string;title:string;detail:string;color:string}> || []).map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                    <input type="text" value={item.icon} onChange={e => {
+                      const arr = [...(data.infoCards as Array<{icon:string;title:string;detail:string;color:string}> || [])]; arr[i] = { ...arr[i], icon: e.target.value }; update('infoCards', arr);
+                    }} className="w-12 text-center border rounded px-1 py-0.5 text-sm" placeholder="📞" />
+                    <div className="flex-1 space-y-1">
+                      <input type="text" value={item.title} onChange={e => {
+                        const arr = [...(data.infoCards as Array<{icon:string;title:string;detail:string;color:string}> || [])]; arr[i] = { ...arr[i], title: e.target.value }; update('infoCards', arr);
+                      }} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="WhatsApp" />
+                      <input type="text" value={item.detail} onChange={e => {
+                        const arr = [...(data.infoCards as Array<{icon:string;title:string;detail:string;color:string}> || [])]; arr[i] = { ...arr[i], detail: e.target.value }; update('infoCards', arr);
+                      }} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="+62 812-3456-7890" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </SectionCard>
+          </>
+        )}
+
+        {/* ═══════════ TESTIMONIALS ═══════════ */}
+        {isTestimonials && (
+          <SectionCard icon="💬" title="Header Testimoni">
+            <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-2" placeholder="Heading" />
+            <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Subheading" />
+          </SectionCard>
+        )}
+
+        {/* ═══════════ FOOTER ═══════════ */}
+        {isFooter && (
+          <SectionCard icon="📄" title="Footer Text">
+            <textarea value={data.text || ''} onChange={e => update('text', e.target.value)} rows={3}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="Deskripsi singkat di footer..." />
+          </SectionCard>
+        )}
+
+        {/* ═══════════ Generic fallback ═══════════ */}
         {isGeneric && (
           <SectionCard icon="📄" title="Konten">
             <textarea value={data.body || JSON.stringify(data, null, 2)} onChange={e => { try { update('body', e.target.value); } catch { /* keep */ } }} rows={12}
