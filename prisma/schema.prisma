@@ -193,3 +193,23 @@ model Newsletter {
 
   @@map("newsletter_subscribers")
 }
+
+model Blog {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String   @default("")
+  content     String   // Rich HTML
+  coverImg    String?  @map("cover_img")
+  category    String   @default("Umum") // Umum, Tips, Destinasi, Budget, Budaya
+  tags        String   @default("[]") // JSON array
+  author      String   @default("Admin")
+  isPublished Boolean  @default(false) @map("is_published")
+  metaTitle   String?  @map("meta_title")
+  metaDesc    String?  @map("meta_desc")
+  viewCount   Int      @default(0) @map("view_count")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("blog_posts")
+}

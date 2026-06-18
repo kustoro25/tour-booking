@@ -10,6 +10,7 @@ const sidebarLinks = [
   { href: '/admin/tours', label: 'Paket Tour', icon: '🏝️' },
   { href: '/admin/destinations', label: 'Destinasi', icon: '🗺️' },
   { href: '/admin/bookings', label: 'Booking', icon: '📋' },
+  { href: '/admin/blog', label: 'Blog', icon: '📝' },
   { href: '/admin/reviews', label: 'Review', icon: '⭐' },
   { href: '/admin/users', label: 'Admin', icon: '👥' },
   { href: '/admin/settings', label: 'Pengaturan', icon: '⚙️' },

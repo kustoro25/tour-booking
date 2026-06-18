@@ -22,6 +22,7 @@ const footerLinks = {
     { href: '/', label: 'Beranda' },
     { href: '/tours', label: 'Paket Wisata' },
     { href: '/destinations', label: 'Destinasi' },
+    { href: '/blog', label: 'Blog & Tips' },
     { href: '/about', label: 'Tentang Kami' },
     { href: '/testimonials', label: 'Testimoni' },
     { href: '/contact', label: 'Hubungi Kami' },
