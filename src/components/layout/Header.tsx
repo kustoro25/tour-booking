@@ -10,7 +10,6 @@ const navLinks = [
   { href: '/destinations', label: 'Destinasi' },
   { href: '/about', label: 'Tentang Kami' },
   { href: '/testimonials', label: 'Testimoni' },
-  { href: '/faq', label: 'FAQ' },
   { href: '/contact', label: 'Hubungi Kami' },
 ];
 

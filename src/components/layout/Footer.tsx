@@ -10,7 +10,6 @@ const footerLinks = {
     { href: '/contact', label: 'Hubungi Kami' },
   ],
   Bantuan: [
-    { href: '/faq', label: 'FAQ' },
     { href: '/terms', label: 'Syarat & Ketentuan' },
     { href: '/privacy', label: 'Kebijakan Privasi' },
   ],
