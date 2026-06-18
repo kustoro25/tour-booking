@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ToastProvider } from '@/components/ui/Toast';
@@ -21,6 +21,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [brandName, setBrandName] = useState('Jelajah Nusantara');
+
+  useEffect(() => {
+    fetch('/api/settings/public')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.data?.brandName) setBrandName(data.data.brandName);
+      })
+      .catch(() => {});
+  }, []);
 
   const isLoginPage = pathname === '/admin/login';
 
@@ -52,7 +62,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-sm font-bold">JN</div>
             <div>
-              <p className="font-semibold text-sm">Jelajah Nusantara</p>
+              <p className="font-semibold text-sm">{brandName}</p>
               <p className="text-xs text-gray-400">Admin Panel</p>
             </div>
           </div>

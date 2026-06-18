@@ -92,18 +92,19 @@ export default function AdminSettingsPage() {
       )}
 
       <div className="bg-white rounded-xl shadow-sm p-6 space-y-8">
-        {/* Business Identity */}
+        {/* Brand Identity */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Identitas Bisnis</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">🏷️ Brand Identity</h2>
+          <p className="text-xs text-gray-500 mb-4">Nama brand dan icon akan muncul di seluruh website (sidebar, footer, invoice).</p>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Nama Perusahaan</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Nama Brand</label>
               <input
                 type="text"
                 value={form.companyName}
                 onChange={(e) => setForm({ ...form, companyName: e.target.value })}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Nama jasa tour Anda"
+                placeholder="Jelajah Nusantara"
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

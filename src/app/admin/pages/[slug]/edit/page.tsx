@@ -45,6 +45,8 @@ type PageData = {
   infoCards?: { icon: string; title: string; detail: string; color: string }[];
   // footer
   text?: string;
+  copyright?: string;
+  socialLinks?: { platform: string; url: string; icon: string }[];
   // generic fallback
   body?: string;
   [key: string]: string | number | boolean | object | undefined | null | string[] | Record<string, unknown>[];
@@ -215,7 +217,15 @@ const defaultData: Record<string, PageData> = {
     heading: 'Cerita dari Mereka yang Telah Berpetualang',
     subheading: 'Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka yang sudah merasakan serunya liburan tanpa beban bersama Jelajah Nusantara.',
   },
-  'footer': { text: 'Platform booking tour terpercaya untuk menjelajahi destinasi terbaik di Indonesia.' },
+  'footer': {
+    text: 'Platform booking tour terpercaya untuk menjelajahi destinasi terbaik di Indonesia. Harga transparan, booking instan, dan guide profesional.',
+    copyright: `© ${new Date().getFullYear()} Jelajah Nusantara Tour. All rights reserved.`,
+    socialLinks: [
+      { platform: 'WhatsApp', url: 'https://wa.me/6281234567890', icon: 'whatsapp' },
+      { platform: 'Instagram', url: 'https://instagram.com/jelajahnusantara', icon: 'instagram' },
+      { platform: 'Email', url: 'mailto:info@jelajahnusantara.com', icon: 'email' },
+    ],
+  },
   'home-cta': {
     heading: 'Siap untuk Petualangan Berikutnya?',
     subheading: 'Pilih paket tour favorit Anda dan booking dalam hitungan menit. Mudah, cepat, dan transparan.',
@@ -582,11 +592,39 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
 
         {/* ═══════════ FOOTER ═══════════ */}
         {isFooter && (
-          <SectionCard icon="📄" title="Footer Text">
-            <textarea value={data.text || ''} onChange={e => update('text', e.target.value)} rows={3}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-              placeholder="Deskripsi singkat di footer..." />
-          </SectionCard>
+          <>
+            <SectionCard icon="📄" title="Deskripsi">
+              <textarea value={data.text || ''} onChange={e => update('text', e.target.value)} rows={3}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                placeholder="Platform booking tour terpercaya..." />
+            </SectionCard>
+            <SectionCard icon="©️" title="Copyright">
+              <input type="text" value={data.copyright || ''} onChange={e => update('copyright', e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                placeholder="© 2026 Jelajah Nusantara Tour. All rights reserved." />
+            </SectionCard>
+            <SectionCard icon="🔗" title="Social Media Links" addLabel="+ Tambah Medsos" onAdd={() => update('socialLinks', [...(data.socialLinks as Array<{platform:string;url:string;icon:string}> || []), { platform: '', url: '', icon: 'globe' }])}>
+              <div className="space-y-3">
+                {(data.socialLinks as Array<{platform:string;url:string;icon:string}> || []).map((link, i) => (
+                  <div key={i} className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl">
+                    <input type="text" value={link.icon} onChange={e => {
+                      const arr = [...(data.socialLinks as Array<{platform:string;url:string;icon:string}> || [])]; arr[i] = { ...arr[i], icon: e.target.value }; update('socialLinks', arr);
+                    }} className="w-20 border rounded-lg px-2 py-1.5 text-sm" placeholder="whatsapp" />
+                    <input type="text" value={link.platform} onChange={e => {
+                      const arr = [...(data.socialLinks as Array<{platform:string;url:string;icon:string}> || [])]; arr[i] = { ...arr[i], platform: e.target.value }; update('socialLinks', arr);
+                    }} className="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="WhatsApp" />
+                    <input type="text" value={link.url} onChange={e => {
+                      const arr = [...(data.socialLinks as Array<{platform:string;url:string;icon:string}> || [])]; arr[i] = { ...arr[i], url: e.target.value }; update('socialLinks', arr);
+                    }} className="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://..." />
+                    {(data.socialLinks as Array<{platform:string;url:string;icon:string}> || []).length > 1 && (
+                      <button type="button" onClick={() => update('socialLinks', (data.socialLinks as Array<{platform:string;url:string;icon:string}>).filter((_, j) => j !== i))}
+                        className="text-red-400 hover:text-red-600 text-xs px-1">✕</button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </SectionCard>
+          </>
         )}
 
         {/* ═══════════ HOME - CTA ═══════════ */}
