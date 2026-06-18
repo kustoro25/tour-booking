@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useToast } from '@/components/ui/Toast';
 
 function useCompanyInfo() {
   const [info, setInfo] = useState({ email: 'info@jelajahnusantara.com', phone: '+62 812-3456-7890' });
@@ -33,6 +34,33 @@ const footerLinks = {
 
 export default function Footer() {
   const info = useCompanyInfo();
+  const { showToast } = useToast();
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [subscribing, setSubscribing] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail.trim()) return;
+    setSubscribing(true);
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNewsletterEmail('');
+        showToast(data.message || 'Berhasil berlangganan!', 'success');
+      } else {
+        showToast(data.error || 'Gagal berlangganan', 'error');
+      }
+    } catch {
+      showToast('Gagal berlangganan. Silakan coba lagi.', 'error');
+    } finally {
+      setSubscribing(false);
+    }
+  };
   return (
     <footer className="bg-gray-900 text-gray-300 relative">
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-teal-500 to-orange-500" />
@@ -80,6 +108,33 @@ export default function Footer() {
                   )}
                 </a>
               ))}
+            </div>
+
+            {/* Newsletter */}
+            <div className="mt-6 pt-6 border-t border-gray-800">
+              <h4 className="text-white font-semibold text-sm mb-2">
+                Dapatkan Info Terbaru ✉️
+              </h4>
+              <p className="text-gray-400 text-xs mb-3">
+                Berlangganan newsletter untuk info promo & paket terbaru.
+              </p>
+              <form onSubmit={handleSubscribe} className="flex gap-2">
+                <input
+                  type="email"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  placeholder="email@anda.com"
+                  required
+                  className="flex-1 min-w-0 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
+                />
+                <button
+                  type="submit"
+                  disabled={subscribing}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors flex-shrink-0"
+                >
+                  {subscribing ? '...' : 'Subscribe'}
+                </button>
+              </form>
             </div>
           </div>
 
