@@ -49,23 +49,23 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
   };
 
   const getDayClass = (date: Date, isCurrentMonth: boolean): string => {
-    if (!isCurrentMonth) return 'text-gray-300 cursor-default';
+    if (!isCurrentMonth) return 'text-gray-300 cursor-default pointer-events-none';
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (date < today) return 'text-gray-300 cursor-not-allowed';
+    if (date < today) return 'text-gray-300 cursor-not-allowed opacity-40';
 
     const slot = getSlotForDate(date);
     const dateStr = date.toISOString().split('T')[0];
     const isSelected = selectedDate === dateStr;
 
-    if (slot?.isBlackout) return 'bg-gray-100 text-gray-400 cursor-not-allowed';
-    if (slot && slot.bookedCount >= slot.quota) return 'bg-gray-100 text-gray-400 cursor-not-allowed';
-    if (isSelected) return 'bg-orange-500 text-white font-bold cursor-pointer hover:bg-orange-600';
+    if (slot?.isBlackout) return 'bg-red-50 text-red-300 cursor-not-allowed';
+    if (slot && slot.bookedCount >= slot.quota) return 'bg-red-50 text-red-300 cursor-not-allowed';
+    if (isSelected) return 'bg-blue-600 text-white font-bold cursor-pointer shadow-md ring-2 ring-blue-300';
 
     const remaining = slot ? slot.quota - slot.bookedCount : 15;
-    if (remaining <= 3 && remaining > 0) return 'bg-orange-100 text-orange-800 font-medium cursor-pointer hover:bg-orange-200';
-    
-    return 'bg-green-50 text-green-800 cursor-pointer hover:bg-green-100 hover:text-green-900';
+    if (remaining <= 3 && remaining > 0) return 'bg-amber-100 text-amber-800 font-semibold cursor-pointer hover:bg-amber-200 hover:text-amber-900';
+
+    return 'bg-green-100 text-green-800 font-medium cursor-pointer hover:bg-green-200 hover:text-green-900';
   };
 
   const handleDateClick = (date: Date) => {
@@ -150,17 +150,17 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
               );
             })}
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-green-50 border border-green-200 rounded flex-shrink-0" />
+          <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-700">
+            <div className="flex items-center gap-1.5">
+              <div className="w-4 h-4 bg-green-100 border border-green-300 rounded flex-shrink-0" />
               <span>Tersedia</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-orange-100 border border-orange-200 rounded flex-shrink-0" />
+            <div className="flex items-center gap-1.5">
+              <div className="w-4 h-4 bg-amber-100 border border-amber-300 rounded flex-shrink-0" />
               <span>Hampir Penuh</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-gray-200 rounded flex-shrink-0" />
+            <div className="flex items-center gap-1.5">
+              <div className="w-4 h-4 bg-red-50 border border-red-200 rounded flex-shrink-0" />
               <span>Penuh</span>
             </div>
           </div>
