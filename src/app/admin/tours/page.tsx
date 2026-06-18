@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { TourCategoryLabels } from '@/types';
 import type { TourCategory } from '@/types';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useToast } from '@/components/ui/Toast';
 
 interface Tour {
   id: string;
@@ -30,7 +31,7 @@ export default function AdminToursPage() {
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<Tour | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const [toast, setToast] = useState<{ show: boolean; message: string; type: string }>({ show: false, message: '', type: '' });
+  const { showToast } = useToast();
 
   useEffect(() => { fetchTours(); }, []);
 
@@ -43,11 +44,6 @@ export default function AdminToursPage() {
     finally { setLoading(false); }
   };
 
-  const showToast = (message: string, type: string = 'success') => {
-    setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: '', type: '' }), 3000);
-  };
-
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -56,7 +52,7 @@ export default function AdminToursPage() {
       const data = await res.json();
       if (data.success) {
         setTours(tours.filter(t => t.id !== deleteTarget.id));
-        showToast(`"${deleteTarget.name}" berhasil dihapus`);
+        showToast(`"${deleteTarget.name}" berhasil dihapus`, 'success');
       } else {
         showToast(data.error || 'Gagal menghapus', 'error');
       }
@@ -104,15 +100,6 @@ export default function AdminToursPage() {
 
   return (
     <div>
-      {/* Toast */}
-      {toast.show && (
-        <div className={`fixed top-4 right-4 z-[100] px-5 py-3 rounded-xl shadow-lg text-sm font-medium animate-[slideDown_0.3s_ease] ${
-          toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-green-600 text-white'
-        }`}>
-          {toast.message}
-        </div>
-      )}
-
       {/* Delete Modal */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useToast } from '@/components/ui/Toast';
 import { UserRoleLabels, type UserRole } from '@/types';
 
 interface AdminUser {
@@ -19,6 +20,9 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     fetchUsers();
@@ -43,22 +47,28 @@ export default function AdminUsersPage() {
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Hapus admin "${name}"?`)) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
       const res = await fetch('/api/admin/users', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id: deleteTarget.id }),
       });
       const data = await res.json();
       if (data.success) {
         fetchUsers();
+        showToast(`Admin "${deleteTarget.name}" berhasil dihapus`, 'success');
       } else {
-        alert(data.error || 'Gagal menghapus');
+        showToast(data.error || 'Gagal menghapus', 'error');
       }
     } catch (err) {
       console.error(err);
+      showToast('Gagal menghapus admin', 'error');
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -94,6 +104,30 @@ export default function AdminUsersPage() {
 
   return (
     <div>
+      {/* Delete Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDeleteTarget(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4 animate-[scaleIn_0.2s_ease]">
+            <div className="w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 text-center mb-1">Hapus Admin?</h3>
+            <p className="text-sm text-gray-500 text-center mb-6">
+              Admin <strong>&quot;{deleteTarget.name}&quot;</strong> akan dihapus permanen.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteTarget(null)} className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">Batal</button>
+              <button onClick={handleDelete} disabled={deleting} className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 transition-colors">
+                {deleting ? 'Menghapus...' : 'Ya, Hapus'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Manajemen Admin</h1>
@@ -138,7 +172,7 @@ export default function AdminUsersPage() {
                   <td className="px-4 py-3 text-gray-500">{formatDate(user.createdAt)}</td>
                   <td className="px-4 py-3 text-center">
                     <button
-                      onClick={() => handleDelete(user.id, user.name)}
+                      onClick={() => setDeleteTarget({ id: user.id, name: user.name })}
                       className="text-red-600 hover:text-red-700 text-xs"
                     >
                       Hapus

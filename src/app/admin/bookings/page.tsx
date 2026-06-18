@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { OrderStatusLabels, OrderStatusColors } from '@/types';
 import type { OrderStatus } from '@/types';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useToast } from '@/components/ui/Toast';
 
 interface Booking {
   id: string;
@@ -25,6 +26,9 @@ export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; invoiceNo: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => { fetchBookings(); }, [statusFilter]);
 
@@ -39,19 +43,24 @@ export default function AdminBookingsPage() {
     finally { setLoading(false); }
   };
 
-  const handleDelete = async (id: string, invoiceNo: string) => {
-    if (!confirm(`Hapus booking ${invoiceNo}?\n\nTindakan ini tidak dapat dibatalkan. Semua data terkait (invoice, review) juga akan dihapus.`)) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/bookings/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/bookings/${deleteTarget.id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         fetchBookings();
+        showToast(`Booking ${deleteTarget.invoiceNo} berhasil dihapus`, 'success');
       } else {
-        alert(data.error || 'Gagal menghapus booking');
+        showToast(data.error || 'Gagal menghapus booking', 'error');
       }
     } catch (err) {
       console.error(err);
-      alert('Gagal menghapus booking');
+      showToast('Gagal menghapus booking', 'error');
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -63,7 +72,11 @@ export default function AdminBookingsPage() {
         body: JSON.stringify({ status: newStatus }),
       });
       fetchBookings();
-    } catch (err) { console.error(err); }
+      showToast('Status booking diperbarui', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Gagal memperbarui status', 'error');
+    }
   };
 
   const formatCurrency = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
@@ -71,6 +84,30 @@ export default function AdminBookingsPage() {
 
   return (
     <div>
+      {/* Delete Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDeleteTarget(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4 animate-[scaleIn_0.2s_ease]">
+            <div className="w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 text-center mb-1">Hapus Booking?</h3>
+            <p className="text-sm text-gray-500 text-center mb-6">
+              Booking <strong>{deleteTarget.invoiceNo}</strong> akan dihapus permanen. Semua data terkait (invoice, review) juga akan dihapus.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteTarget(null)} className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">Batal</button>
+              <button onClick={handleDelete} disabled={deleting} className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 transition-colors">
+                {deleting ? 'Menghapus...' : 'Ya, Hapus'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Semua Booking</h1>
 
       {/* Filter */}
@@ -140,7 +177,7 @@ export default function AdminBookingsPage() {
                       <div className="flex items-center justify-center gap-3">
                         <Link href={`/admin/bookings/${b.id}`} className="text-blue-600 hover:text-blue-700 text-xs">Detail</Link>
                         <button
-                          onClick={() => handleDelete(b.id, b.invoiceNo)}
+                          onClick={() => setDeleteTarget({ id: b.id, invoiceNo: b.invoiceNo })}
                           className="text-red-500 hover:text-red-700 text-xs"
                         >
                           Hapus

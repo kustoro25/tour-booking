@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useToast } from '@/components/ui/Toast';
 
 interface TourSlot {
   id: string;
@@ -20,6 +21,9 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
   const [tourName, setTourName] = useState('');
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const { showToast } = useToast();
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
   const [viewMonth, setViewMonth] = useState(new Date().getMonth());
   const [editingSlot, setEditingSlot] = useState<TourSlot | null>(null);
@@ -137,14 +141,18 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
     }
   };
 
-  const handleDelete = async (slotId: string) => {
-    if (!confirm('Hapus slot ini?')) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     await fetch(`/api/admin/tours/${tourId}/slots`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slotId }),
+      body: JSON.stringify({ slotId: deleteTarget }),
     });
     fetchSlots();
+    showToast('Slot berhasil dihapus', 'success');
+    setDeleting(false);
+    setDeleteTarget(null);
   };
 
   const changeMonth = (offset: number) => {
@@ -199,6 +207,30 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
 
   return (
     <div>
+      {/* Delete Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDeleteTarget(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4 animate-[scaleIn_0.2s_ease]">
+            <div className="w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 text-center mb-1">Hapus Slot?</h3>
+            <p className="text-sm text-gray-500 text-center mb-6">
+              Slot jadwal ini akan dihapus.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteTarget(null)} className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">Batal</button>
+              <button onClick={handleDelete} disabled={deleting} className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 transition-colors">
+                {deleting ? 'Menghapus...' : 'Ya, Hapus'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Jadwal & Kuota</h1>
@@ -479,7 +511,7 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
                             </span>
                           </td>
                           <td className="px-3 py-2 text-center">
-                            <button onClick={(e) => { e.stopPropagation(); handleDelete(slot.id); }}
+                            <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(slot.id); }}
                               className="text-red-500 hover:text-red-700 text-[10px]">Hapus</button>
                           </td>
                         </tr>

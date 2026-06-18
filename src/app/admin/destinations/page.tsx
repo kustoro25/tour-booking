@@ -4,10 +4,14 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useToast } from '@/components/ui/Toast';
 
 export default function AdminDestinationsPage() {
   const [destinations, setDestinations] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     fetchDestinations();
@@ -25,13 +29,19 @@ export default function AdminDestinationsPage() {
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Hapus destinasi "${name}"?`)) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await fetch(`/api/admin/destinations/${id}`, { method: 'DELETE' });
+      await fetch(`/api/admin/destinations/${deleteTarget.id}`, { method: 'DELETE' });
       fetchDestinations();
+      showToast(`Destinasi "${deleteTarget.name}" berhasil dihapus`, 'success');
     } catch (err) {
       console.error(err);
+      showToast('Gagal menghapus destinasi', 'error');
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -61,6 +71,30 @@ export default function AdminDestinationsPage() {
 
   return (
     <div>
+      {/* Delete Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDeleteTarget(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4 animate-[scaleIn_0.2s_ease]">
+            <div className="w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 text-center mb-1">Hapus Destinasi?</h3>
+            <p className="text-sm text-gray-500 text-center mb-6">
+              Destinasi <strong>&quot;{deleteTarget.name}&quot;</strong> akan dihapus permanen.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteTarget(null)} className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">Batal</button>
+              <button onClick={handleDelete} disabled={deleting} className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 transition-colors">
+                {deleting ? 'Menghapus...' : 'Ya, Hapus'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Destinasi</h1>
@@ -145,7 +179,7 @@ export default function AdminDestinationsPage() {
                         Edit
                       </Link>
                       <button
-                        onClick={() => handleDelete(dest.id as string, dest.name as string)}
+                        onClick={() => setDeleteTarget({ id: dest.id as string, name: dest.name as string })}
                         className="text-red-600 hover:text-red-700 text-xs whitespace-nowrap"
                       >
                         Hapus
