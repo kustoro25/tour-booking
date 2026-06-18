@@ -94,6 +94,15 @@ img { image-rendering: auto; }
 .animate-delay-400 { animation-delay: 0.4s; }
 .animate-delay-500 { animation-delay: 0.5s; }
 
+/* ============ CAROUSEL SCROLL ============ */
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-scroll {
+  animation: scroll var(--scroll-duration, 40s) linear infinite;
+}
+
 /* ============ ENHANCED SHADOWS ============ */
 .shadow-card {
   box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);

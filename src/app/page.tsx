@@ -4,6 +4,7 @@ import { formatCurrency, formatDate, parseJsonSafe } from '@/lib/utils';
 import type { ItineraryDay } from '@/types';
 import Button from '@/components/ui/Button';
 import StarRating from '@/components/ui/StarRating';
+import GalleryCarousel from '@/components/tours/GalleryCarousel';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,8 +74,64 @@ async function getFeaturedDestinations() {
   return destinations;
 }
 
+interface GalleryPhoto {
+  url: string;
+  alt: string;
+  destinationSlug: string;
+  destinationName: string;
+}
+
+async function getAllGalleryPhotos(): Promise<GalleryPhoto[]> {
+  const destinations = await prisma.destination.findMany({
+    where: { isActive: true },
+    select: { name: true, slug: true, imageUrl: true, gallery: true },
+    orderBy: { sortOrder: 'asc' },
+  });
+
+  // Collect all photos per destination: imageUrl + gallery images
+  const pools: { slug: string; name: string; photos: string[] }[] = [];
+  for (const dest of destinations) {
+    const galleryImages: string[] = parseJsonSafe(dest.gallery, []);
+    const all = [dest.imageUrl, ...galleryImages].filter(Boolean);
+    if (all.length > 0) {
+      pools.push({ slug: dest.slug, name: dest.name, photos: all });
+    }
+  }
+
+  if (pools.length === 0) return [];
+
+  // Interleave: round-robin from each destination's photo pool
+  const result: GalleryPhoto[] = [];
+  const indices = new Array(pools.length).fill(0);
+  let done = false;
+
+  while (!done) {
+    done = true;
+    for (let i = 0; i < pools.length; i++) {
+      if (indices[i] < pools[i].photos.length) {
+        const photo = pools[i].photos[indices[i]];
+        result.push({
+          url: photo,
+          alt: pools[i].name,
+          destinationSlug: pools[i].slug,
+          destinationName: pools[i].name,
+        });
+        indices[i]++;
+        done = false;
+      }
+    }
+  }
+
+  return result;
+}
+
 export default async function HomePage() {
-  const [tours, reviews, destinations] = await Promise.all([getFeaturedTours(), getLatestReviews(), getFeaturedDestinations()]);
+  const [tours, reviews, destinations, galleryPhotos] = await Promise.all([
+    getFeaturedTours(),
+    getLatestReviews(),
+    getFeaturedDestinations(),
+    getAllGalleryPhotos(),
+  ]);
 
   return (
     <>
@@ -316,6 +373,24 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Gallery Carousel */}
+      {galleryPhotos.length > 0 && (
+        <section className="py-16 sm:py-20 bg-white overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mb-10">
+            <div className="text-center">
+              <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">Jelajah Visual</span>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Sekilas Keindahan Nusantara
+              </h2>
+              <p className="text-gray-500 max-w-2xl mx-auto">
+                Dari sabana luas di timur hingga pantai eksotis di barat — lihat sendiri pesona destinasi impianmu.
+              </p>
+            </div>
+          </div>
+          <GalleryCarousel photos={galleryPhotos} />
+        </section>
+      )}
 
       {/* Testimonial Preview */}
       {reviews.length > 0 && (
