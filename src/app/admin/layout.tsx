@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { ToastProvider } from '@/components/ui/Toast';
 
 const sidebarLinks = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: '📊' },
@@ -22,7 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const isLoginPage = pathname === '/admin/login';
 
   if (isLoginPage) {
-    return <>{children}</>;
+    return <ToastProvider>{children}</ToastProvider>;
   }
 
   const handleLogout = async () => {
@@ -94,7 +95,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main Content */}
       <div className="lg:ml-64 min-h-screen">
         <main className="p-4 sm:p-6 lg:p-8">
-          {children}
+          <ToastProvider>{children}</ToastProvider>
         </main>
       </div>
     </div>

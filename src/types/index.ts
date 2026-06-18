@@ -32,13 +32,18 @@ export interface Tour {
   avgRating?: number;
 }
 
-export type TourCategory = 'OPEN_TRIP' | 'PRIVATE_TRIP' | 'HONEYMOON' | 'CORPORATE';
+export type TourCategory = 'OPEN_TRIP' | 'PRIVATE_TRIP' | 'HONEYMOON' | 'CORPORATE' | 'FAMILY' | 'ADVENTURE' | 'CULTURE' | 'STUDY_TOUR' | 'GROUP';
 
 export const TourCategoryLabels: Record<TourCategory, string> = {
   OPEN_TRIP: 'Open Trip',
   PRIVATE_TRIP: 'Private Trip',
   HONEYMOON: 'Honeymoon',
   CORPORATE: 'Corporate',
+  FAMILY: 'Family Tour',
+  ADVENTURE: 'Petualangan',
+  CULTURE: 'Wisata Budaya',
+  STUDY_TOUR: 'Study Tour',
+  GROUP: 'Rombongan',
 };
 
 // Gallery Types

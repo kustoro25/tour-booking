@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
+import { useToast } from '@/components/ui/Toast';
 
 interface GalleryImage {
   id: string;
@@ -15,11 +16,14 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
   const { id: tourId } = use(params);
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [tourName, setTourName] = useState('');
+  const [coverImg, setCoverImg] = useState('');
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [newUrl, setNewUrl] = useState('');
   const [newAlt, setNewAlt] = useState('');
   const [adding, setAdding] = useState(false);
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     fetchTour();
@@ -29,7 +33,10 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
   const fetchTour = async () => {
     const res = await fetch(`/api/admin/tours/${tourId}`);
     const data = await res.json();
-    if (data.success) setTourName(data.data.name);
+    if (data.success) {
+      setTourName(data.data.name);
+      setCoverImg(data.data.coverImg || '');
+    }
   };
 
   const fetchImages = async () => {
@@ -55,7 +62,7 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
       setNewUrl('');
       setNewAlt('');
       fetchImages();
-      setMessage('Foto berhasil ditambahkan');
+      showToast('Foto berhasil ditambahkan', 'success');
     } else {
       setMessage(data.error || 'Gagal menambahkan foto');
     }
@@ -70,31 +77,38 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
       body: JSON.stringify({ imageId }),
     });
     fetchImages();
+    showToast('Foto berhasil dihapus', 'success');
   };
 
-  const moveUp = async (index: number) => {
-    if (index === 0) return;
+  // Drag & Drop
+  const handleDragStart = (index: number) => {
+    setDragIdx(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (dragIdx === null || dragIdx === index) return;
+
     const updated = [...images];
-    [updated[index], updated[index - 1]] = [updated[index - 1], updated[index]];
-    await saveOrder(updated);
+    const [moved] = updated.splice(dragIdx, 1);
+    updated.splice(index, 0, moved);
+    setImages(updated);
+    setDragIdx(index);
   };
 
-  const moveDown = async (index: number) => {
-    if (index === images.length - 1) return;
-    const updated = [...images];
-    [updated[index], updated[index + 1]] = [updated[index + 1], updated[index]];
-    await saveOrder(updated);
-  };
-
-  const saveOrder = async (ordered: GalleryImage[]) => {
-    const payload = ordered.map((img, i) => ({ id: img.id, sortOrder: i }));
+  const handleDragEnd = async () => {
+    setDragIdx(null);
+    const ordered = images.map((img, i) => ({ id: img.id, sortOrder: i }));
     const res = await fetch(`/api/admin/tours/${tourId}/gallery`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ images: payload }),
+      body: JSON.stringify({ images: ordered }),
     });
     const data = await res.json();
-    if (data.success) setImages(data.data || []);
+    if (data.success) {
+      setImages(data.data || []);
+      showToast('Urutan foto diperbarui', 'success');
+    }
   };
 
   return (
@@ -110,17 +124,21 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
       </div>
 
       {/* Add Form */}
-      <form onSubmit={handleAdd} className="bg-white rounded-xl shadow-sm p-6 mb-6">
-        <h2 className="font-semibold text-gray-900 mb-4">Tambah Foto Baru</h2>
+      <form onSubmit={handleAdd} className="bg-white rounded-xl shadow-sm p-5 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-sm">🖼️</span>
+          <h2 className="font-semibold text-gray-900">Tambah Foto Baru</h2>
+          <span className="text-xs text-gray-400 ml-auto">{images.length}/10 foto</span>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">URL Gambar *</label>
             <input
               type="url"
               value={newUrl}
-              onChange={(e) => setNewUrl(e.target.value)}
+              onChange={e => setNewUrl(e.target.value)}
               placeholder="https://example.com/image.jpg"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"
               required
             />
           </div>
@@ -129,9 +147,9 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
             <input
               type="text"
               value={newAlt}
-              onChange={(e) => setNewAlt(e.target.value)}
+              onChange={e => setNewAlt(e.target.value)}
               placeholder="Deskripsi gambar untuk SEO"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"
             />
           </div>
         </div>
@@ -139,7 +157,7 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
           <button
             type="submit"
             disabled={adding || images.length >= 10}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {adding ? 'Menambahkan...' : '+ Tambah Foto'}
           </button>
@@ -155,66 +173,91 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
       </form>
 
       {/* Gallery Grid */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h2 className="font-semibold text-gray-900 mb-4">
-          Daftar Foto ({images.length}/10)
-        </h2>
+      <div className="bg-white rounded-xl shadow-sm p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="w-8 h-8 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center text-sm">📸</span>
+          <h2 className="font-semibold text-gray-900">Galeri ({images.length}/10)</h2>
+          {images.length > 0 && (
+            <span className="text-xs text-gray-400 ml-2">Drag & drop untuk mengurutkan</span>
+          )}
+        </div>
+
         {loading ? (
-          <div className="flex justify-center py-8">
+          <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent" />
           </div>
         ) : images.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">Belum ada foto di galeri</p>
+          <div className="text-center py-12">
+            <div className="text-4xl mb-3">🖼️</div>
+            <p className="text-gray-500">Belum ada foto di galeri</p>
+            <p className="text-xs text-gray-400 mt-1">Tambahkan foto untuk mempercantik tampilan paket tour</p>
+          </div>
         ) : (
-          <div className="space-y-4">
-            {images.map((img, index) => (
-              <div key={img.id} className="flex items-center gap-4 p-3 border border-gray-100 rounded-lg hover:bg-gray-50">
-                <div className="w-20 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                  <img
-                    src={img.imageUrl}
-                    alt={img.altText || 'Gallery image'}
-                    className="w-full h-full object-cover"
-                    onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 80"><text x="10" y="45" font-size="12" fill="gray">No img</text></svg>'; }}
-                  />
+          <>
+            {/* Cover image preview */}
+            {coverImg && (
+              <div className="mb-6 p-3 bg-blue-50 rounded-xl border border-blue-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">Cover</span>
+                  <span className="text-xs text-gray-500">Foto sampul paket tour</span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{img.imageUrl}</p>
-                  <p className="text-xs text-gray-500">{img.altText || 'Tanpa alt text'} · Urutan: {index + 1}</p>
-                </div>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => moveUp(index)}
-                    disabled={index === 0}
-                    className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
-                    title="Naikkan"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => moveDown(index)}
-                    disabled={index === images.length - 1}
-                    className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
-                    title="Turunkan"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => handleDelete(img.id)}
-                    className="p-1 text-red-400 hover:text-red-600 ml-1"
-                    title="Hapus"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
+                <div className="w-full h-48 rounded-lg overflow-hidden bg-gray-200">
+                  <img src={coverImg} alt="Cover" className="w-full h-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {images.map((img, index) => (
+                <div
+                  key={img.id}
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragEnd={handleDragEnd}
+                  className={`group relative bg-gray-100 rounded-xl overflow-hidden cursor-grab active:cursor-grabbing transition-all ${
+                    dragIdx === index ? 'opacity-50 scale-95 ring-2 ring-blue-400' : 'hover:shadow-lg'
+                  }`}
+                >
+                  {/* Number badge */}
+                  <div className="absolute top-2 left-2 z-10 bg-black/60 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">
+                    {index + 1}
+                  </div>
+
+                  {/* Image */}
+                  <div className="aspect-[4/3]">
+                    <img
+                      src={img.imageUrl}
+                      alt={img.altText || 'Gallery'}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150"><rect fill="%23f3f4f6" width="200" height="150"/><text x="100" y="80" text-anchor="middle" fill="%239ca3af" font-size="14">No Image</text></svg>';
+                      }}
+                    />
+                  </div>
+
+                  {/* Hover overlay with delete button */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                    <button
+                      onClick={() => handleDelete(img.id)}
+                      className="opacity-0 group-hover:opacity-100 bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-red-700 transition-all transform translate-y-2 group-hover:translate-y-0"
+                    >
+                      <svg className="w-4 h-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Hapus
+                    </button>
+                  </div>
+
+                  {/* Info bar */}
+                  <div className="p-2 text-xs">
+                    <p className="text-gray-500 truncate">{img.altText || 'Tanpa deskripsi'}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

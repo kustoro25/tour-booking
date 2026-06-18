@@ -27,7 +27,7 @@ model Tour {
   id            String   @id @default(cuid())
   name          String
   slug          String   @unique
-  category      String   // OPEN_TRIP, PRIVATE_TRIP, HONEYMOON, CORPORATE
+  category      String   // OPEN_TRIP, PRIVATE_TRIP, HONEYMOON, CORPORATE, FAMILY, ADVENTURE, CULTURE, STUDY_TOUR, GROUP
   destination   String
   destinationId String?  @map("destination_id")
   duration      String   // e.g. "3 Hari 2 Malam"
