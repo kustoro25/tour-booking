@@ -24,11 +24,6 @@ const faqs = [
       'Pembatalan H-14: refund 80%. H-7: refund 50%. H-3: refund 25%. Kurang dari H-3: tidak ada refund. Jika tour dibatalkan oleh kami karena force majeure atau kuota minimal tidak terpenuhi, Anda mendapat refund 100%.',
   },
   {
-    question: 'Apakah harga sudah termasuk tiket pesawat?',
-    answer:
-      'Umumnya harga paket belum termasuk tiket pesawat, kecuali disebutkan secara eksplisit di deskripsi paket. Fasilitas yang termasuk dan tidak termasuk tercantum dengan jelas di halaman detail setiap paket tour.',
-  },
-  {
     question: 'Apakah ada minimal peserta untuk setiap tour?',
     answer:
       'Ya, setiap paket tour memiliki minimal peserta (umumnya 2 orang). Informasi ini tercantum di halaman detail masing-masing paket. Jika kuota minimal tidak terpenuhi, tim kami akan menghubungi Anda untuk opsi alternatif.',
