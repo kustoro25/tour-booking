@@ -35,7 +35,7 @@ export default function Header() {
             <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-teal-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/30 group-hover:shadow-lg group-hover:shadow-blue-500/40 transition-shadow duration-300">
               <span className="text-white font-bold text-sm">JN</span>
             </div>
-            <span className="text-xl font-bold text-gray-900 hidden sm:block">
+            <span className="text-base sm:text-xl font-bold text-gray-900">
               <span className="gradient-text">Jelajah Nusantara</span>
             </span>
           </Link>
