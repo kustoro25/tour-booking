@@ -10,23 +10,47 @@ import HeroSearch from '@/components/ui/HeroSearch';
 
 export const dynamic = 'force-dynamic';
 
-async function getCmsFaqs(): Promise<{ question: string; answer: string }[]> {
+interface CmsFaqData {
+  label: string;
+  heading: string;
+  subheading: string;
+  faqs: { question: string; answer: string }[];
+}
+
+async function getCmsFaqs(): Promise<CmsFaqData> {
   try {
     const page = await prisma.page.findUnique({ where: { slug: 'home-faq' } });
     if (page?.content) {
       const parsed = JSON.parse(page.content);
-      // Content can be either the array directly or { faqs: [...] }
-      const items = Array.isArray(parsed) ? parsed : (parsed.faqs || []);
-      if (items.length > 0) return items;
+      // Extract header fields + faqs array from the CMS page data
+      const label = parsed.label || '';
+      const heading = parsed.heading || '';
+      const subheading = parsed.subheading || '';
+      const items = Array.isArray(parsed.faqs) ? parsed.faqs : [];
+      if (label || heading || subheading || items.length > 0) {
+        return {
+          label: label || 'Bantuan',
+          heading: heading || 'Pertanyaan yang Sering Diajukan',
+          subheading: subheading || 'Temukan jawaban untuk pertanyaan-pertanyaan umum seputar pemesanan, pembayaran, dan perjalanan tour bersama Jelajah Nusantara.',
+          faqs: items.length > 0 ? items : FALLBACK_FAQS,
+        };
+      }
     }
   } catch { /* fallback to hardcoded */ }
-  return [
-    { question: 'Bagaimana cara melakukan booking?', answer: 'Caranya sangat mudah! Pilih paket tour yang Anda inginkan, tentukan tanggal keberangkatan dari kalender interaktif, isi data diri dan jumlah peserta, lalu klik "Booking Sekarang". Invoice akan langsung terbit dan dikirim ke email Anda.' },
-    { question: 'Metode pembayaran apa saja yang tersedia?', answer: 'Kami menerima transfer bank (BCA, Mandiri, BRI, BNI) dan e-wallet (OVO, Dana, GoPay, ShopeePay). Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan. Jika melebihi batas waktu, pesanan akan otomatis dibatalkan.' },
-    { question: 'Bagaimana kebijakan pembatalan dan refund?', answer: 'Pembatalan H-14: refund 80%. H-7: refund 50%. H-3: refund 25%. Kurang dari H-3: tidak ada refund. Jika tour dibatalkan oleh kami karena force majeure atau kuota minimal tidak terpenuhi, Anda mendapat refund 100%.' },
-    { question: 'Apakah ada minimal peserta untuk setiap tour?', answer: 'Ya, setiap paket tour memiliki minimal peserta (umumnya 2 orang). Informasi ini tercantum di halaman detail masing-masing paket. Jika kuota minimal tidak terpenuhi, tim kami akan menghubungi Anda untuk opsi alternatif.' },
-  ];
+  return {
+    label: 'Bantuan',
+    heading: 'Pertanyaan yang Sering Diajukan',
+    subheading: 'Temukan jawaban untuk pertanyaan-pertanyaan umum seputar pemesanan, pembayaran, dan perjalanan tour bersama Jelajah Nusantara.',
+    faqs: FALLBACK_FAQS,
+  };
 }
+
+const FALLBACK_FAQS = [
+  { question: 'Bagaimana cara melakukan booking?', answer: 'Caranya sangat mudah! Pilih paket tour yang Anda inginkan, tentukan tanggal keberangkatan dari kalender interaktif, isi data diri dan jumlah peserta, lalu klik "Booking Sekarang". Invoice akan langsung terbit dan dikirim ke email Anda.' },
+  { question: 'Metode pembayaran apa saja yang tersedia?', answer: 'Kami menerima transfer bank (BCA, Mandiri, BRI, BNI) dan e-wallet (OVO, Dana, GoPay, ShopeePay). Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan. Jika melebihi batas waktu, pesanan akan otomatis dibatalkan.' },
+  { question: 'Bagaimana kebijakan pembatalan dan refund?', answer: 'Pembatalan H-14: refund 80%. H-7: refund 50%. H-3: refund 25%. Kurang dari H-3: tidak ada refund. Jika tour dibatalkan oleh kami karena force majeure atau kuota minimal tidak terpenuhi, Anda mendapat refund 100%.' },
+  { question: 'Apakah ada minimal peserta untuk setiap tour?', answer: 'Ya, setiap paket tour memiliki minimal peserta (umumnya 2 orang). Informasi ini tercantum di halaman detail masing-masing paket. Jika kuota minimal tidak terpenuhi, tim kami akan menghubungi Anda untuk opsi alternatif.' },
+];
 
 async function getFeaturedTours() {
   const tours = await prisma.tour.findMany({
@@ -544,18 +568,17 @@ export default async function HomePage() {
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">Bantuan</span>
+            <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">{faqs.label || 'Bantuan'}</span>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Pertanyaan yang Sering Diajukan
+              {faqs.heading || 'Pertanyaan yang Sering Diajukan'}
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Temukan jawaban untuk pertanyaan-pertanyaan umum seputar pemesanan, pembayaran, dan
-              perjalanan tour bersama Jelajah Nusantara.
+              {faqs.subheading || 'Temukan jawaban untuk pertanyaan-pertanyaan umum seputar pemesanan, pembayaran, dan perjalanan tour bersama Jelajah Nusantara.'}
             </p>
           </div>
 
           <div className="space-y-3">
-            {faqs.map((faq, index) => (
+            {faqs.faqs.map((faq, index) => (
               <details
                 key={index}
                 className="bg-white rounded-xl shadow-card group overflow-hidden border border-gray-100 hover:border-blue-100 transition-colors"

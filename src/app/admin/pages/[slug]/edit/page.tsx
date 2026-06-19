@@ -82,6 +82,9 @@ const defaultData: Record<string, PageData> = {
     ],
   },
   'home-faq': {
+    label: 'Bantuan',
+    heading: 'Pertanyaan yang Sering Diajukan',
+    subheading: 'Temukan jawaban untuk pertanyaan-pertanyaan umum seputar pemesanan, pembayaran, dan perjalanan tour bersama Jelajah Nusantara.',
     faqs: [
       { question: 'Bagaimana cara melakukan booking?', answer: 'Caranya sangat mudah! Pilih paket tour yang Anda inginkan, tentukan tanggal keberangkatan dari kalender interaktif, isi data diri dan jumlah peserta, lalu klik "Booking Sekarang". Invoice akan langsung terbit dan dikirim ke email Anda.' },
       { question: 'Metode pembayaran apa saja yang tersedia?', answer: 'Kami menerima transfer bank (BCA, Mandiri, BRI, BNI) dan e-wallet (OVO, Dana, GoPay, ShopeePay). Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan. Jika melebihi batas waktu, pesanan akan otomatis dibatalkan.' },
@@ -472,7 +475,30 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
 
         {/* ═══════════ HOME - FAQ ═══════════ */}
         {isFaq && (
-          <SectionCard icon="❓" title="Daftar FAQ" addLabel="+ Tambah Pertanyaan" onAdd={() => update('faqs', [...(data.faqs || []), { question: '', answer: '' }])}>
+          <>
+            <SectionCard icon="📝" title="Header FAQ">
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Label (atas)</label>
+                  <input type="text" value={data.label || ''} onChange={e => update('label', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Bantuan" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Heading</label>
+                  <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Pertanyaan yang Sering Diajukan" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Subheading</label>
+                  <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Temukan jawaban untuk pertanyaan-pertanyaan umum..." />
+                </div>
+              </div>
+            </SectionCard>
+            <SectionCard icon="❓" title="Daftar FAQ" addLabel="+ Tambah Pertanyaan" onAdd={() => update('faqs', [...(data.faqs || []), { question: '', answer: '' }])}>
             <div className="space-y-4">
               {(data.faqs || []).map((faq, i) => (
                 <div key={i} className="p-4 bg-gray-50 rounded-xl border space-y-3">
@@ -493,6 +519,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
               ))}
             </div>
           </SectionCard>
+          </>
         )}
 
         {/* ═══════════ HTML (privacy, terms) ═══════════ */}
