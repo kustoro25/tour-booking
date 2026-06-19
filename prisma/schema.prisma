@@ -169,6 +169,10 @@ model Destination {
   highlight        Boolean  @default(false)
   isActive         Boolean  @default(true) @map("is_active")
   sortOrder        Int      @default(0) @map("sort_order")
+  ctaHeading       String   @default("Siap Berpetualang?") @map("cta_heading")
+  ctaSubheading    String   @default("Pilih paket tour terbaik ke {{name}} dan wujudkan liburan impian Anda!") @map("cta_subheading")
+  ctaButtonText    String   @default("Lihat Paket Tour") @map("cta_button_text")
+  ctaButtonLink    String   @default("/tours") @map("cta_button_link")
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 

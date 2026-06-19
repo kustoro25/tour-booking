@@ -216,12 +216,12 @@ export default async function DestinationDetailPage({
 
             {/* CTA */}
             <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl shadow-sm p-6 text-white">
-              <h3 className="font-semibold text-lg mb-2">Siap Berpetualang?</h3>
+              <h3 className="font-semibold text-lg mb-2">{destination.ctaHeading || 'Siap Berpetualang?'}</h3>
               <p className="text-blue-100 text-sm mb-4">
-                Pilih paket tour terbaik ke {destination.name} dan wujudkan liburan impian Anda!
+                {(destination.ctaSubheading || 'Pilih paket tour terbaik ke {{name}} dan wujudkan liburan impian Anda!').replace('{{name}}', destination.name)}
               </p>
-              <Button href="/tours" variant="accent" size="sm" fullWidth>
-                Lihat Paket Tour
+              <Button href={destination.ctaButtonLink || '/tours'} variant="accent" size="sm" fullWidth>
+                {destination.ctaButtonText || 'Lihat Paket Tour'}
               </Button>
             </div>
 

@@ -44,6 +44,10 @@ export async function PUT(
     if (body.highlight !== undefined) data.highlight = body.highlight;
     if (body.isActive !== undefined) data.isActive = body.isActive;
     if (body.sortOrder !== undefined) data.sortOrder = parseInt(body.sortOrder);
+    if (body.ctaHeading !== undefined) data.ctaHeading = body.ctaHeading;
+    if (body.ctaSubheading !== undefined) data.ctaSubheading = body.ctaSubheading;
+    if (body.ctaButtonText !== undefined) data.ctaButtonText = body.ctaButtonText;
+    if (body.ctaButtonLink !== undefined) data.ctaButtonLink = body.ctaButtonLink;
 
     const destination = await prisma.destination.update({ where: { id }, data });
     return NextResponse.json({ success: true, data: destination });

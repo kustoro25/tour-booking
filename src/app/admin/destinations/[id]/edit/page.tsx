@@ -21,6 +21,10 @@ export default function EditDestinationPage({ params }: { params: Promise<{ id: 
     highlight: false,
     isActive: true,
     sortOrder: '0',
+    ctaHeading: 'Siap Berpetualang?',
+    ctaSubheading: 'Pilih paket tour terbaik ke {{name}} dan wujudkan liburan impian Anda!',
+    ctaButtonText: 'Lihat Paket Tour',
+    ctaButtonLink: '/tours',
   });
   const [gallery, setGallery] = useState<string[]>(['']);
   const [activities, setActivities] = useState<string[]>(['']);
@@ -53,6 +57,10 @@ export default function EditDestinationPage({ params }: { params: Promise<{ id: 
           highlight: dest.highlight,
           isActive: dest.isActive,
           sortOrder: String(dest.sortOrder || 0),
+          ctaHeading: dest.ctaHeading || 'Siap Berpetualang?',
+          ctaSubheading: dest.ctaSubheading || 'Pilih paket tour terbaik ke {{name}} dan wujudkan liburan impian Anda!',
+          ctaButtonText: dest.ctaButtonText || 'Lihat Paket Tour',
+          ctaButtonLink: dest.ctaButtonLink || '/tours',
         });
         try {
           const g = JSON.parse(dest.gallery);
@@ -270,6 +278,57 @@ export default function EditDestinationPage({ params }: { params: Promise<{ id: 
           <button type="button" onClick={addActivity} className="text-sm text-blue-600 hover:text-blue-700">
             + Tambah Aktivitas
           </button>
+        </div>
+
+        {/* CTA Section (per destination) */}
+        <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+          <h2 className="font-semibold text-gray-900">📢 CTA Section (Sisi Kanan Halaman)</h2>
+          <p className="text-xs text-gray-500">Gunakan <code className="bg-gray-100 px-1 py-0.5 rounded">{'{{name}}'}</code> sebagai placeholder nama destinasi di subheading.</p>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Heading CTA</label>
+            <input
+              type="text"
+              value={form.ctaHeading}
+              onChange={(e) => updateField('ctaHeading', e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              placeholder="Siap Berpetualang?"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Subheading CTA</label>
+            <textarea
+              value={form.ctaSubheading}
+              onChange={(e) => updateField('ctaSubheading', e.target.value)}
+              rows={2}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y"
+              placeholder="Pilih paket tour terbaik ke {{name}} dan wujudkan liburan impian Anda!"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Teks Tombol</label>
+              <input
+                type="text"
+                value={form.ctaButtonText}
+                onChange={(e) => updateField('ctaButtonText', e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                placeholder="Lihat Paket Tour"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Link Tombol</label>
+              <input
+                type="text"
+                value={form.ctaButtonLink}
+                onChange={(e) => updateField('ctaButtonLink', e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                placeholder="/tours"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Rating & Settings */}
