@@ -831,7 +831,7 @@ function CustomInvoice({
         </div>
 
         {/* ── Tour Order Summary ── */}
-        <div className="overflow-hidden mb-6" style={{ border: `1px solid ${border}`, borderRadius: radius }}>
+        <div className="overflow-hidden mb-6" style={{ border: `1px solid ${border}`, borderRadius: '12px' }}>
           <div className="px-5 py-3" style={{ backgroundColor: accentBg }}>
             <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: accentText }}>Ringkasan Pesanan</h3>
           </div>
@@ -867,7 +867,7 @@ function CustomInvoice({
         </div>
 
         {/* ── Price Breakdown ── */}
-        <div className="overflow-hidden mb-6" style={{ border: `1px solid ${border}`, borderRadius: radius }}>
+        <div className="overflow-hidden mb-6" style={{ border: `1px solid ${border}`, borderRadius: '12px' }}>
           <div className="px-5 py-3" style={{ backgroundColor: accentBg }}>
             <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: accentText }}>Rincian Biaya</h3>
           </div>
