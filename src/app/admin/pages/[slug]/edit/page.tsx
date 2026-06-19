@@ -261,7 +261,7 @@ const defaultData: Record<string, PageData> = {
   'invoice-classic': {
     companyTagline: 'Perjalanan Anda, Prioritas Kami',
     headerBg: '#1e293b',
-    headerBgEnd: '#0f172a',
+    headerBgEnd: '#1e293b',
     headerTextColor: '#ffffff',
     accentColor: '#1e40af',
     tableHeaderBg: '#334155',
@@ -299,7 +299,7 @@ const defaultData: Record<string, PageData> = {
   'invoice-minimal': {
     companyTagline: 'Perjalanan Anda, Prioritas Kami',
     headerBg: '#ffffff',
-    headerBgEnd: '#f8fafc',
+    headerBgEnd: '#ffffff',
     headerTextColor: '#111827',
     accentColor: '#374151',
     tableHeaderBg: '#f3f4f6',
@@ -318,7 +318,7 @@ const defaultData: Record<string, PageData> = {
   'invoice-premium': {
     companyTagline: 'Perjalanan Anda, Prioritas Kami',
     headerBg: '#1a1a1a',
-    headerBgEnd: '#0d0d0d',
+    headerBgEnd: '#1a1a1a',
     headerTextColor: '#ffffff',
     accentColor: '#e59800',
     tableHeaderBg: '#1a1a1a',
@@ -1160,12 +1160,6 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             <SectionCard icon="🎨" title="Header Invoice">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Company Tagline</label>
-                  <input type="text" value={(data.companyTagline as string) || ''} onChange={e => update('companyTagline', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                    placeholder="Perjalanan Anda, Prioritas Kami" />
-                </div>
-                <div>
                   <label className="text-xs text-gray-500 mb-1 block">Header Text Color</label>
                   <div className="flex gap-2">
                     <input type="color" value={(data.headerTextColor as string) || '#ffffff'} onChange={e => update('headerTextColor', e.target.value)}
@@ -1198,20 +1192,13 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             </SectionCard>
 
             {/* Accent & Table Colors */}
-            <SectionCard icon="🎯" title="Warna Aksen & Tabel">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <SectionCard icon="🎯" title="Warna Aksen & Border">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-gray-500 mb-1 block">Accent Color</label>
                   <input type="color" value={(data.accentColor as string) || '#f59e0b'} onChange={e => update('accentColor', e.target.value)}
                     className="w-full h-10 border rounded cursor-pointer" />
                   <input type="text" value={(data.accentColor as string) || '#f59e0b'} onChange={e => update('accentColor', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-mono mt-1 focus:ring-2 focus:ring-blue-500 outline-none" />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Table Header BG</label>
-                  <input type="color" value={(data.tableHeaderBg as string) || '#1e293b'} onChange={e => update('tableHeaderBg', e.target.value)}
-                    className="w-full h-10 border rounded cursor-pointer" />
-                  <input type="text" value={(data.tableHeaderBg as string) || '#1e293b'} onChange={e => update('tableHeaderBg', e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-mono mt-1 focus:ring-2 focus:ring-blue-500 outline-none" />
                 </div>
                 <div>

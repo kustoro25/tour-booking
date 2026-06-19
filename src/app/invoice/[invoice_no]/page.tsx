@@ -31,13 +31,10 @@ interface StatusBadgeConfig {
 }
 
 interface InvoiceCustomConfig {
-  companyTagline?: string;
   headerBg?: string;
   headerBgEnd?: string;
   headerTextColor?: string;
   accentColor?: string;
-  tableHeaderBg?: string;
-  tableHeaderText?: string;
   borderColor?: string;
   footerText?: string;
   showSignature?: boolean;
@@ -175,7 +172,7 @@ export default async function InvoicePage({ params }: PageProps) {
             companyAddress={companyAddress}
             companyPhone={companyPhone}
             companyEmail={companyEmail}
-            companyTagline={customConfig.companyTagline || companyTagline}
+            companyTagline={companyTagline}
             statusLabel={statusLabel}
             tourDate={tourDate}
             createdDate={createdDate}
@@ -749,14 +746,16 @@ function CustomInvoice({
   const c = config;
   const H = c.headerBg || '#1e3a5f';
   const He = c.headerBgEnd || H;
+  const headerIsLight = themeKeyForCustom(H) === 'light';
+  // Solid color unless both colors differ (gradient intended, e.g. Modern theme)
   const headerBg = H === He ? H : `linear-gradient(135deg, ${H}, ${He})`;
   const accent = c.accentColor || '#f59e0b';
   const border = c.borderColor || '#e2e8f0';
-  const thBg = c.tableHeaderBg || '#1e293b';
   const hText = c.headerTextColor || '#ffffff';
   const hSub = `${hText}99`;
-  const stripeBg = `${c.tableHeaderBg || '#1e293b'}0d`;
-  const accentBg = `${accent}1a`;
+  const stripeBg = 'rgba(0,0,0,0.03)';
+  // 20% opacity for visible section header backgrounds (matches hardcoded themes)
+  const accentBg = `${accent}33`;
   const accentText = accent;
 
   const priceAdult = order.tour.priceAdult || 0;
@@ -772,9 +771,9 @@ function CustomInvoice({
   const logoBg = isLight ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.2)';
 
   return (
-    <div className="invoice-document bg-white shadow-xl rounded-xl overflow-hidden" id="invoice-print">
+    <div className={`invoice-document bg-white ${headerIsLight ? 'border border-gray-200' : 'shadow-xl'} ${headerIsLight ? '' : 'rounded-xl overflow-hidden'}`} id="invoice-print">
       {/* ── Header ── */}
-      <div className="px-6 sm:px-10 py-8 sm:py-10" style={{ background: headerBg }}>
+      <div className="px-6 sm:px-10 py-8 sm:py-10" style={{ background: headerBg, ...(headerIsLight ? { borderBottom: `2px solid ${c.borderColor || '#111827'}` } : {}) }}>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
           <div>
             <div className="flex items-center gap-3 mb-1">
@@ -783,7 +782,7 @@ function CustomInvoice({
               </div>
               <div>
                 <h2 className="text-xl font-bold" style={{ color: hText }}>{companyName}</h2>
-                <p className="text-xs" style={{ color: hSub }}>{companyTagline}</p>
+                <p className="text-xs" style={{ color: hSub }}>{companyAddress}</p>
               </div>
             </div>
           </div>
