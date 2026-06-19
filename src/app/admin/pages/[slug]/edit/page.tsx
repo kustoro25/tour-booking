@@ -363,27 +363,31 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             </SectionCard>
 
             <SectionCard icon="📝" title="Heading Utama">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Teks kiri</label>
+              <p className="text-xs text-gray-400 mb-3">Heading ditampilkan dalam tiga bagian: teks awal (bold), kata yang disorot (oranye), dan teks akhir.</p>
+              <div className="space-y-4">
+                <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
+                  <label className="text-xs font-semibold text-amber-700 mb-1.5 block uppercase tracking-wide">① Teks Awal (Bold)</label>
                   <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none bg-white"
                     placeholder="Jelajahi Destinasi" />
                 </div>
-                <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Highlight (oranye)</label>
+                <div className="p-4 bg-orange-50 rounded-xl border border-orange-300">
+                  <label className="text-xs font-semibold text-orange-700 mb-1.5 block uppercase tracking-wide">② Highlight (Oranye)</label>
                   <input type="text" value={data.headingHighlight || ''} onChange={e => update('headingHighlight', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none bg-white"
                     placeholder="Impian" />
                 </div>
-                <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Teks kanan</label>
+                <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                  <label className="text-xs font-semibold text-blue-700 mb-1.5 block uppercase tracking-wide">③ Teks Akhir</label>
                   <input type="text" value={data.headingAfter || ''} onChange={e => update('headingAfter', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white"
                     placeholder="Anda Tanpa Ribet!" />
                 </div>
               </div>
-              <p className="text-xs text-gray-400 mt-2">Hasil: <strong>{data.heading || 'Jelajahi Destinasi'}</strong> <span className="text-orange-500 font-bold">{data.headingHighlight || 'Impian'}</span> {data.headingAfter || 'Anda Tanpa Ribet!'}</p>
+              <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-xs text-gray-500 mb-1">Pratinjau Hasil:</p>
+                <p className="text-base"><strong>{data.heading || 'Jelajahi Destinasi'}</strong> <span className="text-orange-500 font-bold">{data.headingHighlight || 'Impian'}</span> {data.headingAfter || 'Anda Tanpa Ribet!'}</p>
+              </div>
             </SectionCard>
 
             <SectionCard icon="💬" title="Subheading / Deskripsi">
