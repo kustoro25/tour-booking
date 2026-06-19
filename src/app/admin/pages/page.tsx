@@ -27,6 +27,7 @@ const pageSlugs = [
   { slug: 'contact', title: 'Contact Us' },
   { slug: 'destinations', title: 'Destinations Page' },
   { slug: 'destinations-cta', title: 'Destinations Detail - CTA' },
+  { slug: 'tours', title: 'Tours Page' },
   { slug: 'privacy', title: 'Privacy Policy' },
   { slug: 'terms', title: 'Terms & Conditions' },
   { slug: 'footer', title: 'Footer' },
