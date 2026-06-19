@@ -204,6 +204,7 @@ const defaultData: Record<string, PageData> = {
     ],
   },
   'contact': {
+    label: 'Kontak',
     heading: 'Hubungi Kami',
     subheading: 'Punya pertanyaan atau butuh bantuan memilih paket? Tim kami siap membantu!',
     infoCards: [
@@ -607,11 +608,27 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
         {/* ═══════════ CONTACT ═══════════ */}
         {isContact && (
           <>
-            <SectionCard icon="📝" title="Header">
-              <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-2" />
-              <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+            <SectionCard icon="📝" title="Header Halaman">
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Label (atas)</label>
+                  <input type="text" value={data.label || ''} onChange={e => update('label', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Kontak" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Heading</label>
+                  <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Hubungi Kami" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Subheading</label>
+                  <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Punya pertanyaan atau butuh bantuan..." />
+                </div>
+              </div>
             </SectionCard>
             <SectionCard icon="📞" title="Info Cards">
               <div className="space-y-3">
