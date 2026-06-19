@@ -32,7 +32,11 @@ const pageSlugs = [
   { slug: 'privacy', title: 'Privacy Policy' },
   { slug: 'terms', title: 'Terms & Conditions' },
   { slug: 'footer', title: 'Footer' },
-  { slug: 'invoice-custom', title: 'Invoice Customization' },
+  // ── Invoice themes (one per theme) ──
+  { slug: 'invoice-classic', title: 'Invoice - Classic Theme' },
+  { slug: 'invoice-modern', title: 'Invoice - Modern Theme' },
+  { slug: 'invoice-minimal', title: 'Invoice - Minimal Theme' },
+  { slug: 'invoice-premium', title: 'Invoice - Premium Theme' },
 ];
 
 export default function AdminPagesPage() {

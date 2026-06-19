@@ -99,36 +99,44 @@ export default async function InvoicePage({ params }: PageProps) {
 
   if (!order) notFound();
 
-  // Read invoice customization from CMS Pages (takes priority over legacy theme setting)
+  // 1. Read selected theme from settings
   let themeKey: InvoiceTheme = 'modern';
+  try {
+    const themeSetting = await prisma.setting.findUnique({ where: { key: 'invoice_theme' } });
+    if (themeSetting) {
+      const val = JSON.parse(themeSetting.value);
+      if (['classic', 'modern', 'minimal', 'premium'].includes(val)) {
+        themeKey = val as InvoiceTheme;
+      }
+    }
+  } catch { /* fallback to modern */ }
+
+  // 2. Read per-theme customization from CMS Page (e.g., invoice-modern, invoice-classic, etc.)
   let customConfig: InvoiceCustomConfig | null = null;
   try {
-    const cmsPage = await prisma.page.findUnique({ where: { slug: 'invoice-custom' } });
-    if (cmsPage) {
+    // Try the theme-specific CMS page first
+    const themeCmsPage = await prisma.page.findUnique({ where: { slug: `invoice-${themeKey}` } });
+    if (themeCmsPage) {
       try {
-        const parsed = JSON.parse(cmsPage.content);
+        const parsed = JSON.parse(themeCmsPage.content);
         if (parsed && typeof parsed === 'object') {
           customConfig = parsed as InvoiceCustomConfig;
-          themeKey = 'custom';
         }
       } catch { /* fallback */ }
     }
-  } catch { /* fallback */ }
-
-  // Fallback to legacy theme setting if no custom config
-  if (!customConfig) {
-    try {
-      const themeSetting = await prisma.setting.findUnique({ where: { key: 'invoice_theme' } });
-      if (themeSetting) {
-        const val = JSON.parse(themeSetting.value);
-        if (['classic', 'modern', 'minimal', 'premium'].includes(val)) {
-          themeKey = val as InvoiceTheme;
-        }
+    // Also try old invoice-custom for backward compatibility
+    if (!customConfig) {
+      const oldCmsPage = await prisma.page.findUnique({ where: { slug: 'invoice-custom' } });
+      if (oldCmsPage) {
+        try {
+          const parsed = JSON.parse(oldCmsPage.content);
+          if (parsed && typeof parsed === 'object') {
+            customConfig = parsed as InvoiceCustomConfig;
+          }
+        } catch { /* fallback */ }
       }
-    } catch {
-      // fallback to modern
     }
-  }
+  } catch { /* fallback */ }
 
   // Read bank accounts from settings
   let bankAccounts = [
@@ -160,7 +168,7 @@ export default async function InvoicePage({ params }: PageProps) {
   return (
     <>
       <div className="max-w-[210mm] mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
-        {themeKey === 'custom' && customConfig ? (
+        {customConfig ? (
           <CustomInvoice
             order={order}
             companyName={companyName}

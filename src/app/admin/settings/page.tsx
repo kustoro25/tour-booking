@@ -5,6 +5,8 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import ImageUpload from '@/components/ui/ImageUpload';
 import { useAdminRole } from '@/lib/useAdminRole';
 
+type InvoiceTheme = 'classic' | 'modern' | 'minimal' | 'premium';
+
 interface BankAccount {
   bank: string;
   number: string;
@@ -32,6 +34,7 @@ export default function AdminSettingsPage() {
     companyPhone: '',
     companyAddress: '',
     companyIcon: '',
+    invoiceTheme: 'modern' as InvoiceTheme,
   });
 
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>(DEFAULT_BANK_ACCOUNTS);
@@ -53,6 +56,7 @@ export default function AdminSettingsPage() {
             companyPhone: data.data.company_phone || '',
             companyAddress: data.data.company_address || '',
             companyIcon: data.data.company_icon || '',
+            invoiceTheme: (data.data.invoice_theme as InvoiceTheme) || 'modern',
           }));
           if (data.data.bank_accounts && Array.isArray(data.data.bank_accounts)) {
             setBankAccounts(data.data.bank_accounts);
@@ -84,6 +88,7 @@ export default function AdminSettingsPage() {
           company_phone: form.companyPhone,
           company_address: form.companyAddress,
           company_icon: form.companyIcon,
+          invoice_theme: form.invoiceTheme,
           bank_accounts: bankAccounts,
         }),
       });
@@ -368,25 +373,47 @@ export default function AdminSettingsPage() {
           )}
         </div>
 
-        {/* Invoice Customization — now managed via CMS Pages */}
+        {/* Invoice Theme */}
         <div className="border-t pt-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">🎨</span>
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">Kustomisasi Invoice</h2>
-                <p className="text-sm text-gray-600 mt-1">
-                  Tampilan invoice kini dikelola melalui <strong>CMS Pages</strong> dengan editor visual lengkap.
-                  Anda bisa mengatur warna header, aksen, tampilan status badge, footer, dan lainnya.
-                </p>
-                <a
-                  href="/admin/pages/invoice-custom/edit"
-                  className="inline-flex items-center gap-1 mt-3 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                >
-                  ✏️ Buka Invoice Editor →
-                </a>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">🎨 Tema Invoice</h2>
+          <p className="text-sm text-gray-500 mb-4">Pilih tema invoice, lalu klik <strong>Edit</strong> untuk kustomisasi warna, status badge, dan footer tema tersebut.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {([
+              { key: 'classic' as InvoiceTheme, label: 'Klasik', desc: 'Elegan gelap & biru', preview: 'bg-slate-800' },
+              { key: 'modern' as InvoiceTheme, label: 'Modern', desc: 'Gradient biru segar', preview: 'bg-gradient-to-r from-blue-600 to-indigo-700' },
+              { key: 'minimal' as InvoiceTheme, label: 'Minimal', desc: 'Bersih & simpel', preview: 'bg-white border-2 border-gray-900' },
+              { key: 'premium' as InvoiceTheme, label: 'Premium', desc: 'Geometris hitam & emas', preview: 'bg-[#1A1A1A]' },
+            ]).map((theme) => (
+              <div
+                key={theme.key}
+                onClick={() => setForm({ ...form, invoiceTheme: theme.key })}
+                className={`relative rounded-xl border-2 p-4 text-left transition-all cursor-pointer ${
+                  form.invoiceTheme === theme.key
+                    ? 'border-blue-500 ring-2 ring-blue-200 shadow-md'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className={`h-12 rounded-lg mb-3 ${theme.preview} flex items-center justify-center`}>
+                  <span className={theme.key === 'minimal' ? 'text-gray-900 text-xs font-bold' : 'text-white text-xs font-bold'}>
+                    INVOICE
+                  </span>
+                </div>
+                <h3 className="font-semibold text-gray-900 text-sm">{theme.label}</h3>
+                <p className="text-xs text-gray-500 mt-0.5 mb-3">{theme.desc}</p>
+                <div className="flex items-center gap-2">
+                  {form.invoiceTheme === theme.key && (
+                    <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">✓ Dipilih</span>
+                  )}
+                  <a
+                    href={`/admin/pages/invoice-${theme.key}/edit`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline ml-auto"
+                  >
+                    ✏️ Edit
+                  </a>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
 

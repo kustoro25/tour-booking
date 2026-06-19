@@ -258,6 +258,82 @@ const defaultData: Record<string, PageData> = {
       { platform: 'Email', url: 'mailto:info@jelajahnusantara.com', icon: 'email' },
     ],
   },
+  'invoice-classic': {
+    companyTagline: 'Perjalanan Anda, Prioritas Kami',
+    headerBg: '#1e293b',
+    headerBgEnd: '#0f172a',
+    headerTextColor: '#ffffff',
+    accentColor: '#3b82f6',
+    tableHeaderBg: '#1e293b',
+    tableHeaderText: '#ffffff',
+    borderColor: '#e2e8f0',
+    footerText: 'Terima kasih telah memilih layanan kami. E-Ticket akan dikirim setelah pembayaran terkonfirmasi.',
+    showSignature: true,
+    showDeadline: true,
+    statusBadges: {
+      PENDING: { bg: '#fffbeb', text: '#b45309', border: '#fcd34d', dot: '#f59e0b', icon: '⏳' },
+      CONFIRMED: { bg: '#ecfdf5', text: '#047857', border: '#6ee7b7', dot: '#10b981', icon: '✅' },
+      COMPLETED: { bg: '#f0f9ff', text: '#0369a1', border: '#7dd3fc', dot: '#0ea5e9', icon: '🏁' },
+      CANCELLED: { bg: '#fff1f2', text: '#be123c', border: '#fda4af', dot: '#f43f5e', icon: '❌' },
+    },
+  },
+  'invoice-modern': {
+    companyTagline: 'Perjalanan Anda, Prioritas Kami',
+    headerBg: '#2563eb',
+    headerBgEnd: '#4338ca',
+    headerTextColor: '#ffffff',
+    accentColor: '#6366f1',
+    tableHeaderBg: '#1e3a5f',
+    tableHeaderText: '#ffffff',
+    borderColor: '#dbeafe',
+    footerText: 'Terima kasih telah memilih layanan kami. E-Ticket akan dikirim setelah pembayaran terkonfirmasi.',
+    showSignature: true,
+    showDeadline: true,
+    statusBadges: {
+      PENDING: { bg: '#fffbeb', text: '#b45309', border: '#fcd34d', dot: '#f59e0b', icon: '⏳' },
+      CONFIRMED: { bg: '#ecfdf5', text: '#047857', border: '#6ee7b7', dot: '#10b981', icon: '✅' },
+      COMPLETED: { bg: '#f0f9ff', text: '#0369a1', border: '#7dd3fc', dot: '#0ea5e9', icon: '🏁' },
+      CANCELLED: { bg: '#fff1f2', text: '#be123c', border: '#fda4af', dot: '#f43f5e', icon: '❌' },
+    },
+  },
+  'invoice-minimal': {
+    companyTagline: 'Perjalanan Anda, Prioritas Kami',
+    headerBg: '#ffffff',
+    headerBgEnd: '#f8fafc',
+    headerTextColor: '#111827',
+    accentColor: '#374151',
+    tableHeaderBg: '#f3f4f6',
+    tableHeaderText: '#111827',
+    borderColor: '#e5e7eb',
+    footerText: 'Terima kasih telah memilih layanan kami.',
+    showSignature: true,
+    showDeadline: true,
+    statusBadges: {
+      PENDING: { bg: '#fff7ed', text: '#9a3412', border: '#fdba74', dot: '#f97316', icon: '⏳' },
+      CONFIRMED: { bg: '#f0fdf4', text: '#166534', border: '#86efac', dot: '#22c55e', icon: '✅' },
+      COMPLETED: { bg: '#eff6ff', text: '#1e40af', border: '#93c5fd', dot: '#3b82f6', icon: '🏁' },
+      CANCELLED: { bg: '#fef2f2', text: '#991b1b', border: '#fca5a5', dot: '#ef4444', icon: '❌' },
+    },
+  },
+  'invoice-premium': {
+    companyTagline: 'Perjalanan Anda, Prioritas Kami',
+    headerBg: '#1a1a1a',
+    headerBgEnd: '#0d0d0d',
+    headerTextColor: '#ffffff',
+    accentColor: '#e59800',
+    tableHeaderBg: '#1a1a1a',
+    tableHeaderText: '#ffffff',
+    borderColor: '#333333',
+    footerText: 'Terima kasih telah memilih layanan premium kami.',
+    showSignature: true,
+    showDeadline: true,
+    statusBadges: {
+      PENDING: { bg: '#2d1f00', text: '#f59e0b', border: '#78350f', dot: '#f59e0b', icon: '⏳' },
+      CONFIRMED: { bg: '#052e16', text: '#22c55e', border: '#166534', dot: '#22c55e', icon: '✅' },
+      COMPLETED: { bg: '#0c1929', text: '#3b82f6', border: '#1e3a5f', dot: '#3b82f6', icon: '🏁' },
+      CANCELLED: { bg: '#2d0d0d', text: '#ef4444', border: '#7f1d1d', dot: '#ef4444', icon: '❌' },
+    },
+  },
   'invoice-custom': {
     companyTagline: 'Perjalanan Anda, Prioritas Kami',
     headerBg: '#1e3a5f',
@@ -333,7 +409,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
   const isDestinationsCta = slug === 'destinations-cta';
   const isToursPage = slug === 'tours';
   const isBlog = slug === 'blog';
-  const isInvoiceCustom = slug === 'invoice-custom';
+  const isInvoiceCustom = slug === 'invoice-custom' || slug.startsWith('invoice-');
   const isGeneric = !isHero && !isValue && !isFaq && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta && !isGallery && !isTours && !isDestinations && !isDestinationsPage && !isDestinationsCta && !isToursPage && !isBlog && !isInvoiceCustom;
 
   useEffect(() => { fetchPage(); }, [slug]);
