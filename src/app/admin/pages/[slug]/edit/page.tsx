@@ -267,7 +267,7 @@ const defaultData: Record<string, PageData> = {
     tableHeaderBg: '#334155',
     tableHeaderText: '#ffffff',
     borderColor: '#e5e7eb',
-    footerText: 'Terima kasih telah memilih layanan kami. E-Ticket akan dikirim setelah pembayaran terkonfirmasi.',
+    footerText: '',
     showSignature: true,
     showDeadline: true,
     statusBadges: {
@@ -286,7 +286,7 @@ const defaultData: Record<string, PageData> = {
     tableHeaderBg: '#1e3a5f',
     tableHeaderText: '#ffffff',
     borderColor: '#dbeafe',
-    footerText: 'Terima kasih telah memilih layanan kami. E-Ticket akan dikirim setelah pembayaran terkonfirmasi.',
+    footerText: '',
     showSignature: true,
     showDeadline: true,
     statusBadges: {
@@ -305,7 +305,7 @@ const defaultData: Record<string, PageData> = {
     tableHeaderBg: '#f3f4f6',
     tableHeaderText: '#111827',
     borderColor: '#e5e7eb',
-    footerText: 'Terima kasih telah memilih layanan kami.',
+    footerText: '',
     showSignature: true,
     showDeadline: true,
     statusBadges: {
@@ -324,7 +324,7 @@ const defaultData: Record<string, PageData> = {
     tableHeaderBg: '#1a1a1a',
     tableHeaderText: '#ffffff',
     borderColor: '#333333',
-    footerText: 'Terima kasih telah memilih layanan premium kami.',
+    footerText: '',
     showSignature: true,
     showDeadline: true,
     statusBadges: {
@@ -343,7 +343,7 @@ const defaultData: Record<string, PageData> = {
     tableHeaderBg: '#1e293b',
     tableHeaderText: '#ffffff',
     borderColor: '#e2e8f0',
-    footerText: 'Terima kasih telah memilih layanan kami. E-Ticket akan dikirim setelah pembayaran terkonfirmasi.',
+    footerText: '',
     showSignature: true,
     showDeadline: true,
     statusBadges: {

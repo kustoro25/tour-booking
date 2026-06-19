@@ -758,8 +758,6 @@ function CustomInvoice({
   const stripeBg = `${c.tableHeaderBg || '#1e293b'}0d`;
   const accentBg = `${accent}1a`;
   const accentText = accent;
-  const footerText = c.footerText || `Terima kasih telah memilih ${companyName}.`;
-  const radius = '12px';
 
   const priceAdult = order.tour.priceAdult || 0;
   const priceChild = order.tour.priceChild || 0;
@@ -888,65 +886,64 @@ function CustomInvoice({
         </div>
 
         {/* ── Payment Instructions ── */}
-        <div className="overflow-hidden mb-4" style={{ border: `1px solid ${border}`, borderRadius: radius }}>
-          <div className="px-5 py-3" style={{ backgroundColor: accentBg }}>
-            <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: accentText }}>Instruksi Pembayaran</h3>
-          </div>
-          <div className="p-5 space-y-3">
+        <div className="mt-6">
+          <h4 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">
+            Informasi Pembayaran
+          </h4>
+          <div className="space-y-2 mb-4">
             {bankAccounts.map((bank) => (
-              <div key={bank.bank} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-sm" style={{ background: `linear-gradient(135deg, ${thBg}, ${accent})` }}>
-                    {bank.bank.slice(0, 2)}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">Bank {bank.bank}</p>
-                    <p className="text-sm font-mono text-gray-600 tracking-wide">{bank.number}</p>
-                    <p className="text-xs text-gray-400">a.n. {bank.name}</p>
-                  </div>
-                </div>
+              <div key={bank.bank} className="grid grid-cols-[100px_1fr_1fr_auto] items-center gap-x-3 text-xs">
+                <span className="font-semibold text-gray-700">Bank {bank.bank}</span>
+                <span className="font-mono text-gray-600">{bank.number}</span>
+                <span className="text-gray-400">a.n. {bank.name}</span>
                 <CopyButton bankNumber={bank.number} />
               </div>
             ))}
           </div>
-        </div>
 
-        {/* ── Deadline Warning ── */}
-        {c.showDeadline !== false && (
-          <div className="rounded-xl px-5 py-4 mb-5" style={{ backgroundColor: accentBg, border: `1px solid ${accent}40` }}>
-            <div className="flex items-start gap-3">
-              <span className="text-lg flex-shrink-0">⏰</span>
-              <div className="text-sm">
-                <p className="font-semibold" style={{ color: accent }}>Batas Waktu Pembayaran</p>
-                <p className="text-gray-600 mt-0.5">
-                  Mohon selesaikan pembayaran sebelum <strong>{formatDateTime(order.expiryAt)}</strong>.
-                  Jika melewati batas waktu, pesanan akan otomatis dibatalkan.
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {/* Left: Deadline + Terms */}
+            <div>
+              {c.showDeadline !== false && (
+                <div className="rounded-xl px-3 py-2 text-[10px] mb-4" style={{ backgroundColor: accentBg, border: `1px solid ${accent}40` }}>
+                  <span className="font-semibold" style={{ color: accent }}>Batas Pembayaran: </span>
+                  <span className="text-gray-600">{formatDateTime(order.expiryAt)}</span>
+                </div>
+              )}
+
+              <div className="pt-3" style={{ borderTop: `1px solid ${border}` }}>
+                <h4 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  Syarat &amp; Ketentuan
+                </h4>
+                <p className="text-[9px] text-gray-400 leading-relaxed">
+                  Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar
+                  dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah
+                  pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.
                 </p>
               </div>
             </div>
-          </div>
-        )}
 
-        {/* ── Signature ── */}
-        {c.showSignature !== false && (
-          <div className="grid grid-cols-2 gap-6 mb-5">
-            <div />
-            <div className="flex flex-col justify-end">
-              <div className="text-right">
-                <div className="inline-block">
-                  <div className="w-32 h-px bg-gray-300 mb-1" />
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wider">Authorised Sign</p>
+            {/* Right: Signature */}
+            {c.showSignature !== false && (
+              <div className="flex flex-col justify-end">
+                <div className="text-right">
+                  <div className="inline-block">
+                    <div className="w-32 h-px bg-gray-300 mb-1" />
+                    <p className="text-[9px] text-gray-400 uppercase tracking-wider">Authorised Sign</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* ── Footer Note ── */}
-        <div className="text-center pt-4" style={{ borderTop: `1px solid ${border}` }}>
-          <p className="text-xs text-gray-400 leading-relaxed">{footerText}</p>
-          <p className="text-[10px] text-gray-300 mt-1">
-            {companyPhone} &nbsp;|&nbsp; {companyEmail}
+        <div className="text-center pt-4 mt-5" style={{ borderTop: `1px solid ${border}` }}>
+          <p className="text-xs text-gray-400 leading-relaxed">
+            {c.footerText
+              ? c.footerText
+              : `Terima kasih telah memilih ${companyName} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi ${companyPhone} atau ${companyEmail}.`
+            }
           </p>
         </div>
       </div>
