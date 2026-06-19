@@ -183,6 +183,8 @@ const defaultData: Record<string, PageData> = {
 <p>Jika ada pertanyaan, hubungi kami melalui halaman Hubungi Kami atau email support@jelajahnusantara.com.</p>`
   },
   'about': {
+    label: 'Tentang',
+    heading: 'Tentang Kami',
     storyTitle: 'Cerita Kami',
     story: 'Jelajah Nusantara Tour adalah perusahaan jasa perjalanan wisata yang berkomitmen memberikan pengalaman liburan tak terlupakan dengan pelayanan personal dan harga transparan.\n\nBerdiri sejak 2018, kami telah melayani ribuan wisatawan domestik dan mancanegara dengan paket-paket tour pilihan ke destinasi terbaik di Indonesia. Dari Bali hingga Raja Ampat, dari Bromo hingga Danau Toba — kami ada untuk mewujudkan liburan impian Anda.\n\nKami percaya bahwa setiap perjalanan adalah cerita yang berharga. Itulah mengapa kami merancang setiap paket tour dengan detail dan penuh perhatian, memastikan setiap momen perjalanan Anda menjadi kenangan yang tak terlupakan.',
     vision: 'Menjadi platform booking tour yang paling mudah, transparan, dan terpercaya bagi wisatawan domestik maupun mancanegara.',
@@ -534,6 +536,22 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
         {/* ═══════════ ABOUT ═══════════ */}
         {isAbout && (
           <>
+            <SectionCard icon="📝" title="Header Halaman">
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Label (atas)</label>
+                  <input type="text" value={data.label || ''} onChange={e => update('label', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Tentang" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Heading Halaman</label>
+                  <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Tentang Kami" />
+                </div>
+              </div>
+            </SectionCard>
             <SectionCard icon="📖" title="Cerita Kami">
               <input type="text" value={data.storyTitle || ''} onChange={e => update('storyTitle', e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-3" placeholder="Judul section" />
