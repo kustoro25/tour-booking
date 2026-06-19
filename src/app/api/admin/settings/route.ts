@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requireAdmin } from '@/lib/auth';
+import { requireAdmin, requireSuperAdmin } from '@/lib/auth';
 
 export async function GET() {
   try {
@@ -25,7 +25,7 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
-    await requireAdmin();
+    await requireSuperAdmin();
     const body = await request.json();
 
     // Update each key-value pair
@@ -41,6 +41,9 @@ export async function PUT(request: NextRequest) {
   } catch (error: unknown) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof Error && error.message === 'Forbidden: Super Admin only') {
+      return NextResponse.json({ success: false, error: 'Hanya Super Admin yang bisa mengubah pengaturan.' }, { status: 403 });
     }
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }

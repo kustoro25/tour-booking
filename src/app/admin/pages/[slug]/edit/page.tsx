@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useToast } from '@/components/ui/Toast';
 import ImageUpload from '@/components/ui/ImageUpload';
+import { useAdminRole } from '@/lib/useAdminRole';
 
 // ─── Data schemas per page type ───
 
@@ -290,9 +291,11 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
   const { slug } = use(params);
   const router = useRouter();
   const { showToast } = useToast();
+  const { isSuperAdmin } = useAdminRole();
   const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showBlocked, setShowBlocked] = useState(false);
   const [data, setData] = useState<PageData>({});
 
   const isHero = slug === 'home-hero';
@@ -338,6 +341,11 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSuperAdmin) {
+      setShowBlocked(true);
+      setTimeout(() => setShowBlocked(false), 3000);
+      return;
+    }
     setSaving(true);
     try {
       const res = await fetch(`/api/admin/pages/${slug}`, {
@@ -1062,6 +1070,11 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             {saving ? 'Menyimpan...' : '💾 Simpan Semua Perubahan'}
           </button>
           <Link href="/admin/pages" className="text-sm text-gray-500 hover:text-gray-700 py-2.5">Batal</Link>
+          {showBlocked && (
+            <span className="text-red-600 text-sm font-medium animate-fade-in">
+              🚫 Hanya Super Admin yang bisa mengubah halaman ini.
+            </span>
+          )}
         </div>
       </form>
     </div>

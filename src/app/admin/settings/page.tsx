@@ -3,14 +3,17 @@
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/Skeleton';
 import ImageUpload from '@/components/ui/ImageUpload';
+import { useAdminRole } from '@/lib/useAdminRole';
 
 type InvoiceTheme = 'classic' | 'modern' | 'minimal' | 'premium';
 
 export default function AdminSettingsPage() {
+  const { isSuperAdmin, loading: roleLoading } = useAdminRole();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showBlocked, setShowBlocked] = useState(false);
 
   const [form, setForm] = useState({
     siteTitle: '',
@@ -46,6 +49,11 @@ export default function AdminSettingsPage() {
   }, []);
 
   const handleSave = async () => {
+    if (!isSuperAdmin) {
+      setShowBlocked(true);
+      setTimeout(() => setShowBlocked(false), 3000);
+      return;
+    }
     setSaving(true);
     setError('');
     setSaved(false);
@@ -259,7 +267,7 @@ export default function AdminSettingsPage() {
         <div className="border-t pt-6 flex items-center gap-4">
           <button
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || roleLoading}
             className="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm transition-colors"
           >
             {saving ? 'Menyimpan...' : 'Simpan Pengaturan'}
@@ -267,6 +275,11 @@ export default function AdminSettingsPage() {
           {saved && (
             <span className="text-green-600 text-sm font-medium animate-fade-in">
               ✅ Pengaturan disimpan!
+            </span>
+          )}
+          {showBlocked && (
+            <span className="text-red-600 text-sm font-medium animate-fade-in">
+              🚫 Hanya Super Admin yang bisa mengubah pengaturan.
             </span>
           )}
         </div>

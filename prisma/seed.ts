@@ -5,16 +5,19 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
 
-  // Create admin user
+  // Create admin user (credentials from .env)
+  const adminEmail = process.env.ADMIN_EMAIL || 'superadmin@gmail.com';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@tourbooking.com' },
+    where: { email: adminEmail },
     update: {},
     create: {
       name: 'Admin Utama',
-      email: 'admin@tourbooking.com',
+      email: adminEmail,
       phone: '081234567890',
       role: 'SUPER_ADMIN',
-      password: 'admin123',
+      password: adminPassword,
     },
   });
   console.log('Admin created:', admin.email);
