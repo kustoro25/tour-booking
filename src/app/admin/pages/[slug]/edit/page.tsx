@@ -44,6 +44,9 @@ type PageData = {
   infoCards?: { icon: string; title: string; detail: string; color: string }[];
   // gallery
   label?: string;
+  // destinations page
+  highlightTitle?: string;
+  allTitle?: string;
   // footer
   text?: string;
   copyright?: string;
