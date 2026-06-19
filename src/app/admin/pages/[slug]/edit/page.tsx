@@ -357,7 +357,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
     finally { setLoading(false); }
   };
 
-  const update = (key: string, value: string | number | object | null | undefined | string[] | Record<string, unknown>[]) => setData({ ...data, [key]: value });
+  const update = (key: string, value: string | number | boolean | object | null | undefined | string[] | Record<string, unknown>[]) => setData({ ...data, [key]: value });
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
