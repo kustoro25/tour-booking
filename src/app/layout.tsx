@@ -4,19 +4,25 @@ import './globals.css';
 import { ToastProvider } from '@/components/ui/Toast';
 import FloatingActions from '@/components/ui/FloatingActions';
 import PublicLayout from '@/components/layout/PublicLayout';
-import { getBrandName, getBrandIcon } from '@/lib/brand';
+import { getBrandName, getBrandIcon, getSiteTitle } from '@/lib/brand';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata: Metadata = {
-  title: {
-    default: 'Jelajah Nusantara - Booking Tour & Aktivitas',
-    template: '%s | Jelajah Nusantara',
-  },
-  description:
-    'Platform booking tour terpercaya untuk menjelajahi destinasi terbaik di Indonesia. Harga transparan, booking instan, dan guide profesional.',
-  keywords: ['tour', 'travel', 'booking', 'wisata', 'indonesia', 'liburan', 'paket tour'],
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const title = await getSiteTitle();
+  return {
+    title: {
+      default: title,
+      template: `%s | ${title.split(' - ')[0] || title}`,
+    },
+    description:
+      'Platform booking tour terpercaya untuk menjelajahi destinasi terbaik di Indonesia. Harga transparan, booking instan, dan guide profesional.',
+    keywords: ['tour', 'travel', 'booking', 'wisata', 'indonesia', 'liburan', 'paket tour'],
+    icons: {
+      icon: '/api/favicon',
+    },
+  };
+}
 
 export default async function RootLayout({
   children,

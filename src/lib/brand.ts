@@ -1,23 +1,35 @@
 import { prisma } from '@/lib/prisma';
 
-export async function getBrandName(): Promise<string> {
+const DEFAULT_TITLE = 'Jelajah Nusantara - Booking Tour & Aktivitas';
+const DEFAULT_BRAND = 'Jelajah Nusantara';
+const DEFAULT_ICON = 'JN';
+
+async function getSetting(key: string): Promise<string> {
   try {
-    const setting = await prisma.setting.findUnique({ where: { key: 'company_name' } });
+    const setting = await prisma.setting.findUnique({ where: { key } });
     if (setting?.value) {
-      const name = JSON.parse(setting.value);
-      if (typeof name === 'string' && name.trim()) return name.trim();
+      const val = JSON.parse(setting.value);
+      if (typeof val === 'string' && val.trim()) return val.trim();
     }
   } catch { /* fallback */ }
-  return 'Jelajah Nusantara';
+  return '';
+}
+
+export async function getSiteTitle(): Promise<string> {
+  const title = await getSetting('site_title');
+  return title || DEFAULT_TITLE;
+}
+
+export async function getSiteFavicon(): Promise<string> {
+  return getSetting('site_favicon');
+}
+
+export async function getBrandName(): Promise<string> {
+  const name = await getSetting('company_name');
+  return name || DEFAULT_BRAND;
 }
 
 export async function getBrandIcon(): Promise<string> {
-  try {
-    const setting = await prisma.setting.findUnique({ where: { key: 'company_icon' } });
-    if (setting?.value) {
-      const icon = JSON.parse(setting.value);
-      if (typeof icon === 'string' && icon.trim()) return icon.trim();
-    }
-  } catch { /* fallback */ }
-  return 'JN';
+  const icon = await getSetting('company_icon');
+  return icon || DEFAULT_ICON;
 }

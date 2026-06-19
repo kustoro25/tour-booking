@@ -13,6 +13,8 @@ export default function AdminSettingsPage() {
   const [error, setError] = useState('');
 
   const [form, setForm] = useState({
+    siteTitle: '',
+    siteFavicon: '',
     companyName: '',
     companyEmail: '',
     companyPhone: '',
@@ -28,6 +30,8 @@ export default function AdminSettingsPage() {
         if (data.success && data.data) {
           setForm((prev) => ({
             ...prev,
+            siteTitle: data.data.site_title || '',
+            siteFavicon: data.data.site_favicon || '',
             companyName: data.data.company_name || '',
             companyEmail: data.data.company_email || '',
             companyPhone: data.data.company_phone || '',
@@ -50,6 +54,8 @@ export default function AdminSettingsPage() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          site_title: form.siteTitle,
+          site_favicon: form.siteFavicon,
           company_name: form.companyName,
           company_email: form.companyEmail,
           company_phone: form.companyPhone,
@@ -96,6 +102,36 @@ export default function AdminSettingsPage() {
       )}
 
       <div className="bg-white rounded-xl shadow-sm p-6 space-y-8">
+        {/* ═══════════ Website Identity ═══════════ */}
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">🌐 Identitas Website</h2>
+          <p className="text-xs text-gray-500 mb-4">Judul dan favicon akan muncul di tab browser dan hasil pencarian Google.</p>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Judul Website (Title Tag)</label>
+              <input
+                type="text"
+                value={form.siteTitle}
+                onChange={(e) => setForm({ ...form, siteTitle: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Jelajah Nusantara - Booking Tour & Aktivitas"
+              />
+              <p className="text-xs text-gray-400 mt-1">Contoh: Jelajah Nusantara — Booking Tour Terpercaya</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Favicon (32×32 PNG)</label>
+              <ImageUpload
+                value={form.siteFavicon || ''}
+                onChange={(url) => setForm({ ...form, siteFavicon: url })}
+                label=""
+                folder="tour-booking/site"
+                placeholder="Upload favicon 32x32 PNG"
+              />
+              <p className="text-xs text-gray-400 mt-1">Upload gambar kecil 32×32 pixel. Kalau kosong, pakai default.</p>
+            </div>
+          </div>
+        </div>
+
         {/* Brand Identity */}
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">🏷️ Brand Identity</h2>
