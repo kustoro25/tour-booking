@@ -39,6 +39,22 @@ export default async function DestinationDetailPage({
     },
   });
 
+  // Fetch CMS CTA data
+  let ctaHeading = 'Siap Berpetualang?';
+  let ctaSubheading = 'Pilih paket tour terbaik ke {{name}} dan wujudkan liburan impian Anda!';
+  let ctaButtonText = 'Lihat Paket Tour';
+  let ctaButtonLink = '/tours';
+  try {
+    const ctaPage = await prisma.page.findUnique({ where: { slug: 'destinations-cta' } });
+    if (ctaPage?.content) {
+      const c = JSON.parse(ctaPage.content);
+      ctaHeading = c.heading || ctaHeading;
+      ctaSubheading = c.subheading || ctaSubheading;
+      ctaButtonText = c.ctaText || ctaButtonText;
+      ctaButtonLink = c.ctaLink || ctaButtonLink;
+    }
+  } catch { /* fallback */ }
+
   if (!destination) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center">
@@ -216,12 +232,12 @@ export default async function DestinationDetailPage({
 
             {/* CTA */}
             <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl shadow-sm p-6 text-white">
-              <h3 className="font-semibold text-lg mb-2">{destination.ctaHeading || 'Siap Berpetualang?'}</h3>
+              <h3 className="font-semibold text-lg mb-2">{ctaHeading}</h3>
               <p className="text-blue-100 text-sm mb-4">
-                {(destination.ctaSubheading || 'Pilih paket tour terbaik ke {{name}} dan wujudkan liburan impian Anda!').replace('{{name}}', destination.name)}
+                {ctaSubheading.replace('{{name}}', destination.name)}
               </p>
-              <Button href={destination.ctaButtonLink || '/tours'} variant="accent" size="sm" fullWidth>
-                {destination.ctaButtonText || 'Lihat Paket Tour'}
+              <Button href={ctaButtonLink} variant="accent" size="sm" fullWidth>
+                {ctaButtonText}
               </Button>
             </div>
 
