@@ -63,7 +63,7 @@ export default function LoginForm({ brandName, brandIcon }: Props) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="admin@tourbooking.com"
+              placeholder="admin@namawebsite.com"
             />
           </div>
           <div>
@@ -92,10 +92,6 @@ export default function LoginForm({ brandName, brandIcon }: Props) {
             {loading ? 'Loading...' : 'Login'}
           </button>
         </form>
-
-        <p className="text-center text-xs text-gray-400 mt-6">
-          Default: admin@tourbooking.com / admin123
-        </p>
       </div>
     </div>
   );
