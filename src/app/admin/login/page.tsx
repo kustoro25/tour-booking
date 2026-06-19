@@ -11,12 +11,16 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
 
   const [brandName, setBrandName] = useState('Jelajah Nusantara Tour');
+  const [brandIcon, setBrandIcon] = useState('JN');
 
   useEffect(() => {
     fetch('/api/settings/public')
       .then(r => r.json())
       .then(data => {
-        if (data.success && data.data?.brandName) setBrandName(data.data.brandName);
+        if (data.success && data.data) {
+          if (data.data.brandName) setBrandName(data.data.brandName);
+          if (data.data.brandIcon) setBrandIcon(data.data.brandIcon);
+        }
       })
       .catch(() => {});
   }, []);
@@ -49,9 +53,13 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-xl">JN</span>
-          </div>
+          {brandIcon.startsWith('http') ? (
+            <img src={brandIcon} alt={brandName} className="w-14 h-14 rounded-xl object-cover mx-auto mb-4" />
+          ) : (
+            <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <span className="text-white font-bold text-xl">{brandIcon.substring(0, 2).toUpperCase()}</span>
+            </div>
+          )}
           <h1 className="text-2xl font-bold text-gray-900">Admin Login</h1>
           <p className="text-sm text-gray-500 mt-1">{brandName}</p>
         </div>
