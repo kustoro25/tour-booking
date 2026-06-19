@@ -379,8 +379,8 @@ export default async function HomePage() {
             </div>
 
             <div className="text-center mt-10">
-              <Button href="/destinations" variant="primary" size="lg">
-                Lihat Semua Destinasi
+              <Button href={destinationsData.ctaLink || '/destinations'} variant="primary" size="lg">
+                {destinationsData.ctaText || 'Lihat Semua Destinasi'}
               </Button>
             </div>
           </div>
@@ -461,8 +461,8 @@ export default async function HomePage() {
           )}
 
           <div className="text-center mt-10">
-            <Button href="/tours" variant="primary" size="lg">
-              Lihat Semua Paket Wisata
+            <Button href={toursData.ctaLink || '/tours'} variant="primary" size="lg">
+              {toursData.ctaText || 'Lihat Semua Paket Wisata'}
             </Button>
           </div>
         </div>
