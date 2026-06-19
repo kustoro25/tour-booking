@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface Props {
   brandName: string;
@@ -10,6 +10,8 @@ interface Props {
 
 export default function LoginForm({ brandName, brandIcon }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/admin/dashboard';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -28,7 +30,7 @@ export default function LoginForm({ brandName, brandIcon }: Props) {
       });
       const data = await res.json();
       if (data.success) {
-        router.push('/admin/dashboard');
+        router.push(redirectTo);
       } else {
         setError(data.error || 'Login gagal');
       }

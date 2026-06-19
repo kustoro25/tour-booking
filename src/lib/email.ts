@@ -102,6 +102,52 @@ export function paymentConfirmationTemplate(data: {
   `;
 }
 
+export function contactNotificationTemplate(data: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  companyName: string;
+}): string {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #2563EB;">📩 Pesan Baru dari Contact Form</h2>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+        <tr><td style="padding: 8px 0;"><strong>Nama</strong></td><td>${data.name}</td></tr>
+        <tr><td style="padding: 8px 0;"><strong>Email</strong></td><td><a href="mailto:${data.email}">${data.email}</a></td></tr>
+        <tr><td style="padding: 8px 0;"><strong>Subjek</strong></td><td>${data.subject || '(Tidak diisi)'}</td></tr>
+      </table>
+      <div style="background: #F3F4F6; padding: 16px; border-radius: 8px;">
+        <p style="margin: 0; white-space: pre-wrap;">${data.message}</p>
+      </div>
+      <p style="margin-top: 20px; font-size: 12px; color: #666;">Pesan ini dikirim melalui contact form website ${data.companyName}.</p>
+    </div>
+  `;
+}
+
+export function contactAutoReplyTemplate(data: {
+  name: string;
+  companyName: string;
+  companyEmail: string;
+  companyPhone: string;
+}): string {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #2563EB;">Terima Kasih telah Menghubungi Kami!</h2>
+      <p>Halo <strong>${data.name}</strong>,</p>
+      <p>Terima kasih telah menghubungi <strong>${data.companyName}</strong>. Pesan Anda telah kami terima dan tim kami akan segera menghubungi Anda.</p>
+      <p>Waktu respons kami biasanya dalam <strong>1x24 jam</strong> pada hari kerja.</p>
+      <p>Jika ada hal mendesak, silakan hubungi kami langsung:</p>
+      <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
+        <tr><td style="padding: 4px 0;">📧 <strong>Email</strong></td><td><a href="mailto:${data.companyEmail}">${data.companyEmail}</a></td></tr>
+        <tr><td style="padding: 4px 0;">📱 <strong>WhatsApp</strong></td><td>${data.companyPhone}</td></tr>
+      </table>
+      <p style="margin-top: 20px;">Salam hangat,<br/><strong>Tim ${data.companyName}</strong></p>
+      <p style="margin-top: 20px; font-size: 12px; color: #666;">Ini adalah email otomatis, mohon tidak membalas email ini.</p>
+    </div>
+  `;
+}
+
 export function reviewRequestTemplate(data: {
   customerName: string;
   tourName: string;
