@@ -25,6 +25,7 @@ const pageSlugs = [
   // ── Standalone pages ──
   { slug: 'about', title: 'About Us' },
   { slug: 'contact', title: 'Contact Us' },
+  { slug: 'destinations', title: 'Destinations Page' },
   { slug: 'privacy', title: 'Privacy Policy' },
   { slug: 'terms', title: 'Terms & Conditions' },
   { slug: 'footer', title: 'Footer' },

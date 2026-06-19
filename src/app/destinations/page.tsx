@@ -5,14 +5,50 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 import Pagination from '@/components/ui/Pagination';
 
-export const metadata: Metadata = {
-  title: 'Destinasi Wisata',
-  description: 'Jelajahi destinasi wisata terbaik di Indonesia bersama Jelajah Nusantara.',
-};
-
 export const dynamic = 'force-dynamic';
 
 const PER_PAGE = 12;
+
+interface DestinationsPageData {
+  label: string;
+  heading: string;
+  subheading: string;
+  highlightTitle: string;
+  allTitle: string;
+}
+
+const FALLBACK: DestinationsPageData = {
+  label: 'Jelajahi',
+  heading: 'Destinasi Wisata',
+  subheading: 'Temukan destinasi impian Anda di seluruh penjuru Nusantara. Dari pantai eksotis hingga pegunungan megah — semua ada di sini.',
+  highlightTitle: 'Destinasi Unggulan',
+  allTitle: 'Semua Destinasi',
+};
+
+async function getDestinationsPageData(): Promise<DestinationsPageData> {
+  try {
+    const page = await prisma.page.findUnique({ where: { slug: 'destinations' } });
+    if (page?.content) {
+      const parsed = JSON.parse(page.content);
+      return {
+        label: parsed.label || FALLBACK.label,
+        heading: parsed.heading || FALLBACK.heading,
+        subheading: parsed.subheading || FALLBACK.subheading,
+        highlightTitle: parsed.highlightTitle || FALLBACK.highlightTitle,
+        allTitle: parsed.allTitle || FALLBACK.allTitle,
+      };
+    }
+  } catch { /* fallback */ }
+  return FALLBACK;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getDestinationsPageData();
+  return {
+    title: data.heading,
+    description: data.subheading.slice(0, 160),
+  };
+}
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -23,7 +59,7 @@ export default async function DestinationsPage({ searchParams }: PageProps) {
   const page = typeof params.page === 'string' ? Math.max(1, parseInt(params.page) || 1) : 1;
   const skip = (page - 1) * PER_PAGE;
 
-  const [destinations, total] = await Promise.all([
+  const [destinations, total, cms] = await Promise.all([
     prisma.destination.findMany({
       where: { isActive: true },
       orderBy: { sortOrder: 'asc' },
@@ -32,21 +68,22 @@ export default async function DestinationsPage({ searchParams }: PageProps) {
       include: { _count: { select: { tours: true } } },
     }),
     prisma.destination.count({ where: { isActive: true } }),
+    getDestinationsPageData(),
   ]);
 
   const totalPages = Math.ceil(total / PER_PAGE);
+  const data = cms || FALLBACK;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-12">
       {/* Hero Header */}
       <div className="text-center mb-12">
-        <span className="inline-block text-teal-600 text-sm font-semibold tracking-wide uppercase mb-2">Jelajahi</span>
+        <span className="inline-block text-teal-600 text-sm font-semibold tracking-wide uppercase mb-2">{data.label}</span>
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-          Destinasi Wisata
+          {data.heading}
         </h1>
         <p className="text-gray-500 max-w-2xl mx-auto">
-          Temukan destinasi impian Anda di seluruh penjuru Nusantara. Dari pantai eksotis
-          hingga pegunungan megah — semua ada di sini.
+          {data.subheading}
         </p>
       </div>
 
@@ -55,7 +92,7 @@ export default async function DestinationsPage({ searchParams }: PageProps) {
         <div className="mb-12">
           <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
             <span className="w-8 h-8 bg-yellow-100 text-yellow-600 rounded-lg flex items-center justify-center text-sm">⭐</span>
-            Destinasi Unggulan
+            {data.highlightTitle}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {destinations
@@ -71,7 +108,7 @@ export default async function DestinationsPage({ searchParams }: PageProps) {
       <div>
         <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-sm">🗺️</span>
-          Semua Destinasi ({total})
+          {data.allTitle} ({total})
         </h2>
         {destinations.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-xl shadow-card">

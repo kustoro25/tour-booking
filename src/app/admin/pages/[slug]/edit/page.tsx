@@ -214,6 +214,13 @@ const defaultData: Record<string, PageData> = {
       { icon: '📍', title: 'Alamat', detail: 'Jl. Pariwisata No. 123, Jakarta Selatan', color: 'from-orange-500 to-orange-600' },
     ],
   },
+  'destinations': {
+    label: 'Jelajahi',
+    heading: 'Destinasi Wisata',
+    subheading: 'Temukan destinasi impian Anda di seluruh penjuru Nusantara. Dari pantai eksotis hingga pegunungan megah — semua ada di sini.',
+    highlightTitle: 'Destinasi Unggulan',
+    allTitle: 'Semua Destinasi',
+  },
   'testimonials': {
     label: 'Testimoni',
     heading: 'Cerita dari Mereka yang Telah Berpetualang',
@@ -280,7 +287,8 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
   const isGallery = slug === 'home-gallery';
   const isTours = slug === 'home-tours';
   const isDestinations = slug === 'home-destinations';
-  const isGeneric = !isHero && !isValue && !isFaq && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta && !isGallery && !isTours && !isDestinations;
+  const isDestinationsPage = slug === 'destinations';
+  const isGeneric = !isHero && !isValue && !isFaq && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta && !isGallery && !isTours && !isDestinations && !isDestinationsPage;
 
   useEffect(() => { fetchPage(); }, [slug]);
 
@@ -870,6 +878,50 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                 <input type="text" value={data.ctaLink || ''} onChange={e => update('ctaLink', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                   placeholder="/destinations" />
+              </div>
+            </SectionCard>
+          </>
+        )}
+
+        {/* ═══════════ DESTINATIONS PAGE ═══════════ */}
+        {isDestinationsPage && (
+          <>
+            <SectionCard icon="📝" title="Header Halaman">
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Label (atas)</label>
+                  <input type="text" value={data.label || ''} onChange={e => update('label', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Jelajahi" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Heading</label>
+                  <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Destinasi Wisata" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Subheading</label>
+                  <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Temukan destinasi impian Anda di seluruh penjuru Nusantara..." />
+                </div>
+              </div>
+            </SectionCard>
+            <SectionCard icon="⭐" title="Judul Section">
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Judul "Destinasi Unggulan"</label>
+                  <input type="text" value={data.highlightTitle || ''} onChange={e => update('highlightTitle', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Destinasi Unggulan" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Judul "Semua Destinasi"</label>
+                  <input type="text" value={data.allTitle || ''} onChange={e => update('allTitle', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Semua Destinasi" />
+                </div>
               </div>
             </SectionCard>
           </>
