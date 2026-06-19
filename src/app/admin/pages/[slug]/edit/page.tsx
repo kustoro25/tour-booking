@@ -1191,7 +1191,56 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
               </div>
             </SectionCard>
 
-            {/* Accent & Table Colors */}
+            {/* Headings & Text Content */}
+            <SectionCard icon="📝" title="Heading & Teks Konten">
+              <p className="text-xs text-gray-400 mb-4">Teks yang muncul di invoice. Kosongkan untuk menggunakan default.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Heading "Ditagihkan Kepada"</label>
+                  <input type="text" value={(data.headingBilledTo as string) || ''} onChange={e => update('headingBilledTo', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Ditagihkan Kepada" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Heading "Detail Invoice"</label>
+                  <input type="text" value={(data.headingInvoiceDetails as string) || ''} onChange={e => update('headingInvoiceDetails', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Detail Invoice" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Heading "Ringkasan Pesanan"</label>
+                  <input type="text" value={(data.headingOrderSummary as string) || ''} onChange={e => update('headingOrderSummary', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Ringkasan Pesanan" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Heading "Rincian Biaya"</label>
+                  <input type="text" value={(data.headingPriceBreakdown as string) || ''} onChange={e => update('headingPriceBreakdown', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Rincian Biaya" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Heading "Informasi Pembayaran"</label>
+                  <input type="text" value={(data.headingPaymentInfo as string) || ''} onChange={e => update('headingPaymentInfo', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Informasi Pembayaran" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Heading "Batas Pembayaran"</label>
+                  <input type="text" value={(data.headingDeadline as string) || ''} onChange={e => update('headingDeadline', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Batas Pembayaran" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <label className="text-xs text-gray-500 mb-1 block">Teks Deadline (gunakan {'{{date}}'} untuk tanggal otomatis)</label>
+                <textarea value={(data.deadlineText as string) || ''} onChange={e => update('deadlineText', e.target.value)} rows={2}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Mohon selesaikan pembayaran sebelum {{date}}. Jika melewati batas waktu, pesanan akan otomatis dibatalkan." />
+              </div>
+              <div className="mt-3">
+                <label className="text-xs text-gray-500 mb-1 block">Teks Syarat & Ketentuan</label>
+                <textarea value={(data.termsText as string) || ''} onChange={e => update('termsText', e.target.value)} rows={3}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Pembayaran harus dilakukan sebelum batas waktu yang ditentukan..." />
+              </div>
+            </SectionCard>
+
+            {/* Accent & Border Colors */}
             <SectionCard icon="🎯" title="Warna Aksen & Border">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>

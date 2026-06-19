@@ -36,6 +36,14 @@ interface InvoiceCustomConfig {
   headerTextColor?: string;
   accentColor?: string;
   borderColor?: string;
+  headingBilledTo?: string;
+  headingInvoiceDetails?: string;
+  headingOrderSummary?: string;
+  headingPriceBreakdown?: string;
+  headingPaymentInfo?: string;
+  headingDeadline?: string;
+  deadlineText?: string;
+  termsText?: string;
   footerText?: string;
   showSignature?: boolean;
   showDeadline?: boolean;
@@ -770,6 +778,19 @@ function CustomInvoice({
   const isLight = themeKeyForCustom(hText) === 'light';
   const logoBg = isLight ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.2)';
 
+  // Editable headings
+  const T = {
+    billedTo: c.headingBilledTo || 'Ditagihkan Kepada',
+    invoiceDetails: c.headingInvoiceDetails || 'Detail Invoice',
+    orderSummary: c.headingOrderSummary || 'Ringkasan Pesanan',
+    priceBreakdown: c.headingPriceBreakdown || 'Rincian Biaya',
+    paymentInfo: c.headingPaymentInfo || 'Informasi Pembayaran',
+    deadline: c.headingDeadline || 'Batas Pembayaran',
+    deadlineBody: (c.deadlineText || 'Mohon selesaikan pembayaran sebelum {{date}}. Jika melewati batas waktu, pesanan akan otomatis dibatalkan.')
+      .replace('{{date}}', formatDateTime(order.expiryAt)),
+    terms: c.termsText || 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
+  };
+
   return (
     <div className={`invoice-document bg-white ${headerIsLight ? 'border border-gray-200' : 'shadow-xl'} ${headerIsLight ? '' : 'rounded-xl overflow-hidden'}`} id="invoice-print">
       {/* ── Header ── */}
@@ -805,7 +826,7 @@ function CustomInvoice({
       <div className="px-6 sm:px-10 py-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
           <div>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Ditagihkan Kepada</h3>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{T.billedTo}</h3>
             <div className="space-y-1">
               <p className="text-sm font-semibold text-gray-900">{order.customerName}</p>
               <p className="text-xs text-gray-500">{order.customerEmail}</p>
@@ -813,7 +834,7 @@ function CustomInvoice({
             </div>
           </div>
           <div className="sm:text-right">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Detail Invoice</h3>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{T.invoiceDetails}</h3>
             <div className="space-y-1.5">
               {[
                 { label: 'Nomor Invoice', value: order.invoiceNo },
@@ -832,7 +853,7 @@ function CustomInvoice({
         {/* ── Tour Order Summary ── */}
         <div className="overflow-hidden mb-6" style={{ border: `1px solid ${border}`, borderRadius: '12px' }}>
           <div className="px-5 py-3" style={{ backgroundColor: accentBg }}>
-            <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: accentText }}>Ringkasan Pesanan</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: accentText }}>{T.orderSummary}</h3>
           </div>
           <div className="p-5">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
@@ -868,7 +889,7 @@ function CustomInvoice({
         {/* ── Price Breakdown ── */}
         <div className="overflow-hidden mb-6" style={{ border: `1px solid ${border}`, borderRadius: '12px' }}>
           <div className="px-5 py-3" style={{ backgroundColor: accentBg }}>
-            <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: accentText }}>Rincian Biaya</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: accentText }}>{T.priceBreakdown}</h3>
           </div>
           <div className="p-5">
             {discountPct > 0 && (
@@ -887,7 +908,7 @@ function CustomInvoice({
         {/* ── Payment Instructions ── */}
         <div className="mt-6">
           <h4 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">
-            Informasi Pembayaran
+            {T.paymentInfo}
           </h4>
           <div className="space-y-2 mb-4">
             {bankAccounts.map((bank) => (
@@ -905,7 +926,7 @@ function CustomInvoice({
             <div>
               {c.showDeadline !== false && (
                 <div className="rounded-xl px-3 py-2 text-[10px] mb-4" style={{ backgroundColor: accentBg, border: `1px solid ${accent}40` }}>
-                  <span className="font-semibold" style={{ color: accent }}>Batas Pembayaran: </span>
+                  <span className="font-semibold" style={{ color: accent }}>{T.deadline}: </span>
                   <span className="text-gray-600">{formatDateTime(order.expiryAt)}</span>
                 </div>
               )}
@@ -915,9 +936,7 @@ function CustomInvoice({
                   Syarat &amp; Ketentuan
                 </h4>
                 <p className="text-[9px] text-gray-400 leading-relaxed">
-                  Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar
-                  dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah
-                  pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.
+                  {T.terms}
                 </p>
               </div>
             </div>
