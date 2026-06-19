@@ -34,8 +34,8 @@ export function formatDateTime(date: string | Date): string {
 
 export function generateInvoiceNo(): string {
   const year = new Date().getFullYear();
-  const random = Math.floor(1000 + Math.random() * 9000);
-  return `TRV-${year}-${random}`;
+  const randomHex = crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+  return `TRV-${year}-${randomHex.toUpperCase()}`;
 }
 
 export function generateReviewToken(): string {
