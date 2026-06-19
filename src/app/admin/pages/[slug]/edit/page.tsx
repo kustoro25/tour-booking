@@ -454,7 +454,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             </SectionCard>
 
             <SectionCard icon="📊" title="Statistik (Trust Badges)">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {(data.stats || []).map((s, i) => (
                   <div key={i} className="space-y-2">
                     <label className="text-xs text-gray-500">#{i + 1}</label>
@@ -739,7 +739,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             <SectionCard icon="🔗" title="Social Media Links" addLabel="+ Tambah Medsos" onAdd={() => update('socialLinks', [...(data.socialLinks as Array<{platform:string;url:string;icon:string}> || []), { platform: '', url: '', icon: 'whatsapp' }])}>
               <div className="space-y-3">
                 {(data.socialLinks as Array<{platform:string;url:string;icon:string}> || []).map((link, i) => (
-                  <div key={i} className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl">
+                  <div key={i} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 p-3 bg-gray-50 rounded-xl">
                     <select value={link.icon} onChange={e => {
                       const arr = [...(data.socialLinks as Array<{platform:string;url:string;icon:string}> || [])]; arr[i] = { ...arr[i], icon: e.target.value }; update('socialLinks', arr);
                     }} className="w-28 border rounded-lg px-2 py-1.5 text-sm bg-white">

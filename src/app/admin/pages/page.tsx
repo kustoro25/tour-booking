@@ -96,7 +96,8 @@ export default function AdminPagesPage() {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
+        {/* Desktop table */}
+        <table className="hidden lg:table w-full text-sm">
           <thead className="bg-gray-50 text-gray-600">
             <tr>
               <th className="px-4 py-3 text-left font-medium">Halaman</th>
@@ -125,6 +126,29 @@ export default function AdminPagesPage() {
             ))}
           </tbody>
         </table>
+
+        {/* Mobile cards */}
+        <div className="lg:hidden divide-y divide-gray-100">
+          {mergedPages.map((page) => (
+            <div key={page.slug} className="p-4 space-y-2">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-gray-900 text-sm truncate">{page.title}</p>
+                  <p className="text-xs font-mono text-gray-400 truncate">{page.slug}</p>
+                </div>
+                <Link
+                  href={`/admin/pages/${page.slug}/edit`}
+                  className="shrink-0 text-blue-600 hover:text-blue-700 text-xs font-medium px-2 py-1"
+                >
+                  ✏️ Edit
+                </Link>
+              </div>
+              <p className="text-xs text-gray-400">
+                {page.updatedAt ? formatDate(page.updatedAt) : 'Belum diatur'}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
