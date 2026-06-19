@@ -135,7 +135,7 @@ export default function AdminDestinationsPage() {
                   <span>{(dest._count as any)?.tours || 0} Paket</span>
                   <span className="text-gray-300">|</span>
                   <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${dest.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{dest.isActive ? 'Aktif' : 'Nonaktif'}</span>
-                  {dest.highlight && <span className="ml-auto">⭐ Unggulan</span>}
+                  {dest.highlight ? <span className="ml-auto">⭐ Unggulan</span> : null}
                 </div>
                 <div className="flex items-center gap-3 pt-1 border-t border-gray-100">
                   <Link href={`/admin/destinations/${dest.id}/edit`} className="text-blue-600 hover:text-blue-700 text-xs font-medium">Edit</Link>
