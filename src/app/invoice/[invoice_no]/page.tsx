@@ -42,9 +42,25 @@ interface InvoiceCustomConfig {
   headingPriceBreakdown?: string;
   headingPaymentInfo?: string;
   headingDeadline?: string;
+  headingTerms?: string;
   deadlineText?: string;
   termsText?: string;
   footerText?: string;
+  labelInvoiceNo?: string;
+  labelInvoiceDate?: string;
+  labelPaymentDeadline?: string;
+  labelTourDate?: string;
+  labelDuration?: string;
+  labelAdults?: string;
+  labelChildren?: string;
+  labelDiscount?: string;
+  labelSubTotal?: string;
+  labelTax?: string;
+  labelTotal?: string;
+  labelBank?: string;
+  labelAccountName?: string;
+  labelSignature?: string;
+  labelPublishedDate?: string;
   showSignature?: boolean;
   showDeadline?: boolean;
   statusBadges?: Record<string, StatusBadgeConfig>;
@@ -762,8 +778,8 @@ function CustomInvoice({
   const hText = c.headerTextColor || '#ffffff';
   const hSub = `${hText}99`;
   const stripeBg = 'rgba(0,0,0,0.03)';
-  // 20% opacity for visible section header backgrounds (matches hardcoded themes)
-  const accentBg = `${accent}33`;
+  // Proper lightening: mix accent with white (mimics Tailwind *-100/*-50 light colors)
+  const accentBg = lightenHex(accent);
   const accentText = accent;
 
   const priceAdult = order.tour.priceAdult || 0;
@@ -778,7 +794,7 @@ function CustomInvoice({
   const isLight = themeKeyForCustom(hText) === 'light';
   const logoBg = isLight ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.2)';
 
-  // Editable headings
+  // Editable headings & labels
   const T = {
     billedTo: c.headingBilledTo || 'Ditagihkan Kepada',
     invoiceDetails: c.headingInvoiceDetails || 'Detail Invoice',
@@ -786,9 +802,27 @@ function CustomInvoice({
     priceBreakdown: c.headingPriceBreakdown || 'Rincian Biaya',
     paymentInfo: c.headingPaymentInfo || 'Informasi Pembayaran',
     deadline: c.headingDeadline || 'Batas Pembayaran',
+    headingTerms: c.headingTerms || 'Syarat & Ketentuan',
     deadlineBody: (c.deadlineText || 'Mohon selesaikan pembayaran sebelum {{date}}. Jika melewati batas waktu, pesanan akan otomatis dibatalkan.')
       .replace('{{date}}', formatDateTime(order.expiryAt)),
     terms: c.termsText || 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
+    L: {
+      invoiceNo: c.labelInvoiceNo || 'Nomor Invoice',
+      invoiceDate: c.labelInvoiceDate || 'Tanggal Invoice',
+      paymentDeadline: c.labelPaymentDeadline || 'Batas Pembayaran',
+      tourDate: c.labelTourDate || 'Tgl. Perjalanan',
+      duration: c.labelDuration || 'Durasi',
+      adults: c.labelAdults || 'Dewasa',
+      children: c.labelChildren || 'Anak',
+      discount: c.labelDiscount || 'Diskon',
+      subTotal: c.labelSubTotal || 'Sub Total',
+      tax: c.labelTax || 'Tax',
+      total: c.labelTotal || 'TOTAL',
+      bank: c.labelBank || 'Bank',
+      accountName: c.labelAccountName || 'a.n.',
+      signature: c.labelSignature || 'Authorised Sign',
+      publishedDate: c.labelPublishedDate || 'Diterbitkan:',
+    },
   };
 
   return (
@@ -818,7 +852,7 @@ function CustomInvoice({
       <div className="px-6 sm:px-10 py-3" style={{ backgroundColor: stripeBg, borderBottom: `1px solid ${border}` }}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <StatBadge order={order} />
-          <span className="text-xs text-gray-400">Diterbitkan: {createdDate}</span>
+          <span className="text-xs text-gray-400">{T.L.publishedDate} {createdDate}</span>
         </div>
       </div>
 
@@ -837,9 +871,9 @@ function CustomInvoice({
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{T.invoiceDetails}</h3>
             <div className="space-y-1.5">
               {[
-                { label: 'Nomor Invoice', value: order.invoiceNo },
-                { label: 'Tanggal Invoice', value: createdDate },
-                { label: 'Batas Pembayaran', value: expiryDate },
+                { label: T.L.invoiceNo, value: order.invoiceNo },
+                { label: T.L.invoiceDate, value: createdDate },
+                { label: T.L.paymentDeadline, value: expiryDate },
               ].map((row) => (
                 <div key={row.label} className="flex sm:flex-col gap-2 sm:gap-0">
                   <span className="text-xs text-gray-400">{row.label}</span>
@@ -872,10 +906,10 @@ function CustomInvoice({
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               {[
-                { label: 'Tgl. Perjalanan', value: tourDate },
-                { label: 'Durasi', value: order.tour.duration },
-                { label: 'Dewasa', value: `${order.adults} orang` },
-                { label: 'Anak', value: order.children > 0 ? `${order.children} orang` : '-' },
+                { label: T.L.tourDate, value: tourDate },
+                { label: T.L.duration, value: order.tour.duration },
+                { label: T.L.adults, value: `${order.adults} orang` },
+                { label: T.L.children, value: order.children > 0 ? `${order.children} orang` : '-' },
               ].map((item) => (
                 <div key={item.label} className="rounded-lg px-3 py-2" style={{ backgroundColor: stripeBg }}>
                   <p className="text-gray-400 mb-0.5">{item.label}</p>
@@ -894,12 +928,12 @@ function CustomInvoice({
           <div className="p-5">
             {discountPct > 0 && (
               <div className="flex justify-between items-center py-2 text-sm">
-                <span className="text-gray-500">Diskon</span>
+                <span className="text-gray-500">{T.L.discount}</span>
                 <span className="font-medium text-green-600">-{discountPct}%</span>
               </div>
             )}
             <div className="flex justify-between items-center pt-3" style={{ borderTop: `2px solid ${border}` }}>
-              <span className="text-base font-bold text-gray-900">TOTAL</span>
+              <span className="text-base font-bold text-gray-900">{T.L.total}</span>
               <span className="text-xl font-extrabold" style={{ color: accent }}>{formatCurrency(grandTotal)}</span>
             </div>
           </div>
@@ -913,9 +947,9 @@ function CustomInvoice({
           <div className="space-y-2 mb-4">
             {bankAccounts.map((bank) => (
               <div key={bank.bank} className="grid grid-cols-[100px_1fr_1fr_auto] items-center gap-x-3 text-xs">
-                <span className="font-semibold text-gray-700">Bank {bank.bank}</span>
+                <span className="font-semibold text-gray-700">{T.L.bank} {bank.bank}</span>
                 <span className="font-mono text-gray-600">{bank.number}</span>
-                <span className="text-gray-400">a.n. {bank.name}</span>
+                <span className="text-gray-400">{T.L.accountName} {bank.name}</span>
                 <CopyButton bankNumber={bank.number} />
               </div>
             ))}
@@ -933,7 +967,7 @@ function CustomInvoice({
 
               <div className="pt-3" style={{ borderTop: `1px solid ${border}` }}>
                 <h4 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
-                  Syarat &amp; Ketentuan
+                  {T.headingTerms}
                 </h4>
                 <p className="text-[9px] text-gray-400 leading-relaxed">
                   {T.terms}
@@ -947,7 +981,7 @@ function CustomInvoice({
                 <div className="text-right">
                   <div className="inline-block">
                     <div className="w-32 h-px bg-gray-300 mb-1" />
-                    <p className="text-[9px] text-gray-400 uppercase tracking-wider">Authorised Sign</p>
+                    <p className="text-[9px] text-gray-400 uppercase tracking-wider">{T.L.signature}</p>
                   </div>
                 </div>
               </div>
@@ -975,4 +1009,13 @@ function themeKeyForCustom(hex: string): 'light' | 'dark' {
   const g = parseInt(h.substring(2, 4), 16);
   const b = parseInt(h.substring(4, 6), 16);
   return (r * 0.299 + g * 0.587 + b * 0.114) > 150 ? 'light' : 'dark';
+}
+
+/** Mix hex color with white to create a light background (like Tailwind *-100 shades) */
+function lightenHex(hex: string, factor = 0.88): string {
+  const h = hex.replace('#', '');
+  const r = Math.round(parseInt(h.substring(0, 2), 16) * (1 - factor) + 255 * factor);
+  const g = Math.round(parseInt(h.substring(2, 4), 16) * (1 - factor) + 255 * factor);
+  const b = Math.round(parseInt(h.substring(4, 6), 16) * (1 - factor) + 255 * factor);
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
