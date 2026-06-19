@@ -212,8 +212,22 @@ async function getCmsDestinations() {
   };
 }
 
+async function getCmsTestimonials() {
+  try {
+    const page = await prisma.page.findUnique({ where: { slug: 'testimonials' } });
+    if (page?.content) return JSON.parse(page.content);
+  } catch { /* fallback */ }
+  return {
+    label: 'Testimoni',
+    heading: 'Cerita dari Mereka yang Telah Berpetualang',
+    subheading: 'Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka yang sudah merasakan serunya liburan tanpa beban bersama Jelajah Nusantara.',
+    ctaText: 'Lihat Semua Testimoni',
+    ctaLink: '/testimonials',
+  };
+}
+
 export default async function HomePage() {
-  const [tours, reviews, destinations, galleryPhotos, faqs, hero, valueData, ctaData, galleryData, toursData, destinationsData] = await Promise.all([
+  const [tours, reviews, destinations, galleryPhotos, faqs, hero, valueData, ctaData, galleryData, toursData, destinationsData, testimonialsData] = await Promise.all([
     getFeaturedTours(),
     getLatestReviews(),
     getFeaturedDestinations(),
@@ -225,6 +239,7 @@ export default async function HomePage() {
     getCmsGallery(),
     getCmsTours(),
     getCmsDestinations(),
+    getCmsTestimonials(),
   ]);
 
   const heroStats = hero.stats || [];
@@ -491,12 +506,12 @@ export default async function HomePage() {
         <section className="py-16 sm:py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div className="text-center mb-12">
-              <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">Testimoni</span>
+              <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">{testimonialsData.label || 'Testimoni'}</span>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Cerita dari Mereka yang Telah Berpetualang
+                {testimonialsData.heading || 'Cerita dari Mereka yang Telah Berpetualang'}
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
-                Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka.
+                {testimonialsData.subheading || 'Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka.'}
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -515,8 +530,8 @@ export default async function HomePage() {
               ))}
             </div>
             <div className="text-center mt-10">
-              <Button href="/testimonials" variant="outline">
-                Lihat Semua Testimoni
+              <Button href={testimonialsData.ctaLink || '/testimonials'} variant="outline">
+                {testimonialsData.ctaText || 'Lihat Semua Testimoni'}
               </Button>
             </div>
           </div>

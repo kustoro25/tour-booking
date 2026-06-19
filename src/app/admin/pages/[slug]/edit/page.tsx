@@ -209,8 +209,11 @@ const defaultData: Record<string, PageData> = {
     ],
   },
   'testimonials': {
+    label: 'Testimoni',
     heading: 'Cerita dari Mereka yang Telah Berpetualang',
     subheading: 'Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka yang sudah merasakan serunya liburan tanpa beban bersama Jelajah Nusantara.',
+    ctaText: 'Lihat Semua Testimoni',
+    ctaLink: '/testimonials',
   },
   'footer': {
     text: 'Platform booking tour terpercaya untuk menjelajahi destinasi terbaik di Indonesia. Harga transparan, booking instan, dan guide profesional.',
@@ -589,12 +592,42 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
 
         {/* ═══════════ TESTIMONIALS ═══════════ */}
         {isTestimonials && (
-          <SectionCard icon="💬" title="Header Testimoni">
-            <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-2" placeholder="Heading" />
-            <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Subheading" />
-          </SectionCard>
+          <>
+            <SectionCard icon="💬" title="Header Testimoni">
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Label (atas)</label>
+                  <input type="text" value={data.label || ''} onChange={e => update('label', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Testimoni" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Heading</label>
+                  <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Cerita dari Mereka yang Telah Berpetualang" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Subheading</label>
+                  <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Kepuasan Anda adalah kebahagiaan kami..." />
+                </div>
+              </div>
+            </SectionCard>
+            <SectionCard icon="🔗" title="Tombol Lihat Semua">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Teks tombol</label>
+                <input type="text" value={data.ctaText || ''} onChange={e => update('ctaText', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none mb-3"
+                  placeholder="Lihat Semua Testimoni" />
+                <label className="text-xs text-gray-500 mb-1 block">Link tujuan</label>
+                <input type="text" value={data.ctaLink || ''} onChange={e => update('ctaLink', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="/testimonials" />
+              </div>
+            </SectionCard>
+          </>
         )}
 
         {/* ═══════════ FOOTER ═══════════ */}
