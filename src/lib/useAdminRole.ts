@@ -21,6 +21,7 @@ export function useAdminRole() {
   }, []);
 
   const isSuperAdmin = role === 'SUPER_ADMIN';
+  const isContentManager = role === 'CONTENT_MANAGER';
 
-  return { role, loading, isSuperAdmin };
+  return { role, loading, isSuperAdmin, isContentManager };
 }

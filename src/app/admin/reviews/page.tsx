@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import StarRating from '@/components/ui/StarRating';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useAdminRole } from '@/lib/useAdminRole';
 
 interface Review {
   id: string;
@@ -16,9 +17,16 @@ interface Review {
 }
 
 export default function AdminReviewsPage() {
+  const { isSuperAdmin } = useAdminRole();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
+  const [showBlocked, setShowBlocked] = useState(false);
+
+  const handleBlocked = () => {
+    setShowBlocked(true);
+    setTimeout(() => setShowBlocked(false), 3000);
+  };
 
   useEffect(() => { fetchReviews(); }, [statusFilter]);
 
@@ -46,6 +54,12 @@ export default function AdminReviewsPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Manajemen Review</h1>
+
+      {showBlocked && (
+        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
+          <p className="text-red-600 text-sm">🚫 Hanya Super Admin yang bisa mengelola review.</p>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-2 mb-4">
         {['', 'PENDING', 'APPROVED', 'HIDDEN'].map(s => (
@@ -92,10 +106,10 @@ export default function AdminReviewsPage() {
                 </div>
                 <div className="flex gap-2 sm:ml-4">
                   {review.status !== 'APPROVED' && (
-                    <button onClick={() => handleApprove(review.id)} className="text-green-600 hover:text-green-700 text-xs font-medium">Setujui</button>
+                    <button onClick={isSuperAdmin ? () => handleApprove(review.id) : handleBlocked} className="text-green-600 hover:text-green-700 text-xs font-medium">Setujui</button>
                   )}
                   {review.status !== 'HIDDEN' && (
-                    <button onClick={() => handleHide(review.id)} className="text-gray-500 hover:text-gray-700 text-xs font-medium">Sembunyikan</button>
+                    <button onClick={isSuperAdmin ? () => handleHide(review.id) : handleBlocked} className="text-gray-500 hover:text-gray-700 text-xs font-medium">Sembunyikan</button>
                   )}
                 </div>
               </div>

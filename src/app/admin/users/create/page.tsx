@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { UserRoleLabels, type UserRole } from '@/types';
+import { useAdminRole } from '@/lib/useAdminRole';
 
 export default function AdminUserCreatePage() {
   const router = useRouter();
+  const { isSuperAdmin } = useAdminRole();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -14,9 +16,15 @@ export default function AdminUserCreatePage() {
   const [password, setPassword] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [showBlocked, setShowBlocked] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSuperAdmin) {
+      setShowBlocked(true);
+      setTimeout(() => setShowBlocked(false), 3000);
+      return;
+    }
     setSaving(true);
     setError('');
 
@@ -115,6 +123,12 @@ export default function AdminUserCreatePage() {
 
         {error && (
           <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm">{error}</div>
+        )}
+
+        {showBlocked && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+            <p className="text-red-600 text-sm">🚫 Hanya Super Admin yang bisa menambah admin baru.</p>
+          </div>
         )}
 
         <div className="flex items-center gap-3 pt-2">

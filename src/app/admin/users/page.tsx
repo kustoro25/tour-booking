@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useToast } from '@/components/ui/Toast';
 import { UserRoleLabels, type UserRole } from '@/types';
+import { useAdminRole } from '@/lib/useAdminRole';
 
 interface AdminUser {
   id: string;
@@ -17,12 +18,19 @@ interface AdminUser {
 }
 
 export default function AdminUsersPage() {
+  const { isSuperAdmin } = useAdminRole();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [showBlocked, setShowBlocked] = useState(false);
   const { showToast } = useToast();
+
+  const handleBlocked = () => {
+    setShowBlocked(true);
+    setTimeout(() => setShowBlocked(false), 3000);
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -133,17 +141,90 @@ export default function AdminUsersPage() {
           <h1 className="text-2xl font-bold text-gray-900">Manajemen Admin</h1>
           <p className="text-sm text-gray-500 mt-1">Kelola akun admin dan role-nya (Super Admin only)</p>
         </div>
-        <Link
-          href="/admin/users/create"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 whitespace-nowrap"
-        >
-          + Tambah Admin
-        </Link>
+        {isSuperAdmin ? (
+          <Link
+            href="/admin/users/create"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 whitespace-nowrap"
+          >
+            + Tambah Admin
+          </Link>
+        ) : (
+          <button
+            onClick={handleBlocked}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 whitespace-nowrap"
+          >
+            + Tambah Admin
+          </button>
+        )}
       </div>
+
+      {showBlocked && (
+        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
+          <p className="text-red-600 text-sm">🚫 Hanya Super Admin yang bisa menambah admin baru.</p>
+        </div>
+      )}
 
       {error && (
         <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-6 text-sm">{error}</div>
       )}
+
+      {/* ═══════ Role Permissions Info ═══════ */}
+      <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-sm">📋</span>
+          Hak Akses Per Role
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Super Admin */}
+          <div className="border border-purple-200 rounded-xl p-4 bg-purple-50/50">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">Super Admin</span>
+            </div>
+            <ul className="space-y-1.5 text-xs text-gray-700">
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Akses penuh ke semua menu</li>
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Tambah, edit, hapus paket tour & destinasi</li>
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Kelola booking (ubah status & hapus)</li>
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Approve/hide review</li>
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Tambah & hapus admin</li>
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Ubah pengaturan website</li>
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Edit halaman CMS</li>
+            </ul>
+          </div>
+
+          {/* Admin Operasional */}
+          <div className="border border-blue-200 rounded-xl p-4 bg-blue-50/50">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">Admin Operasional</span>
+            </div>
+            <ul className="space-y-1.5 text-xs text-gray-700">
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Tambah, edit, hapus paket tour & destinasi</li>
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Kelola booking (ubah status & hapus)</li>
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Approve/hide review</li>
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Kelola blog</li>
+              <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Tambah/hapus admin</li>
+              <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Ubah pengaturan website</li>
+              <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Simpan perubahan halaman CMS</li>
+            </ul>
+          </div>
+
+          {/* Content Manager */}
+          <div className="border border-green-200 rounded-xl p-4 bg-green-50/50">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Content Manager</span>
+            </div>
+            <ul className="space-y-1.5 text-xs text-gray-700">
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Edit paket tour & destinasi</li>
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Kelola blog</li>
+              <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Tambah/hapus paket tour & destinasi</li>
+              <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Kelola booking</li>
+              <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Kelola review</li>
+              <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Tambah/hapus admin</li>
+              <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Ubah pengaturan website</li>
+              <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Simpan perubahan halaman CMS</li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         {/* ═══════ Mobile Card View ═══════ */}
@@ -171,7 +252,11 @@ export default function AdminUsersPage() {
                   <span>{formatDate(user.createdAt)}</span>
                 </div>
                 <div className="flex items-center gap-3 pt-1 border-t border-gray-100">
-                  <button onClick={() => setDeleteTarget({ id: user.id, name: user.name })} className="text-red-600 hover:text-red-700 text-xs font-medium">Hapus</button>
+                  {isSuperAdmin ? (
+                    <button onClick={() => setDeleteTarget({ id: user.id, name: user.name })} className="text-red-600 hover:text-red-700 text-xs font-medium">Hapus</button>
+                  ) : (
+                    <button onClick={handleBlocked} className="text-red-600 hover:text-red-700 text-xs font-medium">Hapus</button>
+                  )}
                 </div>
               </div>
             ))
@@ -205,12 +290,21 @@ export default function AdminUsersPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-500">{formatDate(user.createdAt)}</td>
                   <td className="px-4 py-3 text-center">
+                  {isSuperAdmin ? (
                     <button
                       onClick={() => setDeleteTarget({ id: user.id, name: user.name })}
                       className="text-red-600 hover:text-red-700 text-xs"
                     >
                       Hapus
                     </button>
+                  ) : (
+                    <button
+                      onClick={handleBlocked}
+                      className="text-red-600 hover:text-red-700 text-xs"
+                    >
+                      Hapus
+                    </button>
+                  )}
                   </td>
                 </tr>
               ))}

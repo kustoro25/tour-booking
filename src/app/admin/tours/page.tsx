@@ -7,6 +7,7 @@ import { TourCategoryLabels } from '@/types';
 import type { TourCategory } from '@/types';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useToast } from '@/components/ui/Toast';
+import { useAdminRole } from '@/lib/useAdminRole';
 
 interface Tour {
   id: string;
@@ -24,6 +25,7 @@ interface Tour {
 const ITEMS_PER_PAGE = 6;
 
 export default function AdminToursPage() {
+  const { isSuperAdmin } = useAdminRole();
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -31,7 +33,13 @@ export default function AdminToursPage() {
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<Tour | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [showBlocked, setShowBlocked] = useState(false);
   const { showToast } = useToast();
+
+  const handleBlocked = () => {
+    setShowBlocked(true);
+    setTimeout(() => setShowBlocked(false), 3000);
+  };
 
   useEffect(() => { fetchTours(); }, []);
 
@@ -126,10 +134,22 @@ export default function AdminToursPage() {
 
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Paket Tour</h1>
-        <Link href="/admin/tours/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 whitespace-nowrap transition-colors">
-          + Tambah Paket
-        </Link>
+        {isSuperAdmin ? (
+          <Link href="/admin/tours/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 whitespace-nowrap transition-colors">
+            + Tambah Paket
+          </Link>
+        ) : (
+          <button onClick={handleBlocked} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 whitespace-nowrap transition-colors">
+            + Tambah Paket
+          </button>
+        )}
       </div>
+
+      {showBlocked && (
+        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
+          <p className="text-red-600 text-sm">🚫 Hanya Super Admin yang bisa menambah/menghapus paket tour.</p>
+        </div>
+      )}
 
       {/* Search & Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -215,11 +235,19 @@ export default function AdminToursPage() {
                   </svg>
                 </Link>
                 <div className="flex-1" />
-                <button onClick={() => setDeleteTarget(tour)} title="Hapus" className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
+                {isSuperAdmin ? (
+                  <button onClick={() => setDeleteTarget(tour)} title="Hapus" className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                ) : (
+                  <button onClick={handleBlocked} title="Hapus" className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                )}
               </div>
             </div>
           ))}
