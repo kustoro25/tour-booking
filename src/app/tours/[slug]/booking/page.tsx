@@ -46,13 +46,8 @@ export default function BookingPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [bookingResult, setBookingResult] = useState<{ invoiceNo: string } | null>(null);
-  const [uniqueCode, setUniqueCode] = useState(0);
   const [slotInfo, setSlotInfo] = useState<SlotInfo | null>(null);
   const [slotLoading, setSlotLoading] = useState(false);
-
-  useEffect(() => {
-    setUniqueCode(Math.floor(100 + Math.random() * 900));
-  }, []);
 
   useEffect(() => {
     fetch(`/api/tours/${slug}`)
@@ -192,7 +187,7 @@ export default function BookingPage() {
   }
 
   const total = tour.priceAdult * formData.adults + tour.priceChild * formData.children;
-  const grandTotal = total - total * (tour.discount / 100) + uniqueCode;
+  const grandTotal = total - total * (tour.discount / 100);
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
@@ -481,10 +476,6 @@ export default function BookingPage() {
                 <span>-{formatCurrency(total * (tour.discount / 100))}</span>
               </div>
             )}
-            <div className="flex justify-between text-sm text-gray-500">
-              <span>Kode Unik</span>
-              <span>{formatCurrency(uniqueCode)}</span>
-            </div>
             <div className="flex justify-between font-bold text-lg pt-2 border-t">
               <span>Total</span>
               <span className="text-blue-600">{formatCurrency(grandTotal)}</span>

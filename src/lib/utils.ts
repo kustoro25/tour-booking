@@ -50,9 +50,8 @@ export function calculateTotal(
   discount: number = 0
 ): number {
   const subtotal = priceAdult * adults + priceChild * children;
-  const uniqueCode = Math.floor(100 + Math.random() * 900); // Unique code 100-999
   const discountAmount = subtotal * (discount / 100);
-  return Math.max(0, subtotal - discountAmount + uniqueCode);
+  return Math.max(0, subtotal - discountAmount);
 }
 
 export function getExpiryDate(hoursFromNow: number = 24): Date {
