@@ -77,10 +77,24 @@ export const OrderStatusLabels: Record<OrderStatus, string> = {
 };
 
 export const OrderStatusColors: Record<OrderStatus, string> = {
-  PENDING: 'bg-orange-100 text-orange-800',
-  CONFIRMED: 'bg-green-100 text-green-800',
-  COMPLETED: 'bg-blue-100 text-blue-800',
-  CANCELLED: 'bg-red-100 text-red-800',
+  PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
+  CONFIRMED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  COMPLETED: 'bg-sky-50 text-sky-700 border-sky-200',
+  CANCELLED: 'bg-rose-50 text-rose-700 border-rose-200',
+};
+
+export const OrderStatusIcons: Record<OrderStatus, string> = {
+  PENDING: '⏳',
+  CONFIRMED: '✅',
+  COMPLETED: '🏁',
+  CANCELLED: '❌',
+};
+
+export const OrderStatusDotColors: Record<OrderStatus, string> = {
+  PENDING: 'bg-amber-500',
+  CONFIRMED: 'bg-emerald-500',
+  COMPLETED: 'bg-sky-500',
+  CANCELLED: 'bg-rose-500',
 };
 
 export interface Order {

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
-import { OrderStatusLabels } from '@/types';
+import { OrderStatusLabels, OrderStatusColors, OrderStatusIcons, OrderStatusDotColors, type OrderStatus } from '@/types';
 import CopyButton from '@/components/ui/CopyButton';
 import InvoiceActions from '@/components/booking/InvoiceActions';
 import { getBrandName } from '@/lib/brand';
@@ -20,7 +20,30 @@ async function getOrder(invoiceNo: string) {
   return order;
 }
 
-type InvoiceTheme = 'classic' | 'modern' | 'minimal' | 'premium';
+type InvoiceTheme = 'classic' | 'modern' | 'minimal' | 'premium' | 'custom';
+
+interface StatusBadgeConfig {
+  bg: string;
+  text: string;
+  border: string;
+  dot: string;
+  icon: string;
+}
+
+interface InvoiceCustomConfig {
+  companyTagline?: string;
+  headerBg?: string;
+  headerBgEnd?: string;
+  headerTextColor?: string;
+  accentColor?: string;
+  tableHeaderBg?: string;
+  tableHeaderText?: string;
+  borderColor?: string;
+  footerText?: string;
+  showSignature?: boolean;
+  showDeadline?: boolean;
+  statusBadges?: Record<string, StatusBadgeConfig>;
+}
 
 interface ThemeConfig {
   headerBg: string;
@@ -34,7 +57,7 @@ interface ThemeConfig {
   badgeText: string;
 }
 
-const themes: Record<Exclude<InvoiceTheme, 'premium'>, ThemeConfig> = {
+const themes: Record<Exclude<InvoiceTheme, 'premium' | 'custom'>, ThemeConfig> = {
   classic: {
     headerBg: 'bg-slate-800',
     headerText: 'text-white',
@@ -76,18 +99,35 @@ export default async function InvoicePage({ params }: PageProps) {
 
   if (!order) notFound();
 
-  // Read invoice theme from settings
+  // Read invoice customization from CMS Pages (takes priority over legacy theme setting)
   let themeKey: InvoiceTheme = 'modern';
+  let customConfig: InvoiceCustomConfig | null = null;
   try {
-    const themeSetting = await prisma.setting.findUnique({ where: { key: 'invoice_theme' } });
-    if (themeSetting) {
-      const val = JSON.parse(themeSetting.value);
-      if (['classic', 'modern', 'minimal', 'premium'].includes(val)) {
-        themeKey = val as InvoiceTheme;
-      }
+    const cmsPage = await prisma.page.findUnique({ where: { slug: 'invoice-custom' } });
+    if (cmsPage) {
+      try {
+        const parsed = JSON.parse(cmsPage.content);
+        if (parsed && typeof parsed === 'object') {
+          customConfig = parsed as InvoiceCustomConfig;
+          themeKey = 'custom';
+        }
+      } catch { /* fallback */ }
     }
-  } catch {
-    // fallback to modern
+  } catch { /* fallback */ }
+
+  // Fallback to legacy theme setting if no custom config
+  if (!customConfig) {
+    try {
+      const themeSetting = await prisma.setting.findUnique({ where: { key: 'invoice_theme' } });
+      if (themeSetting) {
+        const val = JSON.parse(themeSetting.value);
+        if (['classic', 'modern', 'minimal', 'premium'].includes(val)) {
+          themeKey = val as InvoiceTheme;
+        }
+      }
+    } catch {
+      // fallback to modern
+    }
   }
 
   // Read bank accounts from settings
@@ -120,7 +160,22 @@ export default async function InvoicePage({ params }: PageProps) {
   return (
     <>
       <div className="max-w-[210mm] mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
-        {themeKey === 'premium' ? (
+        {themeKey === 'custom' && customConfig ? (
+          <CustomInvoice
+            order={order}
+            companyName={companyName}
+            companyAddress={companyAddress}
+            companyPhone={companyPhone}
+            companyEmail={companyEmail}
+            companyTagline={customConfig.companyTagline || companyTagline}
+            statusLabel={statusLabel}
+            tourDate={tourDate}
+            createdDate={createdDate}
+            expiryDate={expiryDate}
+            bankAccounts={bankAccounts}
+            config={customConfig}
+          />
+        ) : themeKey === 'premium' ? (
           <PremiumInvoice
             order={order}
             companyName={companyName}
@@ -146,8 +201,8 @@ export default async function InvoicePage({ params }: PageProps) {
             createdDate={createdDate}
             expiryDate={expiryDate}
             bankAccounts={bankAccounts}
-            theme={themes[themeKey]}
-            themeKey={themeKey}
+            theme={themes[themeKey as 'classic' | 'modern' | 'minimal']}
+            themeKey={themeKey as 'classic' | 'modern' | 'minimal'}
           />
         )}
         <InvoiceActions
@@ -246,10 +301,7 @@ function PremiumInvoice({
                 </div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-gray-400 w-14 flex-shrink-0">Status</span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800">
-                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                    {statusLabel}
-                  </span>
+                  <StatBadge order={order} />
                 </div>
                 <div className="flex items-baseline gap-2 pt-1">
                   <span className="text-gray-400 w-14 flex-shrink-0" />
@@ -504,10 +556,7 @@ function InvoiceDocument({
       {/* ── Status Badge ── */}
       <div className={`px-6 sm:px-10 py-3 ${t.stripeBg} border-b ${t.border}`}>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${t.badgeBg} ${t.badgeText}`}>
-            <span className="w-1.5 h-1.5 rounded-full bg-current" />
-            {statusLabel}
-          </span>
+          <StatBadge order={order} />
           <span className="text-xs text-gray-400">Diterbitkan: {createdDate}</span>
         </div>
       </div>
@@ -639,6 +688,242 @@ function InvoiceDocument({
             Terima kasih telah memilih {companyName} sebagai mitra perjalanan Anda.
             E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi.
             Untuk bantuan, hubungi {companyPhone} atau {companyEmail}.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============ CUSTOM — Dynamic config from CMS ============ */
+function StatBadge({ order }: { order: { status: string } }) {
+  const status = (order.status || 'PENDING') as OrderStatus;
+  const colors = OrderStatusColors[status] || 'bg-gray-50 text-gray-700 border-gray-200';
+  const icon = OrderStatusIcons[status] || '📋';
+  const dot = OrderStatusDotColors[status] || 'bg-gray-500';
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${colors}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
+      <span>{icon}</span>
+      <span>{OrderStatusLabels[status] || status}</span>
+    </span>
+  );
+}
+
+function CustomInvoice({
+  order,
+  companyName,
+  companyAddress,
+  companyPhone,
+  companyEmail,
+  companyTagline,
+  statusLabel,
+  tourDate,
+  createdDate,
+  expiryDate,
+  bankAccounts,
+  config,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  order: any;
+  companyName: string;
+  companyAddress: string;
+  companyPhone: string;
+  companyEmail: string;
+  companyTagline: string;
+  statusLabel: string;
+  tourDate: string;
+  createdDate: string;
+  expiryDate: string;
+  bankAccounts: { bank: string; number: string; name: string }[];
+  config: InvoiceCustomConfig;
+}) {
+  const c = config;
+  const headerBg = `linear-gradient(135deg, ${c.headerBg || '#1e3a5f'}, ${c.headerBgEnd || '#0f172a'})`;
+  const accent = c.accentColor || '#f59e0b';
+  const borderColor = c.borderColor || '#e2e8f0';
+  const tableHeaderBg = c.tableHeaderBg || '#1e293b';
+  const headerText = c.headerTextColor || '#ffffff';
+  const footerText = c.footerText || `Terima kasih telah memilih ${companyName}.`;
+
+  const priceAdult = order.tour.priceAdult || 0;
+  const priceChild = order.tour.priceChild || 0;
+  const discountPct = order.tour.discount || 0;
+  const adultTotal = priceAdult * order.adults;
+  const childTotal = order.children > 0 ? priceChild * order.children : 0;
+  const subTotal = adultTotal + childTotal;
+  const discountAmount = subTotal * (discountPct / 100);
+  const grandTotal = subTotal - discountAmount;
+
+  return (
+    <div className="invoice-document bg-white shadow-xl rounded-xl overflow-hidden" id="invoice-print">
+      {/* ── Header ── */}
+      <div className="px-6 sm:px-10 py-8 sm:py-10" style={{ background: headerBg }}>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold" style={{ backgroundColor: accent }}>
+                <span style={{ color: headerText }}>JN</span>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold" style={{ color: headerText }}>{companyName}</h2>
+                <p style={{ color: headerText, opacity: 0.75 }} className="text-xs">{companyTagline}</p>
+              </div>
+            </div>
+          </div>
+          <div className="text-right">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight" style={{ color: headerText }}>INVOICE</h1>
+            <p className="text-lg font-mono font-bold mt-1" style={{ color: headerText, opacity: 0.85 }}>{order.invoiceNo}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Status Badge ── */}
+      <div className="px-6 sm:px-10 py-3 bg-gray-50/50" style={{ borderBottom: `1px solid ${borderColor}` }}>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <StatBadge order={order} />
+          <span className="text-xs text-gray-400">Diterbitkan: {createdDate}</span>
+        </div>
+      </div>
+
+      {/* ── Body ── */}
+      <div className="px-6 sm:px-10 py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Ditagihkan Kepada</h3>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-gray-900">{order.customerName}</p>
+              <p className="text-xs text-gray-500">{order.customerEmail}</p>
+              <p className="text-xs text-gray-500">{order.customerPhone}</p>
+            </div>
+          </div>
+          <div className="sm:text-right">
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Detail Invoice</h3>
+            <div className="space-y-1.5">
+              {[
+                { label: 'Nomor Invoice', value: order.invoiceNo },
+                { label: 'Tanggal Invoice', value: createdDate },
+                { label: 'Batas Pembayaran', value: expiryDate },
+              ].map((row) => (
+                <div key={row.label} className="flex sm:flex-col gap-2 sm:gap-0">
+                  <span className="text-xs text-gray-400">{row.label}</span>
+                  <span className="text-xs font-medium text-gray-700">{row.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Pricing Table ── */}
+        <div className="overflow-hidden mb-6" style={{ border: `1px solid ${borderColor}`, borderRadius: '12px' }}>
+          <div className="grid grid-cols-12 text-[11px] font-semibold uppercase tracking-wider" style={{ backgroundColor: tableHeaderBg, color: '#ffffff' }}>
+            <div className="col-span-1 px-4 py-3 text-center">No.</div>
+            <div className="col-span-5 px-4 py-3">Deskripsi</div>
+            <div className="col-span-2 px-4 py-3 text-right">Harga</div>
+            <div className="col-span-2 px-4 py-3 text-center">Qty.</div>
+            <div className="col-span-2 px-4 py-3 text-right">Total</div>
+          </div>
+          <div className="grid grid-cols-12 text-xs" style={{ borderBottom: `1px solid ${borderColor}` }}>
+            <div className="col-span-1 px-4 py-3 text-center text-gray-400">01</div>
+            <div className="col-span-5 px-4 py-3">
+              <p className="font-semibold text-gray-800">{order.tour.name}</p>
+              <p className="text-gray-400 text-[10px]">Tiket Dewasa &middot; {order.tour.duration}</p>
+            </div>
+            <div className="col-span-2 px-4 py-3 text-right text-gray-700">{formatCurrency(priceAdult)}</div>
+            <div className="col-span-2 px-4 py-3 text-center text-gray-700">{order.adults}</div>
+            <div className="col-span-2 px-4 py-3 text-right font-semibold text-gray-800">{formatCurrency(adultTotal)}</div>
+          </div>
+          {order.children > 0 && (
+            <div className="grid grid-cols-12 text-xs" style={{ borderBottom: `1px solid ${borderColor}` }}>
+              <div className="col-span-1 px-4 py-3 text-center text-gray-400">02</div>
+              <div className="col-span-5 px-4 py-3">
+                <p className="font-semibold text-gray-800">{order.tour.name}</p>
+                <p className="text-gray-400 text-[10px]">Tiket Anak &middot; {order.tour.duration}</p>
+              </div>
+              <div className="col-span-2 px-4 py-3 text-right text-gray-700">{formatCurrency(priceChild)}</div>
+              <div className="col-span-2 px-4 py-3 text-center text-gray-700">{order.children}</div>
+              <div className="col-span-2 px-4 py-3 text-right font-semibold text-gray-800">{formatCurrency(childTotal)}</div>
+            </div>
+          )}
+          {discountPct > 0 && (
+            <div className="grid grid-cols-12 text-xs" style={{ borderBottom: `1px solid ${borderColor}` }}>
+              <div className="col-span-8 px-4 py-2.5" />
+              <div className="col-span-4 px-4 py-2.5 flex justify-between">
+                <span className="text-green-700">Diskon ({discountPct}%)</span>
+                <span className="font-semibold text-green-700">-{formatCurrency(discountAmount)}</span>
+              </div>
+            </div>
+          )}
+          <div className="grid grid-cols-12 text-sm bg-gray-50/50" style={{ borderBottom: `1px solid ${borderColor}` }}>
+            <div className="col-span-8 px-4 py-2.5" />
+            <div className="col-span-4 px-4 py-2.5 flex justify-between">
+              <span className="text-gray-500">Sub Total</span>
+              <span className="font-semibold text-gray-800">{formatCurrency(subTotal)}</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-12" style={{ backgroundColor: accent }}>
+            <div className="col-span-8 px-5 py-3.5" />
+            <div className="col-span-4 px-5 py-3.5 flex justify-between">
+              <span className="text-base font-extrabold text-white">TOTAL</span>
+              <span className="text-lg font-extrabold text-white">{formatCurrency(grandTotal)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Payment Instructions ── */}
+        <div className="mb-4" style={{ border: `1px solid ${borderColor}`, borderRadius: '12px', overflow: 'hidden' }}>
+          <div className="px-5 py-3" style={{ backgroundColor: accent, opacity: 0.1 }}>
+            <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: accent }}>Instruksi Pembayaran</h3>
+          </div>
+          <div className="p-5 space-y-3">
+            {bankAccounts.map((bank) => (
+              <div key={bank.bank} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-sm" style={{ backgroundColor: tableHeaderBg }}>
+                    {bank.bank.slice(0, 2)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Bank {bank.bank}</p>
+                    <p className="text-sm font-mono text-gray-600 tracking-wide">{bank.number}</p>
+                    <p className="text-xs text-gray-400">a.n. {bank.name}</p>
+                  </div>
+                </div>
+                <CopyButton bankNumber={bank.number} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Deadline ── */}
+        {c.showDeadline !== false && (
+          <div className="rounded-xl px-5 py-4 mb-5" style={{ backgroundColor: `${accent}15`, border: `1px solid ${accent}40` }}>
+            <div className="flex items-start gap-3">
+              <span className="text-lg">⏰</span>
+              <div className="text-sm">
+                <p className="font-semibold" style={{ color: accent }}>Batas Waktu Pembayaran</p>
+                <p className="text-gray-600 mt-0.5">
+                  Mohon selesaikan pembayaran sebelum <strong>{formatDateTime(order.expiryAt)}</strong>.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Signature ── */}
+        {c.showSignature !== false && (
+          <div className="flex justify-end mb-5">
+            <div className="text-right">
+              <div className="w-32 h-px bg-gray-300 mb-1" />
+              <p className="text-[10px] text-gray-400 uppercase tracking-wider">Authorised Sign</p>
+            </div>
+          </div>
+        )}
+
+        {/* ── Footer ── */}
+        <div className="text-center pt-4" style={{ borderTop: `1px solid ${borderColor}` }}>
+          <p className="text-xs text-gray-400 leading-relaxed">{footerText}</p>
+          <p className="text-[10px] text-gray-300 mt-1">
+            {companyPhone} &nbsp;|&nbsp; {companyEmail}
           </p>
         </div>
       </div>

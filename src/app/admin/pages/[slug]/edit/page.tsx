@@ -54,7 +54,7 @@ type PageData = {
   socialLinks?: { platform: string; url: string; icon: string }[];
   // generic fallback
   body?: string;
-  [key: string]: string | number | object | undefined | null | string[] | Record<string, unknown>[];
+  [key: string]: string | number | boolean | object | undefined | null | string[] | Record<string, unknown>[];
 };
 
 const defaultData: Record<string, PageData> = {
@@ -258,6 +258,25 @@ const defaultData: Record<string, PageData> = {
       { platform: 'Email', url: 'mailto:info@jelajahnusantara.com', icon: 'email' },
     ],
   },
+  'invoice-custom': {
+    companyTagline: 'Perjalanan Anda, Prioritas Kami',
+    headerBg: '#1e3a5f',
+    headerBgEnd: '#0f172a',
+    headerTextColor: '#ffffff',
+    accentColor: '#f59e0b',
+    tableHeaderBg: '#1e293b',
+    tableHeaderText: '#ffffff',
+    borderColor: '#e2e8f0',
+    footerText: 'Terima kasih telah memilih layanan kami. E-Ticket akan dikirim setelah pembayaran terkonfirmasi.',
+    showSignature: true,
+    showDeadline: true,
+    statusBadges: {
+      PENDING: { bg: '#fffbeb', text: '#b45309', border: '#fcd34d', dot: '#f59e0b', icon: '⏳' },
+      CONFIRMED: { bg: '#ecfdf5', text: '#047857', border: '#6ee7b7', dot: '#10b981', icon: '✅' },
+      COMPLETED: { bg: '#f0f9ff', text: '#0369a1', border: '#7dd3fc', dot: '#0ea5e9', icon: '🏁' },
+      CANCELLED: { bg: '#fff1f2', text: '#be123c', border: '#fda4af', dot: '#f43f5e', icon: '❌' },
+    },
+  },
   'home-cta': {
     heading: 'Siap untuk Petualangan Berikutnya?',
     subheading: 'Pilih paket tour favorit Anda dan booking dalam hitungan menit. Mudah, cepat, dan transparan.',
@@ -314,7 +333,8 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
   const isDestinationsCta = slug === 'destinations-cta';
   const isToursPage = slug === 'tours';
   const isBlog = slug === 'blog';
-  const isGeneric = !isHero && !isValue && !isFaq && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta && !isGallery && !isTours && !isDestinations && !isDestinationsPage && !isDestinationsCta && !isToursPage && !isBlog;
+  const isInvoiceCustom = slug === 'invoice-custom';
+  const isGeneric = !isHero && !isValue && !isFaq && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta && !isGallery && !isTours && !isDestinations && !isDestinationsPage && !isDestinationsCta && !isToursPage && !isBlog && !isInvoiceCustom;
 
   useEffect(() => { fetchPage(); }, [slug]);
 
@@ -1053,6 +1073,172 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
           </SectionCard>
+        )}
+
+        {/* ═══════════ INVOICE CUSTOM ═══════════ */}
+        {isInvoiceCustom && (
+          <>
+            <p className="text-xs text-gray-400 mb-2">🎨 Kustomisasi tampilan invoice. Perubahan akan langsung terlihat di halaman invoice customer.</p>
+
+            {/* Header Configuration */}
+            <SectionCard icon="🎨" title="Header Invoice">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Company Tagline</label>
+                  <input type="text" value={(data.companyTagline as string) || ''} onChange={e => update('companyTagline', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Perjalanan Anda, Prioritas Kami" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Header Text Color</label>
+                  <div className="flex gap-2">
+                    <input type="color" value={(data.headerTextColor as string) || '#ffffff'} onChange={e => update('headerTextColor', e.target.value)}
+                      className="w-10 h-10 border rounded cursor-pointer" />
+                    <input type="text" value={(data.headerTextColor as string) || '#ffffff'} onChange={e => update('headerTextColor', e.target.value)}
+                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none" />
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Header Background Color</label>
+                  <div className="flex gap-2">
+                    <input type="color" value={(data.headerBg as string) || '#1e3a5f'} onChange={e => update('headerBg', e.target.value)}
+                      className="w-10 h-10 border rounded cursor-pointer" />
+                    <input type="text" value={(data.headerBg as string) || '#1e3a5f'} onChange={e => update('headerBg', e.target.value)}
+                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Header End Color (gradient)</label>
+                  <div className="flex gap-2">
+                    <input type="color" value={(data.headerBgEnd as string) || '#0f172a'} onChange={e => update('headerBgEnd', e.target.value)}
+                      className="w-10 h-10 border rounded cursor-pointer" />
+                    <input type="text" value={(data.headerBgEnd as string) || '#0f172a'} onChange={e => update('headerBgEnd', e.target.value)}
+                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none" />
+                  </div>
+                </div>
+              </div>
+            </SectionCard>
+
+            {/* Accent & Table Colors */}
+            <SectionCard icon="🎯" title="Warna Aksen & Tabel">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Accent Color</label>
+                  <input type="color" value={(data.accentColor as string) || '#f59e0b'} onChange={e => update('accentColor', e.target.value)}
+                    className="w-full h-10 border rounded cursor-pointer" />
+                  <input type="text" value={(data.accentColor as string) || '#f59e0b'} onChange={e => update('accentColor', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-mono mt-1 focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Table Header BG</label>
+                  <input type="color" value={(data.tableHeaderBg as string) || '#1e293b'} onChange={e => update('tableHeaderBg', e.target.value)}
+                    className="w-full h-10 border rounded cursor-pointer" />
+                  <input type="text" value={(data.tableHeaderBg as string) || '#1e293b'} onChange={e => update('tableHeaderBg', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-mono mt-1 focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Border Color</label>
+                  <input type="color" value={(data.borderColor as string) || '#e2e8f0'} onChange={e => update('borderColor', e.target.value)}
+                    className="w-full h-10 border rounded cursor-pointer" />
+                  <input type="text" value={(data.borderColor as string) || '#e2e8f0'} onChange={e => update('borderColor', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-mono mt-1 focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+              </div>
+            </SectionCard>
+
+            {/* Status Badges */}
+            <SectionCard icon="🏷️" title="Tampilan Status Badge">
+              <p className="text-xs text-gray-400 mb-4">Atur warna dan ikon untuk setiap status pesanan yang muncul di invoice.</p>
+              <div className="space-y-4">
+                {(['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'] as const).map(status => {
+                  const badge = (data.statusBadges as Record<string, Record<string, string>>)?.[status] || {};
+                  return (
+                    <div key={status} className="p-4 bg-gray-50 rounded-xl border">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-sm font-semibold text-gray-700">{status}</span>
+                        <span className="text-xs" style={{ backgroundColor: badge.bg, color: badge.text, border: `1px solid ${badge.border}`, padding: '2px 10px', borderRadius: '999px' }}>
+                          {badge.icon} {status}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        <div>
+                          <label className="text-[10px] text-gray-400 block">Background</label>
+                          <div className="flex gap-1">
+                            <input type="color" value={badge.bg || '#ffffff'} onChange={e => {
+                              const sb = { ...(data.statusBadges as Record<string, Record<string, string>> || {}) };
+                              sb[status] = { ...sb[status], bg: e.target.value };
+                              update('statusBadges', sb);
+                            }} className="w-8 h-8 border rounded cursor-pointer" />
+                            <input type="text" value={badge.bg || ''} onChange={e => {
+                              const sb = { ...(data.statusBadges as Record<string, Record<string, string>> || {}) };
+                              sb[status] = { ...sb[status], bg: e.target.value };
+                              update('statusBadges', sb);
+                            }} className="flex-1 border border-gray-300 rounded px-1.5 py-1 text-[10px] font-mono" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-400 block">Text</label>
+                          <input type="color" value={badge.text || '#000000'} onChange={e => {
+                            const sb = { ...(data.statusBadges as Record<string, Record<string, string>> || {}) };
+                            sb[status] = { ...sb[status], text: e.target.value };
+                            update('statusBadges', sb);
+                          }} className="w-full h-8 border rounded cursor-pointer" />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-400 block">Border</label>
+                          <input type="color" value={badge.border || '#cccccc'} onChange={e => {
+                            const sb = { ...(data.statusBadges as Record<string, Record<string, string>> || {}) };
+                            sb[status] = { ...sb[status], border: e.target.value };
+                            update('statusBadges', sb);
+                          }} className="w-full h-8 border rounded cursor-pointer" />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-400 block">Dot</label>
+                          <input type="color" value={badge.dot || '#888888'} onChange={e => {
+                            const sb = { ...(data.statusBadges as Record<string, Record<string, string>> || {}) };
+                            sb[status] = { ...sb[status], dot: e.target.value };
+                            update('statusBadges', sb);
+                          }} className="w-full h-8 border rounded cursor-pointer" />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-400 block">Icon</label>
+                          <input type="text" value={badge.icon || ''} onChange={e => {
+                            const sb = { ...(data.statusBadges as Record<string, Record<string, string>> || {}) };
+                            sb[status] = { ...sb[status], icon: e.target.value };
+                            update('statusBadges', sb);
+                          }} className="w-full border border-gray-300 rounded px-2 py-1.5 text-xs" placeholder="⏳" />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </SectionCard>
+
+            {/* Footer & Options */}
+            <SectionCard icon="📄" title="Footer & Opsi">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Teks Footer</label>
+                <textarea value={(data.footerText as string) || ''} onChange={e => update('footerText', e.target.value)} rows={2}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Terima kasih telah memilih layanan kami..." />
+              </div>
+              <div className="flex items-center gap-6 mt-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={!!data.showSignature} onChange={e => update('showSignature', e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                  <span className="text-sm text-gray-700">Tampilkan Tanda Tangan</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={!!data.showDeadline} onChange={e => update('showDeadline', e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                  <span className="text-sm text-gray-700">Tampilkan Batas Pembayaran</span>
+                </label>
+              </div>
+            </SectionCard>
+          </>
         )}
 
         {/* ═══════════ Generic fallback ═══════════ */}
