@@ -236,6 +236,11 @@ const defaultData: Record<string, PageData> = {
     heading: 'Paket Wisata',
     subheading: 'Jelajahi berbagai pilihan paket tour ke destinasi terbaik di Indonesia',
   },
+  'blog': {
+    label: 'Blog & Tips',
+    heading: 'Tips Traveling & Inspirasi Wisata',
+    subheading: 'Panduan lengkap untuk liburan hemat, destinasi tersembunyi, dan tips traveling dari para ahli.',
+  },
   'testimonials': {
     label: 'Testimoni',
     heading: 'Cerita dari Mereka yang Telah Berpetualang',
@@ -305,7 +310,8 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
   const isDestinationsPage = slug === 'destinations';
   const isDestinationsCta = slug === 'destinations-cta';
   const isToursPage = slug === 'tours';
-  const isGeneric = !isHero && !isValue && !isFaq && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta && !isGallery && !isTours && !isDestinations && !isDestinationsPage && !isDestinationsCta && !isToursPage;
+  const isBlog = slug === 'blog';
+  const isGeneric = !isHero && !isValue && !isFaq && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta && !isGallery && !isTours && !isDestinations && !isDestinationsPage && !isDestinationsCta && !isToursPage && !isBlog;
 
   useEffect(() => { fetchPage(); }, [slug]);
 
@@ -1010,6 +1016,32 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                 <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                   placeholder="Jelajahi berbagai pilihan paket tour ke destinasi terbaik di Indonesia" />
+              </div>
+            </div>
+          </SectionCard>
+        )}
+
+        {/* ═══════════ BLOG PAGE ═══════════ */}
+        {isBlog && (
+          <SectionCard icon="📝" title="Header Halaman">
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Label (atas)</label>
+                <input type="text" value={data.label || ''} onChange={e => update('label', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Blog & Tips" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Heading</label>
+                <input type="text" value={data.heading || ''} onChange={e => update('heading', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Tips Traveling & Inspirasi Wisata" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Subheading</label>
+                <textarea value={data.subheading || ''} onChange={e => update('subheading', e.target.value)} rows={2}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Panduan lengkap untuk liburan hemat..." />
               </div>
             </div>
           </SectionCard>

@@ -2,10 +2,43 @@ import { prisma } from '@/lib/prisma';
 import StarRating from '@/components/ui/StarRating';
 import Button from '@/components/ui/Button';
 import Pagination from '@/components/ui/Pagination';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
 
 const PER_PAGE = 9;
+
+interface TestimonialsPageData {
+  label: string;
+  heading: string;
+  subheading: string;
+}
+
+const FALLBACK: TestimonialsPageData = {
+  label: 'Testimoni',
+  heading: 'Cerita dari Mereka yang Telah Berpetualang',
+  subheading: 'Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka yang sudah merasakan serunya liburan tanpa beban bersama Jelajah Nusantara.',
+};
+
+async function getTestimonialsPageData(): Promise<TestimonialsPageData> {
+  try {
+    const page = await prisma.page.findUnique({ where: { slug: 'testimonials' } });
+    if (page?.content) {
+      const parsed = JSON.parse(page.content);
+      return {
+        label: parsed.label || FALLBACK.label,
+        heading: parsed.heading || FALLBACK.heading,
+        subheading: parsed.subheading || FALLBACK.subheading,
+      };
+    }
+  } catch { /* fallback */ }
+  return FALLBACK;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getTestimonialsPageData();
+  return { title: data.heading, description: data.subheading.slice(0, 160) };
+}
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -44,6 +77,7 @@ export default async function TestimonialsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const page = typeof params.page === 'string' ? Math.max(1, parseInt(params.page) || 1) : 1;
   const { reviews, total, avgRating, allRatings } = await getReviews(page, PER_PAGE);
+  const cms = await getTestimonialsPageData();
   const totalPages = Math.ceil(total / PER_PAGE);
 
   const distribution = [5, 4, 3, 2, 1].map((star) => {
@@ -54,12 +88,12 @@ export default async function TestimonialsPage({ searchParams }: PageProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-12">
       <div className="text-center mb-12">
-        <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">Testimoni</span>
+        <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">{cms.label}</span>
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-          Cerita dari Mereka yang Telah Berpetualang
+          {cms.heading}
         </h1>
         <p className="text-gray-500 max-w-2xl mx-auto">
-          Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka yang sudah merasakan serunya liburan tanpa beban bersama Jelajah Nusantara.
+          {cms.subheading}
         </p>
       </div>
 

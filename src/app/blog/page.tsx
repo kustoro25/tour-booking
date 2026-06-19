@@ -4,14 +4,41 @@ import { prisma } from '@/lib/prisma';
 import type { Metadata } from 'next';
 import Pagination from '@/components/ui/Pagination';
 
-export const metadata: Metadata = {
-  title: 'Blog — Tips Traveling & Inspirasi Wisata',
-  description: 'Tips traveling, panduan destinasi, budget hemat, dan inspirasi wisata Nusantara.',
-};
-
 export const dynamic = 'force-dynamic';
 
 const PER_PAGE = 9;
+
+interface BlogPageData {
+  label: string;
+  heading: string;
+  subheading: string;
+}
+
+const FALLBACK: BlogPageData = {
+  label: 'Blog & Tips',
+  heading: 'Tips Traveling & Inspirasi Wisata',
+  subheading: 'Panduan lengkap untuk liburan hemat, destinasi tersembunyi, dan tips traveling dari para ahli.',
+};
+
+async function getBlogPageData(): Promise<BlogPageData> {
+  try {
+    const page = await prisma.page.findUnique({ where: { slug: 'blog' } });
+    if (page?.content) {
+      const parsed = JSON.parse(page.content);
+      return {
+        label: parsed.label || FALLBACK.label,
+        heading: parsed.heading || FALLBACK.heading,
+        subheading: parsed.subheading || FALLBACK.subheading,
+      };
+    }
+  } catch { /* fallback */ }
+  return FALLBACK;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getBlogPageData();
+  return { title: data.heading, description: data.subheading.slice(0, 160) };
+}
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -35,6 +62,8 @@ export default async function BlogPage({ searchParams }: PageProps) {
     prisma.blog.count({ where }),
   ]);
 
+  const cms = await getBlogPageData();
+
   const totalPages = Math.ceil(total / PER_PAGE);
 
   // Get all categories for filter
@@ -55,13 +84,13 @@ export default async function BlogPage({ searchParams }: PageProps) {
       {/* Header */}
       <div className="text-center mb-10">
         <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">
-          Blog & Tips
+          {cms.label}
         </span>
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-          Tips Traveling & Inspirasi Wisata
+          {cms.heading}
         </h1>
         <p className="text-gray-500 max-w-2xl mx-auto">
-          Panduan lengkap untuk liburan hemat, destinasi tersembunyi, dan tips traveling dari para ahli.
+          {cms.subheading}
         </p>
       </div>
 
