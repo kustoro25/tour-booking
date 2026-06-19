@@ -13,16 +13,18 @@ interface CmsPage {
 }
 
 const pageSlugs = [
+  // ── Landing page sections (in order of appearance) ──
   { slug: 'home-hero', title: 'Home - Hero Section' },
   { slug: 'home-value', title: 'Home - Value Proposition' },
+  { slug: 'home-destinations', title: 'Home - Destinasi Impian' },
+  { slug: 'home-tours', title: 'Home - Paket Wisata Unggulan' },
+  { slug: 'home-gallery', title: 'Home - Jelajah Visual' },
+  { slug: 'testimonials', title: 'Home - Testimoni' },
   { slug: 'home-faq', title: 'Home - FAQ Section' },
   { slug: 'home-cta', title: 'Home - CTA (Siap Berpetualang?)' },
-  { slug: 'home-gallery', title: 'Home - Jelajah Visual' },
-  { slug: 'home-tours', title: 'Home - Paket Wisata Unggulan' },
-  { slug: 'home-destinations', title: 'Home - Destinasi Impian' },
+  // ── Standalone pages ──
   { slug: 'about', title: 'About Us' },
   { slug: 'contact', title: 'Contact Us' },
-  { slug: 'testimonials', title: 'Testimonials Header' },
   { slug: 'privacy', title: 'Privacy Policy' },
   { slug: 'terms', title: 'Terms & Conditions' },
   { slug: 'footer', title: 'Footer' },
