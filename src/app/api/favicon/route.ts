@@ -3,16 +3,7 @@ import { getSiteFavicon } from '@/lib/brand';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
-  try {
-    const url = await getSiteFavicon();
-    if (url) {
-      // Redirect to Cloudinary favicon — most modern browsers handle this fine
-      return NextResponse.redirect(url, { status: 302 });
-    }
-  } catch { /* fallback */ }
-
-  // Default SVG favicon with brand initials
+async function defaultFavicon() {
   return new NextResponse(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
       <rect width="32" height="32" rx="8" fill="#2563eb"/>
@@ -21,8 +12,30 @@ export async function GET() {
     {
       headers: {
         'Content-Type': 'image/svg+xml',
-        'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+        'Cache-Control': 'public, max-age=300, s-maxage=300',
       },
     }
   );
+}
+
+export async function GET() {
+  try {
+    const url = await getSiteFavicon();
+    if (url) {
+      // Fetch the image from Cloudinary and proxy it directly
+      const res = await fetch(url);
+      if (res.ok) {
+        const contentType = res.headers.get('content-type') || 'image/png';
+        const body = await res.arrayBuffer();
+        return new NextResponse(body, {
+          headers: {
+            'Content-Type': contentType,
+            'Cache-Control': 'public, max-age=300, s-maxage=300',
+          },
+        });
+      }
+    }
+  } catch { /* fallback */ }
+
+  return defaultFavicon();
 }
