@@ -105,17 +105,17 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="flex flex-wrap gap-3 mb-8">
-        <Link href="/admin/tours/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
+      <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 mb-8">
+        <Link href="/admin/tours/create" className="bg-blue-600 text-white px-3 sm:px-4 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 text-center">
           + Tambah Paket Tour
         </Link>
-        <Link href="/admin/blog/create" className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700">
+        <Link href="/admin/blog/create" className="bg-indigo-600 text-white px-3 sm:px-4 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-indigo-700 text-center">
           + Tulis Artikel
         </Link>
-        <Link href="/admin/bookings" className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50">
+        <Link href="/admin/bookings" className="bg-white border border-gray-300 text-gray-700 px-3 sm:px-4 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-gray-50 text-center">
           Lihat Semua Booking
         </Link>
-        <Link href="/admin/pages" className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50">
+        <Link href="/admin/pages" className="bg-white border border-gray-300 text-gray-700 px-3 sm:px-4 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-gray-50 text-center">
           Kelola Halaman CMS
         </Link>
       </div>
@@ -125,6 +125,39 @@ export default function AdminDashboardPage() {
         <div className="p-5 border-b border-gray-100">
           <h2 className="font-semibold text-gray-900">Booking Terbaru</h2>
         </div>
+
+        {/* ═══════ Mobile Card View ═══════ */}
+        <div className="sm:hidden divide-y divide-gray-100">
+          {(!stats?.recentBookings || stats.recentBookings.length === 0) ? (
+            <div className="p-8 text-center text-gray-500">Belum ada booking</div>
+          ) : (
+            stats.recentBookings.map((booking) => (
+              <div key={booking.id} className="p-4 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="font-semibold text-gray-900 text-sm">{booking.customerName}</p>
+                    <p className="text-xs text-gray-500 font-mono">{booking.invoiceNo}</p>
+                  </div>
+                  <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                    booking.status === 'PENDING' ? 'bg-orange-100 text-orange-700' :
+                    booking.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
+                    booking.status === 'COMPLETED' ? 'bg-blue-100 text-blue-700' :
+                    'bg-red-100 text-red-700'
+                  }`}>{booking.status}</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <span>{booking.tour.name}</span>
+                  <span>·</span>
+                  <span className="font-medium text-gray-700">{formatCurrency(booking.total)}</span>
+                </div>
+                <Link href={`/admin/bookings/${booking.id}`} className="inline-flex items-center text-blue-600 hover:text-blue-700 text-xs font-medium pt-1">Detail →</Link>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* ═══════ Desktop Table View ═══════ */}
+        <div className="hidden sm:block">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-600 text-left">
@@ -168,6 +201,7 @@ export default function AdminDashboardPage() {
               )}
             </tbody>
           </table>
+        </div>
         </div>
       </div>
     </div>

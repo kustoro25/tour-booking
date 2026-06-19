@@ -139,7 +139,62 @@ export default function AdminBookingsPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <>
+          {/* ═══════ Mobile Card View ═══════ */}
+          <div className="sm:hidden space-y-3">
+            {bookings.length === 0 ? (
+              <div className="bg-white rounded-xl shadow-sm p-8 text-center text-gray-500">Tidak ada booking</div>
+            ) : (
+              bookings.map(b => (
+                <div key={b.id} className="bg-white rounded-xl shadow-sm p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm">{b.customerName}</p>
+                      <p className="text-xs text-gray-500 font-mono">{b.invoiceNo}</p>
+                    </div>
+                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                      b.status === 'PENDING' ? 'bg-orange-100 text-orange-700' :
+                      b.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
+                      b.status === 'COMPLETED' ? 'bg-blue-100 text-blue-700' :
+                      'bg-red-100 text-red-700'
+                    }`}>{b.status}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-xs text-gray-400">Paket</span>
+                      <p className="text-gray-700">{b.tour.name}</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-gray-400">Tgl Tour</span>
+                      <p className="text-gray-700">{formatDate(b.tourDate)}</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-gray-400">Peserta</span>
+                      <p className="text-gray-700">{b.adults + b.children} orang</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-gray-400">Total</span>
+                      <p className="text-gray-900 font-semibold">{formatCurrency(b.total)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+                    <select
+                      value={b.status}
+                      onChange={e => handleStatusUpdate(b.id, e.target.value)}
+                      className="text-xs border border-gray-300 rounded-lg px-2 py-1.5 flex-1 bg-white"
+                    >
+                      {Object.keys(OrderStatusLabels).map(s => <option key={s} value={s}>{OrderStatusLabels[s as OrderStatus]}</option>)}
+                    </select>
+                    <Link href={`/admin/bookings/${b.id}`} className="text-blue-600 hover:text-blue-700 text-xs font-medium">Detail</Link>
+                    <button onClick={() => setDeleteTarget({ id: b.id, invoiceNo: b.invoiceNo })} className="text-red-500 hover:text-red-700 text-xs font-medium">Hapus</button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* ═══════ Desktop Table View ═══════ */}
+          <div className="hidden sm:block bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 text-gray-600">
@@ -191,6 +246,7 @@ export default function AdminBookingsPage() {
             </table>
           </div>
         </div>
+        </>
       )}
     </div>
   );

@@ -146,6 +146,40 @@ export default function AdminUsersPage() {
       )}
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        {/* ═══════ Mobile Card View ═══════ */}
+        <div className="sm:hidden divide-y divide-gray-100">
+          {users.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">Belum ada admin</div>
+          ) : (
+            users.map((user) => (
+              <div key={user.id} className="p-4 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 text-sm">{user.name}</p>
+                    <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                  </div>
+                  <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${roleColors[user.role]}`}>
+                    {UserRoleLabels[user.role]}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <span>{user.phone || '-'}</span>
+                  <span>·</span>
+                  <span>{formatDate(user.createdAt)}</span>
+                </div>
+                <div className="flex items-center gap-3 pt-1 border-t border-gray-100">
+                  <button onClick={() => setDeleteTarget({ id: user.id, name: user.name })} className="text-red-600 hover:text-red-700 text-xs font-medium">Hapus</button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* ═══════ Desktop Table View ═══════ */}
+        <div className="hidden sm:block">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-600">
@@ -189,6 +223,7 @@ export default function AdminUsersPage() {
               )}
             </tbody>
           </table>
+        </div>
         </div>
       </div>
     </div>

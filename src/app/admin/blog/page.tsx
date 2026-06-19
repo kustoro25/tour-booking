@@ -107,6 +107,42 @@ export default function AdminBlogPage() {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        {/* ═══════ Mobile Card View ═══════ */}
+        <div className="sm:hidden divide-y divide-gray-100">
+          {posts.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">Belum ada artikel</div>
+          ) : (
+            posts.map((post) => (
+              <div key={post.id} className="p-4 space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 text-sm">{post.title}</p>
+                    <p className="text-xs text-gray-400 font-mono truncate">{post.slug}</p>
+                  </div>
+                  <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${post.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    {post.isPublished ? 'Published' : 'Draft'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">{post.category}</span>
+                  <span>·</span>
+                  <span>{post.author}</span>
+                  <span>·</span>
+                  <span>👁 {post.viewCount}</span>
+                  <span>·</span>
+                  <span>{formatDate(post.createdAt)}</span>
+                </div>
+                <div className="flex items-center gap-3 pt-1 border-t border-gray-100">
+                  <Link href={`/admin/blog/${post.id}/edit`} className="text-blue-600 hover:text-blue-700 text-xs font-medium">Edit</Link>
+                  <button onClick={() => setDeleteTarget({ id: post.id, title: post.title })} className="text-red-500 hover:text-red-700 text-xs font-medium">Hapus</button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* ═══════ Desktop Table View ═══════ */}
+        <div className="hidden sm:block">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-600">
@@ -155,6 +191,7 @@ export default function AdminBlogPage() {
               )}
             </tbody>
           </table>
+        </div>
         </div>
       </div>
     </div>
