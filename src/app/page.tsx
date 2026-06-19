@@ -15,7 +15,9 @@ async function getCmsFaqs(): Promise<{ question: string; answer: string }[]> {
     const page = await prisma.page.findUnique({ where: { slug: 'home-faq' } });
     if (page?.content) {
       const parsed = JSON.parse(page.content);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      // Content can be either the array directly or { faqs: [...] }
+      const items = Array.isArray(parsed) ? parsed : (parsed.faqs || []);
+      if (items.length > 0) return items;
     }
   } catch { /* fallback to hardcoded */ }
   return [
