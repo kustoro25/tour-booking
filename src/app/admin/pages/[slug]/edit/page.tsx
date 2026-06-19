@@ -32,8 +32,6 @@ type PageData = {
   valueItems?: ValueItem[];
   // home-faq
   faqs?: FaqItem[];
-  // home-stats landing
-  landingStats?: StatItem[];
   // privacy / terms
   html?: string;
   // about
@@ -89,13 +87,6 @@ const defaultData: Record<string, PageData> = {
       { question: 'Metode pembayaran apa saja yang tersedia?', answer: 'Kami menerima transfer bank (BCA, Mandiri, BRI, BNI) dan e-wallet (OVO, Dana, GoPay, ShopeePay). Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan. Jika melebihi batas waktu, pesanan akan otomatis dibatalkan.' },
       { question: 'Bagaimana kebijakan pembatalan dan refund?', answer: 'Pembatalan H-14: refund 80%. H-7: refund 50%. H-3: refund 25%. Kurang dari H-3: tidak ada refund. Jika tour dibatalkan oleh kami karena force majeure atau kuota minimal tidak terpenuhi, Anda mendapat refund 100%.' },
       { question: 'Apakah ada minimal peserta untuk setiap tour?', answer: 'Ya, setiap paket tour memiliki minimal peserta (umumnya 2 orang). Informasi ini tercantum di halaman detail masing-masing paket. Jika kuota minimal tidak terpenuhi, tim kami akan menghubungi Anda untuk opsi alternatif.' },
-    ],
-  },
-  'home-stats': {
-    landingStats: [
-      { num: '5000+', label: 'Wisatawan' },
-      { num: '50+', label: 'Destinasi' },
-      { num: '4.9', label: 'Rating ★' },
     ],
   },
   'privacy': {
@@ -267,7 +258,6 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
   const isHero = slug === 'home-hero';
   const isValue = slug === 'home-value';
   const isFaq = slug === 'home-faq';
-  const isStats = slug === 'home-stats';
   const isHtml = slug === 'privacy' || slug === 'terms';
   const isAbout = slug === 'about';
   const isContact = slug === 'contact';
@@ -277,7 +267,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
   const isGallery = slug === 'home-gallery';
   const isTours = slug === 'home-tours';
   const isDestinations = slug === 'home-destinations';
-  const isGeneric = !isHero && !isValue && !isFaq && !isStats && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta && !isGallery && !isTours && !isDestinations;
+  const isGeneric = !isHero && !isValue && !isFaq && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta && !isGallery && !isTours && !isDestinations;
 
   useEffect(() => { fetchPage(); }, [slug]);
 
@@ -492,25 +482,6 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                   <textarea value={faq.answer} onChange={e => {
                     const f = [...(data.faqs || [])]; f[i] = { ...f[i], answer: e.target.value }; update('faqs', f);
                   }} rows={3} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Jawaban..." />
-                </div>
-              ))}
-            </div>
-          </SectionCard>
-        )}
-
-        {/* ═══════════ HOME - STATS (standalone) ═══════════ */}
-        {isStats && (
-          <SectionCard icon="📊" title="Statistik Landing Page">
-            <div className="grid grid-cols-3 gap-4">
-              {(data.landingStats || []).map((s, i) => (
-                <div key={i} className="space-y-2">
-                  <label className="text-xs text-gray-500">#{i + 1}</label>
-                  <input type="text" value={s.num} onChange={e => {
-                    const st = [...(data.landingStats || [])]; st[i] = { ...st[i], num: e.target.value }; update('landingStats', st);
-                  }} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="5000+" />
-                  <input type="text" value={s.label} onChange={e2 => {
-                    const st = [...(data.landingStats || [])]; st[i] = { ...st[i], label: e2.target.value }; update('landingStats', st);
-                  }} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Wisatawan" />
                 </div>
               ))}
             </div>

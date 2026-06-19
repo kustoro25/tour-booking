@@ -15,7 +15,6 @@ interface CmsPage {
 const pageSlugs = [
   { slug: 'home-hero', title: 'Home - Hero Section' },
   { slug: 'home-value', title: 'Home - Value Proposition' },
-  { slug: 'home-stats', title: 'Home - Statistik (5000+, 50+, 4.9)' },
   { slug: 'home-faq', title: 'Home - FAQ Section' },
   { slug: 'home-cta', title: 'Home - CTA (Siap Berpetualang?)' },
   { slug: 'home-gallery', title: 'Home - Jelajah Visual' },
