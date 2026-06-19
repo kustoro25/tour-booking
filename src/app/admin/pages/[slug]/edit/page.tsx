@@ -705,13 +705,21 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                 placeholder="© 2026 Jelajah Nusantara Tour. All rights reserved." />
             </SectionCard>
-            <SectionCard icon="🔗" title="Social Media Links" addLabel="+ Tambah Medsos" onAdd={() => update('socialLinks', [...(data.socialLinks as Array<{platform:string;url:string;icon:string}> || []), { platform: '', url: '', icon: 'globe' }])}>
+            <SectionCard icon="🔗" title="Social Media Links" addLabel="+ Tambah Medsos" onAdd={() => update('socialLinks', [...(data.socialLinks as Array<{platform:string;url:string;icon:string}> || []), { platform: '', url: '', icon: 'whatsapp' }])}>
               <div className="space-y-3">
                 {(data.socialLinks as Array<{platform:string;url:string;icon:string}> || []).map((link, i) => (
                   <div key={i} className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl">
-                    <input type="text" value={link.icon} onChange={e => {
+                    <select value={link.icon} onChange={e => {
                       const arr = [...(data.socialLinks as Array<{platform:string;url:string;icon:string}> || [])]; arr[i] = { ...arr[i], icon: e.target.value }; update('socialLinks', arr);
-                    }} className="w-20 border rounded-lg px-2 py-1.5 text-sm" placeholder="whatsapp" />
+                    }} className="w-28 border rounded-lg px-2 py-1.5 text-sm bg-white">
+                      <option value="whatsapp">WhatsApp</option>
+                      <option value="instagram">Instagram</option>
+                      <option value="facebook">Facebook</option>
+                      <option value="youtube">YouTube</option>
+                      <option value="tiktok">TikTok</option>
+                      <option value="email">Email</option>
+                      <option value="globe">Website</option>
+                    </select>
                     <input type="text" value={link.platform} onChange={e => {
                       const arr = [...(data.socialLinks as Array<{platform:string;url:string;icon:string}> || [])]; arr[i] = { ...arr[i], platform: e.target.value }; update('socialLinks', arr);
                     }} className="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="WhatsApp" />
