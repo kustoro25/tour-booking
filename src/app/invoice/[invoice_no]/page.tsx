@@ -31,6 +31,7 @@ interface StatusBadgeConfig {
 }
 
 interface InvoiceCustomConfig {
+  companyTagline?: string;
   headerBg?: string;
   headerBgEnd?: string;
   headerTextColor?: string;
@@ -220,6 +221,7 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     showDeadline: true,
   },
   premium: {
+    companyTagline: 'Perjalanan Anda, Prioritas Kami',
     headerBg: '#1a1a1a',
     headerBgEnd: '#1a1a1a',
     headerTextColor: '#ffffff',
@@ -936,6 +938,9 @@ function CustomInvoice({
               <div>
                 <h2 className="text-xl font-bold" style={{ color: hText }}>{companyName}</h2>
                 <p className="text-xs" style={{ color: hSub }}>{companyAddress}</p>
+                {c.companyTagline && (
+                  <p className="text-xs mt-0.5" style={{ color: hSub, opacity: 0.8 }}>{c.companyTagline}</p>
+                )}
               </div>
             </div>
           </div>

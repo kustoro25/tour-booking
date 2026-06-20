@@ -1264,22 +1264,14 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
           </SectionCard>
         )}
 
-        {/* ═══════════ INVOICE CUSTOM ═══════════ */}
-        {isInvoiceCustom && (
+        {/* ═══════════ INVOICE STANDARD (classic / modern / minimal) ═══════════ */}
+        {isInvoiceCustom && !isInvoicePremium && (
           <>
             <p className="text-xs text-gray-400 mb-2">🎨 Kustomisasi tampilan invoice. Urutan field mengikuti tampilan invoice customer.</p>
 
             {/* 1. HEADER */}
             <SectionCard icon="🎨" title="① Header — Logo, Nama Brand, INVOICE">
-              {isInvoicePremium && (
-                <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Company Tagline</label>
-                  <input type="text" value={(data.companyTagline as string) || ''} onChange={e => update('companyTagline', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                    placeholder="Perjalanan Anda, Prioritas Kami" />
-                </div>
-              )}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="text-xs text-gray-500 mb-1 block">Text Color</label>
                   <div className="flex gap-2">
@@ -1504,6 +1496,299 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                   <div className="flex gap-2">
                     <input type="color" value={(data.borderColor as string) || '#e2e8f0'} onChange={e => update('borderColor', e.target.value)} className="w-10 h-10 border rounded cursor-pointer" />
                     <input type="text" value={(data.borderColor as string) || '#e2e8f0'} onChange={e => update('borderColor', e.target.value)} className="flex-1 border rounded-lg px-2 py-1.5 text-xs font-mono focus:ring-2 focus:ring-blue-500 outline-none" />
+                  </div>
+                </div>
+              </div>
+              <hr className="my-3" />
+              <p className="text-xs text-gray-400 mb-4">Atur warna dan ikon untuk setiap status pesanan.</p>
+              <div className="space-y-4">
+                {(['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'] as const).map(status => {
+                  const badge = (data.statusBadges as Record<string, Record<string, string>>)?.[status] || {};
+                  return (
+                    <div key={status} className="p-4 bg-gray-50 rounded-xl border">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-sm font-semibold text-gray-700">{status}</span>
+                        <span className="text-xs" style={{ backgroundColor: badge.bg, color: badge.text, border: `1px solid ${badge.border}`, padding: '2px 10px', borderRadius: '999px' }}>
+                          {badge.icon} {status}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        <div>
+                          <label className="text-[10px] text-gray-400 block">Background</label>
+                          <div className="flex gap-1">
+                            <input type="color" value={badge.bg || '#ffffff'} onChange={e => { const sb = { ...(data.statusBadges as Record<string, Record<string, string>> || {}) }; sb[status] = { ...sb[status], bg: e.target.value }; update('statusBadges', sb); }} className="w-8 h-8 border rounded cursor-pointer" />
+                            <input type="text" value={badge.bg || ''} onChange={e => { const sb = { ...(data.statusBadges as Record<string, Record<string, string>> || {}) }; sb[status] = { ...sb[status], bg: e.target.value }; update('statusBadges', sb); }} className="flex-1 border border-gray-300 rounded px-1.5 py-1 text-[10px] font-mono" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-400 block">Text</label>
+                          <input type="color" value={badge.text || '#000000'} onChange={e => { const sb = { ...(data.statusBadges as Record<string, Record<string, string>> || {}) }; sb[status] = { ...sb[status], text: e.target.value }; update('statusBadges', sb); }} className="w-full h-8 border rounded cursor-pointer" />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-400 block">Border</label>
+                          <input type="color" value={badge.border || '#cccccc'} onChange={e => { const sb = { ...(data.statusBadges as Record<string, Record<string, string>> || {}) }; sb[status] = { ...sb[status], border: e.target.value }; update('statusBadges', sb); }} className="w-full h-8 border rounded cursor-pointer" />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-400 block">Dot</label>
+                          <input type="color" value={badge.dot || '#888888'} onChange={e => { const sb = { ...(data.statusBadges as Record<string, Record<string, string>> || {}) }; sb[status] = { ...sb[status], dot: e.target.value }; update('statusBadges', sb); }} className="w-full h-8 border rounded cursor-pointer" />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-400 block">Icon</label>
+                          <input type="text" value={badge.icon || ''} onChange={e => { const sb = { ...(data.statusBadges as Record<string, Record<string, string>> || {}) }; sb[status] = { ...sb[status], icon: e.target.value }; update('statusBadges', sb); }} className="w-full border border-gray-300 rounded px-2 py-1.5 text-xs" placeholder="⏳" />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </SectionCard>
+          </>
+        )}
+
+        {/* ═══════════ INVOICE PREMIUM ═══════════ */}
+        {isInvoicePremium && (
+          <>
+            <div className="bg-gradient-to-r from-amber-900/10 to-orange-900/10 border border-amber-500/30 rounded-xl p-4 mb-4">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">🌟</span>
+                <span className="text-sm font-bold text-amber-700 dark:text-amber-400">Tema Premium — Desain Geometris Mewah</span>
+              </div>
+              <p className="text-xs text-gray-500 ml-7">Layout premium dengan header dual-panel mewah, background gelap, aksen emas, dan logo brand. Field di bawah mengikuti urutan tampilan invoice premium.</p>
+            </div>
+
+            {/* 1. HEADER — Premium Dual-Panel */}
+            <SectionCard icon="🎨" title="① Header — Identitas Brand + Tagline">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Company Tagline (tampil di bawah nama brand)</label>
+                <input type="text" value={(data.companyTagline as string) || ''} onChange={e => update('companyTagline', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none"
+                  placeholder="Perjalanan Anda, Prioritas Kami" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Text Color</label>
+                  <div className="flex gap-2">
+                    <input type="color" value={(data.headerTextColor as string) || '#ffffff'} onChange={e => update('headerTextColor', e.target.value)} className="w-10 h-10 border rounded cursor-pointer" />
+                    <input type="text" value={(data.headerTextColor as string) || '#ffffff'} onChange={e => update('headerTextColor', e.target.value)} className="flex-1 border rounded-lg px-2 py-1.5 text-xs font-mono focus:ring-2 focus:ring-amber-500 outline-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Background</label>
+                  <div className="flex gap-2">
+                    <input type="color" value={(data.headerBg as string) || '#1a1a1a'} onChange={e => update('headerBg', e.target.value)} className="w-10 h-10 border rounded cursor-pointer" />
+                    <input type="text" value={(data.headerBg as string) || '#1a1a1a'} onChange={e => update('headerBg', e.target.value)} className="flex-1 border rounded-lg px-2 py-1.5 text-xs font-mono focus:ring-2 focus:ring-amber-500 outline-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Gradient End</label>
+                  <div className="flex gap-2">
+                    <input type="color" value={(data.headerBgEnd as string) || '#1a1a1a'} onChange={e => update('headerBgEnd', e.target.value)} className="w-10 h-10 border rounded cursor-pointer" />
+                    <input type="text" value={(data.headerBgEnd as string) || '#1a1a1a'} onChange={e => update('headerBgEnd', e.target.value)} className="flex-1 border rounded-lg px-2 py-1.5 text-xs font-mono focus:ring-2 focus:ring-amber-500 outline-none" />
+                  </div>
+                </div>
+              </div>
+            </SectionCard>
+
+            {/* 2. STATUS BAR */}
+            <SectionCard icon="📋" title="② Status Bar — Badge & Tanggal Diterbitkan">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Label "Diterbitkan:"</label>
+                <input type="text" value={(data.labelPublishedDate as string) || ''} onChange={e => update('labelPublishedDate', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Diterbitkan:" />
+              </div>
+            </SectionCard>
+
+            {/* 3. BODY — Invoice to: + Detail Invoice */}
+            <SectionCard icon="👤" title="③ Body — Invoice to: & Detail Invoice">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold text-gray-600 border-b pb-1">Kolom Kiri</p>
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1 block">Heading "Invoice to:" (premium style)</label>
+                    <input type="text" value={(data.headingBilledTo as string) || ''} onChange={e => update('headingBilledTo', e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Invoice to:" />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold text-gray-600 border-b pb-1">Kolom Kanan</p>
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1 block">Heading "Detail Invoice"</label>
+                    <input type="text" value={(data.headingInvoiceDetails as string) || ''} onChange={e => update('headingInvoiceDetails', e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Detail Invoice" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1 block">Label "Invoice#" (premium style)</label>
+                    <input type="text" value={(data.labelInvoiceNo as string) || ''} onChange={e => update('labelInvoiceNo', e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Invoice#" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1 block">Label "Tanggal"</label>
+                    <input type="text" value={(data.labelInvoiceDate as string) || ''} onChange={e => update('labelInvoiceDate', e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Tanggal" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1 block">Label "Batas Pembayaran"</label>
+                    <input type="text" value={(data.labelPaymentDeadline as string) || ''} onChange={e => update('labelPaymentDeadline', e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Batas Pembayaran" />
+                  </div>
+                </div>
+              </div>
+            </SectionCard>
+
+            {/* 4. RINGKASAN PESANAN */}
+            <SectionCard icon="📦" title="④ Ringkasan Pesanan">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Heading "Ringkasan Pesanan"</label>
+                <input type="text" value={(data.headingOrderSummary as string) || ''} onChange={e => update('headingOrderSummary', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-3" placeholder="Ringkasan Pesanan" />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  { key: 'labelTourDate', label: 'Tanggal Perjalanan' },
+                  { key: 'labelDuration', label: 'Durasi' },
+                  { key: 'labelAdults', label: 'Dewasa' },
+                  { key: 'labelChildren', label: 'Anak' },
+                ].map((f) => (
+                  <div key={f.key}>
+                    <label className="text-[10px] text-gray-400 block mb-0.5">{f.label}</label>
+                    <input type="text" value={(data as Record<string,unknown>)[f.key] as string || ''} onChange={e => update(f.key, e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-amber-500 outline-none" />
+                  </div>
+                ))}
+              </div>
+            </SectionCard>
+
+            {/* 5. RINCIAN BIAYA */}
+            <SectionCard icon="💰" title="⑤ Rincian Biaya">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Heading "Rincian Biaya"</label>
+                <input type="text" value={(data.headingPriceBreakdown as string) || ''} onChange={e => update('headingPriceBreakdown', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-3" placeholder="Rincian Biaya" />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {[
+                  { key: 'labelDiscount', label: 'Diskon' },
+                  { key: 'labelSubTotal', label: 'Sub Total' },
+                  { key: 'labelTax', label: 'Tax' },
+                  { key: 'labelTotal', label: 'Total' },
+                ].map((f) => (
+                  <div key={f.key}>
+                    <label className="text-[10px] text-gray-400 block mb-0.5">{f.label}</label>
+                    <input type="text" value={(data as Record<string,unknown>)[f.key] as string || ''} onChange={e => update(f.key, e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-amber-500 outline-none" />
+                  </div>
+                ))}
+              </div>
+            </SectionCard>
+
+            {/* 6. INFORMASI PEMBAYARAN */}
+            <SectionCard icon="🏦" title="⑥ Informasi Pembayaran">
+              <p className="text-xs text-gray-400 mb-3">Rekening bank dikelola di <strong>Settings → Bank Accounts</strong>.</p>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Heading "Informasi Pembayaran"</label>
+                <input type="text" value={(data.headingPaymentInfo as string) || ''} onChange={e => update('headingPaymentInfo', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-3" placeholder="Informasi Pembayaran" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { key: 'labelBank', label: 'Label "Bank"' },
+                  { key: 'labelAccountName', label: 'Label "a.n."' },
+                ].map((f) => (
+                  <div key={f.key}>
+                    <label className="text-[10px] text-gray-400 block mb-0.5">{f.label}</label>
+                    <input type="text" value={(data as Record<string,unknown>)[f.key] as string || ''} onChange={e => update(f.key, e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-amber-500 outline-none" />
+                  </div>
+                ))}
+              </div>
+            </SectionCard>
+
+            {/* 7. BATAS PEMBAYARAN */}
+            <SectionCard icon="⏰" title="⑦ Batas Pembayaran">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Heading "Batas Pembayaran"</label>
+                <input type="text" value={(data.headingDeadline as string) || ''} onChange={e => update('headingDeadline', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-3" placeholder="Batas Pembayaran" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Teks Deadline ({'{{date}}'})</label>
+                <textarea value={(data.deadlineText as string) || ''} onChange={e => update('deadlineText', e.target.value)} rows={2}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none"
+                  placeholder="Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan." />
+              </div>
+              <div className="mt-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={!!data.showDeadline} onChange={e => update('showDeadline', e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500" />
+                  <span className="text-sm text-gray-700">Tampilkan section ini</span>
+                </label>
+              </div>
+            </SectionCard>
+
+            {/* 8. SYARAT & KETENTUAN + TANDA TANGAN */}
+            <SectionCard icon="📜" title="⑧ Syarat & Ketentuan + Tanda Tangan">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold text-gray-600 border-b pb-1">Kolom Kiri</p>
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1 block">Heading "Syarat & Ketentuan"</label>
+                    <input type="text" value={(data.headingTerms as string) || ''} onChange={e => update('headingTerms', e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Syarat & Ketentuan" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1 block">Teks Syarat & Ketentuan</label>
+                    <textarea value={(data.termsText as string) || ''} onChange={e => update('termsText', e.target.value)} rows={3}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none"
+                      placeholder="Pembayaran harus dilakukan sebelum batas waktu yang ditentukan..." />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold text-gray-600 border-b pb-1">Kolom Kanan — Tanda Tangan</p>
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1 block">Label "Authorised Sign"</label>
+                    <input type="text" value={(data.labelSignature as string) || ''} onChange={e => update('labelSignature', e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Authorised Sign" />
+                  </div>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={!!data.showSignature} onChange={e => update('showSignature', e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500" />
+                    <span className="text-sm text-gray-700">Tampilkan Tanda Tangan</span>
+                  </label>
+                </div>
+              </div>
+            </SectionCard>
+
+            {/* 9. FOOTER + TOMBOL */}
+            <SectionCard icon="📄" title="⑨ Footer & Tombol Aksi">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Teks Footer (placeholder: {'{nama}'}, {'{phone}'}, {'{email}'})</label>
+                <textarea value={(data.footerText as string) || ''} onChange={e => update('footerText', e.target.value)} rows={2}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none"
+                  placeholder="Terima kasih telah memilih layanan kami..." />
+              </div>
+              <div className="mt-3">
+                <label className="text-xs text-gray-500 mb-1 block">Link Tombol "Butuh Bantuan?"</label>
+                <input type="text" value={(data.helpLink as string) || ''} onChange={e => update('helpLink', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none"
+                  placeholder="/contact" />
+              </div>
+            </SectionCard>
+
+            {/* 10. WARNA & TAMPILAN */}
+            <SectionCard icon="🎯" title="⑩ Warna (Amber/Gold) & Status Badge">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Accent Color</label>
+                  <div className="flex gap-2">
+                    <input type="color" value={(data.accentColor as string) || '#e59800'} onChange={e => update('accentColor', e.target.value)} className="w-10 h-10 border rounded cursor-pointer" />
+                    <input type="text" value={(data.accentColor as string) || '#e59800'} onChange={e => update('accentColor', e.target.value)} className="flex-1 border rounded-lg px-2 py-1.5 text-xs font-mono focus:ring-2 focus:ring-amber-500 outline-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Border Color</label>
+                  <div className="flex gap-2">
+                    <input type="color" value={(data.borderColor as string) || '#333333'} onChange={e => update('borderColor', e.target.value)} className="w-10 h-10 border rounded cursor-pointer" />
+                    <input type="text" value={(data.borderColor as string) || '#333333'} onChange={e => update('borderColor', e.target.value)} className="flex-1 border rounded-lg px-2 py-1.5 text-xs font-mono focus:ring-2 focus:ring-amber-500 outline-none" />
                   </div>
                 </div>
               </div>
