@@ -13,8 +13,8 @@ type AdminRole = 'SUPER_ADMIN' | 'ADMIN' | 'CONTENT_MANAGER';
  * - CONTENT_MANAGER: content only (tours, destinations, blog, pages, dashboard)
  */
 const ROLE_PATH_RULES: { prefix: string; allowedRoles: AdminRole[] }[] = [
-  { prefix: '/admin/users',        allowedRoles: ['SUPER_ADMIN'] },
-  { prefix: '/admin/settings',      allowedRoles: ['SUPER_ADMIN'] },
+  { prefix: '/admin/users',        allowedRoles: ['SUPER_ADMIN', 'ADMIN'] },
+  { prefix: '/admin/settings',      allowedRoles: ['SUPER_ADMIN', 'ADMIN'] },
   { prefix: '/admin/bookings',      allowedRoles: ['SUPER_ADMIN', 'ADMIN'] },
   { prefix: '/admin/reviews',       allowedRoles: ['SUPER_ADMIN', 'ADMIN'] },
   { prefix: '/admin/dashboard',     allowedRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_MANAGER'] },
