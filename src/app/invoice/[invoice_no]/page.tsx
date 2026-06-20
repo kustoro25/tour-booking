@@ -4,7 +4,7 @@ import { formatCurrency, formatDateTime } from '@/lib/utils';
 import { OrderStatusLabels, OrderStatusColors, OrderStatusIcons, OrderStatusDotColors, type OrderStatus } from '@/types';
 import CopyButton from '@/components/ui/CopyButton';
 import InvoiceActions from '@/components/booking/InvoiceActions';
-import { getBrandName } from '@/lib/brand';
+import { getBrandName, getBrandIcon } from '@/lib/brand';
 
 export const dynamic = 'force-dynamic';
 
@@ -161,6 +161,7 @@ export default async function InvoicePage({ params }: PageProps) {
   }
 
   const brandName = await getBrandName();
+  const brandIcon = await getBrandIcon();
 
   // Read company details from settings
   let companyPhone = '+62 812-3456-7890';
@@ -202,6 +203,7 @@ export default async function InvoicePage({ params }: PageProps) {
           companyPhone={companyPhone}
           companyEmail={companyEmail}
           companyTagline={companyTagline}
+          brandIcon={brandIcon}
           statusLabel={statusLabel}
           tourDate={tourDate}
           createdDate={createdDate}
@@ -244,6 +246,7 @@ function CustomInvoice({
   companyPhone,
   companyEmail,
   companyTagline,
+  brandIcon,
   statusLabel,
   tourDate,
   createdDate,
@@ -258,6 +261,7 @@ function CustomInvoice({
   companyPhone: string;
   companyEmail: string;
   companyTagline: string;
+  brandIcon: string;
   statusLabel: string;
   tourDate: string;
   createdDate: string;
@@ -291,6 +295,7 @@ function CustomInvoice({
 
   const isLight = themeKeyForCustom(hText) === 'light';
   const logoBg = isLight ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.2)';
+  const isIconUrl = brandIcon && (brandIcon.startsWith('http://') || brandIcon.startsWith('https://'));
 
   // Editable headings & labels
   const T = {
@@ -332,8 +337,13 @@ function CustomInvoice({
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold" style={{ backgroundColor: logoBg }}>
-                <span style={{ color: hText }}>JN</span>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold overflow-hidden" style={{ backgroundColor: isIconUrl ? 'transparent' : logoBg }}>
+                {isIconUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={brandIcon} alt={companyName} className="w-full h-full object-cover" />
+                ) : (
+                  <span style={{ color: hText }}>{brandIcon}</span>
+                )}
               </div>
               <div>
                 <h2 className="text-xl font-bold" style={{ color: hText }}>{companyName}</h2>
