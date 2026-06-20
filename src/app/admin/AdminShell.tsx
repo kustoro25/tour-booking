@@ -62,49 +62,49 @@ export default function AdminShell({ brandName, brandIcon, children }: Props) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white transform transition-transform lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-56 bg-gray-900 text-white transform transition-transform lg:translate-x-0 flex flex-col ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="p-5 border-b border-gray-700">
+        <div className="p-4 border-b border-gray-700 flex-shrink-0">
           <div className="flex items-center gap-2">
-            <BrandIcon icon={brandIcon} className="w-8 h-8 bg-blue-600 rounded" />
+            <BrandIcon icon={brandIcon} className="w-7 h-7 bg-blue-600 rounded" />
             <div>
-              <p className="font-semibold text-sm">{brandName}</p>
-              <p className="text-xs text-gray-400">Admin Panel</p>
+              <p className="font-semibold text-xs">{brandName}</p>
+              <p className="text-[10px] text-gray-400">Admin Panel</p>
             </div>
           </div>
         </div>
 
-        <nav className="p-3 space-y-1">
+        <nav className="flex-1 overflow-y-auto p-2 space-y-0.5">
           {sidebarLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+              className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
                 pathname === link.href || pathname.startsWith(link.href + '/')
                   ? 'bg-blue-600 text-white'
                   : 'text-gray-300 hover:bg-gray-800'
               }`}
             >
-              <span>{link.icon}</span>
+              <span className="text-sm">{link.icon}</span>
               <span>{link.label}</span>
             </Link>
           ))}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
+        <div className="flex-shrink-0 p-3 border-t border-gray-700">
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-white mb-2"
+            className="flex items-center gap-2 text-xs text-gray-400 hover:text-white mb-1.5"
             target="_blank"
           >
             🌐 Lihat Website
           </Link>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-red-400 w-full"
+            className="flex items-center gap-2 text-xs text-gray-400 hover:text-red-400 w-full"
           >
             🚪 Logout
           </button>
@@ -117,7 +117,7 @@ export default function AdminShell({ brandName, brandIcon, children }: Props) {
       )}
 
       {/* Main Content */}
-      <div className="lg:ml-64 min-h-screen">
+      <div className="lg:ml-56 min-h-screen">
         <main className="p-4 sm:p-6 lg:p-8">
           <ToastProvider>{children}</ToastProvider>
         </main>
