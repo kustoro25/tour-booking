@@ -61,6 +61,7 @@ interface InvoiceCustomConfig {
   labelAccountName?: string;
   labelSignature?: string;
   labelPublishedDate?: string;
+  helpLink?: string;
   showSignature?: boolean;
   showDeadline?: boolean;
   statusBadges?: Record<string, StatusBadgeConfig>;
@@ -146,6 +147,7 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     labelBank: 'Bank',
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
+    helpLink: '/contact',
     showSignature: true,
     showDeadline: true,
   },
@@ -179,6 +181,7 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     labelBank: 'Bank',
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
+    helpLink: '/contact',
     showSignature: true,
     showDeadline: true,
   },
@@ -212,6 +215,7 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     labelBank: 'Bank',
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
+    helpLink: '/contact',
     showSignature: true,
     showDeadline: true,
   },
@@ -245,6 +249,7 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     labelBank: 'Bank',
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
+    helpLink: '/contact',
     showSignature: true,
     showDeadline: true,
   },
@@ -332,6 +337,7 @@ export default async function InvoicePage({ params }: PageProps) {
           tourName={order.tour.name}
           total={order.total}
           companyPhone={companyPhone}
+          helpLink={config.helpLink}
         />
       </div>
     </>

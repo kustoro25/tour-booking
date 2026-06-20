@@ -8,6 +8,7 @@ interface InvoiceActionsProps {
   tourName: string;
   total: number;
   companyPhone: string;
+  helpLink?: string;
 }
 
 export default function InvoiceActions({
@@ -16,6 +17,7 @@ export default function InvoiceActions({
   tourName,
   total,
   companyPhone,
+  helpLink,
 }: InvoiceActionsProps) {
   const waNumber = companyPhone.replace(/[^0-9]/g, '');
 
@@ -41,7 +43,7 @@ export default function InvoiceActions({
       >
         💬 Konfirmasi Pembayaran
       </Button>
-      <Button href="/contact" variant="outline">
+      <Button href={helpLink || '/contact'} variant="outline">
         Butuh Bantuan?
       </Button>
     </div>
