@@ -1360,36 +1360,6 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
               </div>
             </SectionCard>
 
-            {/* Labels */}
-            <SectionCard icon="🏷️" title="Label Teks">
-              <p className="text-xs text-gray-400 mb-4">Label kecil di dalam section. Kosongkan untuk default.</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[
-                  { key: 'labelInvoiceNo', label: '"Nomor Invoice"' },
-                  { key: 'labelInvoiceDate', label: '"Tanggal Invoice"' },
-                  { key: 'labelPaymentDeadline', label: '"Batas Pembayaran"' },
-                  { key: 'labelPublishedDate', label: '"Diterbitkan:"' },
-                  { key: 'labelTourDate', label: '"Tgl. Perjalanan"' },
-                  { key: 'labelDuration', label: '"Durasi"' },
-                  { key: 'labelAdults', label: '"Dewasa"' },
-                  { key: 'labelChildren', label: '"Anak"' },
-                  { key: 'labelDiscount', label: '"Diskon"' },
-                  { key: 'labelSubTotal', label: '"Sub Total"' },
-                  { key: 'labelTax', label: '"Tax"' },
-                  { key: 'labelTotal', label: '"TOTAL"' },
-                  { key: 'labelBank', label: '"Bank"' },
-                  { key: 'labelAccountName', label: '"a.n."' },
-                  { key: 'labelSignature', label: '"Authorised Sign"' },
-                ].map((f) => (
-                  <div key={f.key}>
-                    <label className="text-[10px] text-gray-400 block mb-0.5">{f.label}</label>
-                    <input type="text" value={(data as Record<string,unknown>)[f.key] as string || ''} onChange={e => update(f.key, e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none" />
-                  </div>
-                ))}
-              </div>
-            </SectionCard>
-
             {/* Accent & Border Colors */}
             <SectionCard icon="🎯" title="Warna Aksen & Border">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
