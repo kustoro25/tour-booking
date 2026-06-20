@@ -73,9 +73,11 @@ const footerLinks = {
   ],
 };
 
-export default function Footer() {
+export default function Footer({ footerCms: serverCms }: { footerCms?: Record<string, unknown> }) {
   const info = useCompanyInfo();
-  const cms = useFooterCms();
+  const clientCms = useFooterCms();
+  // Prefer server-provided data (instant), fallback to client fetch
+  const cms = (serverCms && Object.keys(serverCms).length > 0) ? serverCms : clientCms;
   const { showToast } = useToast();
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribing, setSubscribing] = useState(false);

@@ -5,6 +5,7 @@ import { ToastProvider } from '@/components/ui/Toast';
 import FloatingActions from '@/components/ui/FloatingActions';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { getBrandName, getBrandIcon, getSiteTitle } from '@/lib/brand';
+import { prisma } from '@/lib/prisma';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -31,11 +32,21 @@ export default async function RootLayout({
 }) {
   const brandName = await getBrandName();
   const brandIcon = await getBrandIcon();
+
+  // Fetch footer CMS data server-side for instant rendering
+  let footerCms: Record<string, unknown> = {};
+  try {
+    const footerPage = await prisma.page.findUnique({ where: { slug: 'footer' } });
+    if (footerPage?.content) {
+      footerCms = JSON.parse(footerPage.content);
+    }
+  } catch { /* use defaults */ }
+
   return (
     <html lang="id">
       <body className={`${inter.className} antialiased bg-gray-50 text-gray-800 min-h-screen flex flex-col selection:bg-blue-100 selection:text-blue-900`}>
         <ToastProvider>
-          <PublicLayout brandName={brandName} brandIcon={brandIcon}>{children}</PublicLayout>
+          <PublicLayout brandName={brandName} brandIcon={brandIcon} footerCms={footerCms}>{children}</PublicLayout>
           <FloatingActions />
         </ToastProvider>
       </body>
