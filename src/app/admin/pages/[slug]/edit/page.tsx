@@ -259,7 +259,6 @@ const defaultData: Record<string, PageData> = {
     ],
   },
   'invoice-classic': {
-    companyTagline: 'Perjalanan Anda, Prioritas Kami',
     headerBg: '#1e293b',
     headerBgEnd: '#1e293b',
     headerTextColor: '#ffffff',
@@ -300,7 +299,6 @@ const defaultData: Record<string, PageData> = {
     },
   },
   'invoice-modern': {
-    companyTagline: 'Perjalanan Anda, Prioritas Kami',
     headerBg: '#2563eb',
     headerBgEnd: '#4338ca',
     headerTextColor: '#ffffff',
@@ -341,7 +339,6 @@ const defaultData: Record<string, PageData> = {
     },
   },
   'invoice-minimal': {
-    companyTagline: 'Perjalanan Anda, Prioritas Kami',
     headerBg: '#ffffff',
     headerBgEnd: '#ffffff',
     headerTextColor: '#111827',
@@ -423,7 +420,6 @@ const defaultData: Record<string, PageData> = {
     },
   },
   'invoice-custom': {
-    companyTagline: 'Perjalanan Anda, Prioritas Kami',
     headerBg: '#1e3a5f',
     headerBgEnd: '#0f172a',
     headerTextColor: '#ffffff',
@@ -520,6 +516,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
   const isToursPage = slug === 'tours';
   const isBlog = slug === 'blog';
   const isInvoiceCustom = slug === 'invoice-custom' || slug.startsWith('invoice-');
+  const isInvoicePremium = slug === 'invoice-premium';
   const isGeneric = !isHero && !isValue && !isFaq && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta && !isGallery && !isTours && !isDestinations && !isDestinationsPage && !isDestinationsCta && !isToursPage && !isBlog && !isInvoiceCustom;
 
   useEffect(() => { fetchPage(); }, [slug]);
@@ -1268,13 +1265,15 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
 
             {/* Header Configuration */}
             <SectionCard icon="🎨" title="Header Invoice">
-              <div>
-                <label className="text-xs text-gray-500 mb-1 block">Company Tagline (di bawah nama brand)</label>
-                <input type="text" value={(data.companyTagline as string) || ''} onChange={e => update('companyTagline', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  placeholder="Perjalanan Anda, Prioritas Kami" />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+              {isInvoicePremium && (
+                <div className="mb-3">
+                  <label className="text-xs text-gray-500 mb-1 block">Company Tagline (di bawah nama brand)</label>
+                  <input type="text" value={(data.companyTagline as string) || ''} onChange={e => update('companyTagline', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Perjalanan Anda, Prioritas Kami" />
+                </div>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-gray-500 mb-1 block">Header Text Color</label>
                   <div className="flex gap-2">

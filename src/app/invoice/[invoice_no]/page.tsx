@@ -31,7 +31,6 @@ interface StatusBadgeConfig {
 }
 
 interface InvoiceCustomConfig {
-  companyTagline?: string;
   headerBg?: string;
   headerBgEnd?: string;
   headerTextColor?: string;
@@ -838,9 +837,6 @@ function CustomInvoice({
               </div>
               <div>
                 <h2 className="text-xl font-bold" style={{ color: hText }}>{companyName}</h2>
-                {(c.companyTagline || companyTagline) && (
-                  <p className="text-[9px] uppercase tracking-[0.2em] mt-0.5" style={{ color: hSub }}>{c.companyTagline || companyTagline}</p>
-                )}
                 <p className="text-xs" style={{ color: hSub }}>{companyAddress}</p>
               </div>
             </div>
