@@ -10,6 +10,7 @@ interface DashboardStats {
   pendingBookings: number;
   totalTours: number;
   totalReviews: number;
+  totalSubscribers: number;
   recentBookings: Array<{
     id: string;
     invoiceNo: string;
@@ -31,15 +32,17 @@ export default function AdminDashboardPage() {
 
   const fetchDashboardData = async () => {
     try {
-      const [bookingsRes, toursRes, reviewsRes] = await Promise.all([
+      const [bookingsRes, toursRes, reviewsRes, newsletterRes] = await Promise.all([
         fetch('/api/admin/bookings?limit=5'),
         fetch('/api/admin/tours'),
         fetch('/api/admin/reviews'),
+        fetch('/api/admin/newsletter?limit=1'),
       ]);
 
       const bookings = await bookingsRes.json();
       const tours = await toursRes.json();
       const reviews = await reviewsRes.json();
+      const newsletter = await newsletterRes.json();
 
       const allBookings = bookings.data || [];
       const totalRevenue = allBookings
@@ -52,6 +55,7 @@ export default function AdminDashboardPage() {
         pendingBookings: allBookings.filter((b: { status: string }) => b.status === 'PENDING').length,
         totalTours: tours.total || tours.data?.length || 0,
         totalReviews: reviews.total || reviews.data?.length || 0,
+        totalSubscribers: newsletter.total || 0,
         recentBookings: allBookings.slice(0, 5),
       });
     } catch (err) {
@@ -68,7 +72,7 @@ export default function AdminDashboardPage() {
       <div>
         <Skeleton className="h-8 w-48 mb-6" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {Array.from({ length: 4 }).map((_, i) => (
+          {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="bg-white rounded-xl shadow-sm p-5">
               <Skeleton className="h-3 w-20 mb-2" />
               <Skeleton className="h-8 w-16 mb-1" />
@@ -86,12 +90,13 @@ export default function AdminDashboardPage() {
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         {[
           { label: 'Total Booking', value: stats?.totalBookings || 0, color: 'bg-blue-500', icon: '📋' },
           { label: 'Revenue', value: formatCurrency(stats?.totalRevenue || 0), color: 'bg-green-500', icon: '💰' },
           { label: 'Menunggu Bayar', value: stats?.pendingBookings || 0, color: 'bg-orange-500', icon: '⏳' },
           { label: 'Paket Tour', value: stats?.totalTours || 0, color: 'bg-purple-500', icon: '🏝️' },
+          { label: 'Subscriber', value: stats?.totalSubscribers || 0, color: 'bg-pink-500', icon: '📧' },
         ].map((stat) => (
           <div key={stat.label} className="bg-white rounded-xl shadow-sm p-5">
             <div className="flex items-center justify-between mb-3">

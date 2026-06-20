@@ -21,6 +21,7 @@ const sidebarLinks = [
   { href: '/admin/blog', label: 'Blog', icon: '📝' },
   { href: '/admin/pages', label: 'Halaman CMS', icon: '📄' },
   { href: '/admin/reviews', label: 'Review', icon: '⭐' },
+  { href: '/admin/newsletter', label: 'Newsletter', icon: '📧' },
   { href: '/admin/users', label: 'Admin', icon: '👥' },
   { href: '/admin/settings', label: 'Pengaturan', icon: '⚙️' },
 ];
