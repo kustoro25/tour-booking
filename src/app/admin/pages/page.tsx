@@ -32,10 +32,7 @@ const pageSlugs = [
   { slug: 'privacy', title: 'Privacy Policy' },
   { slug: 'terms', title: 'Terms & Conditions' },
   { slug: 'footer', title: 'Footer' },
-  // ── Invoice themes (one per theme) ──
-  { slug: 'invoice-classic', title: 'Invoice - Classic Theme' },
-  { slug: 'invoice-modern', title: 'Invoice - Modern Theme' },
-  { slug: 'invoice-minimal', title: 'Invoice - Minimal Theme' },
+  // ── Invoice theme ──
   { slug: 'invoice-premium', title: 'Invoice - Premium Theme' },
 ];
 

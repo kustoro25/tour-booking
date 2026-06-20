@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import ImageUpload from '@/components/ui/ImageUpload';
 import { useAdminRole } from '@/lib/useAdminRole';
 
-type InvoiceTheme = 'classic' | 'modern' | 'minimal' | 'premium';
+type InvoiceTheme = 'premium';
 
 interface BankAccount {
   bank: string;
@@ -34,7 +34,7 @@ export default function AdminSettingsPage() {
     companyPhone: '',
     companyAddress: '',
     companyIcon: '',
-    invoiceTheme: 'modern' as InvoiceTheme,
+    invoiceTheme: 'premium' as InvoiceTheme,
   });
 
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>(DEFAULT_BANK_ACCOUNTS);
@@ -56,7 +56,7 @@ export default function AdminSettingsPage() {
             companyPhone: data.data.company_phone || '',
             companyAddress: data.data.company_address || '',
             companyIcon: data.data.company_icon || '',
-            invoiceTheme: (data.data.invoice_theme as InvoiceTheme) || 'modern',
+            invoiceTheme: (data.data.invoice_theme as InvoiceTheme) || 'premium',
           }));
           if (data.data.bank_accounts && Array.isArray(data.data.bank_accounts)) {
             setBankAccounts(data.data.bank_accounts);
@@ -377,11 +377,8 @@ export default function AdminSettingsPage() {
         <div className="border-t pt-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-2">🎨 Tema Invoice</h2>
           <p className="text-sm text-gray-500 mb-4">Pilih tema invoice, lalu klik <strong>Edit</strong> untuk kustomisasi warna, status badge, dan footer tema tersebut.</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
             {([
-              { key: 'classic' as InvoiceTheme, label: 'Klasik', desc: 'Elegan gelap & biru', preview: 'bg-slate-800' },
-              { key: 'modern' as InvoiceTheme, label: 'Modern', desc: 'Gradient biru segar', preview: 'bg-gradient-to-r from-blue-600 to-indigo-700' },
-              { key: 'minimal' as InvoiceTheme, label: 'Minimal', desc: 'Bersih & simpel', preview: 'bg-white border-2 border-gray-900' },
               { key: 'premium' as InvoiceTheme, label: 'Premium', desc: 'Geometris hitam & emas', preview: 'bg-[#1A1A1A]' },
             ]).map((theme) => (
               <div
@@ -394,7 +391,7 @@ export default function AdminSettingsPage() {
                 }`}
               >
                 <div className={`h-12 rounded-lg mb-3 ${theme.preview} flex items-center justify-center`}>
-                  <span className={theme.key === 'minimal' ? 'text-gray-900 text-xs font-bold' : 'text-white text-xs font-bold'}>
+                  <span className='text-white text-xs font-bold'>
                     INVOICE
                   </span>
                 </div>
