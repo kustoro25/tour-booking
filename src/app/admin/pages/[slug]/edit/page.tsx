@@ -294,6 +294,7 @@ const defaultData: Record<string, PageData> = {
     labelBank: 'Bank',
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
+    signatureImage: '',
     helpLink: '/contact',
     showSignature: true,
     showDeadline: true,
@@ -1358,6 +1359,17 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                 </div>
                 <div className="space-y-3">
                   <p className="text-xs font-semibold text-gray-600 border-b pb-1">Kolom Kanan — Tanda Tangan</p>
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1 block">Upload Gambar Tanda Tangan (PNG, max lebar 160px)</label>
+                    <ImageUpload
+                      value={(data.signatureImage as string) || ''}
+                      onChange={(url) => update('signatureImage', url)}
+                      label=""
+                      folder="tour-booking/signatures"
+                      placeholder="Upload gambar tanda tangan"
+                    />
+                    <p className="text-[10px] text-gray-400 mt-1">Kosongkan untuk tampil garis + teks.</p>
+                  </div>
                   <div>
                     <label className="text-xs text-gray-500 mb-1 block">Label "Authorised Sign"</label>
                     <input type="text" value={(data.labelSignature as string) || ''} onChange={e => update('labelSignature', e.target.value)}

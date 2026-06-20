@@ -64,6 +64,7 @@ interface InvoiceCustomConfig {
   labelBank?: string;
   labelAccountName?: string;
   labelSignature?: string;
+  signatureImage?: string;
   labelPublishedDate?: string;
   helpLink?: string;
   showSignature?: boolean;
@@ -107,6 +108,7 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     labelBank: 'Bank',
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
+    signatureImage: '',
     helpLink: '/contact',
     footerText: 'Terima kasih telah memilih {nama} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {phone} atau {email}.',
     showSignature: true,
@@ -511,10 +513,18 @@ function CustomInvoice({
             {c.showSignature !== false && (
               <div className="flex flex-col justify-end">
                 <div className="text-right">
-                  <div className="inline-block">
-                    <div className="w-32 h-px bg-gray-300 mb-1" />
-                    <p className="text-[9px] text-gray-400 uppercase tracking-wider">{T.L.signature}</p>
-                  </div>
+                  {c.signatureImage ? (
+                    <div className="inline-block">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={c.signatureImage} alt="Tanda Tangan" className="max-h-16 max-w-[160px] object-contain mb-1" />
+                      <p className="text-[9px] text-gray-400 uppercase tracking-wider">{T.L.signature}</p>
+                    </div>
+                  ) : (
+                    <div className="inline-block">
+                      <div className="w-32 h-px bg-gray-300 mb-1" />
+                      <p className="text-[9px] text-gray-400 uppercase tracking-wider">{T.L.signature}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
