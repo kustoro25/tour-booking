@@ -24,7 +24,8 @@ interface Booking {
 }
 
 export default function AdminBookingsPage() {
-  const { isSuperAdmin } = useAdminRole();
+  const { isSuperAdmin, role } = useAdminRole();
+  const canManageBookings = isSuperAdmin || role === 'ADMIN';
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
@@ -37,6 +38,10 @@ export default function AdminBookingsPage() {
     setShowBlocked(true);
     setTimeout(() => setShowBlocked(false), 3000);
   };
+
+  const blockedMessage = role === 'CONTENT_MANAGER'
+    ? '🚫 Hanya Super Admin & Admin Operasional yang bisa mengelola booking.'
+    : '🚫 Hanya Super Admin yang bisa mengelola booking.';
 
   useEffect(() => { fetchBookings(); }, [statusFilter]);
 
@@ -120,7 +125,7 @@ export default function AdminBookingsPage() {
 
       {showBlocked && (
         <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
-          <p className="text-red-600 text-sm">🚫 Hanya Super Admin yang bisa mengelola booking.</p>
+          <p className="text-red-600 text-sm">{blockedMessage}</p>
         </div>
       )}
 
@@ -194,13 +199,13 @@ export default function AdminBookingsPage() {
                   <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
                     <select
                       value={b.status}
-                      onChange={e => isSuperAdmin ? handleStatusUpdate(b.id, e.target.value) : handleBlocked()}
+                      onChange={e => canManageBookings ? handleStatusUpdate(b.id, e.target.value) : handleBlocked()}
                       className="text-xs border border-gray-300 rounded-lg px-2 py-1.5 flex-1 bg-white"
                     >
                       {Object.keys(OrderStatusLabels).map(s => <option key={s} value={s}>{OrderStatusLabels[s as OrderStatus]}</option>)}
                     </select>
                     <Link href={`/admin/bookings/${b.id}`} className="text-blue-600 hover:text-blue-700 text-xs font-medium">Detail</Link>
-                    <button onClick={isSuperAdmin ? () => setDeleteTarget({ id: b.id, invoiceNo: b.invoiceNo }) : handleBlocked} className="text-red-500 hover:text-red-700 text-xs font-medium">Hapus</button>
+                    <button onClick={canManageBookings ? () => setDeleteTarget({ id: b.id, invoiceNo: b.invoiceNo }) : handleBlocked} className="text-red-500 hover:text-red-700 text-xs font-medium">Hapus</button>
                   </div>
                 </div>
               ))
@@ -236,7 +241,7 @@ export default function AdminBookingsPage() {
                     <td className="px-4 py-3 text-center">
                       <select
                         value={b.status}
-                        onChange={e => isSuperAdmin ? handleStatusUpdate(b.id, e.target.value) : handleBlocked()}
+                        onChange={e => canManageBookings ? handleStatusUpdate(b.id, e.target.value) : handleBlocked()}
                         className="text-xs border border-gray-300 rounded px-2 py-1"
                       >
                         {Object.keys(OrderStatusLabels).map(s => <option key={s} value={s}>{OrderStatusLabels[s as OrderStatus]}</option>)}
@@ -246,7 +251,7 @@ export default function AdminBookingsPage() {
                       <div className="flex items-center justify-center gap-3">
                         <Link href={`/admin/bookings/${b.id}`} className="text-blue-600 hover:text-blue-700 text-xs">Detail</Link>
                         <button
-                          onClick={isSuperAdmin ? () => setDeleteTarget({ id: b.id, invoiceNo: b.invoiceNo }) : handleBlocked}
+                          onClick={canManageBookings ? () => setDeleteTarget({ id: b.id, invoiceNo: b.invoiceNo }) : handleBlocked}
                           className="text-red-500 hover:text-red-700 text-xs"
                         >
                           Hapus

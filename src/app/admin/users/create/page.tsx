@@ -8,7 +8,7 @@ import { useAdminRole } from '@/lib/useAdminRole';
 
 export default function AdminUserCreatePage() {
   const router = useRouter();
-  const { isSuperAdmin } = useAdminRole();
+  const { isSuperAdmin, role: currentUserRole } = useAdminRole();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -127,7 +127,9 @@ export default function AdminUserCreatePage() {
 
         {showBlocked && (
           <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-            <p className="text-red-600 text-sm">🚫 Hanya Super Admin yang bisa menambah admin baru.</p>
+            <p className="text-red-600 text-sm">{currentUserRole === 'CONTENT_MANAGER'
+              ? '🚫 Hanya Super Admin yang bisa menambah admin baru. Hubungi Admin Operasional untuk bantuan.'
+              : '🚫 Hanya Super Admin yang bisa menambah admin baru.'}</p>
           </div>
         )}
 

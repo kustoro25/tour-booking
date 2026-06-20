@@ -8,7 +8,8 @@ import { useToast } from '@/components/ui/Toast';
 import { useAdminRole } from '@/lib/useAdminRole';
 
 export default function AdminDestinationsPage() {
-  const { isSuperAdmin } = useAdminRole();
+  const { isSuperAdmin, role } = useAdminRole();
+  const canManageDestinations = isSuperAdmin || role === 'ADMIN';
   const [destinations, setDestinations] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
@@ -20,6 +21,10 @@ export default function AdminDestinationsPage() {
     setShowBlocked(true);
     setTimeout(() => setShowBlocked(false), 3000);
   };
+
+  const blockedMessage = role === 'CONTENT_MANAGER'
+    ? '🚫 Hanya Super Admin & Admin Operasional yang bisa menambah/menghapus destinasi.'
+    : '🚫 Hanya Super Admin yang bisa menambah/menghapus destinasi.';
 
   useEffect(() => {
     fetchDestinations();
@@ -108,7 +113,7 @@ export default function AdminDestinationsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Destinasi</h1>
           <p className="text-sm text-gray-500 mt-1">Kelola halaman destinasi wisata</p>
         </div>
-        {isSuperAdmin ? (
+        {canManageDestinations ? (
           <Link
             href="/admin/destinations/create"
             className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 whitespace-nowrap"
@@ -127,7 +132,7 @@ export default function AdminDestinationsPage() {
 
       {showBlocked && (
         <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
-          <p className="text-red-600 text-sm">🚫 Hanya Super Admin yang bisa menambah/menghapus destinasi.</p>
+          <p className="text-red-600 text-sm">{blockedMessage}</p>
         </div>
       )}
 
@@ -162,7 +167,7 @@ export default function AdminDestinationsPage() {
                 </div>
                 <div className="flex items-center gap-3 pt-1 border-t border-gray-100">
                   <Link href={`/admin/destinations/${dest.id}/edit`} className="text-blue-600 hover:text-blue-700 text-xs font-medium">Edit</Link>
-                  {isSuperAdmin ? (
+                  {canManageDestinations ? (
                     <button onClick={() => setDeleteTarget({ id: dest.id as string, name: dest.name as string })} className="text-red-600 hover:text-red-700 text-xs font-medium">Hapus</button>
                   ) : (
                     <button onClick={handleBlocked} className="text-red-600 hover:text-red-700 text-xs font-medium">Hapus</button>
@@ -244,7 +249,7 @@ export default function AdminDestinationsPage() {
                       >
                         Edit
                       </Link>
-                      {isSuperAdmin ? (
+                      {canManageDestinations ? (
                         <button
                           onClick={() => setDeleteTarget({ id: dest.id as string, name: dest.name as string })}
                           className="text-red-600 hover:text-red-700 text-xs whitespace-nowrap"

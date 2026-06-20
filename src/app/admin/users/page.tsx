@@ -18,7 +18,7 @@ interface AdminUser {
 }
 
 export default function AdminUsersPage() {
-  const { isSuperAdmin } = useAdminRole();
+  const { isSuperAdmin, role } = useAdminRole();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -31,6 +31,10 @@ export default function AdminUsersPage() {
     setShowBlocked(true);
     setTimeout(() => setShowBlocked(false), 3000);
   };
+
+  const blockedMessage = role === 'CONTENT_MANAGER'
+    ? '🚫 Hanya Super Admin yang bisa menambah/menghapus admin. Hubungi Admin Operasional untuk bantuan.'
+    : '🚫 Hanya Super Admin yang bisa menambah/menghapus admin.';
 
   useEffect(() => {
     fetchUsers();
@@ -160,7 +164,7 @@ export default function AdminUsersPage() {
 
       {showBlocked && (
         <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
-          <p className="text-red-600 text-sm">🚫 Hanya Super Admin yang bisa menambah admin baru.</p>
+          <p className="text-red-600 text-sm">{blockedMessage}</p>
         </div>
       )}
 

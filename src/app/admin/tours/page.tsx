@@ -25,7 +25,8 @@ interface Tour {
 const ITEMS_PER_PAGE = 6;
 
 export default function AdminToursPage() {
-  const { isSuperAdmin } = useAdminRole();
+  const { isSuperAdmin, role } = useAdminRole();
+  const canManageTours = isSuperAdmin || role === 'ADMIN';
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -40,6 +41,10 @@ export default function AdminToursPage() {
     setShowBlocked(true);
     setTimeout(() => setShowBlocked(false), 3000);
   };
+
+  const blockedMessage = role === 'CONTENT_MANAGER'
+    ? '🚫 Hanya Super Admin & Admin Operasional yang bisa menambah/menghapus paket tour.'
+    : '🚫 Hanya Super Admin yang bisa menambah/menghapus paket tour.';
 
   useEffect(() => { fetchTours(); }, []);
 
@@ -134,7 +139,7 @@ export default function AdminToursPage() {
 
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Paket Tour</h1>
-        {isSuperAdmin ? (
+        {canManageTours ? (
           <Link href="/admin/tours/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 whitespace-nowrap transition-colors">
             + Tambah Paket
           </Link>
@@ -147,7 +152,7 @@ export default function AdminToursPage() {
 
       {showBlocked && (
         <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
-          <p className="text-red-600 text-sm">🚫 Hanya Super Admin yang bisa menambah/menghapus paket tour.</p>
+          <p className="text-red-600 text-sm">{blockedMessage}</p>
         </div>
       )}
 
@@ -235,7 +240,7 @@ export default function AdminToursPage() {
                   </svg>
                 </Link>
                 <div className="flex-1" />
-                {isSuperAdmin ? (
+                {canManageTours ? (
                   <button onClick={() => setDeleteTarget(tour)} title="Hapus" className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

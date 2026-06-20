@@ -19,7 +19,7 @@ const DEFAULT_BANK_ACCOUNTS: BankAccount[] = [
 ];
 
 export default function AdminSettingsPage() {
-  const { isSuperAdmin, loading: roleLoading } = useAdminRole();
+  const { isSuperAdmin, role, loading: roleLoading } = useAdminRole();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -430,7 +430,9 @@ export default function AdminSettingsPage() {
           )}
           {showBlocked && (
             <span className="text-red-600 text-sm font-medium animate-fade-in">
-              🚫 Hanya Super Admin yang bisa mengubah pengaturan.
+              {role === 'CONTENT_MANAGER'
+                ? '🚫 Hanya Super Admin yang bisa mengubah pengaturan. Hubungi Admin Operasional untuk bantuan.'
+                : '🚫 Hanya Super Admin yang bisa mengubah pengaturan.'}
             </span>
           )}
         </div>

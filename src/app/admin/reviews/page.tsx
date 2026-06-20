@@ -17,7 +17,8 @@ interface Review {
 }
 
 export default function AdminReviewsPage() {
-  const { isSuperAdmin } = useAdminRole();
+  const { isSuperAdmin, role } = useAdminRole();
+  const canManageReviews = isSuperAdmin || role === 'ADMIN';
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
@@ -27,6 +28,10 @@ export default function AdminReviewsPage() {
     setShowBlocked(true);
     setTimeout(() => setShowBlocked(false), 3000);
   };
+
+  const blockedMessage = role === 'CONTENT_MANAGER'
+    ? '🚫 Hanya Super Admin & Admin Operasional yang bisa mengelola review.'
+    : '🚫 Hanya Super Admin yang bisa mengelola review.';
 
   useEffect(() => { fetchReviews(); }, [statusFilter]);
 
@@ -57,7 +62,7 @@ export default function AdminReviewsPage() {
 
       {showBlocked && (
         <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
-          <p className="text-red-600 text-sm">🚫 Hanya Super Admin yang bisa mengelola review.</p>
+          <p className="text-red-600 text-sm">{blockedMessage}</p>
         </div>
       )}
 
@@ -106,10 +111,10 @@ export default function AdminReviewsPage() {
                 </div>
                 <div className="flex gap-2 sm:ml-4">
                   {review.status !== 'APPROVED' && (
-                    <button onClick={isSuperAdmin ? () => handleApprove(review.id) : handleBlocked} className="text-green-600 hover:text-green-700 text-xs font-medium">Setujui</button>
+                    <button onClick={canManageReviews ? () => handleApprove(review.id) : handleBlocked} className="text-green-600 hover:text-green-700 text-xs font-medium">Setujui</button>
                   )}
                   {review.status !== 'HIDDEN' && (
-                    <button onClick={isSuperAdmin ? () => handleHide(review.id) : handleBlocked} className="text-gray-500 hover:text-gray-700 text-xs font-medium">Sembunyikan</button>
+                    <button onClick={canManageReviews ? () => handleHide(review.id) : handleBlocked} className="text-gray-500 hover:text-gray-700 text-xs font-medium">Sembunyikan</button>
                   )}
                 </div>
               </div>

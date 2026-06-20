@@ -383,7 +383,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
   const { slug } = use(params);
   const router = useRouter();
   const { showToast } = useToast();
-  const { isSuperAdmin } = useAdminRole();
+  const { isSuperAdmin, role } = useAdminRole();
   const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -1507,7 +1507,9 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
           <Link href="/admin/pages" className="text-sm text-gray-500 hover:text-gray-700 py-2.5">Batal</Link>
           {showBlocked && (
             <span className="text-red-600 text-sm font-medium animate-fade-in">
-              🚫 Hanya Super Admin yang bisa mengubah halaman ini.
+              🚫 {role === 'CONTENT_MANAGER'
+                ? 'Hanya Super Admin yang bisa menyimpan perubahan halaman CMS. Hubungi Admin Operasional untuk bantuan.'
+                : 'Hanya Super Admin yang bisa menyimpan perubahan halaman CMS.'}
             </span>
           )}
         </div>
