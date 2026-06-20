@@ -11,7 +11,10 @@ export async function GET(
     const { slug } = await params;
     const page = await prisma.page.findUnique({ where: { slug } });
     if (!page) return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 });
-    return NextResponse.json({ success: true, data: page });
+    return NextResponse.json(
+      { success: true, data: page },
+      { headers: { 'Cache-Control': 'no-store, max-age=0' } }
+    );
   } catch (error: unknown) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });

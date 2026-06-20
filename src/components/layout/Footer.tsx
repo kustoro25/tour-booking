@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useToast } from '@/components/ui/Toast';
 
 function useCompanyInfo() {
@@ -18,9 +19,10 @@ function useCompanyInfo() {
 }
 
 function useFooterCms() {
+  const pathname = usePathname();
   const [cms, setCms] = useState<{ text?: string; copyright?: string; socialLinks?: { platform: string; url: string; icon: string }[] }>({});
   useEffect(() => {
-    fetch('/api/admin/pages/footer')
+    fetch('/api/admin/pages/footer', { cache: 'no-store' })
       .then(r => r.json())
       .then(data => {
         if (data.success && data.data?.content) {
@@ -28,7 +30,7 @@ function useFooterCms() {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [pathname]);
   return cms;
 }
 
