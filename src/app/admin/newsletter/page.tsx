@@ -66,6 +66,32 @@ export default function AdminNewsletterPage() {
     }
   };
 
+  const handleExportCSV = async () => {
+    try {
+      const res = await fetch('/api/admin/newsletter?limit=99999');
+      const data = await res.json();
+      if (!data.success || !data.data?.length) {
+        showToast('Tidak ada data untuk diexport', 'error');
+        return;
+      }
+      const header = 'Email,Tanggal Bergabung';
+      const rows = data.data.map((s: Subscriber) =>
+        `"${s.email}","${formatDate(s.createdAt)}"`
+      );
+      const csv = [header, ...rows].join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `newsletter-subscribers-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast(`${data.data.length} subscriber berhasil diexport`, 'success');
+    } catch {
+      showToast('Gagal mengexport data', 'error');
+    }
+  };
+
   const handleSendNewsletter = async () => {
     if (!subject.trim()) { showToast('Subject wajib diisi', 'error'); return; }
     if (!body.trim()) { showToast('Konten wajib diisi', 'error'); return; }
@@ -107,12 +133,20 @@ export default function AdminNewsletterPage() {
             {total} subscriber · Kelola daftar email & kirim newsletter
           </p>
         </div>
-        <button
-          onClick={() => setShowCompose(!showCompose)}
-          className="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors"
-        >
-          {showCompose ? '✕ Tutup' : '✉️ Kirim Newsletter'}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportCSV}
+            className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+          >
+            📥 Export CSV
+          </button>
+          <button
+            onClick={() => setShowCompose(!showCompose)}
+            className="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors"
+          >
+            {showCompose ? '✕ Tutup' : '✉️ Kirim Newsletter'}
+          </button>
+        </div>
       </div>
 
       {/* ── Compose Newsletter ── */}
