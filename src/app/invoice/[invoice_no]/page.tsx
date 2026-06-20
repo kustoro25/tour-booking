@@ -46,6 +46,7 @@ interface InvoiceCustomConfig {
   headingTerms?: string;
   deadlineText?: string;
   termsText?: string;
+  paymentInstructionsText?: string;
   footerText?: string;
   labelInvoiceNo?: string;
   labelInvoiceDate?: string;
@@ -54,6 +55,8 @@ interface InvoiceCustomConfig {
   labelDuration?: string;
   labelAdults?: string;
   labelChildren?: string;
+  labelPricePerAdult?: string;
+  labelPricePerChild?: string;
   labelDiscount?: string;
   labelSubTotal?: string;
   labelTax?: string;
@@ -86,6 +89,7 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     headingTerms: 'Syarat & Ketentuan',
     deadlineText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan.',
     termsText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
+    paymentInstructionsText: 'Silakan lakukan transfer ke salah satu rekening bank di bawah ini. Pastikan jumlah yang ditransfer sesuai dengan total invoice. Setelah transfer, konfirmasi akan dikirim otomatis ke email Anda.',
     labelInvoiceNo: 'Invoice#',
     labelInvoiceDate: 'Tanggal',
     labelPaymentDeadline: 'Batas Pembayaran',
@@ -94,6 +98,8 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     labelDuration: 'Durasi',
     labelAdults: 'Dewasa',
     labelChildren: 'Anak',
+    labelPricePerAdult: 'Harga / Dewasa',
+    labelPricePerChild: 'Harga / Anak',
     labelDiscount: 'Diskon',
     labelSubTotal: 'Sub Total',
     labelTax: 'Tax',
@@ -154,10 +160,29 @@ export default async function InvoicePage({ params }: PageProps) {
 
   const brandName = await getBrandName();
 
+  // Read company details from settings
+  let companyPhone = '+62 812-3456-7890';
+  let companyEmail = 'info@jelajahnusantara.com';
+  let companyAddress = 'Jl. Pariwisata No. 123, Jakarta Selatan';
+  try {
+    const phoneSetting = await prisma.setting.findUnique({ where: { key: 'company_phone' } });
+    if (phoneSetting) {
+      const val = JSON.parse(phoneSetting.value);
+      if (typeof val === 'string' && val.trim()) companyPhone = val.trim();
+    }
+    const emailSetting = await prisma.setting.findUnique({ where: { key: 'company_email' } });
+    if (emailSetting) {
+      const val = JSON.parse(emailSetting.value);
+      if (typeof val === 'string' && val.trim()) companyEmail = val.trim();
+    }
+    const addrSetting = await prisma.setting.findUnique({ where: { key: 'company_address' } });
+    if (addrSetting) {
+      const val = JSON.parse(addrSetting.value);
+      if (typeof val === 'string' && val.trim()) companyAddress = val.trim();
+    }
+  } catch { /* fallback to defaults */ }
+
   const companyName = brandName;
-  const companyAddress = 'Jl. Pariwisata No. 123, Jakarta Selatan';
-  const companyPhone = '+62 812-3456-7890';
-  const companyEmail = 'info@jelajahnusantara.com';
   const companyTagline = 'Perjalanan Anda, Prioritas Kami';
 
   const statusLabel = OrderStatusLabels[order.status as keyof typeof OrderStatusLabels] || order.status;
@@ -285,6 +310,8 @@ function CustomInvoice({
       duration: c.labelDuration || 'Durasi',
       adults: c.labelAdults || 'Dewasa',
       children: c.labelChildren || 'Anak',
+      pricePerAdult: c.labelPricePerAdult || 'Harga / Dewasa',
+      pricePerChild: c.labelPricePerChild || 'Harga / Anak',
       discount: c.labelDiscount || 'Diskon',
       subTotal: c.labelSubTotal || 'Sub Total',
       tax: c.labelTax || 'Tax',
@@ -400,12 +427,36 @@ function CustomInvoice({
             <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: accentText }}>{T.priceBreakdown}</h3>
           </div>
           <div className="p-5">
-            {discountPct > 0 && (
+            {/* Adult line */}
+            <div className="flex justify-between items-center py-2 text-sm">
+              <span className="text-gray-600">{T.L.adults} ({order.adults} × {formatCurrency(priceAdult)})</span>
+              <span className="font-medium text-gray-800">{formatCurrency(adultTotal)}</span>
+            </div>
+            {/* Child line */}
+            {order.children > 0 && (
               <div className="flex justify-between items-center py-2 text-sm">
-                <span className="text-gray-500">{T.L.discount}</span>
-                <span className="font-medium text-green-600">-{discountPct}%</span>
+                <span className="text-gray-600">{T.L.children} ({order.children} × {formatCurrency(priceChild)})</span>
+                <span className="font-medium text-gray-800">{formatCurrency(childTotal)}</span>
               </div>
             )}
+            {/* Sub Total */}
+            <div className="flex justify-between items-center py-2 text-sm border-t border-gray-100">
+              <span className="text-gray-600">{T.L.subTotal}</span>
+              <span className="font-semibold text-gray-800">{formatCurrency(subTotal)}</span>
+            </div>
+            {/* Discount */}
+            {discountPct > 0 && (
+              <div className="flex justify-between items-center py-2 text-sm">
+                <span className="text-green-600">{T.L.discount} ({discountPct}%)</span>
+                <span className="font-medium text-green-600">-{formatCurrency(discountAmount)}</span>
+              </div>
+            )}
+            {/* Tax */}
+            <div className="flex justify-between items-center py-2 text-sm">
+              <span className="text-gray-600">{T.L.tax}</span>
+              <span className="font-medium text-gray-800">0%</span>
+            </div>
+            {/* Grand Total */}
             <div className="flex justify-between items-center pt-3" style={{ borderTop: `2px solid ${border}` }}>
               <span className="text-base font-bold text-gray-900">{T.L.total}</span>
               <span className="text-xl font-extrabold" style={{ color: accent }}>{formatCurrency(grandTotal)}</span>
@@ -418,6 +469,10 @@ function CustomInvoice({
           <h4 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">
             {T.paymentInfo}
           </h4>
+          {/* Transfer instructions text */}
+          <p className="text-xs text-gray-600 leading-relaxed mb-4">
+            {c.paymentInstructionsText || 'Silakan lakukan transfer ke salah satu rekening bank di bawah ini. Pastikan jumlah yang ditransfer sesuai dengan total invoice. Setelah transfer, konfirmasi akan dikirim otomatis ke email Anda.'}
+          </p>
           <div className="space-y-2 mb-4">
             {bankAccounts.map((bank) => (
               <div key={bank.bank} className="grid grid-cols-[100px_1fr_1fr_auto] items-center gap-x-3 text-xs">

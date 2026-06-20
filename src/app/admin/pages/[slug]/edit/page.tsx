@@ -275,6 +275,7 @@ const defaultData: Record<string, PageData> = {
     headingTerms: 'Syarat & Ketentuan',
     deadlineText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan.',
     termsText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
+    paymentInstructionsText: 'Silakan lakukan transfer ke salah satu rekening bank di bawah ini. Pastikan jumlah yang ditransfer sesuai dengan total invoice. Setelah transfer, konfirmasi akan dikirim otomatis ke email Anda.',
     footerText: 'Terima kasih telah memilih {nama} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {phone} atau {email}.',
     labelInvoiceNo: 'Invoice#',
     labelInvoiceDate: 'Tanggal',
@@ -284,6 +285,8 @@ const defaultData: Record<string, PageData> = {
     labelDuration: 'Durasi',
     labelAdults: 'Dewasa',
     labelChildren: 'Anak',
+    labelPricePerAdult: 'Harga / Dewasa',
+    labelPricePerChild: 'Harga / Anak',
     labelDiscount: 'Diskon',
     labelSubTotal: 'Sub Total',
     labelTax: 'Tax',
@@ -1257,17 +1260,20 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
 
             {/* 5. RINCIAN BIAYA */}
             <SectionCard icon="💰" title="⑤ Rincian Biaya">
+              <p className="text-xs text-gray-400 mb-3">Bagian ini menampilkan detail biaya: Dewasa (qty × harga), Anak, Sub Total, Diskon, Tax, dan Total.</p>
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Heading "Rincian Biaya"</label>
                 <input type="text" value={(data.headingPriceBreakdown as string) || ''} onChange={e => update('headingPriceBreakdown', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-3" placeholder="Rincian Biaya" />
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
-                  { key: 'labelDiscount', label: 'Diskon' },
-                  { key: 'labelSubTotal', label: 'Sub Total' },
-                  { key: 'labelTax', label: 'Tax' },
-                  { key: 'labelTotal', label: 'Total' },
+                  { key: 'labelAdults', label: 'Label "Dewasa"' },
+                  { key: 'labelChildren', label: 'Label "Anak"' },
+                  { key: 'labelSubTotal', label: 'Label "Sub Total"' },
+                  { key: 'labelDiscount', label: 'Label "Diskon"' },
+                  { key: 'labelTax', label: 'Label "Tax"' },
+                  { key: 'labelTotal', label: 'Label "Total"' },
                 ].map((f) => (
                   <div key={f.key}>
                     <label className="text-[10px] text-gray-400 block mb-0.5">{f.label}</label>
@@ -1285,6 +1291,12 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                 <label className="text-xs text-gray-500 mb-1 block">Heading "Informasi Pembayaran"</label>
                 <input type="text" value={(data.headingPaymentInfo as string) || ''} onChange={e => update('headingPaymentInfo', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-3" placeholder="Informasi Pembayaran" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Teks Instruksi Transfer (tampil sebelum daftar bank)</label>
+                <textarea value={(data.paymentInstructionsText as string) || ''} onChange={e => update('paymentInstructionsText', e.target.value)} rows={2}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-3"
+                  placeholder="Silakan lakukan transfer ke salah satu rekening bank di bawah ini..." />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {[
@@ -1362,6 +1374,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
 
             {/* 9. FOOTER + TOMBOL */}
             <SectionCard icon="📄" title="⑨ Footer & Tombol Aksi">
+              <p className="text-xs text-gray-400 mb-3">Placeholder <code>{'{nama}'}</code>, <code>{'{phone}'}</code>, <code>{'{email}'}</code> otomatis diambil dari <strong>Settings → Brand Identity</strong> (Nama Brand, No WhatsApp, Email Bisnis).</p>
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Teks Footer (placeholder: {'{nama}'}, {'{phone}'}, {'{email}'})</label>
                 <textarea value={(data.footerText as string) || ''} onChange={e => update('footerText', e.target.value)} rows={2}
