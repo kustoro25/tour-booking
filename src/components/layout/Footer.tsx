@@ -21,8 +21,20 @@ function useCompanyInfo() {
 function useFooterCms() {
   const pathname = usePathname();
   const [cms, setCms] = useState<{ text?: string; copyright?: string; socialLinks?: { platform: string; url: string; icon: string }[] }>({});
+  const [fetchKey, setFetchKey] = useState(0);
+
   useEffect(() => {
-    fetch('/api/admin/pages/footer', { cache: 'no-store' })
+    // Re-fetch on every route change by incrementing key
+    setFetchKey((k: number) => k + 1);
+  }, [pathname]);
+
+  useEffect(() => {
+    // Cache-busting: add timestamp to URL to bypass browser cache
+    const ts = Date.now();
+    fetch(`/api/admin/pages/footer?_t=${ts}`, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
+    })
       .then(r => r.json())
       .then(data => {
         if (data.success && data.data?.content) {
@@ -30,7 +42,7 @@ function useFooterCms() {
         }
       })
       .catch(() => {});
-  }, [pathname]);
+  }, [fetchKey]);
   return cms;
 }
 
