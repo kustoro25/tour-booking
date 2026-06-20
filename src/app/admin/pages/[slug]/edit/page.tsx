@@ -274,7 +274,7 @@ const defaultData: Record<string, PageData> = {
     headingTerms: 'Syarat & Ketentuan',
     deadlineText: 'Mohon selesaikan pembayaran sebelum {{date}}. Jika melewati batas waktu, pesanan akan otomatis dibatalkan.',
     termsText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
-    footerText: '',
+    footerText: 'Terima kasih telah memilih {nama} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {phone} atau {email}.',
     labelInvoiceNo: 'Nomor Invoice',
     labelInvoiceDate: 'Tanggal Invoice',
     labelPaymentDeadline: 'Batas Pembayaran',
@@ -291,8 +291,9 @@ const defaultData: Record<string, PageData> = {
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
     helpLink: '/contact',
-    showSignature: true,
+    showSignature: false,
     showDeadline: true,
+    showTerms: false,
     statusBadges: {
       PENDING: { bg: '#fffbeb', text: '#b45309', border: '#fcd34d', dot: '#f59e0b', icon: '⏳' },
       CONFIRMED: { bg: '#ecfdf5', text: '#047857', border: '#6ee7b7', dot: '#10b981', icon: '✅' },
@@ -315,7 +316,7 @@ const defaultData: Record<string, PageData> = {
     headingTerms: 'Syarat & Ketentuan',
     deadlineText: 'Mohon selesaikan pembayaran sebelum {{date}}. Jika melewati batas waktu, pesanan akan otomatis dibatalkan.',
     termsText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
-    footerText: '',
+    footerText: 'Terima kasih telah memilih {nama} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {phone} atau {email}.',
     labelInvoiceNo: 'Nomor Invoice',
     labelInvoiceDate: 'Tanggal Invoice',
     labelPaymentDeadline: 'Batas Pembayaran',
@@ -332,8 +333,9 @@ const defaultData: Record<string, PageData> = {
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
     helpLink: '/contact',
-    showSignature: true,
+    showSignature: false,
     showDeadline: true,
+    showTerms: false,
     statusBadges: {
       PENDING: { bg: '#fffbeb', text: '#b45309', border: '#fcd34d', dot: '#f59e0b', icon: '⏳' },
       CONFIRMED: { bg: '#ecfdf5', text: '#047857', border: '#6ee7b7', dot: '#10b981', icon: '✅' },
@@ -356,7 +358,7 @@ const defaultData: Record<string, PageData> = {
     headingTerms: 'Syarat & Ketentuan',
     deadlineText: 'Mohon selesaikan pembayaran sebelum {{date}}. Jika melewati batas waktu, pesanan akan otomatis dibatalkan.',
     termsText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
-    footerText: '',
+    footerText: 'Terima kasih telah memilih {nama} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {phone} atau {email}.',
     labelInvoiceNo: 'Nomor Invoice',
     labelInvoiceDate: 'Tanggal Invoice',
     labelPaymentDeadline: 'Batas Pembayaran',
@@ -373,8 +375,9 @@ const defaultData: Record<string, PageData> = {
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
     helpLink: '/contact',
-    showSignature: true,
+    showSignature: false,
     showDeadline: true,
+    showTerms: false,
     statusBadges: {
       PENDING: { bg: '#fff7ed', text: '#9a3412', border: '#fdba74', dot: '#f97316', icon: '⏳' },
       CONFIRMED: { bg: '#f0fdf4', text: '#166534', border: '#86efac', dot: '#22c55e', icon: '✅' },
@@ -398,7 +401,7 @@ const defaultData: Record<string, PageData> = {
     headingTerms: 'Syarat & Ketentuan',
     deadlineText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan.',
     termsText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
-    footerText: '',
+    footerText: 'Terima kasih telah memilih {nama} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {phone} atau {email}.',
     labelInvoiceNo: 'Invoice#',
     labelInvoiceDate: 'Tanggal',
     labelPaymentDeadline: 'Batas Pembayaran',
@@ -417,6 +420,7 @@ const defaultData: Record<string, PageData> = {
     helpLink: '/contact',
     showSignature: true,
     showDeadline: true,
+    showTerms: true,
     statusBadges: {
       PENDING: { bg: '#2d1f00', text: '#f59e0b', border: '#78350f', dot: '#f59e0b', icon: '⏳' },
       CONFIRMED: { bg: '#052e16', text: '#22c55e', border: '#166534', dot: '#22c55e', icon: '✅' },
@@ -439,7 +443,7 @@ const defaultData: Record<string, PageData> = {
     headingTerms: 'Syarat & Ketentuan',
     deadlineText: 'Mohon selesaikan pembayaran sebelum {{date}}. Jika melewati batas waktu, pesanan akan otomatis dibatalkan.',
     termsText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
-    footerText: '',
+    footerText: 'Terima kasih telah memilih {nama} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {phone} atau {email}.',
     labelInvoiceNo: 'Nomor Invoice',
     labelInvoiceDate: 'Tanggal Invoice',
     labelPaymentDeadline: 'Batas Pembayaran',
@@ -456,8 +460,9 @@ const defaultData: Record<string, PageData> = {
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
     helpLink: '/contact',
-    showSignature: true,
+    showSignature: false,
     showDeadline: true,
+    showTerms: false,
     statusBadges: {
       PENDING: { bg: '#fffbeb', text: '#b45309', border: '#fcd34d', dot: '#f59e0b', icon: '⏳' },
       CONFIRMED: { bg: '#ecfdf5', text: '#047857', border: '#6ee7b7', dot: '#10b981', icon: '✅' },
@@ -1432,41 +1437,8 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
               </div>
             </SectionCard>
 
-            {/* 8. SYARAT & KETENTUAN + TANDA TANGAN */}
-            <SectionCard icon="📜" title="⑧ Syarat & Ketentuan + Tanda Tangan">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <p className="text-xs font-semibold text-gray-600 border-b pb-1">Kolom Kiri</p>
-                  <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Heading "Syarat & Ketentuan"</label>
-                    <input type="text" value={(data.headingTerms as string) || ''} onChange={e => update('headingTerms', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Syarat & Ketentuan" />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Teks Syarat & Ketentuan</label>
-                    <textarea value={(data.termsText as string) || ''} onChange={e => update('termsText', e.target.value)} rows={3}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                      placeholder="Pembayaran harus dilakukan sebelum batas waktu yang ditentukan..." />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <p className="text-xs font-semibold text-gray-600 border-b pb-1">Kolom Kanan — Tanda Tangan</p>
-                  <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Label "Authorised Sign"</label>
-                    <input type="text" value={(data.labelSignature as string) || ''} onChange={e => update('labelSignature', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Authorised Sign" />
-                  </div>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={!!data.showSignature} onChange={e => update('showSignature', e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                    <span className="text-sm text-gray-700">Tampilkan Tanda Tangan</span>
-                  </label>
-                </div>
-              </div>
-            </SectionCard>
-
-            {/* 9. FOOTER + TOMBOL */}
-            <SectionCard icon="📄" title="⑨ Footer & Tombol Aksi">
+            {/* 8. FOOTER + TOMBOL */}
+            <SectionCard icon="📄" title="⑧ Footer & Tombol Aksi">
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Teks Footer (placeholder: {'{nama}'}, {'{phone}'}, {'{email}'})</label>
                 <textarea value={(data.footerText as string) || ''} onChange={e => update('footerText', e.target.value)} rows={2}
@@ -1481,8 +1453,8 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
               </div>
             </SectionCard>
 
-            {/* 10. WARNA & TAMPILAN */}
-            <SectionCard icon="🎯" title="⑩ Warna Aksen, Border & Status Badge">
+            {/* 9. WARNA & TAMPILAN */}
+            <SectionCard icon="🎯" title="⑨ Warna Aksen, Border & Status Badge">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="text-xs text-gray-500 mb-1 block">Accent Color</label>
@@ -1741,6 +1713,11 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none"
                       placeholder="Pembayaran harus dilakukan sebelum batas waktu yang ditentukan..." />
                   </div>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={data.showTerms !== false} onChange={e => update('showTerms', e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500" />
+                    <span className="text-sm text-gray-700">Tampilkan Syarat & Ketentuan</span>
+                  </label>
                 </div>
                 <div className="space-y-3">
                   <p className="text-xs font-semibold text-gray-600 border-b pb-1">Kolom Kanan — Tanda Tangan</p>

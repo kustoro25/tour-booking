@@ -65,6 +65,7 @@ interface InvoiceCustomConfig {
   helpLink?: string;
   showSignature?: boolean;
   showDeadline?: boolean;
+  showTerms?: boolean;
   statusBadges?: Record<string, StatusBadgeConfig>;
 }
 
@@ -149,8 +150,10 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
     helpLink: '/contact',
-    showSignature: true,
+    footerText: 'Terima kasih telah memilih {nama} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {phone} atau {email}.',
+    showSignature: false,
     showDeadline: true,
+    showTerms: false,
   },
   modern: {
     headerBg: '#2563eb',
@@ -183,8 +186,10 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
     helpLink: '/contact',
-    showSignature: true,
+    footerText: 'Terima kasih telah memilih {nama} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {phone} atau {email}.',
+    showSignature: false,
     showDeadline: true,
+    showTerms: false,
   },
   minimal: {
     headerBg: '#ffffff',
@@ -217,8 +222,10 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
     helpLink: '/contact',
-    showSignature: true,
+    footerText: 'Terima kasih telah memilih {nama} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {phone} atau {email}.',
+    showSignature: false,
     showDeadline: true,
+    showTerms: false,
   },
   premium: {
     companyTagline: 'Perjalanan Anda, Prioritas Kami',
@@ -252,8 +259,10 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
     helpLink: '/contact',
+    footerText: 'Terima kasih telah memilih {nama} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {phone} atau {email}.',
     showSignature: true,
     showDeadline: true,
+    showTerms: true,
   },
 };
 
@@ -1068,14 +1077,16 @@ function CustomInvoice({
                 </div>
               )}
 
-              <div className="pt-3" style={{ borderTop: `1px solid ${border}` }}>
-                <h4 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
-                  {T.headingTerms}
-                </h4>
-                <p className="text-[9px] text-gray-400 leading-relaxed">
-                  {T.terms}
-                </p>
-              </div>
+              {c.showTerms !== false && (
+                <div className="pt-3" style={{ borderTop: `1px solid ${border}` }}>
+                  <h4 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                    {T.headingTerms}
+                  </h4>
+                  <p className="text-[9px] text-gray-400 leading-relaxed">
+                    {T.terms}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Right: Signature */}
@@ -1095,10 +1106,10 @@ function CustomInvoice({
         {/* ── Footer Note ── */}
         <div className="text-center pt-4 mt-5" style={{ borderTop: `1px solid ${border}` }}>
           <p className="text-xs text-gray-400 leading-relaxed">
-            {c.footerText
-              ? c.footerText
+            {(c.footerText
+              ? c.footerText.replace('{nama}', companyName).replace('{phone}', companyPhone).replace('{email}', companyEmail)
               : `Terima kasih telah memilih ${companyName} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi ${companyPhone} atau ${companyEmail}.`
-            }
+            )}
           </p>
         </div>
       </div>
