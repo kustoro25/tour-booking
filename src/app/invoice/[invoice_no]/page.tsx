@@ -114,6 +114,142 @@ const themes: Record<Exclude<InvoiceTheme, 'premium' | 'custom'>, ThemeConfig> =
   },
 };
 
+// ─── Hardcoded theme defaults (used when CMS is empty) ───
+const themeDefaults: Record<string, InvoiceCustomConfig> = {
+  classic: {
+    headerBg: '#1e293b',
+    headerBgEnd: '#1e293b',
+    headerTextColor: '#ffffff',
+    accentColor: '#1e40af',
+    borderColor: '#e5e7eb',
+    headingBilledTo: 'Ditagihkan Kepada',
+    headingInvoiceDetails: 'Detail Invoice',
+    headingOrderSummary: 'Ringkasan Pesanan',
+    headingPriceBreakdown: 'Rincian Biaya',
+    headingPaymentInfo: 'Instruksi Pembayaran',
+    headingDeadline: 'Batas Waktu Pembayaran',
+    headingTerms: 'Syarat & Ketentuan',
+    deadlineText: 'Mohon selesaikan pembayaran sebelum {{date}}. Jika melewati batas waktu, pesanan akan otomatis dibatalkan.',
+    termsText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
+    labelInvoiceNo: 'Nomor Invoice',
+    labelInvoiceDate: 'Tanggal Invoice',
+    labelPaymentDeadline: 'Batas Pembayaran',
+    labelPublishedDate: 'Diterbitkan:',
+    labelTourDate: 'Tgl. Perjalanan',
+    labelDuration: 'Durasi',
+    labelAdults: 'Dewasa',
+    labelChildren: 'Anak',
+    labelDiscount: 'Diskon',
+    labelSubTotal: 'Sub Total',
+    labelTax: 'Tax',
+    labelTotal: 'TOTAL',
+    labelBank: 'Bank',
+    labelAccountName: 'a.n.',
+    labelSignature: 'Authorised Sign',
+    showSignature: true,
+    showDeadline: true,
+  },
+  modern: {
+    headerBg: '#2563eb',
+    headerBgEnd: '#4338ca',
+    headerTextColor: '#ffffff',
+    accentColor: '#4338ca',
+    borderColor: '#dbeafe',
+    headingBilledTo: 'Ditagihkan Kepada',
+    headingInvoiceDetails: 'Detail Invoice',
+    headingOrderSummary: 'Ringkasan Pesanan',
+    headingPriceBreakdown: 'Rincian Biaya',
+    headingPaymentInfo: 'Instruksi Pembayaran',
+    headingDeadline: 'Batas Waktu Pembayaran',
+    headingTerms: 'Syarat & Ketentuan',
+    deadlineText: 'Mohon selesaikan pembayaran sebelum {{date}}. Jika melewati batas waktu, pesanan akan otomatis dibatalkan.',
+    termsText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
+    labelInvoiceNo: 'Nomor Invoice',
+    labelInvoiceDate: 'Tanggal Invoice',
+    labelPaymentDeadline: 'Batas Pembayaran',
+    labelPublishedDate: 'Diterbitkan:',
+    labelTourDate: 'Tgl. Perjalanan',
+    labelDuration: 'Durasi',
+    labelAdults: 'Dewasa',
+    labelChildren: 'Anak',
+    labelDiscount: 'Diskon',
+    labelSubTotal: 'Sub Total',
+    labelTax: 'Tax',
+    labelTotal: 'TOTAL',
+    labelBank: 'Bank',
+    labelAccountName: 'a.n.',
+    labelSignature: 'Authorised Sign',
+    showSignature: true,
+    showDeadline: true,
+  },
+  minimal: {
+    headerBg: '#ffffff',
+    headerBgEnd: '#ffffff',
+    headerTextColor: '#111827',
+    accentColor: '#374151',
+    borderColor: '#e5e7eb',
+    headingBilledTo: 'Ditagihkan Kepada',
+    headingInvoiceDetails: 'Detail Invoice',
+    headingOrderSummary: 'Ringkasan Pesanan',
+    headingPriceBreakdown: 'Rincian Biaya',
+    headingPaymentInfo: 'Instruksi Pembayaran',
+    headingDeadline: 'Batas Waktu Pembayaran',
+    headingTerms: 'Syarat & Ketentuan',
+    deadlineText: 'Mohon selesaikan pembayaran sebelum {{date}}. Jika melewati batas waktu, pesanan akan otomatis dibatalkan.',
+    termsText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
+    labelInvoiceNo: 'Nomor Invoice',
+    labelInvoiceDate: 'Tanggal Invoice',
+    labelPaymentDeadline: 'Batas Pembayaran',
+    labelPublishedDate: 'Diterbitkan:',
+    labelTourDate: 'Tgl. Perjalanan',
+    labelDuration: 'Durasi',
+    labelAdults: 'Dewasa',
+    labelChildren: 'Anak',
+    labelDiscount: 'Diskon',
+    labelSubTotal: 'Sub Total',
+    labelTax: 'Tax',
+    labelTotal: 'TOTAL',
+    labelBank: 'Bank',
+    labelAccountName: 'a.n.',
+    labelSignature: 'Authorised Sign',
+    showSignature: true,
+    showDeadline: true,
+  },
+  premium: {
+    headerBg: '#1a1a1a',
+    headerBgEnd: '#1a1a1a',
+    headerTextColor: '#ffffff',
+    accentColor: '#e59800',
+    borderColor: '#333333',
+    headingBilledTo: 'Invoice to:',
+    headingInvoiceDetails: 'Detail Invoice',
+    headingOrderSummary: 'Ringkasan Pesanan',
+    headingPriceBreakdown: 'Rincian Biaya',
+    headingPaymentInfo: 'Informasi Pembayaran',
+    headingDeadline: 'Batas Pembayaran',
+    headingTerms: 'Syarat & Ketentuan',
+    deadlineText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan.',
+    termsText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
+    labelInvoiceNo: 'Invoice#',
+    labelInvoiceDate: 'Tanggal',
+    labelPaymentDeadline: 'Batas Pembayaran',
+    labelPublishedDate: 'Diterbitkan:',
+    labelTourDate: 'Tanggal Perjalanan',
+    labelDuration: 'Durasi',
+    labelAdults: 'Dewasa',
+    labelChildren: 'Anak',
+    labelDiscount: 'Diskon',
+    labelSubTotal: 'Sub Total',
+    labelTax: 'Tax',
+    labelTotal: 'Total',
+    labelBank: 'Bank',
+    labelAccountName: 'a.n.',
+    labelSignature: 'Authorised Sign',
+    showSignature: true,
+    showDeadline: true,
+  },
+};
+
 export default async function InvoicePage({ params }: PageProps) {
   const { invoice_no } = await params;
   const order = await getOrder(invoice_no);
@@ -132,32 +268,19 @@ export default async function InvoicePage({ params }: PageProps) {
     }
   } catch { /* fallback to modern */ }
 
-  // 2. Read per-theme customization from CMS Page (e.g., invoice-modern, invoice-classic, etc.)
-  let customConfig: InvoiceCustomConfig | null = null;
+  // 2. Always start from hardcoded theme defaults, then overlay CMS config
+  const config: InvoiceCustomConfig = { ...themeDefaults[themeKey] };
   try {
-    // Try the theme-specific CMS page first
     const themeCmsPage = await prisma.page.findUnique({ where: { slug: `invoice-${themeKey}` } });
     if (themeCmsPage) {
       try {
         const parsed = JSON.parse(themeCmsPage.content);
         if (parsed && typeof parsed === 'object') {
-          customConfig = parsed as InvoiceCustomConfig;
+          Object.assign(config, parsed);
         }
-      } catch { /* fallback */ }
+      } catch { /* keep defaults */ }
     }
-    // Also try old invoice-custom for backward compatibility
-    if (!customConfig) {
-      const oldCmsPage = await prisma.page.findUnique({ where: { slug: 'invoice-custom' } });
-      if (oldCmsPage) {
-        try {
-          const parsed = JSON.parse(oldCmsPage.content);
-          if (parsed && typeof parsed === 'object') {
-            customConfig = parsed as InvoiceCustomConfig;
-          }
-        } catch { /* fallback */ }
-      }
-    }
-  } catch { /* fallback */ }
+  } catch { /* keep defaults */ }
 
   // Read bank accounts from settings
   let bankAccounts = [
@@ -189,51 +312,20 @@ export default async function InvoicePage({ params }: PageProps) {
   return (
     <>
       <div className="max-w-[210mm] mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
-        {customConfig ? (
-          <CustomInvoice
-            order={order}
-            companyName={companyName}
-            companyAddress={companyAddress}
-            companyPhone={companyPhone}
-            companyEmail={companyEmail}
-            companyTagline={companyTagline}
-            statusLabel={statusLabel}
-            tourDate={tourDate}
-            createdDate={createdDate}
-            expiryDate={expiryDate}
-            bankAccounts={bankAccounts}
-            config={customConfig}
-          />
-        ) : themeKey === 'premium' ? (
-          <PremiumInvoice
-            order={order}
-            companyName={companyName}
-            companyAddress={companyAddress}
-            companyPhone={companyPhone}
-            companyEmail={companyEmail}
-            companyTagline={companyTagline}
-            statusLabel={statusLabel}
-            tourDate={tourDate}
-            createdDate={createdDate}
-            expiryDate={expiryDate}
-            bankAccounts={bankAccounts}
-          />
-        ) : (
-          <InvoiceDocument
-            order={order}
-            companyName={companyName}
-            companyAddress={companyAddress}
-            companyPhone={companyPhone}
-            companyEmail={companyEmail}
-            statusLabel={statusLabel}
-            tourDate={tourDate}
-            createdDate={createdDate}
-            expiryDate={expiryDate}
-            bankAccounts={bankAccounts}
-            theme={themes[themeKey as 'classic' | 'modern' | 'minimal']}
-            themeKey={themeKey as 'classic' | 'modern' | 'minimal'}
-          />
-        )}
+        <CustomInvoice
+          order={order}
+          companyName={companyName}
+          companyAddress={companyAddress}
+          companyPhone={companyPhone}
+          companyEmail={companyEmail}
+          companyTagline={companyTagline}
+          statusLabel={statusLabel}
+          tourDate={tourDate}
+          createdDate={createdDate}
+          expiryDate={expiryDate}
+          bankAccounts={bankAccounts}
+          config={config}
+        />
         <InvoiceActions
           invoiceNo={order.invoiceNo}
           customerName={order.customerName}
