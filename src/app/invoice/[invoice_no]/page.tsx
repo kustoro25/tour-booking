@@ -491,6 +491,7 @@ function CustomInvoice({
                 <div className="rounded-xl px-3 py-2 text-[10px] mb-4" style={{ backgroundColor: accentBg, border: `1px solid ${accent}40` }}>
                   <span className="font-semibold" style={{ color: accent }}>{T.deadline}: </span>
                   <span className="text-gray-600">{formatDateTime(order.expiryAt)}</span>
+                  <p className="text-gray-500 mt-1 leading-relaxed">{T.deadlineBody}</p>
                 </div>
               )}
 
