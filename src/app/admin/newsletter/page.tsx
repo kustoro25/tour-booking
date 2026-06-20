@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useToast } from '@/components/ui/Toast';
-import Pagination from '@/components/ui/Pagination';
 
 interface Subscriber {
   id: string;
@@ -266,8 +265,22 @@ export default function AdminNewsletterPage() {
               </tbody>
             </table>
             {totalPages > 1 && (
-              <div className="p-4 border-t border-gray-100 flex justify-center">
-                <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+              <div className="p-4 border-t border-gray-100 flex items-center justify-center gap-3">
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  ← Prev
+                </button>
+                <span className="text-sm text-gray-500">{page} / {totalPages}</span>
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  Next →
+                </button>
               </div>
             )}
           </>
