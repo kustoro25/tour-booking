@@ -1,11 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function WhatsAppButton() {
   const [showTooltip, setShowTooltip] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('6281234567890');
 
-  const phoneNumber = '6281234567890';
+  useEffect(() => {
+    fetch('/api/settings/public')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.data?.phone) {
+          // Strip +, spaces, and dashes for wa.me format
+          const cleaned = data.data.phone.replace(/[+\s-]/g, '');
+          if (cleaned) setPhoneNumber(cleaned);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const message = encodeURIComponent(
     'Halo Jelajah Nusantara, saya ingin bertanya tentang paket tour.'
   );

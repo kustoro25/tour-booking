@@ -5,6 +5,19 @@ import { useState, useEffect, useCallback } from 'react';
 export default function FloatingActions() {
   const [scrolled, setScrolled] = useState(false);
   const [showWaTooltip, setShowWaTooltip] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('6281234567890');
+
+  useEffect(() => {
+    fetch('/api/settings/public')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.data?.phone) {
+          const cleaned = data.data.phone.replace(/[+\s-]/g, '');
+          if (cleaned) setPhoneNumber(cleaned);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleScroll = useCallback(() => {
     setScrolled(window.scrollY > 400);
@@ -19,7 +32,6 @@ export default function FloatingActions() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const phoneNumber = '6281234567890';
   const waMessage = encodeURIComponent(
     'Halo Jelajah Nusantara, saya ingin bertanya tentang paket tour.'
   );

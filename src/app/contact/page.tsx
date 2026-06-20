@@ -23,6 +23,29 @@ const FALLBACK: ContactData = {
   ],
 };
 
+async function getSettingsFallback(fallback: ContactData): Promise<ContactData> {
+  try {
+    const [phoneSetting, emailSetting, addrSetting] = await Promise.all([
+      prisma.setting.findUnique({ where: { key: 'company_phone' } }),
+      prisma.setting.findUnique({ where: { key: 'company_email' } }),
+      prisma.setting.findUnique({ where: { key: 'company_address' } }),
+    ]);
+    const cards = fallback.infoCards.map(card => {
+      if (card.title === 'WhatsApp' && phoneSetting) {
+        try { const v = JSON.parse(phoneSetting.value); if (typeof v === 'string' && v.trim()) return { ...card, detail: v.trim() }; } catch {}
+      }
+      if (card.title === 'Email' && emailSetting) {
+        try { const v = JSON.parse(emailSetting.value); if (typeof v === 'string' && v.trim()) return { ...card, detail: v.trim() }; } catch {}
+      }
+      if (card.title === 'Alamat' && addrSetting) {
+        try { const v = JSON.parse(addrSetting.value); if (typeof v === 'string' && v.trim()) return { ...card, detail: v.trim() }; } catch {}
+      }
+      return card;
+    });
+    return { ...fallback, infoCards: cards };
+  } catch { return fallback; }
+}
+
 async function getContactData(): Promise<ContactData> {
   try {
     const page = await prisma.page.findUnique({ where: { slug: 'contact' } });
@@ -32,11 +55,13 @@ async function getContactData(): Promise<ContactData> {
         label: parsed.label || FALLBACK.label,
         heading: parsed.heading || FALLBACK.heading,
         subheading: parsed.subheading || FALLBACK.subheading,
-        infoCards: Array.isArray(parsed.infoCards) ? parsed.infoCards : FALLBACK.infoCards,
+        infoCards: Array.isArray(parsed.infoCards) && parsed.infoCards.length > 0
+          ? parsed.infoCards
+          : (await getSettingsFallback(FALLBACK)).infoCards,
       };
     }
   } catch { /* fallback */ }
-  return FALLBACK;
+  return getSettingsFallback(FALLBACK);
 }
 
 async function getContactMeta(): Promise<{ title: string; description: string }> {

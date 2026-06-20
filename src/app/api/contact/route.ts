@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 import { sendEmail, contactNotificationTemplate, contactAutoReplyTemplate } from '@/lib/email';
 import { validateEmail } from '@/lib/validators';
 
@@ -23,9 +24,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Pesan minimal 10 karakter' }, { status: 400 });
     }
 
-    const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
-    const companyEmail = process.env.COMPANY_EMAIL || 'info@tourbooking.com';
-    const companyPhone = process.env.COMPANY_PHONE || '+6281234567890';
+    // Read company info from settings (same source as admin/settings page)
+    let companyName = 'Jelajah Nusantara Tour';
+    let companyEmail = 'info@tourbooking.com';
+    let companyPhone = '+6281234567890';
+    try {
+      const [nameSetting, emailSetting, phoneSetting] = await Promise.all([
+        prisma.setting.findUnique({ where: { key: 'company_name' } }),
+        prisma.setting.findUnique({ where: { key: 'company_email' } }),
+        prisma.setting.findUnique({ where: { key: 'company_phone' } }),
+      ]);
+      if (nameSetting) { const v = JSON.parse(nameSetting.value); if (typeof v === 'string' && v.trim()) companyName = v.trim(); }
+      if (emailSetting) { const v = JSON.parse(emailSetting.value); if (typeof v === 'string' && v.trim()) companyEmail = v.trim(); }
+      if (phoneSetting) { const v = JSON.parse(phoneSetting.value); if (typeof v === 'string' && v.trim()) companyPhone = v.trim(); }
+    } catch { /* fallback to defaults */ }
+
     const adminEmail = process.env.ADMIN_EMAIL || companyEmail;
 
     // 1. Kirim notifikasi ke admin
