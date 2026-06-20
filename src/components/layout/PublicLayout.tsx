@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+import Footer, { type FooterCms } from '@/components/layout/Footer';
 
-export default function PublicLayout({ children, brandName, brandIcon, footerCms }: { children: React.ReactNode; brandName?: string; brandIcon?: string; footerCms?: Record<string, unknown> }) {
+export default function PublicLayout({ children, brandName, brandIcon, footerCms }: { children: React.ReactNode; brandName?: string; brandIcon?: string; footerCms?: FooterCms }) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 

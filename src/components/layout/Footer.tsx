@@ -5,6 +5,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useToast } from '@/components/ui/Toast';
 
+export interface FooterCms {
+  text?: string;
+  copyright?: string;
+  socialLinks?: { platform: string; url: string; icon: string }[];
+  [key: string]: unknown;
+}
+
 function useCompanyInfo() {
   const [info, setInfo] = useState({ email: 'info@jelajahnusantara.com', phone: '+62 812-3456-7890', address: 'Jl. Pariwisata No. 123, Jakarta Selatan', brandName: 'Jelajah Nusantara', brandIcon: 'JN' });
   useEffect(() => {
@@ -20,7 +27,7 @@ function useCompanyInfo() {
 
 function useFooterCms() {
   const pathname = usePathname();
-  const [cms, setCms] = useState<{ text?: string; copyright?: string; socialLinks?: { platform: string; url: string; icon: string }[] }>({});
+  const [cms, setCms] = useState<FooterCms>({});
   const [fetchKey, setFetchKey] = useState(0);
 
   useEffect(() => {
@@ -73,11 +80,11 @@ const footerLinks = {
   ],
 };
 
-export default function Footer({ footerCms: serverCms }: { footerCms?: Record<string, unknown> }) {
+export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms }) {
   const info = useCompanyInfo();
   const clientCms = useFooterCms();
   // Prefer server-provided data (instant), fallback to client fetch
-  const cms = (serverCms && Object.keys(serverCms).length > 0) ? serverCms : clientCms;
+  const cms: FooterCms = (serverCms && Object.keys(serverCms).length > 0) ? serverCms as FooterCms : clientCms;
   const { showToast } = useToast();
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribing, setSubscribing] = useState(false);
