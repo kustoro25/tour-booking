@@ -292,7 +292,13 @@ export default async function InvoicePage({ params }: PageProps) {
       try {
         const parsed = JSON.parse(themeCmsPage.content);
         if (parsed && typeof parsed === 'object') {
-          Object.assign(config, parsed);
+          // Only overlay non-empty values so CMS empty strings don't wipe themeDefaults
+          for (const key of Object.keys(parsed)) {
+            const val = (parsed as Record<string, unknown>)[key];
+            if (val !== '' && val !== null && val !== undefined) {
+              (config as Record<string, unknown>)[key] = val;
+            }
+          }
         }
       } catch { /* keep defaults */ }
     }
