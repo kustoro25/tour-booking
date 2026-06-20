@@ -65,6 +65,8 @@ interface InvoiceCustomConfig {
   labelAccountName?: string;
   labelSignature?: string;
   signatureImage?: string;
+  stampImage?: string;
+  showStamp?: boolean;
   labelPublishedDate?: string;
   helpLink?: string;
   showSignature?: boolean;
@@ -109,6 +111,8 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
     signatureImage: '',
+    stampImage: '',
+    showStamp: false,
     helpLink: '/contact',
     footerText: 'Terima kasih telah memilih {nama} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {phone} atau {email}.',
     showSignature: true,
@@ -361,10 +365,13 @@ function CustomInvoice({
         </div>
       </div>
 
-      {/* ── Status Badge ── */}
+      {/* ── Status Bar ── */}
       <div className="px-6 sm:px-10 py-3" style={{ backgroundColor: stripeBg, borderBottom: `1px solid ${border}` }}>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <StatBadge order={order} />
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Status:</span>
+            <StatBadge order={order} />
+          </div>
           <span className="text-xs text-gray-400">{T.L.publishedDate} {createdDate}</span>
         </div>
       </div>
@@ -434,11 +441,36 @@ function CustomInvoice({
         </div>
 
         {/* ── Price Breakdown ── */}
-        <div className="overflow-hidden mb-6" style={{ border: `1px solid ${border}`, borderRadius: '12px' }}>
+        <div className="overflow-hidden mb-6 relative" style={{ border: `1px solid ${border}`, borderRadius: '12px' }}>
           <div className="px-5 py-3" style={{ backgroundColor: accentBg }}>
             <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: accentText }}>{T.priceBreakdown}</h3>
           </div>
-          <div className="p-5">
+          <div className="p-5 relative">
+            {/* ── Stamp Overlay (COMPLETED only) ── */}
+            {c.showStamp && order.status === 'COMPLETED' && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                {c.stampImage ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={c.stampImage}
+                    alt="LUNAS"
+                    className="max-h-28 max-w-[180px] object-contain opacity-80"
+                    style={{ transform: 'rotate(-15deg)' }}
+                  />
+                ) : (
+                  <div
+                    className="border-4 rounded-full px-8 py-4 opacity-30 select-none"
+                    style={{
+                      borderColor: accent,
+                      color: accent,
+                      transform: 'rotate(-15deg)',
+                    }}
+                  >
+                    <span className="text-3xl font-black tracking-[0.3em] uppercase">LUNAS</span>
+                  </div>
+                )}
+              </div>
+            )}
             {/* Adult line */}
             <div className="flex justify-between items-center py-2 text-sm">
               <span className="text-gray-600">{T.L.adults} ({order.adults} × {formatCurrency(priceAdult)})</span>

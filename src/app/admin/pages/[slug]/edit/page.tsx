@@ -295,6 +295,8 @@ const defaultData: Record<string, PageData> = {
     labelAccountName: 'a.n.',
     labelSignature: 'Authorised Sign',
     signatureImage: '',
+    stampImage: '',
+    showStamp: false,
     helpLink: '/contact',
     showSignature: true,
     showDeadline: true,
@@ -1282,6 +1284,29 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                       className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-amber-500 outline-none" />
                   </div>
                 ))}
+              </div>
+            </SectionCard>
+
+            {/* 5½. STAMPEL LUNAS */}
+            <SectionCard icon="🛡️" title="⑤½ Stempel LUNAS (Tampil di Tengah Rincian Biaya)">
+              <p className="text-xs text-gray-400 mb-3">Stempel hanya muncul saat status pesanan <strong>COMPLETED / Selesai</strong>. Upload gambar stempel atau biarkan kosong untuk tampil teks "LUNAS".</p>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Upload Gambar Stempel (PNG transparan disarankan)</label>
+                <ImageUpload
+                  value={(data.stampImage as string) || ''}
+                  onChange={(url) => update('stampImage', url)}
+                  label=""
+                  folder="tour-booking/stamps"
+                  placeholder="Upload gambar stempel LUNAS"
+                />
+                <p className="text-[10px] text-gray-400 mt-1">Kosongkan untuk tampil teks "LUNAS" dengan aksen warna tema.</p>
+              </div>
+              <div className="mt-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={!!data.showStamp} onChange={e => update('showStamp', e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500" />
+                  <span className="text-sm text-gray-700">Tampilkan Stempel saat status Selesai</span>
+                </label>
               </div>
             </SectionCard>
 
