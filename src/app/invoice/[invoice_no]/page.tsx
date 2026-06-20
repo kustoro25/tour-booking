@@ -1112,10 +1112,11 @@ function CustomInvoice({
         {/* ── Footer Note ── */}
         <div className="text-center pt-4 mt-5" style={{ borderTop: `1px solid ${border}` }}>
           <p className="text-xs text-gray-400 leading-relaxed">
-            {(c.footerText
-              ? c.footerText.replace('{nama}', companyName).replace('{phone}', companyPhone).replace('{email}', companyEmail)
-              : `Terima kasih telah memilih ${companyName} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi ${companyPhone} atau ${companyEmail}.`
-            )}
+            {(c.footerText || 'Terima kasih telah memilih {nama} sebagai mitra perjalanan Anda. E-Ticket akan dikirim ke email Anda setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {phone} atau {email}.')
+              .replace('{nama}', companyName)
+              .replace('{phone}', companyPhone)
+              .replace('{email}', companyEmail)
+            }
           </p>
         </div>
       </div>
