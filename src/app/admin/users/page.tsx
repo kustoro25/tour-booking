@@ -40,8 +40,8 @@ export default function AdminUsersPage() {
   };
 
   const blockedMessage = role === 'CONTENT_MANAGER'
-    ? '🚫 Hanya Super Admin yang bisa menambah/menghapus admin. Hubungi Admin Operasional untuk bantuan.'
-    : '🚫 Hanya Super Admin yang bisa menambah/menghapus admin.';
+    ? '🚫 Hanya Super Admin yang bisa menambah, mengganti password, atau menghapus admin. Hubungi Admin Operasional untuk bantuan.'
+    : '🚫 Hanya Super Admin yang bisa menambah, mengganti password, atau menghapus admin.';
 
   useEffect(() => {
     fetchUsers();
@@ -281,9 +281,10 @@ export default function AdminUsersPage() {
               <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Tambah, edit, hapus paket tour & destinasi</li>
               <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Kelola booking (ubah status & hapus)</li>
               <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Approve/hide review</li>
-              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Tambah & hapus admin</li>
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Tambah admin, ganti password admin & hapus admin</li>
               <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Ubah pengaturan website</li>
               <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Edit halaman CMS</li>
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Kirim newsletter</li>
             </ul>
           </div>
 
@@ -297,7 +298,8 @@ export default function AdminUsersPage() {
               <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Kelola booking (ubah status & hapus)</li>
               <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Approve/hide review</li>
               <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Kelola blog</li>
-              <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Tambah/hapus admin</li>
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Kirim newsletter</li>
+              <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Tambah admin, ganti password admin & hapus admin</li>
               <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Ubah pengaturan website</li>
               <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Simpan perubahan halaman CMS</li>
             </ul>
@@ -311,10 +313,11 @@ export default function AdminUsersPage() {
             <ul className="space-y-1.5 text-xs text-gray-700">
               <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Edit paket tour & destinasi</li>
               <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Kelola blog</li>
+              <li className="flex items-start gap-1.5"><span className="text-green-500 mt-0.5">✅</span> Kirim newsletter</li>
               <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Tambah/hapus paket tour & destinasi</li>
               <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Kelola booking</li>
               <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Kelola review</li>
-              <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Tambah/hapus admin</li>
+              <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Tambah admin, ganti password admin & hapus admin</li>
               <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Ubah pengaturan website</li>
               <li className="flex items-start gap-1.5"><span className="text-red-400 mt-0.5">❌</span> Simpan perubahan halaman CMS</li>
             </ul>
