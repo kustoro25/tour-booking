@@ -25,6 +25,13 @@ export default function AdminUsersPage() {
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [showBlocked, setShowBlocked] = useState(false);
+
+  // Password reset modal
+  const [pwTarget, setPwTarget] = useState<{ id: string; name: string; email: string } | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwError, setPwError] = useState('');
+  const [pwSaved, setPwSaved] = useState(false);
   const { showToast } = useToast();
 
   const handleBlocked = () => {
@@ -134,6 +141,91 @@ export default function AdminUsersPage() {
               <button onClick={() => setDeleteTarget(null)} className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">Batal</button>
               <button onClick={handleDelete} disabled={deleting} className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 transition-colors">
                 {deleting ? 'Menghapus...' : 'Ya, Hapus'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Password Reset Modal */}
+      {pwTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setPwTarget(null); setPwError(''); setNewPassword(''); setPwSaved(false); }} />
+          <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4 animate-[scaleIn_0.2s_ease]">
+            <div className="w-12 h-12 mx-auto mb-4 bg-orange-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 text-center mb-1">Ganti Password</h3>
+            <p className="text-sm text-gray-500 text-center mb-4">
+              <strong>{pwTarget.name}</strong> — {pwTarget.email}
+            </p>
+
+            {pwError && (
+              <div className="mb-3 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                <p className="text-red-600 text-sm">{pwError}</p>
+              </div>
+            )}
+            {pwSaved && (
+              <div className="mb-3 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                <p className="text-green-600 text-sm">✅ Password berhasil diubah!</p>
+              </div>
+            )}
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password Baru</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                placeholder="Minimal 6 karakter"
+                autoFocus
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setPwTarget(null); setPwError(''); setNewPassword(''); setPwSaved(false); }}
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={async () => {
+                  setPwError('');
+                  setPwSaved(false);
+                  if (!newPassword || newPassword.length < 6) {
+                    setPwError('Password baru minimal 6 karakter');
+                    return;
+                  }
+                  setPwSaving(true);
+                  try {
+                    const res = await fetch(`/api/admin/users/${pwTarget.id}/password`, {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ newPassword }),
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                      setPwSaved(true);
+                      setNewPassword('');
+                      showToast(`Password untuk "${pwTarget.name}" berhasil diubah`, 'success');
+                      setTimeout(() => { setPwTarget(null); setPwSaved(false); }, 1500);
+                    } else {
+                      setPwError(data.error || 'Gagal mengubah password');
+                    }
+                  } catch {
+                    setPwError('Gagal menghubungi server');
+                  } finally {
+                    setPwSaving(false);
+                  }
+                }}
+                disabled={pwSaving}
+                className="flex-1 px-4 py-2.5 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 disabled:opacity-50 transition-colors"
+              >
+                {pwSaving ? 'Menyimpan...' : 'Simpan'}
               </button>
             </div>
           </div>
@@ -257,9 +349,15 @@ export default function AdminUsersPage() {
                 </div>
                 <div className="flex items-center gap-3 pt-1 border-t border-gray-100">
                   {isSuperAdmin ? (
-                    <button onClick={() => setDeleteTarget({ id: user.id, name: user.name })} className="text-red-600 hover:text-red-700 text-xs font-medium">Hapus</button>
+                    <>
+                      <button onClick={() => setDeleteTarget({ id: user.id, name: user.name })} className="text-red-600 hover:text-red-700 text-xs font-medium">Hapus</button>
+                      <button onClick={() => setPwTarget({ id: user.id, name: user.name, email: user.email })} className="text-orange-600 hover:text-orange-700 text-xs font-medium">Ganti Password</button>
+                    </>
                   ) : (
-                    <button onClick={handleBlocked} className="text-red-600 hover:text-red-700 text-xs font-medium">Hapus</button>
+                    <>
+                      <button onClick={handleBlocked} className="text-red-600 hover:text-red-700 text-xs font-medium">Hapus</button>
+                      <button onClick={handleBlocked} className="text-orange-600 hover:text-orange-700 text-xs font-medium">Ganti Password</button>
+                    </>
                   )}
                 </div>
               </div>
@@ -294,21 +392,39 @@ export default function AdminUsersPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-500">{formatDate(user.createdAt)}</td>
                   <td className="px-4 py-3 text-center">
-                  {isSuperAdmin ? (
-                    <button
-                      onClick={() => setDeleteTarget({ id: user.id, name: user.name })}
-                      className="text-red-600 hover:text-red-700 text-xs"
-                    >
-                      Hapus
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleBlocked}
-                      className="text-red-600 hover:text-red-700 text-xs"
-                    >
-                      Hapus
-                    </button>
-                  )}
+                    <div className="flex items-center justify-center gap-3">
+                      {isSuperAdmin ? (
+                        <>
+                          <button
+                            onClick={() => setDeleteTarget({ id: user.id, name: user.name })}
+                            className="text-red-600 hover:text-red-700 text-xs"
+                          >
+                            Hapus
+                          </button>
+                          <button
+                            onClick={() => setPwTarget({ id: user.id, name: user.name, email: user.email })}
+                            className="text-orange-600 hover:text-orange-700 text-xs"
+                          >
+                            Ganti Password
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={handleBlocked}
+                            className="text-red-600 hover:text-red-700 text-xs"
+                          >
+                            Hapus
+                          </button>
+                          <button
+                            onClick={handleBlocked}
+                            className="text-orange-600 hover:text-orange-700 text-xs"
+                          >
+                            Ganti Password
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
