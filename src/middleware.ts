@@ -25,9 +25,12 @@ const ROLE_PATH_RULES: { prefix: string; allowedRoles: AdminRole[] }[] = [
   { prefix: '/admin/pages',         allowedRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_MANAGER'] },
 ];
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'tour-booking-jwt-secret'
-);
+function getJwtSecret(): Uint8Array {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable is required');
+  }
+  return new TextEncoder().encode(process.env.JWT_SECRET);
+}
 
 interface JWTPayload {
   userId: string;
@@ -37,7 +40,7 @@ interface JWTPayload {
 
 async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getJwtSecret());
     return payload as unknown as JWTPayload;
   } catch {
     return null;

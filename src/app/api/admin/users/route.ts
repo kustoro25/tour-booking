@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { requireSuperAdmin } from '@/lib/auth';
 
@@ -45,13 +46,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Email sudah terdaftar' }, { status: 400 });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 12);
+
     const user = await prisma.user.create({
       data: {
         name,
         email,
         phone: phone || null,
         role: role || 'ADMIN',
-        password, // In production, hash with bcrypt
+        password: hashedPassword,
       },
       select: {
         id: true,

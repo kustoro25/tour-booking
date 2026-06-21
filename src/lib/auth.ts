@@ -1,10 +1,14 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
+import bcrypt from 'bcryptjs';
 import { prisma } from './prisma';
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'tour-booking-jwt-secret'
-);
+function getJwtSecret(): Uint8Array {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable is required');
+  }
+  return new TextEncoder().encode(process.env.JWT_SECRET);
+}
 const COOKIE_NAME = 'admin_token';
 
 export interface JWTPayload {
@@ -17,12 +21,12 @@ export async function createToken(payload: JWTPayload): Promise<string> {
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime('24h')
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 }
 
 export async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getJwtSecret());
     return payload as unknown as JWTPayload;
   } catch {
     return null;
@@ -56,8 +60,9 @@ export async function loginAdmin(email: string, password: string): Promise<{ tok
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return null;
 
-  // Simple password comparison (in production use bcrypt)
-  if (user.password !== password) return null;
+  // Verify hashed password
+  const passwordValid = await bcrypt.compare(password, user.password);
+  if (!passwordValid) return null;
 
   const token = await createToken({
     userId: user.id,

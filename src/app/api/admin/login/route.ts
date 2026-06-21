@@ -1,8 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { loginAdmin, setTokenCookie } from '@/lib/auth';
+import { rateLimit } from '@/lib/rate-limit';
+
+// Max 5 attempts per IP per 15 minutes
+const LOGIN_RATE_LIMIT = { maxRequests: 5, windowMs: 15 * 60 * 1000 };
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: IP-based
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      || request.headers.get('x-real-ip')
+      || 'unknown';
+    const { success, remaining, resetAt } = rateLimit(`login:${ip}`, LOGIN_RATE_LIMIT);
+
+    if (!success) {
+      const retryAfter = Math.ceil((resetAt - Date.now()) / 1000);
+      return NextResponse.json(
+        { success: false, error: `Terlalu banyak percobaan. Coba lagi dalam ${retryAfter} detik.` },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(retryAfter),
+            'X-RateLimit-Remaining': '0',
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const { email, password } = body;
 
@@ -12,7 +36,13 @@ export async function POST(request: NextRequest) {
 
     const result = await loginAdmin(email, password);
     if (!result) {
-      return NextResponse.json({ success: false, error: 'Email atau password salah' }, { status: 401 });
+      return NextResponse.json(
+        { success: false, error: 'Email atau password salah' },
+        {
+          status: 401,
+          headers: { 'X-RateLimit-Remaining': String(remaining) },
+        }
+      );
     }
 
     const cookie = setTokenCookie(result.token);
