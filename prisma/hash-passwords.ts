@@ -6,6 +6,7 @@
  * (bcrypt hashes always start with "$2a$" or "$2b$")
  */
 
+import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 

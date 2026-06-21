@@ -26,6 +26,13 @@ export default function AdminSettingsPage() {
   const [error, setError] = useState('');
   const [showBlocked, setShowBlocked] = useState(false);
 
+  // Password change
+  const [pwForm, setPwForm] = useState({ current: '', newPw: '', confirm: '' });
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwError, setPwError] = useState('');
+  const [pwSaved, setPwSaved] = useState(false);
+  const [pwShowBlocked, setPwShowBlocked] = useState(false);
+
   const [form, setForm] = useState({
     siteTitle: '',
     siteFavicon: '',
@@ -413,6 +420,115 @@ export default function AdminSettingsPage() {
             ))}
           </div>
         </div>
+
+        {/* Change Password — Super Admin only */}
+        {isSuperAdmin && (
+          <div className="border-t pt-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">🔐 Ganti Password</h2>
+            <p className="text-xs text-gray-500 mb-4">
+              Ubah password akun Super Admin Anda. Password baru minimal 6 karakter.
+            </p>
+
+            {pwError && (
+              <div className="mb-3 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                <p className="text-red-600 text-sm">{pwError}</p>
+              </div>
+            )}
+            {pwSaved && (
+              <div className="mb-3 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                <p className="text-green-600 text-sm">✅ Password berhasil diubah!</p>
+              </div>
+            )}
+
+            <div className="space-y-3 max-w-md">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Password Saat Ini</label>
+                <input
+                  type="password"
+                  value={pwForm.current}
+                  onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="••••••••"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Password Baru</label>
+                <input
+                  type="password"
+                  value={pwForm.newPw}
+                  onChange={(e) => setPwForm({ ...pwForm, newPw: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Minimal 6 karakter"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password Baru</label>
+                <input
+                  type="password"
+                  value={pwForm.confirm}
+                  onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Ketik ulang password baru"
+                />
+              </div>
+            </div>
+
+            <div className="mt-4 flex items-center gap-4">
+              <button
+                onClick={async () => {
+                  setPwError('');
+                  setPwSaved(false);
+
+                  if (!pwForm.current || !pwForm.newPw || !pwForm.confirm) {
+                    setPwError('Semua field harus diisi');
+                    return;
+                  }
+                  if (pwForm.newPw.length < 6) {
+                    setPwError('Password baru minimal 6 karakter');
+                    return;
+                  }
+                  if (pwForm.newPw !== pwForm.confirm) {
+                    setPwError('Konfirmasi password tidak cocok');
+                    return;
+                  }
+
+                  setPwSaving(true);
+                  try {
+                    const res = await fetch('/api/admin/me/password', {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        currentPassword: pwForm.current,
+                        newPassword: pwForm.newPw,
+                      }),
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                      setPwSaved(true);
+                      setPwForm({ current: '', newPw: '', confirm: '' });
+                      setTimeout(() => setPwSaved(false), 3000);
+                    } else {
+                      setPwError(data.error || 'Gagal mengubah password');
+                    }
+                  } catch {
+                    setPwError('Gagal menghubungi server');
+                  } finally {
+                    setPwSaving(false);
+                  }
+                }}
+                disabled={pwSaving}
+                className="bg-orange-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm transition-colors"
+              >
+                {pwSaving ? 'Menyimpan...' : 'Ganti Password'}
+              </button>
+              {pwShowBlocked && (
+                <span className="text-red-600 text-sm font-medium animate-fade-in">
+                  🚫 Hanya Super Admin yang bisa mengubah password.
+                </span>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Save */}
         <div className="border-t pt-6 flex items-center gap-4">
