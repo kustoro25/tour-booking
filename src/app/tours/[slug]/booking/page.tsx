@@ -493,26 +493,28 @@ export default function BookingPage() {
             </div>
 
             {/* Installment Payment */}
-            {installmentEnabled ? (
-              <div
-                onClick={() => setPaymentType('INSTALLMENT')}
-                className={`rounded-xl border-2 p-5 cursor-pointer transition-all ${
-                  paymentType === 'INSTALLMENT'
-                    ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300 bg-white'
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <div className={`w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                    paymentType === 'INSTALLMENT' ? 'border-blue-500' : 'border-gray-300'
-                  }`}>
-                    {paymentType === 'INSTALLMENT' && <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">Pembayaran Angsuran (Cicilan)</h3>
-                    <p className="text-sm text-gray-500 mt-0.5">Bayar dengan DP {dpPercentage}% dan sisanya dicicil sesuai pilihan Anda</p>
-                  </div>
+            <div
+              onClick={() => setPaymentType('INSTALLMENT')}
+              className={`rounded-xl border-2 p-5 cursor-pointer transition-all ${
+                paymentType === 'INSTALLMENT'
+                  ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50'
+                  : 'border-gray-200 hover:border-gray-300 bg-white'
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className={`w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                  paymentType === 'INSTALLMENT' ? 'border-blue-500' : 'border-gray-300'
+                }`}>
+                  {paymentType === 'INSTALLMENT' && <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />}
                 </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">Pembayaran Angsuran (Cicilan)</h3>
+                  <p className="text-sm text-gray-500 mt-0.5">Bayar dengan DP {dpPercentage}% dan sisanya dicicil sesuai pilihan Anda</p>
+                  {!installmentEnabled && (
+                    <p className="text-xs text-amber-600 mt-1">⚠ Fitur ini mungkin belum diaktifkan oleh admin. Booking akan gagal jika fitur tidak tersedia.</p>
+                  )}
+                </div>
+              </div>
 
                 {paymentType === 'INSTALLMENT' && (
                   <div className="mt-4 ml-9 space-y-4">
@@ -560,17 +562,6 @@ export default function BookingPage() {
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="rounded-xl border-2 border-dashed border-gray-200 p-5 bg-gray-50">
-                <div className="flex items-start gap-4 opacity-50">
-                  <div className="w-5 h-5 mt-0.5 rounded-full border-2 border-gray-300 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Pembayaran Angsuran (Cicilan)</h3>
-                    <p className="text-sm text-gray-500 mt-0.5">Fitur angsuran belum tersedia untuk saat ini</p>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
           <div className="flex justify-between mt-6">
