@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
-import { OrderStatusLabels, OrderStatusColors, OrderStatusIcons, OrderStatusDotColors, type OrderStatus } from '@/types';
+import { OrderStatusLabels, OrderStatusColors, OrderStatusIcons, OrderStatusDotColors, type OrderStatus, type InstallmentPaymentStatus } from '@/types';
+import { InstallmentPaymentStatusLabels, InstallmentPaymentStatusColors, InstallmentPaymentStatusDots } from '@/types';
 import CopyButton from '@/components/ui/CopyButton';
 import InvoiceActions from '@/components/booking/InvoiceActions';
 import { getBrandName, getBrandIcon } from '@/lib/brand';
@@ -15,7 +16,12 @@ interface PageProps {
 async function getOrder(invoiceNo: string) {
   const order = await prisma.order.findUnique({
     where: { invoiceNo },
-    include: { tour: true },
+    include: {
+      tour: true,
+      installmentPlan: {
+        include: { payments: true },
+      },
+    },
   });
   return order;
 }
@@ -439,6 +445,94 @@ function CustomInvoice({
             </div>
           </div>
         </div>
+
+        {/* ── Installment Summary (only for installment orders) ── */}
+        {order.paymentType === 'INSTALLMENT' && (order as any).installmentPlan && (
+          <div className="overflow-hidden mb-6 relative" style={{ border: `1px solid ${border}`, borderRadius: '12px' }}>
+            <div className="px-5 py-3" style={{ backgroundColor: '#FFF7ED' }}>
+              <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#E59800' }}>Pembayaran Angsuran (Cicilan)</h3>
+            </div>
+            <div className="p-5">
+              {/* Plan summary */}
+              {(() => {
+                const plan = (order as any).installmentPlan;
+                const payments = plan.payments || [];
+                const paidCount = payments.filter((p: any) => p.status === 'CONFIRMED').length;
+                const totalPaid = payments.filter((p: any) => p.status === 'CONFIRMED').reduce((s: number, p: any) => s + p.amount, 0);
+                
+                return (
+                  <>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-4">
+                      <div className="rounded-lg px-3 py-2" style={{ backgroundColor: stripeBg }}>
+                        <p className="text-gray-400 mb-0.5">Jumlah Angsuran</p>
+                        <p className="font-medium text-gray-800">{plan.installmentCount}x</p>
+                      </div>
+                      <div className="rounded-lg px-3 py-2" style={{ backgroundColor: stripeBg }}>
+                        <p className="text-gray-400 mb-0.5">DP ({plan.dpPercentage}%)</p>
+                        <p className="font-medium text-gray-800">{formatCurrency(plan.downPayment)}</p>
+                      </div>
+                      <div className="rounded-lg px-3 py-2" style={{ backgroundColor: stripeBg }}>
+                        <p className="text-gray-400 mb-0.5">Per Angsuran</p>
+                        <p className="font-medium text-gray-800">{formatCurrency(plan.amountPerInstallment)}</p>
+                      </div>
+                      <div className="rounded-lg px-3 py-2" style={{ backgroundColor: paidCount === plan.installmentCount ? '#ECFDF5' : stripeBg }}>
+                        <p className="text-gray-400 mb-0.5">Terbayar</p>
+                        <p className="font-medium text-gray-800">{paidCount}/{plan.installmentCount}</p>
+                      </div>
+                    </div>
+
+                    {/* Payment status table */}
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="border-b" style={{ borderColor: border }}>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Angsuran</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">Jumlah</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">Jatuh Tempo</th>
+                            <th className="text-center py-2 px-2 text-gray-400 font-medium">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {payments.map((p: any) => {
+                            const st = p.status as InstallmentPaymentStatus;
+                            const dotColor = InstallmentPaymentStatusDots[st] || 'bg-gray-500';
+                            const label = InstallmentPaymentStatusLabels[st] || st;
+                            return (
+                              <tr key={p.id} className="border-b" style={{ borderColor: border }}>
+                                <td className="py-2 px-2 font-medium text-gray-700">Angsuran ke-{p.installmentNumber}</td>
+                                <td className="py-2 px-2 text-right text-gray-700">{formatCurrency(p.amount)}</td>
+                                <td className="py-2 px-2 text-right text-gray-600">{new Date(p.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</td>
+                                <td className="py-2 px-2 text-center">
+                                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${InstallmentPaymentStatusColors[st] || ''}`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
+                                    {label}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Link to installment page for payment upload */}
+                    {paidCount < plan.installmentCount && (
+                      <div className="mt-4 text-center">
+                        <a
+                          href={`/invoice/${order.invoiceNo}/installments`}
+                          className="inline-flex items-center gap-1 text-xs font-medium px-4 py-2 rounded-lg transition-colors"
+                          style={{ backgroundColor: '#E59800', color: '#fff' }}
+                        >
+                          💳 Upload Bukti Transfer Angsuran
+                        </a>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        )}
 
         {/* ── Price Breakdown ── */}
         <div className="overflow-hidden mb-6 relative" style={{ border: `1px solid ${border}`, borderRadius: '12px' }}>

@@ -98,6 +98,7 @@ model Order {
   status        String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED
   paymentMethod String?  @map("payment_method")
   paymentProof  String?  @map("payment_proof")
+  paymentType   String   @default("FULL") @map("payment_type") // FULL, INSTALLMENT
   notes         String?
   adminNotes    String?  @map("admin_notes")
   reviewToken   String?  @unique @map("review_token")
@@ -106,9 +107,10 @@ model Order {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  tour    Tour     @relation(fields: [tourId], references: [id])
-  invoice Invoice?
-  review  Review?
+  tour            Tour             @relation(fields: [tourId], references: [id])
+  invoice         Invoice?
+  review          Review?
+  installmentPlan InstallmentPlan?
 
   @@map("orders")
 }
@@ -188,6 +190,47 @@ model Setting {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("settings")
+}
+
+model InstallmentPlan {
+  id                 String   @id @default(cuid())
+  orderId            String   @unique @map("order_id")
+  totalAmount        Float    @map("total_amount")
+  installmentCount   Int      @map("installment_count")
+  amountPerInstallment Float  @map("amount_per_installment")
+  downPayment        Float    @default(0) @map("down_payment")
+  dpPercentage       Float    @default(0) @map("dp_percentage")
+  installmentDates   String   @default("[]") @map("installment_dates") // JSON array of date strings
+  agreementDocUrl    String?  @map("agreement_doc_url")
+  status             String   @default("ACTIVE") // ACTIVE, COMPLETED, CANCELLED
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  order    Order                @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  payments InstallmentPayment[]
+
+  @@map("installment_plans")
+}
+
+model InstallmentPayment {
+  id               String    @id @default(cuid())
+  planId           String    @map("plan_id")
+  installmentNumber Int      @map("installment_number") // 1-based
+  amount           Float
+  dueDate          DateTime  @map("due_date")
+  status           String    @default("PENDING") // PENDING, PAID, CONFIRMED, OVERDUE
+  paymentProof     String?   @map("payment_proof")
+  adminConfirmedBy String?   @map("admin_confirmed_by")
+  adminConfirmedAt DateTime? @map("admin_confirmed_at")
+  notes            String?
+  paidAt           DateTime? @map("paid_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  plan InstallmentPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, installmentNumber])
+  @@map("installment_payments")
 }
 
 model Newsletter {

@@ -165,3 +165,123 @@ export function reviewRequestTemplate(data: {
     </div>
   `;
 }
+
+// ============ INSTALLMENT EMAIL TEMPLATES ============
+
+export function installmentAgreementTemplate(data: {
+  customerName: string;
+  tourName: string;
+  invoiceNo: string;
+  total: string;
+  installmentCount: number;
+  amountPerInstallment: string;
+  downPayment: string;
+  agreementUrl: string;
+  companyName: string;
+}): string {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #2563EB;">Perjanjian Pembiayaan Angsuran</h2>
+      <p>Halo <strong>${data.customerName}</strong>,</p>
+      <p>Terima kasih telah memilih pembayaran secara angsuran untuk pemesanan tour <strong>${data.tourName}</strong>.</p>
+      <p>Berikut adalah ringkasan Perjanjian Pembiayaan Anda:</p>
+      <table style="width: 100%; border-collapse: collapse; background: #F9FAFB; border-radius: 8px; overflow: hidden;">
+        <tr><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;"><strong>Invoice</strong></td><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;">${data.invoiceNo}</td></tr>
+        <tr><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;"><strong>Total</strong></td><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;">${data.total}</td></tr>
+        <tr><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;"><strong>Uang Muka (DP)</strong></td><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;">${data.downPayment}</td></tr>
+        <tr><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;"><strong>Jumlah Angsuran</strong></td><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;">${data.installmentCount}x @ ${data.amountPerInstallment}</td></tr>
+      </table>
+      <br/>
+      <a href="${data.agreementUrl}" style="background: #2563EB; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">📄 Lihat Surat Perjanjian</a>
+      <p style="margin-top: 20px; font-size: 12px; color: #666;">Mohon baca dan simpan surat perjanjian ini. Penagihan angsuran akan dikirim sesuai jadwal yang tertera.</p>
+      <p style="margin-top: 10px;">Salam,<br/><strong>${data.companyName}</strong></p>
+    </div>
+  `;
+}
+
+export function installmentBillingTemplate(data: {
+  customerName: string;
+  tourName: string;
+  invoiceNo: string;
+  installmentNumber: number;
+  totalInstallments: number;
+  amount: string;
+  dueDate: string;
+  paymentUrl: string;
+  bankAccounts: { bank: string; number: string; name: string }[];
+  companyName: string;
+}): string {
+  const bankRows = data.bankAccounts
+    .map(
+      (b) =>
+        `<tr><td style="padding: 6px 12px; border-bottom: 1px solid #E5E7EB;"><strong>Bank ${b.bank}</strong></td><td style="padding: 6px 12px; border-bottom: 1px solid #E5E7EB;">${b.number}</td><td style="padding: 6px 12px; border-bottom: 1px solid #E5E7EB;">a.n. ${b.name}</td></tr>`
+    )
+    .join('');
+
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #E59800;">Penagihan Angsuran ke-${data.installmentNumber}</h2>
+      <p>Halo <strong>${data.customerName}</strong>,</p>
+      <p>Berikut adalah penagihan angsuran ke-<strong>${data.installmentNumber}</strong> dari <strong>${data.totalInstallments}</strong> untuk pemesanan tour <strong>${data.tourName}</strong>.</p>
+      
+      <div style="background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr><td style="padding: 6px 0; color: #92400E;"><strong>Invoice</strong></td><td style="padding: 6px 0;">${data.invoiceNo}</td></tr>
+          <tr><td style="padding: 6px 0; color: #92400E;"><strong>Angsuran ke-</strong></td><td style="padding: 6px 0;">${data.installmentNumber} / ${data.totalInstallments}</td></tr>
+          <tr><td style="padding: 6px 0; color: #92400E;"><strong>Jumlah</strong></td><td style="padding: 6px 0; font-size: 18px; font-weight: bold; color: #EA580C;">${data.amount}</td></tr>
+          <tr><td style="padding: 6px 0; color: #92400E;"><strong>Jatuh Tempo</strong></td><td style="padding: 6px 0; font-weight: bold; color: #DC2626;">${data.dueDate}</td></tr>
+        </table>
+      </div>
+
+      <h3 style="font-size: 14px; color: #374151;">Informasi Rekening</h3>
+      <table style="width: 100%; border-collapse: collapse; background: #F9FAFB; border-radius: 8px; overflow: hidden;">
+        ${bankRows}
+      </table>
+
+      <br/>
+      <a href="${data.paymentUrl}" style="background: #E59800; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">💳 Upload Bukti Transfer</a>
+      <p style="margin-top: 20px; font-size: 12px; color: #666;">Mohon lakukan pembayaran sebelum tanggal jatuh tempo dan upload bukti transfer melalui link di atas. Keterlambatan pembayaran dapat mengakibatkan pembatalan pesanan.</p>
+      <p>Salam,<br/><strong>${data.companyName}</strong></p>
+    </div>
+  `;
+}
+
+export function installmentConfirmationTemplate(data: {
+  customerName: string;
+  tourName: string;
+  invoiceNo: string;
+  installmentNumber: number;
+  amount: string;
+  remainingInstallments: number;
+  nextDueDate: string;
+  companyName: string;
+}): string {
+  const nextBillingNote =
+    data.remainingInstallments > 0
+      ? `<div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="margin: 0; color: #1E40AF;"><strong>Sisa Angsuran: ${data.remainingInstallments}x</strong></p>
+          <p style="margin: 4px 0 0; font-size: 13px; color: #3B82F6;">Penagihan berikutnya akan dikirim menjelang jatuh tempo: <strong>${data.nextDueDate}</strong></p>
+        </div>`
+      : `<div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="margin: 0; color: #065F46; font-size: 16px;"><strong>🎉 Seluruh angsuran telah LUNAS!</strong></p>
+          <p style="margin: 4px 0 0; font-size: 13px; color: #059669;">Terima kasih telah menyelesaikan seluruh pembayaran. E-Ticket akan segera dikirimkan.</p>
+        </div>`;
+
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #059669;">Pembayaran Angsuran Dikonfirmasi!</h2>
+      <p>Halo <strong>${data.customerName}</strong>,</p>
+      <p>Pembayaran angsuran ke-<strong>${data.installmentNumber}</strong> sebesar <strong>${data.amount}</strong> untuk pemesanan <strong>${data.tourName}</strong> telah kami terima dan konfirmasi.</p>
+      
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr><td style="padding: 8px 0; color: #6B7280;">Invoice</td><td><strong>${data.invoiceNo}</strong></td></tr>
+        <tr><td style="padding: 8px 0; color: #6B7280;">Angsuran ke-</td><td><strong>${data.installmentNumber}</strong></td></tr>
+        <tr><td style="padding: 8px 0; color: #6B7280;">Jumlah Dibayar</td><td style="font-weight: bold; color: #059669;">${data.amount}</td></tr>
+      </table>
+
+      ${nextBillingNote}
+
+      <p>Salam,<br/><strong>${data.companyName}</strong></p>
+    </div>
+  `;
+}

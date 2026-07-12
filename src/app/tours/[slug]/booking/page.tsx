@@ -26,6 +26,11 @@ interface SlotInfo {
   priceOverride: number | null;
 }
 
+type PaymentType = 'FULL' | 'INSTALLMENT';
+
+const INSTALLMENT_OPTIONS = [2, 3, 4, 6];
+const DP_PERCENTAGE = 30;
+
 export default function BookingPage() {
   const params = useParams();
   const router = useRouter();
@@ -43,6 +48,12 @@ export default function BookingPage() {
     children: 0,
     notes: '',
   });
+  const [paymentType, setPaymentType] = useState<PaymentType>('FULL');
+  const [installmentCount, setInstallmentCount] = useState(3);
+  const [installmentEnabled, setInstallmentEnabled] = useState(false);
+  const [installmentOptions, setInstallmentOptions] = useState<number[]>([2, 3, 4, 6]);
+  const [dpPercentage, setDpPercentage] = useState(30);
+  const [minInstallmentAmount, setMinInstallmentAmount] = useState(0);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [bookingResult, setBookingResult] = useState<{ invoiceNo: string } | null>(null);
@@ -57,6 +68,30 @@ export default function BookingPage() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
+
+    // Fetch installment settings
+    fetch('/api/settings/public')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && data.data) {
+          setInstallmentEnabled(data.data.installment_enabled === true);
+          if (data.data.installment_options && Array.isArray(data.data.installment_options)) {
+            setInstallmentOptions(data.data.installment_options);
+            if (data.data.installment_options.length > 0) {
+              setInstallmentCount(data.data.installment_options[0]);
+            }
+          }
+          if (typeof data.data.dp_percentage === 'number') {
+            setDpPercentage(data.data.dp_percentage);
+          }
+          if (typeof data.data.min_amount_for_installment === 'number') {
+            setMinInstallmentAmount(data.data.min_amount_for_installment);
+          }
+        }
+      })
+      .catch(() => {
+        // Default: disabled
+      });
   }, [slug]);
 
   const updateField = (field: string, value: string | number) => {
@@ -110,12 +145,17 @@ export default function BookingPage() {
   };
 
   const handleNext = () => {
-    const errs = step === 1 ? validateStep1() : validateStep2();
-    if (Object.keys(errs).length > 0) {
-      setErrors(errs);
-      return;
+    if (step === 1) {
+      const errs = validateStep1();
+      if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+      setStep(2);
+    } else if (step === 2) {
+      const errs = validateStep2();
+      if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+      setStep(3);
+    } else if (step === 3) {
+      setStep(4);
     }
-    setStep(step + 1);
   };
 
   const handleSubmit = async () => {
@@ -141,14 +181,15 @@ export default function BookingPage() {
           tourId: tour.id,
           tourDate: selectedDate,
           ...formData,
+          paymentType,
+          installmentCount: paymentType === 'INSTALLMENT' ? installmentCount : undefined,
         }),
       });
       const data = await res.json();
       if (data.success) {
         setBookingResult(data.data);
-        setStep(4);
+        setStep(5);
       } else {
-        // Handle both backend error formats: { error: '...' } and { errors: { field: '...' } }
         if (data.errors && typeof data.errors === 'object') {
           setErrors((prev) => ({ ...prev, ...data.errors }));
         } else {
@@ -192,10 +233,10 @@ export default function BookingPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
       {/* Booking Steps Progress */}
-      {step < 4 && (
+      {step < 5 && (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
-            {['Pilih Tanggal', 'Isi Data', 'Konfirmasi'].map((label, i) => (
+            {['Pilih Tanggal', 'Isi Data', 'Metode Bayar', 'Konfirmasi'].map((label, i) => (
               <div key={label} className="flex items-center">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
@@ -207,7 +248,7 @@ export default function BookingPage() {
                 <span className={`ml-2 text-sm hidden sm:inline ${step >= i + 1 ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
                   {label}
                 </span>
-                {i < 2 && <div className={`flex-1 h-0.5 mx-2 ${step > i + 1 ? 'bg-green-500' : 'bg-gray-200'}`} />}
+                {i < 3 && <div className={`flex-1 h-0.5 mx-2 ${step > i + 1 ? 'bg-green-500' : 'bg-gray-200'}`} />}
               </div>
             ))}
           </div>
@@ -422,8 +463,125 @@ export default function BookingPage() {
         </div>
       )}
 
-      {/* Step 3: Confirmation */}
+      {/* Step 3: Payment Method */}
       {step === 3 && (
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-1">Pilih Metode Pembayaran</h2>
+          <p className="text-gray-500 text-sm mb-6">Pilih cara pembayaran yang sesuai untuk Anda</p>
+
+          <div className="space-y-4 mb-6">
+            {/* Full Payment */}
+            <div
+              onClick={() => setPaymentType('FULL')}
+              className={`rounded-xl border-2 p-5 cursor-pointer transition-all ${
+                paymentType === 'FULL'
+                  ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50'
+                  : 'border-gray-200 hover:border-gray-300 bg-white'
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className={`w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                  paymentType === 'FULL' ? 'border-blue-500' : 'border-gray-300'
+                }`}>
+                  {paymentType === 'FULL' && <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />}
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">Pembayaran Lunas</h3>
+                  <p className="text-sm text-gray-500 mt-0.5">Bayar penuh sekarang sebesar <strong className="text-gray-700">{formatCurrency(grandTotal)}</strong></p>
+                </div>
+              </div>
+            </div>
+
+            {/* Installment Payment */}
+            {installmentEnabled ? (
+              <div
+                onClick={() => setPaymentType('INSTALLMENT')}
+                className={`rounded-xl border-2 p-5 cursor-pointer transition-all ${
+                  paymentType === 'INSTALLMENT'
+                    ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300 bg-white'
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <div className={`w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                    paymentType === 'INSTALLMENT' ? 'border-blue-500' : 'border-gray-300'
+                  }`}>
+                    {paymentType === 'INSTALLMENT' && <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900">Pembayaran Angsuran (Cicilan)</h3>
+                    <p className="text-sm text-gray-500 mt-0.5">Bayar dengan DP {dpPercentage}% dan sisanya dicicil sesuai pilihan Anda</p>
+                  </div>
+                </div>
+
+                {paymentType === 'INSTALLMENT' && (
+                  <div className="mt-4 ml-9 space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Jumlah Angsuran</label>
+                      <div className="flex flex-wrap gap-2">
+                        {installmentOptions.map((opt) => (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setInstallmentCount(opt); }}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              installmentCount === opt
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                            }`}
+                          >
+                            {opt}x
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Installment simulation */}
+                    {(() => {
+                      const dp = Math.round(grandTotal * (dpPercentage / 100));
+                      const remaining = grandTotal - dp;
+                      const perInstallment = Math.round(remaining / installmentCount);
+                      return (
+                        <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-2">
+                          <h4 className="text-sm font-semibold text-gray-700">Simulasi Angsuran</h4>
+                          <div className="grid grid-cols-2 gap-y-1.5 text-sm">
+                            <span className="text-gray-500">Total Harga</span>
+                            <span className="text-right font-medium">{formatCurrency(grandTotal)}</span>
+                            <span className="text-gray-500">DP ({dpPercentage}%)</span>
+                            <span className="text-right font-medium text-orange-600">{formatCurrency(dp)}</span>
+                            <span className="text-gray-500">Sisa</span>
+                            <span className="text-right font-medium">{formatCurrency(remaining)}</span>
+                            <span className="text-gray-500 pt-2 border-t">Angsuran / Bulan</span>
+                            <span className="text-right font-bold text-blue-600 pt-2 border-t">{installmentCount}x {formatCurrency(perInstallment)}</span>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="rounded-xl border-2 border-dashed border-gray-200 p-5 bg-gray-50">
+                <div className="flex items-start gap-4 opacity-50">
+                  <div className="w-5 h-5 mt-0.5 rounded-full border-2 border-gray-300 flex-shrink-0" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Pembayaran Angsuran (Cicilan)</h3>
+                    <p className="text-sm text-gray-500 mt-0.5">Fitur angsuran belum tersedia untuk saat ini</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-between mt-6">
+            <Button onClick={() => setStep(2)} variant="outline">← Kembali</Button>
+            <Button onClick={handleNext} variant="primary">Lanjutkan →</Button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 4: Confirmation */}
+      {step === 4 && (
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Pemesanan</h2>
 
@@ -456,6 +614,20 @@ export default function BookingPage() {
                 <p className="font-medium">{formData.customerPhone}</p>
               </div>
             </div>
+            <div>
+              <span className="text-sm text-gray-500">Metode Pembayaran</span>
+              <p className="font-medium">
+                {paymentType === 'FULL' ? 'Pembayaran Lunas' : `Angsuran ${installmentCount}x`}
+              </p>
+            </div>
+            {paymentType === 'INSTALLMENT' && (
+              <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                <p className="text-sm font-medium text-blue-800">Detail Angsuran:</p>
+                <p className="text-xs text-blue-600 mt-1">
+                  DP {dpPercentage}%: {formatCurrency(Math.round(grandTotal * (dpPercentage / 100)))} &bull; Sisa {installmentCount}x @ {formatCurrency(Math.round((grandTotal - Math.round(grandTotal * (dpPercentage / 100))) / installmentCount))}/bulan
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Price Summary */}
@@ -489,7 +661,7 @@ export default function BookingPage() {
           )}
 
           <div className="flex justify-between mt-6">
-            <Button onClick={() => setStep(2)} variant="outline">← Kembali</Button>
+            <Button onClick={() => setStep(3)} variant="outline">← Kembali</Button>
             <Button onClick={handleSubmit} variant="accent" size="lg" isLoading={submitting}>
               Booking Sekarang
             </Button>
@@ -497,8 +669,8 @@ export default function BookingPage() {
         </div>
       )}
 
-      {/* Step 4: Success / Invoice */}
-      {step === 4 && bookingResult && (
+      {/* Step 5: Success / Invoice */}
+      {step === 5 && bookingResult && (
         <div className="bg-white rounded-xl shadow-sm p-6 text-center">
           <div className="text-6xl mb-4">🎉</div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Berhasil!</h2>

@@ -42,6 +42,10 @@ export default function AdminSettingsPage() {
     companyAddress: '',
     companyIcon: '',
     invoiceTheme: 'premium' as InvoiceTheme,
+    installmentEnabled: false,
+    installmentOptions: '2,3,4,6,12',
+    dpPercentage: 30,
+    minAmountForInstallment: 1000000,
   });
 
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>(DEFAULT_BANK_ACCOUNTS);
@@ -64,6 +68,12 @@ export default function AdminSettingsPage() {
             companyAddress: data.data.company_address || '',
             companyIcon: data.data.company_icon || '',
             invoiceTheme: (data.data.invoice_theme as InvoiceTheme) || 'premium',
+            installmentEnabled: data.data.installment_enabled === true || data.data.installment_enabled === 'true',
+            installmentOptions: Array.isArray(data.data.installment_options)
+              ? data.data.installment_options.join(',')
+              : (data.data.installment_options as string) || '2,3,4,6,12',
+            dpPercentage: Number(data.data.dp_percentage) || 30,
+            minAmountForInstallment: Number(data.data.min_amount_for_installment) || 1000000,
           }));
           if (data.data.bank_accounts && Array.isArray(data.data.bank_accounts)) {
             setBankAccounts(data.data.bank_accounts);
@@ -96,6 +106,10 @@ export default function AdminSettingsPage() {
           company_address: form.companyAddress,
           company_icon: form.companyIcon,
           invoice_theme: form.invoiceTheme,
+          installment_enabled: form.installmentEnabled,
+          installment_options: form.installmentOptions.split(',').map((s) => Number(s.trim())).filter((n) => !isNaN(n) && n > 0),
+          dp_percentage: form.dpPercentage,
+          min_amount_for_installment: form.minAmountForInstallment,
           bank_accounts: bankAccounts,
         }),
       });
@@ -418,6 +432,85 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Installment Settings */}
+        <div className="border-t pt-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">💳 Pembayaran Angsuran</h2>
+          <p className="text-xs text-gray-500 mb-4">
+            Aktifkan fitur pembayaran angsuran untuk tamu yang ingin mencicil biaya tour.
+          </p>
+          <div className="space-y-4">
+            {/* Enable Toggle */}
+            <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-200">
+              <div>
+                <p className="text-sm font-medium text-gray-900">Aktifkan Fitur Angsuran</p>
+                <p className="text-xs text-gray-500">Tamu dapat memilih pembayaran cicilan saat booking</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, installmentEnabled: !form.installmentEnabled })}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  form.installmentEnabled ? 'bg-blue-600' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    form.installmentEnabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {form.installmentEnabled && (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Pilihan Angsuran (pisahkan dengan koma)
+                    </label>
+                    <input
+                      type="text"
+                      value={form.installmentOptions}
+                      onChange={(e) => setForm({ ...form, installmentOptions: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="2,3,4,6,12"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">Contoh: 2,3,4,6,12 (jumlah kali angsuran)</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Persentase Down Payment (%)
+                    </label>
+                    <input
+                      type="number"
+                      value={form.dpPercentage}
+                      onChange={(e) => setForm({ ...form, dpPercentage: Number(e.target.value) })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="30"
+                      min="0"
+                      max="100"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">Persentase DP dari total harga (0-100)</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Minimal Harga untuk Angsuran (Rp)
+                  </label>
+                  <input
+                    type="number"
+                    value={form.minAmountForInstallment}
+                    onChange={(e) => setForm({ ...form, minAmountForInstallment: Number(e.target.value) })}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="1000000"
+                    min="0"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Tamu hanya bisa memilih angsuran jika total pesanan ≥ jumlah ini</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
 

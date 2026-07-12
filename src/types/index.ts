@@ -68,6 +68,12 @@ export interface TourSlot {
 
 // Order Types
 export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+export type PaymentType = 'FULL' | 'INSTALLMENT';
+
+export const PaymentTypeLabels: Record<PaymentType, string> = {
+  FULL: 'Lunas',
+  INSTALLMENT: 'Angsuran',
+};
 
 export const OrderStatusLabels: Record<OrderStatus, string> = {
   PENDING: 'Menunggu Pembayaran',
@@ -111,6 +117,7 @@ export interface Order {
   status: OrderStatus;
   paymentMethod: string | null;
   paymentProof: string | null;
+  paymentType: PaymentType;
   notes: string | null;
   adminNotes: string | null;
   reviewToken: string | null;
@@ -121,6 +128,7 @@ export interface Order {
   tour?: Tour;
   invoice?: Invoice;
   review?: Review;
+  installmentPlan?: InstallmentPlan;
 }
 
 // Invoice Types
@@ -130,6 +138,77 @@ export interface Invoice {
   pdfUrl: string | null;
   sentAt: string | null;
   createdAt: string;
+}
+
+// Installment Types
+export type InstallmentPlanStatus = 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+
+export const InstallmentPlanStatusLabels: Record<InstallmentPlanStatus, string> = {
+  ACTIVE: 'Aktif',
+  COMPLETED: 'Lunas',
+  CANCELLED: 'Dibatalkan',
+};
+
+export const InstallmentPlanStatusColors: Record<InstallmentPlanStatus, string> = {
+  ACTIVE: 'bg-blue-50 text-blue-700 border-blue-200',
+  COMPLETED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  CANCELLED: 'bg-rose-50 text-rose-700 border-rose-200',
+};
+
+export type InstallmentPaymentStatus = 'PENDING' | 'PAID' | 'CONFIRMED' | 'OVERDUE';
+
+export const InstallmentPaymentStatusLabels: Record<InstallmentPaymentStatus, string> = {
+  PENDING: 'Menunggu Pembayaran',
+  PAID: 'Menunggu Konfirmasi',
+  CONFIRMED: 'Terkonfirmasi',
+  OVERDUE: 'Terlambat',
+};
+
+export const InstallmentPaymentStatusColors: Record<InstallmentPaymentStatus, string> = {
+  PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
+  PAID: 'bg-sky-50 text-sky-700 border-sky-200',
+  CONFIRMED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  OVERDUE: 'bg-rose-50 text-rose-700 border-rose-200',
+};
+
+export const InstallmentPaymentStatusDots: Record<InstallmentPaymentStatus, string> = {
+  PENDING: 'bg-amber-500',
+  PAID: 'bg-sky-500',
+  CONFIRMED: 'bg-emerald-500',
+  OVERDUE: 'bg-rose-500',
+};
+
+export interface InstallmentPlan {
+  id: string;
+  orderId: string;
+  totalAmount: number;
+  installmentCount: number;
+  amountPerInstallment: number;
+  downPayment: number;
+  dpPercentage: number;
+  installmentDates: string[];
+  agreementDocUrl: string | null;
+  status: InstallmentPlanStatus;
+  createdAt: string;
+  updatedAt: string;
+  order?: Order;
+  payments?: InstallmentPayment[];
+}
+
+export interface InstallmentPayment {
+  id: string;
+  planId: string;
+  installmentNumber: number;
+  amount: number;
+  dueDate: string;
+  status: InstallmentPaymentStatus;
+  paymentProof: string | null;
+  adminConfirmedBy: string | null;
+  adminConfirmedAt: string | null;
+  notes: string | null;
+  paidAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Review Types
@@ -210,6 +289,11 @@ export interface AppSettings {
   paymentGateway: 'manual' | 'midtrans' | 'xendit';
   midtransServerKey: string;
   midtransClientKey: string;
+  // Installment settings
+  installmentEnabled: boolean;
+  installmentOptions: number[];
+  dpPercentage: number;
+  minAmountForInstallment: number;
 }
 
 export interface BankAccount {

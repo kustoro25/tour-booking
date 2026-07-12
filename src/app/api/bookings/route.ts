@@ -2,17 +2,33 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateInvoiceNo, calculateTotal, getExpiryDate, generateReviewToken } from '@/lib/utils';
 import { validateBookingForm } from '@/lib/validators';
-import { sendEmail, invoiceEmailTemplate } from '@/lib/email';
+import { sendEmail, invoiceEmailTemplate, installmentAgreementTemplate, installmentBillingTemplate } from '@/lib/email';
+import { generateInstallmentDates } from '@/lib/agreement';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { tourId, tourDate, customerName, customerEmail, customerPhone, adults, children, notes } = body;
+    const { tourId, tourDate, customerName, customerEmail, customerPhone, adults, children, notes, paymentType, installmentCount } = body;
 
     // Validate
     const errors = validateBookingForm({ customerName, customerEmail, customerPhone, adults, children });
     if (Object.keys(errors).length > 0) {
       return NextResponse.json({ success: false, errors }, { status: 400 });
+    }
+
+    const isInstallment = paymentType === 'INSTALLMENT';
+    const installmentNum = isInstallment ? (parseInt(String(installmentCount)) || 3) : 0;
+
+    if (isInstallment && (installmentNum < 2 || installmentNum > 12)) {
+      return NextResponse.json({ success: false, error: 'Jumlah angsuran tidak valid (2-12x)' }, { status: 400 });
+    }
+
+    // Check if installment is enabled from settings
+    if (isInstallment) {
+      const installmentSetting = await prisma.setting.findUnique({ where: { key: 'installment_enabled' } });
+      if (!installmentSetting || JSON.parse(installmentSetting.value) !== true) {
+        return NextResponse.json({ success: false, error: 'Fitur angsuran sedang tidak tersedia' }, { status: 400 });
+      }
     }
 
     if (!tourId || !tourDate) {
@@ -72,11 +88,71 @@ export async function POST(request: NextRequest) {
           children: children || 0,
           total,
           status: 'PENDING',
+          paymentType: isInstallment ? 'INSTALLMENT' : 'FULL',
           notes: notes || null,
           reviewToken: generateReviewToken(),
           expiryAt: getExpiryDate(24),
         },
       });
+
+      // Create installment plan if applicable
+      let installmentPlanData: {
+        planId: string;
+        dpAmount: number;
+        dpPercentage: number;
+        installmentCount: number;
+        amountPerInstallment: number;
+        dates: string[];
+      } | null = null;
+
+      if (isInstallment) {
+        // Read DP percentage from settings
+        let dpPct = 30;
+        try {
+          const dpSetting = await tx.setting.findUnique({ where: { key: 'dp_percentage' } });
+          if (dpSetting) {
+            const val = JSON.parse(dpSetting.value);
+            if (typeof val === 'number') dpPct = val;
+          }
+        } catch { /* use default */ }
+
+        const installmentInfo = generateInstallmentDates(installmentNum, dpPct, total);
+
+        const plan = await tx.installmentPlan.create({
+          data: {
+            orderId: order.id,
+            totalAmount: total,
+            installmentCount: installmentNum,
+            amountPerInstallment: installmentInfo.amountPerInstallment,
+            downPayment: installmentInfo.downPayment,
+            dpPercentage: dpPct,
+            installmentDates: JSON.stringify(installmentInfo.dates),
+            status: 'ACTIVE',
+          },
+        });
+
+        // Create individual installment payment records
+        for (let i = 0; i < installmentInfo.dates.length; i++) {
+          await tx.installmentPayment.create({
+            data: {
+              planId: plan.id,
+              installmentNumber: i + 1,
+              amount: installmentInfo.amountPerInstallment,
+              dueDate: new Date(installmentInfo.dates[i]),
+              status: 'PENDING',
+            },
+          });
+        }
+
+        installmentPlanData = {
+          planId: plan.id,
+          dpAmount: installmentInfo.downPayment,
+          dpPercentage: dpPct,
+          installmentCount: installmentNum,
+          amountPerInstallment: installmentInfo.amountPerInstallment,
+          dates: installmentInfo.dates,
+        };
+      }
 
       // Update or create slot atomically
       await tx.tourSlot.upsert({
@@ -99,7 +175,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return { order, invoiceNo, total };
+      return { order, invoiceNo, total, isInstallment, installmentPlanData };
     }, {
       isolationLevel: 'ReadCommitted',
       maxWait: 5000,  // max wait for transaction to start (ms)
@@ -107,24 +183,71 @@ export async function POST(request: NextRequest) {
     });
 
     // Send email notification (outside transaction, non-blocking)
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
+
     try {
-      const paymentUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/invoice/${result.invoiceNo}`;
-      await sendEmail({
-        to: customerEmail,
-        subject: `Invoice Pesanan Anda - ${tour.name}`,
-        html: invoiceEmailTemplate({
-          customerName,
-          tourName: tour.name,
-          invoiceNo: result.invoiceNo,
-          tourDate: new Date(tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
-          total: `Rp ${result.total.toLocaleString('id-ID')}`,
-          expiryDate: getExpiryDate(24).toLocaleString('id-ID'),
-          paymentUrl,
-          companyName: process.env.COMPANY_NAME || 'Jelajah Nusantara Tour',
-        }),
-      });
+      const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
+
+      if (result.isInstallment && result.installmentPlanData) {
+        const ipd = result.installmentPlanData;
+        const agreementUrl = `${siteUrl}/invoice/${result.invoiceNo}/installments`;
+
+        await sendEmail({
+          to: customerEmail,
+          subject: `Perjanjian Pembiayaan Angsuran - ${tour.name}`,
+          html: installmentAgreementTemplate({
+            customerName,
+            tourName: tour.name,
+            invoiceNo: result.invoiceNo,
+            total: formatCur(result.total),
+            installmentCount: ipd.installmentCount,
+            amountPerInstallment: formatCur(ipd.amountPerInstallment),
+            downPayment: formatCur(ipd.dpAmount),
+            agreementUrl,
+            companyName,
+          }),
+        });
+
+        // Also send first billing notification for the first installment
+        if (ipd.dates.length > 0) {
+          const firstDueDate = new Date(ipd.dates[0]).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+          await sendEmail({
+            to: customerEmail,
+            subject: `Penagihan Angsuran ke-1 - ${tour.name}`,
+            html: installmentBillingTemplate({
+              customerName,
+              tourName: tour.name,
+              invoiceNo: result.invoiceNo,
+              installmentNumber: 1,
+              totalInstallments: ipd.installmentCount,
+              amount: formatCur(ipd.amountPerInstallment),
+              dueDate: firstDueDate,
+              paymentUrl: agreementUrl,
+              bankAccounts: [{ bank: 'BCA', number: '1234567890', name: companyName }],
+              companyName,
+            }),
+          });
+        }
+      } else {
+        const paymentUrl = `${siteUrl}/invoice/${result.invoiceNo}`;
+        await sendEmail({
+          to: customerEmail,
+          subject: `Invoice Pesanan Anda - ${tour.name}`,
+          html: invoiceEmailTemplate({
+            customerName,
+            tourName: tour.name,
+            invoiceNo: result.invoiceNo,
+            tourDate: new Date(tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+            total: formatCur(result.total),
+            expiryDate: getExpiryDate(24).toLocaleString('id-ID'),
+            paymentUrl,
+            companyName,
+          }),
+        });
+      }
     } catch (emailErr) {
-      console.error('Failed to send invoice email:', emailErr);
+      console.error('Failed to send email:', emailErr);
     }
 
     return NextResponse.json({
