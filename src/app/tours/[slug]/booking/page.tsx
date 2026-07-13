@@ -423,24 +423,77 @@ export default function BookingPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Dewasa</label>
-                <input
-                  type="number"
-                  min={1}
-                  value={formData.adults}
-                  onChange={(e) => updateField('adults', parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
+                <div className="flex items-center">
+                  <button
+                    type="button"
+                    onClick={() => updateField('adults', Math.max(1, formData.adults - 1))}
+                    className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-l-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors text-lg font-semibold"
+                    aria-label="Kurangi dewasa"
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    min={1}
+                    value={formData.adults}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === '') {
+                        updateField('adults', 0);
+                      } else {
+                        const num = parseInt(val, 10);
+                        if (!isNaN(num)) updateField('adults', num);
+                      }
+                    }}
+                    className="w-full px-3 py-2.5 border-y border-gray-300 text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => updateField('adults', formData.adults + 1)}
+                    className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-r-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors text-lg font-semibold"
+                    aria-label="Tambah dewasa"
+                  >
+                    +
+                  </button>
+                </div>
                 {errors.adults && <p className="text-red-500 text-sm mt-1">{errors.adults}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Anak</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={formData.children}
-                  onChange={(e) => updateField('children', parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
+                <div className="flex items-center">
+                  <button
+                    type="button"
+                    onClick={() => updateField('children', Math.max(0, formData.children - 1))}
+                    className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-l-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors text-lg font-semibold"
+                    aria-label="Kurangi anak"
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    min={0}
+                    value={formData.children}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === '') {
+                        updateField('children', 0);
+                      } else {
+                        const num = parseInt(val, 10);
+                        if (!isNaN(num)) updateField('children', num);
+                      }
+                    }}
+                    className="w-full px-3 py-2.5 border-y border-gray-300 text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => updateField('children', formData.children + 1)}
+                    className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-r-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors text-lg font-semibold"
+                    aria-label="Tambah anak"
+                  >
+                    +
+                  </button>
+                </div>
+                {errors.children && <p className="text-red-500 text-sm mt-1">{errors.children}</p>}
               </div>
             </div>
 
