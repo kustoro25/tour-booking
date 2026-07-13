@@ -54,6 +54,7 @@ export default function BookingPage() {
   const [installmentOptions, setInstallmentOptions] = useState<number[]>([2, 3, 4, 6]);
   const [dpPercentage, setDpPercentage] = useState(30);
   const [minInstallmentAmount, setMinInstallmentAmount] = useState(0);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [bookingResult, setBookingResult] = useState<{ invoiceNo: string } | null>(null);
@@ -525,7 +526,7 @@ export default function BookingPage() {
           <div className="space-y-4 mb-6">
             {/* Full Payment */}
             <div
-              onClick={() => setPaymentType('FULL')}
+              onClick={() => { setPaymentType('FULL'); setAgreedToTerms(false); }}
               className={`rounded-xl border-2 p-5 cursor-pointer transition-all ${
                 paymentType === 'FULL'
                   ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50'
@@ -547,7 +548,7 @@ export default function BookingPage() {
 
             {/* Installment Payment */}
             <div
-              onClick={() => setPaymentType('INSTALLMENT')}
+              onClick={() => { setPaymentType('INSTALLMENT'); setAgreedToTerms(false); }}
               className={`rounded-xl border-2 p-5 cursor-pointer transition-all ${
                 paymentType === 'INSTALLMENT'
                   ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50'
@@ -617,9 +618,39 @@ export default function BookingPage() {
               </div>
           </div>
 
+          {paymentType === 'INSTALLMENT' && (
+            <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+              <h4 className="text-sm font-semibold text-amber-800 mb-2">Syarat & Ketentuan Angsuran</h4>
+              <ol className="text-xs text-amber-700 space-y-1.5 list-decimal list-inside leading-relaxed">
+                <li>Pembayaran angsuran wajib dilakukan sesuai jadwal jatuh tempo yang telah disepakati.</li>
+                <li>Setiap angsuran harus dibayar paling lambat pada tanggal jatuh tempo. Keterlambatan lebih dari 7 hari setelah jatuh tempo dapat mengakibatkan pembatalan pesanan.</li>
+                <li>Uang muka (DP) dan angsuran yang telah dibayarkan <strong>tidak dapat dikembalikan</strong>.</li>
+                <li>Seluruh angsuran harus <strong>lunas H-7</strong> sebelum tanggal keberangkatan. Jika belum lunas, pihak tour berhak menunda atau membatalkan keberangkatan.</li>
+                <li>Bukti transfer dikirim melalui <strong>email atau WhatsApp</strong> ke admin. Admin akan mengunggah dan mengkonfirmasi pembayaran Anda.</li>
+              </ol>
+              <label className="flex items-start gap-2 mt-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm text-amber-800">
+                  Saya telah membaca dan menyetujui syarat & ketentuan pembayaran angsuran di atas
+                </span>
+              </label>
+            </div>
+          )}
+
           <div className="flex justify-between mt-6">
-            <Button onClick={() => setStep(2)} variant="outline">← Kembali</Button>
-            <Button onClick={handleNext} variant="primary">Lanjutkan →</Button>
+            <Button onClick={() => { setStep(2); setAgreedToTerms(false); }} variant="outline">← Kembali</Button>
+            <Button
+              onClick={handleNext}
+              variant="primary"
+              disabled={paymentType === 'INSTALLMENT' && !agreedToTerms}
+            >
+              Lanjutkan →
+            </Button>
           </div>
         </div>
       )}

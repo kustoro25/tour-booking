@@ -23,6 +23,10 @@ export default function AdminInstallmentDetailPage() {
   const [plan, setPlan] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [proofUrl, setProofUrl] = useState('');
+  const [uploadingProof, setUploadingProof] = useState<number | null>(null);
+  const [editingDueDate, setEditingDueDate] = useState<number | null>(null);
+  const [dueDateValue, setDueDateValue] = useState('');
 
   const fetchPlan = useCallback(() => {
     fetch(`/api/admin/installments/${id}`)
@@ -94,6 +98,61 @@ export default function AdminInstallmentDetailPage() {
       }
     } catch {
       showToast('Gagal mengubah status', 'error');
+    }
+  };
+
+  const handleUploadProof = async (installmentNumber: number) => {
+    if (!proofUrl.trim()) {
+      showToast('Masukkan URL bukti transfer', 'error');
+      return;
+    }
+    setUploadingProof(installmentNumber);
+    try {
+      const res = await fetch(`/api/admin/installments/${id}/upload-proof/${installmentNumber}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentProof: proofUrl }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message || 'Bukti transfer berhasil diunggah', 'success');
+        setProofUrl('');
+        fetchPlan();
+      } else {
+        showToast(data.error || 'Gagal mengunggah', 'error');
+      }
+    } catch {
+      showToast('Gagal menghubungi server', 'error');
+    } finally {
+      setUploadingProof(null);
+    }
+  };
+
+  const handleUpdateDueDate = async (installmentNumber: number) => {
+    if (!dueDateValue) {
+      showToast('Pilih tanggal jatuh tempo', 'error');
+      return;
+    }
+    setActionLoading(installmentNumber);
+    try {
+      const res = await fetch(`/api/admin/installments/${id}/due-date/${installmentNumber}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dueDate: dueDateValue }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message || 'Tanggal jatuh tempo diperbarui', 'success');
+        setEditingDueDate(null);
+        setDueDateValue('');
+        fetchPlan();
+      } else {
+        showToast(data.error || 'Gagal memperbarui', 'error');
+      }
+    } catch {
+      showToast('Gagal menghubungi server', 'error');
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -221,6 +280,20 @@ export default function AdminInstallmentDetailPage() {
           </Link>
         </div>
 
+        {/* Upload Proof Section */}
+        <div className="px-4 sm:px-6 py-3 bg-gray-50 border-b border-gray-100">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-gray-600 whitespace-nowrap">Upload Bukti:</span>
+            <input
+              type="url"
+              value={proofUrl}
+              onChange={(e) => setProofUrl(e.target.value)}
+              placeholder="URL bukti transfer (Google Drive, Imgur, dll)"
+              className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+
         {/* Mobile Cards */}
         <div className="sm:hidden divide-y divide-gray-100">
           {payments.map((payment, idx) => {
@@ -246,9 +319,45 @@ export default function AdminInstallmentDetailPage() {
                   </div>
                   <div>
                     <span className="text-xs text-gray-400">Jatuh Tempo</span>
-                    <p className={`text-sm ${status === 'OVERDUE' ? 'text-red-600 font-medium' : ''}`}>
-                      {payment.dueDate ? new Date(payment.dueDate as string).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}
-                    </p>
+                    {editingDueDate === num ? (
+                      <div className="flex items-center gap-1 mt-1">
+                        <input
+                          type="date"
+                          value={dueDateValue}
+                          onChange={(e) => setDueDateValue(e.target.value)}
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-xs"
+                        />
+                        <button
+                          onClick={() => handleUpdateDueDate(num)}
+                          disabled={isLoadingMe}
+                          className="bg-green-600 text-white px-2 py-1 rounded text-xs font-medium hover:bg-green-700 disabled:opacity-50 whitespace-nowrap"
+                        >
+                          ✓
+                        </button>
+                        <button
+                          onClick={() => { setEditingDueDate(null); setDueDateValue(''); }}
+                          className="text-gray-400 hover:text-gray-600 text-xs px-1"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <div>
+                        <p className={`text-sm ${status === 'OVERDUE' ? 'text-red-600 font-medium' : ''}`}>
+                          {payment.dueDate ? new Date(payment.dueDate as string).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}
+                        </p>
+                        <button
+                          onClick={() => {
+                            setEditingDueDate(num);
+                            const d = payment.dueDate ? new Date(payment.dueDate as string) : new Date();
+                            setDueDateValue(d.toISOString().split('T')[0]);
+                          }}
+                          className="text-xs text-blue-600 hover:underline mt-0.5"
+                        >
+                          ✎ Ubah Tanggal
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
                 {Boolean(payment.paymentProof) && (
@@ -262,6 +371,15 @@ export default function AdminInstallmentDetailPage() {
                   </a>
                 )}
                 <div className="flex gap-2 pt-1">
+                  {(status === 'PENDING' || status === 'OVERDUE') && (
+                    <button
+                      onClick={() => handleUploadProof(num)}
+                      disabled={uploadingProof === num}
+                      className="flex-1 bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-orange-700 disabled:opacity-50"
+                    >
+                      {uploadingProof === num ? '...' : 'Upload Bukti'}
+                    </button>
+                  )}
                   {(status === 'PAID') && (
                     <button
                       onClick={() => handleConfirm(num)}
@@ -322,9 +440,45 @@ export default function AdminInstallmentDetailPage() {
                     </td>
                     <td className="px-4 py-3 text-right font-medium">{formatCurrency(payment.amount as number)}</td>
                     <td className="px-4 py-3">
-                      <span className={status === 'OVERDUE' ? 'text-red-600 font-medium' : ''}>
-                        {payment.dueDate ? new Date(payment.dueDate as string).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}
-                      </span>
+                      {editingDueDate === num ? (
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="date"
+                            value={dueDateValue}
+                            onChange={(e) => setDueDateValue(e.target.value)}
+                            className="w-36 px-2 py-1 border border-gray-300 rounded text-xs"
+                          />
+                          <button
+                            onClick={() => handleUpdateDueDate(num)}
+                            disabled={isLoadingMe}
+                            className="bg-green-600 text-white px-2 py-1 rounded text-xs font-medium hover:bg-green-700 disabled:opacity-50"
+                          >
+                            ✓
+                          </button>
+                          <button
+                            onClick={() => { setEditingDueDate(null); setDueDateValue(''); }}
+                            className="text-gray-400 hover:text-gray-600 text-xs"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ) : (
+                        <div>
+                          <span className={status === 'OVERDUE' ? 'text-red-600 font-medium' : ''}>
+                            {payment.dueDate ? new Date(payment.dueDate as string).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}
+                          </span>
+                          <button
+                            onClick={() => {
+                              setEditingDueDate(num);
+                              const d = payment.dueDate ? new Date(payment.dueDate as string) : new Date();
+                              setDueDateValue(d.toISOString().split('T')[0]);
+                            }}
+                            className="block text-xs text-blue-600 hover:underline mt-0.5"
+                          >
+                            ✎ Ubah
+                          </button>
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       {payment.paymentProof ? (
@@ -342,6 +496,15 @@ export default function AdminInstallmentDetailPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-2">
+                        {(status === 'PENDING' || status === 'OVERDUE') && (
+                          <button
+                            onClick={() => handleUploadProof(num)}
+                            disabled={uploadingProof === num}
+                            className="bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-orange-700 disabled:opacity-50 whitespace-nowrap"
+                          >
+                            {uploadingProof === num ? '...' : 'Upload Bukti'}
+                          </button>
+                        )}
                         {(status === 'PAID') && (
                           <button
                             onClick={() => handleConfirm(num)}

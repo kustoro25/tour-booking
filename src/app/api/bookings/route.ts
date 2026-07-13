@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateInvoiceNo, calculateTotal, getExpiryDate, generateReviewToken } from '@/lib/utils';
 import { validateBookingForm } from '@/lib/validators';
-import { sendEmail, invoiceEmailTemplate, installmentAgreementTemplate, installmentBillingTemplate } from '@/lib/email';
+import { sendEmail, invoiceEmailTemplate, installmentBillingTemplate } from '@/lib/email';
 import { generateInstallmentDates } from '@/lib/agreement';
 
 export async function POST(request: NextRequest) {
@@ -191,25 +191,16 @@ export async function POST(request: NextRequest) {
 
       if (result.isInstallment && result.installmentPlanData) {
         const ipd = result.installmentPlanData;
-        const agreementUrl = `${siteUrl}/invoice/${result.invoiceNo}/installments`;
+        const installmentUrl = `${siteUrl}/invoice/${result.invoiceNo}/installments`;
 
-        await sendEmail({
-          to: customerEmail,
-          subject: `Perjanjian Pembiayaan Angsuran - ${tour.name}`,
-          html: installmentAgreementTemplate({
-            customerName,
-            tourName: tour.name,
-            invoiceNo: result.invoiceNo,
-            total: formatCur(result.total),
-            installmentCount: ipd.installmentCount,
-            amountPerInstallment: formatCur(ipd.amountPerInstallment),
-            downPayment: formatCur(ipd.dpAmount),
-            agreementUrl,
-            companyName,
-          }),
-        });
+        // Read bank accounts
+        let bankAccounts = [{ bank: 'BCA', number: '1234567890', name: companyName }];
+        try {
+          const bankSetting = await prisma.setting.findUnique({ where: { key: 'bank_accounts' } });
+          if (bankSetting) bankAccounts = JSON.parse(bankSetting.value);
+        } catch { /* default */ }
 
-        // Also send first billing notification for the first installment
+        // Send first billing notification for the first installment
         if (ipd.dates.length > 0) {
           const firstDueDate = new Date(ipd.dates[0]).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
           await sendEmail({
@@ -223,8 +214,8 @@ export async function POST(request: NextRequest) {
               totalInstallments: ipd.installmentCount,
               amount: formatCur(ipd.amountPerInstallment),
               dueDate: firstDueDate,
-              paymentUrl: agreementUrl,
-              bankAccounts: [{ bank: 'BCA', number: '1234567890', name: companyName }],
+              paymentUrl: installmentUrl,
+              bankAccounts,
               companyName,
             }),
           });

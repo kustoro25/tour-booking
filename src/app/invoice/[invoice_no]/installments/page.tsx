@@ -49,9 +49,6 @@ export default function InstallmentTrackingPage() {
   const [data, setData] = useState<InstallmentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [uploading, setUploading] = useState<number | null>(null);
-  const [uploadMsg, setUploadMsg] = useState('');
-  const [proofUrl, setProofUrl] = useState('');
 
   useEffect(() => {
     fetch(`/api/installments/${invoiceNo}`)
@@ -63,37 +60,6 @@ export default function InstallmentTrackingPage() {
       .catch(() => setError('Gagal menghubungi server'))
       .finally(() => setLoading(false));
   }, [invoiceNo]);
-
-  const handleUpload = async (installmentNumber: number) => {
-    if (!proofUrl.trim()) {
-      setUploadMsg('Masukkan URL bukti transfer');
-      return;
-    }
-    setUploading(installmentNumber);
-    setUploadMsg('');
-    try {
-      const res = await fetch(`/api/installments/${invoiceNo}/pay/${installmentNumber}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentProof: proofUrl }),
-      });
-      const d = await res.json();
-      if (d.success) {
-        setUploadMsg(d.message);
-        setProofUrl('');
-        // Refresh data
-        const refresh = await fetch(`/api/installments/${invoiceNo}`);
-        const refreshData = await refresh.json();
-        if (refreshData.success) setData(refreshData.data);
-      } else {
-        setUploadMsg(d.error || 'Gagal mengunggah');
-      }
-    } catch {
-      setUploadMsg('Gagal menghubungi server');
-    } finally {
-      setUploading(null);
-    }
-  };
 
   if (loading) {
     return (
@@ -167,7 +133,7 @@ export default function InstallmentTrackingPage() {
                 <th className="py-2.5 px-4 text-right font-medium">Jumlah</th>
                 <th className="py-2.5 px-4 text-right font-medium">Jatuh Tempo</th>
                 <th className="py-2.5 px-4 text-center font-medium">Status</th>
-                <th className="py-2.5 px-4 text-center font-medium">Aksi</th>
+                <th className="py-2.5 px-4 text-center font-medium">Bukti</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -210,49 +176,16 @@ export default function InstallmentTrackingPage() {
         </div>
       </div>
 
-      {/* Upload Section */}
-      {nextUnpaid && (
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Upload Bukti Transfer - Angsuran ke-{nextUnpaid.installmentNumber}
-          </h3>
-          <p className="text-sm text-gray-500 mb-3">
-            Jumlah: <strong className="text-gray-800">{formatCurrency(nextUnpaid.amount)}</strong> &bull;
-            Jatuh Tempo: <strong className="text-orange-600">
-              {new Date(nextUnpaid.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-            </strong>
-          </p>
-
-          {uploadMsg && (
-            <div className={`mb-4 p-3 rounded-lg text-sm ${uploadMsg.includes('berhasil') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-              {uploadMsg}
-            </div>
-          )}
-
-          <div className="space-y-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">URL Bukti Transfer</label>
-              <input
-                type="url"
-                value={proofUrl}
-                onChange={(e) => setProofUrl(e.target.value)}
-                placeholder="https://drive.google.com/file/... atau https://i.imgur.com/..."
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                Upload bukti transfer ke Google Drive, Imgur, atau layanan gambar lainnya, lalu tempel URL-nya di sini.
-              </p>
-            </div>
-            <button
-              onClick={() => handleUpload(nextUnpaid.installmentNumber)}
-              disabled={uploading !== null}
-              className="bg-orange-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-orange-700 disabled:opacity-50 text-sm transition-colors"
-            >
-              {uploading ? 'Mengunggah...' : 'Upload Bukti Transfer'}
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Upload Info */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 text-sm text-blue-800">
+        <h3 className="font-semibold mb-2">📤 Cara Mengirim Bukti Transfer</h3>
+        <p className="mb-2">Kirimkan bukti transfer Anda melalui:</p>
+        <ul className="list-disc list-inside space-y-1 ml-1">
+          <li><strong>Email:</strong> Kirim ke alamat email yang tertera di invoice</li>
+          <li><strong>WhatsApp:</strong> Kirim ke nomor WhatsApp admin yang tertera di invoice</li>
+        </ul>
+        <p className="mt-3 text-xs text-blue-600">Setelah admin menerima dan memverifikasi bukti transfer, status pembayaran akan diperbarui dan bukti akan muncul di tabel di atas.</p>
+      </div>
     </div>
   );
 }
