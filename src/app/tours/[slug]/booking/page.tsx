@@ -648,10 +648,10 @@ export default function BookingPage() {
               <span className="text-sm text-gray-500">Nama Pemesan</span>
               <p className="font-medium">{formData.customerName}</p>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="min-w-0">
                 <span className="text-sm text-gray-500">Email</span>
-                <p className="font-medium text-sm">{formData.customerEmail}</p>
+                <p className="font-medium text-sm break-all">{formData.customerEmail}</p>
               </div>
               <div>
                 <span className="text-sm text-gray-500">No. HP</span>
