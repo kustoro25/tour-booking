@@ -46,6 +46,11 @@ export default function AdminSettingsPage() {
     installmentOptions: '2,3,4,6,12',
     dpPercentage: 30,
     minAmountForInstallment: 1000000,
+    googleReviewsEnabled: false,
+    googlePlaceId: '',
+    googleApiKey: '',
+    googleReviewsCount: 5,
+    googleReviewsMinRating: 3,
   });
 
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>(DEFAULT_BANK_ACCOUNTS);
@@ -74,6 +79,11 @@ export default function AdminSettingsPage() {
               : (data.data.installment_options as string) || '2,3,4,6,12',
             dpPercentage: Number(data.data.dp_percentage) || 30,
             minAmountForInstallment: Number(data.data.min_amount_for_installment) || 1000000,
+            googleReviewsEnabled: data.data.google_reviews_enabled === true || data.data.google_reviews_enabled === 'true',
+            googlePlaceId: (data.data.google_place_id as string) || '',
+            googleApiKey: (data.data.google_api_key as string) || '',
+            googleReviewsCount: Number(data.data.google_reviews_count) || 5,
+            googleReviewsMinRating: Number(data.data.google_reviews_min_rating) || 3,
           }));
           if (data.data.bank_accounts && Array.isArray(data.data.bank_accounts)) {
             setBankAccounts(data.data.bank_accounts);
@@ -110,6 +120,11 @@ export default function AdminSettingsPage() {
           installment_options: form.installmentOptions.split(',').map((s) => Number(s.trim())).filter((n) => !isNaN(n) && n > 0),
           dp_percentage: form.dpPercentage,
           min_amount_for_installment: form.minAmountForInstallment,
+          google_reviews_enabled: form.googleReviewsEnabled,
+          google_place_id: form.googlePlaceId,
+          google_api_key: form.googleApiKey,
+          google_reviews_count: form.googleReviewsCount,
+          google_reviews_min_rating: form.googleReviewsMinRating,
           bank_accounts: bankAccounts,
         }),
       });
@@ -508,6 +523,92 @@ export default function AdminSettingsPage() {
                     min="0"
                   />
                   <p className="text-xs text-gray-400 mt-1">Tamu hanya bisa memilih angsuran jika total pesanan ≥ jumlah ini</p>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* ═══════════ Google Reviews ═══════════ */}
+        <div className="border-t pt-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">⭐ Google Maps Reviews</h2>
+          <p className="text-xs text-gray-500 mb-4">
+            Tampilkan review dari Google Maps di landing page. Butuh Google API Key dengan Places API enabled.
+          </p>
+
+          <div className="space-y-4">
+            {/* Enable Toggle */}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-900">Aktifkan Google Reviews</p>
+                <p className="text-xs text-gray-500">Tampilkan section review dari Google Maps di halaman utama</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, googleReviewsEnabled: !form.googleReviewsEnabled })}
+                className={`relative w-12 h-7 rounded-full transition-colors ${form.googleReviewsEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
+              >
+                <span className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${form.googleReviewsEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+
+            {form.googleReviewsEnabled && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Google Place ID</label>
+                  <input
+                    type="text"
+                    value={form.googlePlaceId}
+                    onChange={(e) => setForm({ ...form, googlePlaceId: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="ChIJN1t_tDeuEmsRUsoyG83frY4"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      Cara mendapatkan Place ID ↗
+                    </a>
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Google API Key</label>
+                  <input
+                    type="text"
+                    value={form.googleApiKey}
+                    onChange={(e) => setForm({ ...form, googleApiKey: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="AIzaSy..."
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    Pastikan API Key memiliki <strong>Places API</strong> enabled di Google Cloud Console.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Jumlah Review Ditampilkan</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={5}
+                      value={form.googleReviewsCount}
+                      onChange={(e) => setForm({ ...form, googleReviewsCount: parseInt(e.target.value) || 5 })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">Google API maksimal mengembalikan 5 review terbaru</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Rating Minimal (1-5)</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={5}
+                      value={form.googleReviewsMinRating}
+                      onChange={(e) => setForm({ ...form, googleReviewsMinRating: parseInt(e.target.value) || 3 })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">Hanya tampilkan review dengan rating ≥ nilai ini</p>
+                  </div>
                 </div>
               </>
             )}

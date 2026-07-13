@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import StarRating from '@/components/ui/StarRating';
 import GalleryCarousel from '@/components/tours/GalleryCarousel';
 import HeroSearch from '@/components/ui/HeroSearch';
+import GoogleReviewsSection from '@/components/reviews/GoogleReviewsSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -563,6 +564,9 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Google Maps Reviews */}
+      <GoogleReviewsSection />
 
       {/* FAQ Section */}
       <section className="py-16 sm:py-20 bg-white">
