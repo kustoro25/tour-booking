@@ -4,12 +4,16 @@
 // Alur: verifikasi signature -> update status order/angsuran -> kirim notifikasi (email + WhatsApp).
 // Pola order_id: {invoiceNo} = pembayaran lunas; {invoiceNo}-INST-{n} = pembayaran angsuran (0 = DP).
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendEmail, paymentConfirmationTemplate, installmentConfirmationTemplate } from '@/lib/email';
 import { sendOrderTicketEmail } from '@/lib/eticket';
 import { notifyCustomerPaymentReceived } from '@/lib/whatsapp';
 import { verifyMidtransSignature, mapMidtransState, type MidtransNotificationPayload } from '@/lib/midtrans';
+
+// Notifikasi pasca-response (email/WA/e-ticket) dijalankan via after() agar
+// serverless tetap mengerjakannya sampai selesai (waitUntil), tidak dibekukan.
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
@@ -77,31 +81,35 @@ export async function POST(request: NextRequest) {
         const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
         const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 
-        sendEmail({
-          to: order.customerEmail,
-          subject: `Pembayaran Dikonfirmasi - ${order.tour.name}`,
-          html: paymentConfirmationTemplate({
-            customerName: order.customerName,
-            tourName: order.tour.name,
-            invoiceNo: order.invoiceNo,
-            tourDate: new Date(order.tourDate).toLocaleDateString('id-ID', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
+        after(() =>
+          sendEmail({
+            to: order.customerEmail,
+            subject: `Pembayaran Dikonfirmasi - ${order.tour.name}`,
+            html: paymentConfirmationTemplate({
+              customerName: order.customerName,
+              tourName: order.tour.name,
+              invoiceNo: order.invoiceNo,
+              tourDate: new Date(order.tourDate).toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              }),
+              companyName,
             }),
-            companyName,
-          }),
-        }).catch((err) => console.error('Payment confirmation email failed:', err));
+          }).catch((err) => console.error('Payment confirmation email failed:', err))
+        );
 
         // E-Ticket otomatis (anti-duplikat via eticketSentAt)
-        sendOrderTicketEmail(order.id).catch((err) => console.error('E-ticket email failed:', err));
+        after(() => sendOrderTicketEmail(order.id).catch((err) => console.error('E-ticket email failed:', err)));
 
-        notifyCustomerPaymentReceived({
-          customerPhone: order.customerPhone,
-          customerName: order.customerName,
-          invoiceNo: order.invoiceNo,
-          amountLabel: formatCur(order.total),
-        }).catch((err) => console.error('Payment confirmation WA failed:', err));
+        after(() =>
+          notifyCustomerPaymentReceived({
+            customerPhone: order.customerPhone,
+            customerName: order.customerName,
+            invoiceNo: order.invoiceNo,
+            amountLabel: formatCur(order.total),
+          }).catch((err) => console.error('Payment confirmation WA failed:', err))
+        );
       } else {
         // Order sudah CONFIRMED/COMPLETED — cukup simpan referensi transaksi terbaru
         await prisma.order.update({
@@ -236,51 +244,57 @@ async function handleInstallmentPayment(
     const remaining = plan.payments.filter((p) => p.id !== payment.id && p.status !== 'CONFIRMED').length;
     const nextPayment = plan.payments.find((p) => p.id !== payment.id && p.status !== 'CONFIRMED');
 
-    sendEmail({
-      to: order.customerEmail,
-      subject: `DP Diterima — Pesanan ${order.invoiceNo} Aktif`,
-      html: installmentConfirmationTemplate({
-        customerName: order.customerName,
-        tourName: order.tour.name,
-        invoiceNo: order.invoiceNo,
-        installmentNumber: 0,
-        amount: formatCur(payment.amount),
-        remainingInstallments: remaining,
-        nextDueDate: nextPayment
-          ? new Date(nextPayment.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
-          : '-',
-        companyName,
-      }),
-    }).catch((err) => console.error('DP confirmation email failed:', err));
+    after(() =>
+      sendEmail({
+        to: order.customerEmail,
+        subject: `DP Diterima — Pesanan ${order.invoiceNo} Aktif`,
+        html: installmentConfirmationTemplate({
+          customerName: order.customerName,
+          tourName: order.tour.name,
+          invoiceNo: order.invoiceNo,
+          installmentNumber: 0,
+          amount: formatCur(payment.amount),
+          remainingInstallments: remaining,
+          nextDueDate: nextPayment
+            ? new Date(nextPayment.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+            : '-',
+          companyName,
+        }),
+      }).catch((err) => console.error('DP confirmation email failed:', err))
+    );
   } else {
     // Angsuran ke-n diterima → notifikasi konfirmasi
     const remaining = plan.payments.filter((p) => p.id !== payment.id && p.status !== 'CONFIRMED').length;
     const nextPayment = plan.payments.find((p) => p.id !== payment.id && p.status !== 'CONFIRMED');
 
-    sendEmail({
-      to: order.customerEmail,
-      subject: `Pembayaran Angsuran ke-${installmentNumber} Dikonfirmasi - ${order.tour.name}`,
-      html: installmentConfirmationTemplate({
-        customerName: order.customerName,
-        tourName: order.tour.name,
-        invoiceNo: order.invoiceNo,
-        installmentNumber,
-        amount: formatCur(payment.amount),
-        remainingInstallments: remaining,
-        nextDueDate: nextPayment
-          ? new Date(nextPayment.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
-          : '-',
-        companyName,
-      }),
-    }).catch((err) => console.error('Installment confirmation email failed:', err));
+    after(() =>
+      sendEmail({
+        to: order.customerEmail,
+        subject: `Pembayaran Angsuran ke-${installmentNumber} Dikonfirmasi - ${order.tour.name}`,
+        html: installmentConfirmationTemplate({
+          customerName: order.customerName,
+          tourName: order.tour.name,
+          invoiceNo: order.invoiceNo,
+          installmentNumber,
+          amount: formatCur(payment.amount),
+          remainingInstallments: remaining,
+          nextDueDate: nextPayment
+            ? new Date(nextPayment.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+            : '-',
+          companyName,
+        }),
+      }).catch((err) => console.error('Installment confirmation email failed:', err))
+    );
   }
 
-  notifyCustomerPaymentReceived({
-    customerPhone: order.customerPhone,
-    customerName: order.customerName,
-    invoiceNo: order.invoiceNo,
-    amountLabel: `${installmentNumber === 0 ? 'DP ' : `Angsuran ke-${installmentNumber} `}${formatCur(payment.amount)}`,
-  }).catch((err) => console.error('Payment confirmation WA failed:', err));
+  after(() =>
+    notifyCustomerPaymentReceived({
+      customerPhone: order.customerPhone,
+      customerName: order.customerName,
+      invoiceNo: order.invoiceNo,
+      amountLabel: `${installmentNumber === 0 ? 'DP ' : `Angsuran ke-${installmentNumber} `}${formatCur(payment.amount)}`,
+    }).catch((err) => console.error('Payment confirmation WA failed:', err))
+  );
 
   // Semua pembayaran (DP + seluruh angsuran) terkonfirmasi → plan LUNAS
   const allPayments = await prisma.installmentPayment.findMany({ where: { planId: plan.id } });
@@ -291,7 +305,7 @@ async function handleInstallmentPayment(
     });
 
     // Seluruh angsuran lunas → kirim E-Ticket otomatis
-    sendOrderTicketEmail(order.id).catch((err) => console.error('E-ticket email failed:', err));
+    after(() => sendOrderTicketEmail(order.id).catch((err) => console.error('E-ticket email failed:', err)));
   }
 
   return NextResponse.json({ success: true });

@@ -1,9 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { sendEmail, installmentConfirmationTemplate } from '@/lib/email';
 import { notifyCustomerPaymentReceived } from '@/lib/whatsapp';
 import { sendOrderTicketEmail } from '@/lib/eticket';
+
+// Notifikasi pasca-response dijalankan via after() agar serverless tetap
+// mengerjakannya sampai selesai (waitUntil), tidak dibekukan setelah response.
+export const maxDuration = 60;
 
 export async function POST(
   request: NextRequest,
@@ -66,7 +70,7 @@ export async function POST(
       });
 
       // Seluruh angsuran lunas → kirim E-Ticket otomatis
-      sendOrderTicketEmail(plan.order.id).catch((err) => console.error('E-ticket email failed:', err));
+      after(() => sendOrderTicketEmail(plan.order.id).catch((err) => console.error('E-ticket email failed:', err)));
     }
 
     // Send confirmation email
@@ -79,28 +83,32 @@ export async function POST(
       ? new Date(nextPayment.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
       : '-';
 
-    sendEmail({
-      to: plan.order.customerEmail,
-      subject: `Pembayaran Angsuran ke-${installmentNumber} Dikonfirmasi - ${plan.order.tour.name}`,
-      html: installmentConfirmationTemplate({
-        customerName: plan.order.customerName,
-        tourName: plan.order.tour.name,
-        invoiceNo: plan.order.invoiceNo,
-        installmentNumber,
-        amount: formatCur(payment.amount),
-        remainingInstallments: remaining,
-        nextDueDate,
-        companyName,
-      }),
-    }).catch((err) => console.error('Confirmation email failed:', err));
+    after(() =>
+      sendEmail({
+        to: plan.order.customerEmail,
+        subject: `Pembayaran Angsuran ke-${installmentNumber} Dikonfirmasi - ${plan.order.tour.name}`,
+        html: installmentConfirmationTemplate({
+          customerName: plan.order.customerName,
+          tourName: plan.order.tour.name,
+          invoiceNo: plan.order.invoiceNo,
+          installmentNumber,
+          amount: formatCur(payment.amount),
+          remainingInstallments: remaining,
+          nextDueDate,
+          companyName,
+        }),
+      }).catch((err) => console.error('Confirmation email failed:', err))
+    );
 
-    // Notifikasi WhatsApp ke pembeli (non-blocking)
-    notifyCustomerPaymentReceived({
-      customerPhone: plan.order.customerPhone,
-      customerName: plan.order.customerName,
-      invoiceNo: plan.order.invoiceNo,
-      amountLabel: formatCur(payment.amount),
-    }).catch((err) => console.error('Confirmation WA failed:', err));
+    // Notifikasi WhatsApp ke pembeli (non-blocking, tetap jalan via after())
+    after(() =>
+      notifyCustomerPaymentReceived({
+        customerPhone: plan.order.customerPhone,
+        customerName: plan.order.customerName,
+        invoiceNo: plan.order.invoiceNo,
+        amountLabel: formatCur(payment.amount),
+      }).catch((err) => console.error('Confirmation WA failed:', err))
+    );
 
     return NextResponse.json({
       success: true,

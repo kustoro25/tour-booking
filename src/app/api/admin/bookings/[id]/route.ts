@@ -1,9 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { sendEmail, reviewRequestTemplate, paymentConfirmationTemplate } from '@/lib/email';
 import { notifyCustomerPaymentReceived } from '@/lib/whatsapp';
 import { sendOrderTicketEmail } from '@/lib/eticket';
+
+// Notifikasi pasca-response dijalankan via after() agar serverless tetap
+// mengerjakannya sampai selesai (waitUntil), tidak dibekukan setelah response.
+export const maxDuration = 60;
 
 export async function GET(
   request: NextRequest,
@@ -99,29 +103,33 @@ export async function PUT(
       const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
       const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 
-      sendEmail({
-        to: currentOrder.customerEmail,
-        subject: `Pembayaran Dikonfirmasi - ${currentOrder.tour.name}`,
-        html: paymentConfirmationTemplate({
-          customerName: currentOrder.customerName,
-          tourName: currentOrder.tour.name,
-          invoiceNo: currentOrder.invoiceNo,
-          tourDate: new Date(currentOrder.tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
-          companyName,
-        }),
-      }).catch((err) => console.error('Payment confirmation email failed:', err));
+      after(() =>
+        sendEmail({
+          to: currentOrder.customerEmail,
+          subject: `Pembayaran Dikonfirmasi - ${currentOrder.tour.name}`,
+          html: paymentConfirmationTemplate({
+            customerName: currentOrder.customerName,
+            tourName: currentOrder.tour.name,
+            invoiceNo: currentOrder.invoiceNo,
+            tourDate: new Date(currentOrder.tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+            companyName,
+          }),
+        }).catch((err) => console.error('Payment confirmation email failed:', err))
+      );
 
-      notifyCustomerPaymentReceived({
-        customerPhone: currentOrder.customerPhone,
-        customerName: currentOrder.customerName,
-        invoiceNo: currentOrder.invoiceNo,
-        amountLabel: formatCur(currentOrder.total),
-      }).catch((err) => console.error('Payment confirmation WA failed:', err));
+      after(() =>
+        notifyCustomerPaymentReceived({
+          customerPhone: currentOrder.customerPhone,
+          customerName: currentOrder.customerName,
+          invoiceNo: currentOrder.invoiceNo,
+          amountLabel: formatCur(currentOrder.total),
+        }).catch((err) => console.error('Payment confirmation WA failed:', err))
+      );
     }
 
     // E-Ticket otomatis begitu pembayaran lunas terkonfirmasi (anti-duplikat via eticketSentAt)
     if ((newStatus === 'CONFIRMED' || newStatus === 'COMPLETED') && currentOrder.status !== newStatus) {
-      sendOrderTicketEmail(id).catch((err) => console.error('E-ticket email failed:', err));
+      after(() => sendOrderTicketEmail(id).catch((err) => console.error('E-ticket email failed:', err)));
     }
 
     // Auto-send review request when status changes to COMPLETED
@@ -129,27 +137,29 @@ export async function PUT(
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
       const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
 
-      // Send review email (non-blocking)
-      sendEmail({
-        to: currentOrder.customerEmail,
-        subject: `Bagaimana Pengalaman Tour ${currentOrder.tour.name} Anda?`,
-        html: reviewRequestTemplate({
-          customerName: currentOrder.customerName,
-          tourName: currentOrder.tour.name,
-          reviewUrl: `${siteUrl}/review/${currentOrder.reviewToken}`,
-          companyName,
-        }),
-      }).then(async (sent) => {
-        if (sent) {
-          // Mark that review email has been sent
-          await prisma.order.update({
-            where: { id },
-            data: { reviewSentAt: new Date() },
-          });
-        }
-      }).catch((err) => {
-        console.error('Failed to send review email:', err);
-      });
+      // Send review email (non-blocking, tetap jalan via after())
+      after(() =>
+        sendEmail({
+          to: currentOrder.customerEmail,
+          subject: `Bagaimana Pengalaman Tour ${currentOrder.tour.name} Anda?`,
+          html: reviewRequestTemplate({
+            customerName: currentOrder.customerName,
+            tourName: currentOrder.tour.name,
+            reviewUrl: `${siteUrl}/review/${currentOrder.reviewToken}`,
+            companyName,
+          }),
+        }).then(async (sent) => {
+          if (sent) {
+            // Mark that review email has been sent
+            await prisma.order.update({
+              where: { id },
+              data: { reviewSentAt: new Date() },
+            });
+          }
+        }).catch((err) => {
+          console.error('Failed to send review email:', err);
+        })
+      );
     }
 
     return NextResponse.json({ success: true, data: booking });
