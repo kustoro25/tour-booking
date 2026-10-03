@@ -99,6 +99,10 @@ model Order {
   paymentMethod String?  @map("payment_method")
   paymentProof  String?  @map("payment_proof")
   paymentType   String   @default("FULL") @map("payment_type") // FULL, INSTALLMENT
+  paymentRef    String?  @map("payment_ref") // Midtrans transaction_id
+  snapToken     String?  @map("snap_token") // Midtrans Snap token
+  paymentUrl    String?  @map("payment_url") // Midtrans Snap redirect URL
+  paidAt        DateTime? @map("paid_at")
   notes         String?
   adminNotes    String?  @map("admin_notes")
   reviewToken   String?  @unique @map("review_token")

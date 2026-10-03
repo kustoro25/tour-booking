@@ -57,7 +57,7 @@ export default function BookingPage() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [bookingResult, setBookingResult] = useState<{ invoiceNo: string } | null>(null);
+  const [bookingResult, setBookingResult] = useState<{ invoiceNo: string; paymentUrl?: string | null } | null>(null);
   const [slotInfo, setSlotInfo] = useState<SlotInfo | null>(null);
   const [slotLoading, setSlotLoading] = useState(false);
 
@@ -759,6 +759,11 @@ export default function BookingPage() {
           </div>
 
           <div className="flex flex-wrap justify-center gap-3">
+            {bookingResult.paymentUrl && (
+              <Button href={bookingResult.paymentUrl} variant="accent" size="lg">
+                💳 Bayar Sekarang
+              </Button>
+            )}
             <Button href={`/invoice/${bookingResult.invoiceNo}`} variant="primary">
               Lihat Invoice
             </Button>

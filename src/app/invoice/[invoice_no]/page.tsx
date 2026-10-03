@@ -6,6 +6,7 @@ import { InstallmentPaymentStatusLabels, InstallmentPaymentStatusColors, Install
 import CopyButton from '@/components/ui/CopyButton';
 import InvoiceActions from '@/components/booking/InvoiceActions';
 import { getBrandName, getBrandIcon } from '@/lib/brand';
+import { getPaymentGateway } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -173,6 +174,13 @@ export default async function InvoicePage({ params }: PageProps) {
   const brandName = await getBrandName();
   const brandIcon = await getBrandIcon();
 
+  // Pembayaran online (Midtrans) — hanya untuk order FULL yang masih PENDING
+  const gateway = await getPaymentGateway();
+  const payUrl =
+    gateway === 'midtrans' && order.status === 'PENDING' && order.paymentType === 'FULL'
+      ? order.paymentUrl || `/api/invoice/${order.invoiceNo}/pay`
+      : undefined;
+
   // Read company details from settings
   let companyPhone = '+62 812-3456-7890';
   let companyEmail = 'info@jelajahnusantara.com';
@@ -228,6 +236,7 @@ export default async function InvoicePage({ params }: PageProps) {
           total={order.total}
           companyPhone={companyPhone}
           helpLink={config.helpLink}
+          payUrl={payUrl}
         />
       </div>
     </>

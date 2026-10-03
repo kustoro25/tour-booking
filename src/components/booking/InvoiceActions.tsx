@@ -9,6 +9,8 @@ interface InvoiceActionsProps {
   total: number;
   companyPhone: string;
   helpLink?: string;
+  /** Link pembayaran online (Midtrans) — tampil hanya jika gateway aktif & order masih PENDING */
+  payUrl?: string;
 }
 
 export default function InvoiceActions({
@@ -18,6 +20,7 @@ export default function InvoiceActions({
   total,
   companyPhone,
   helpLink,
+  payUrl,
 }: InvoiceActionsProps) {
   const waNumber = companyPhone.replace(/[^0-9]/g, '');
 
@@ -32,6 +35,11 @@ export default function InvoiceActions({
 
   return (
     <div className="screen-only flex flex-wrap justify-center gap-8 mt-6">
+      {payUrl && (
+        <Button href={payUrl} variant="accent">
+          💳 Bayar Online (QRIS / VA / E-Wallet)
+        </Button>
+      )}
       <Button onClick={() => window.print()} variant="primary">
         🖨️ Cetak Invoice
       </Button>

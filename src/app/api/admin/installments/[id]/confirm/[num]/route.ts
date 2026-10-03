@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { sendEmail, installmentConfirmationTemplate, installmentBillingTemplate } from '@/lib/email';
+import { notifyCustomerPaymentReceived } from '@/lib/whatsapp';
 
 export async function POST(
   request: NextRequest,
@@ -81,6 +82,14 @@ export async function POST(
         companyName,
       }),
     }).catch((err) => console.error('Confirmation email failed:', err));
+
+    // Notifikasi WhatsApp ke pembeli (non-blocking)
+    notifyCustomerPaymentReceived({
+      customerPhone: plan.order.customerPhone,
+      customerName: plan.order.customerName,
+      invoiceNo: plan.order.invoiceNo,
+      amountLabel: formatCur(payment.amount),
+    }).catch((err) => console.error('Confirmation WA failed:', err));
 
     return NextResponse.json({
       success: true,

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
-import { sendEmail, reviewRequestTemplate } from '@/lib/email';
+import { sendEmail, reviewRequestTemplate, paymentConfirmationTemplate } from '@/lib/email';
+import { notifyCustomerPaymentReceived } from '@/lib/whatsapp';
 
 export async function GET(
   request: NextRequest,
@@ -90,8 +91,34 @@ export async function PUT(
       data: updateData,
     });
 
-    // Auto-send review request when status changes to COMPLETED
     const newStatus = status || currentOrder.status;
+
+    // Notifikasi pembayaran dikonfirmasi (email + WA) saat status berubah ke CONFIRMED
+    if (newStatus === 'CONFIRMED' && currentOrder.status !== 'CONFIRMED' && currentOrder.status !== 'COMPLETED') {
+      const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
+      const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
+
+      sendEmail({
+        to: currentOrder.customerEmail,
+        subject: `Pembayaran Dikonfirmasi - ${currentOrder.tour.name}`,
+        html: paymentConfirmationTemplate({
+          customerName: currentOrder.customerName,
+          tourName: currentOrder.tour.name,
+          invoiceNo: currentOrder.invoiceNo,
+          tourDate: new Date(currentOrder.tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+          companyName,
+        }),
+      }).catch((err) => console.error('Payment confirmation email failed:', err));
+
+      notifyCustomerPaymentReceived({
+        customerPhone: currentOrder.customerPhone,
+        customerName: currentOrder.customerName,
+        invoiceNo: currentOrder.invoiceNo,
+        amountLabel: formatCur(currentOrder.total),
+      }).catch((err) => console.error('Payment confirmation WA failed:', err));
+    }
+
+    // Auto-send review request when status changes to COMPLETED
     if (newStatus === 'COMPLETED' && currentOrder.status !== 'COMPLETED' && !currentOrder.reviewSentAt) {
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
       const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';

@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateInvoiceNo, calculateTotal, getExpiryDate, generateReviewToken } from '@/lib/utils';
 import { validateBookingForm } from '@/lib/validators';
-import { sendEmail, invoiceEmailTemplate, installmentBillingTemplate } from '@/lib/email';
+import { sendEmail, invoiceEmailTemplate, installmentBillingTemplate, adminOrderNotificationTemplate } from '@/lib/email';
 import { generateInstallmentDates } from '@/lib/agreement';
+import { getPaymentGateway, getSetting } from '@/lib/settings';
+import { createSnapTransaction, isMidtransConfigured } from '@/lib/midtrans';
+import { notifyCustomerNewBooking, notifyAdminNewOrder } from '@/lib/whatsapp';
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,6 +41,15 @@ export async function POST(request: NextRequest) {
     const tour = await prisma.tour.findUnique({ where: { id: tourId, isActive: true } });
     if (!tour) {
       return NextResponse.json({ success: false, error: 'Tour not found' }, { status: 404 });
+    }
+
+    // Minimal peserta (konsisten dengan validasi di halaman booking)
+    const requestedPax = (Number(adults) || 0) + (Number(children) || 0);
+    if (requestedPax < tour.minPax) {
+      return NextResponse.json(
+        { success: false, error: `Minimal ${tour.minPax} peserta per pemesanan` },
+        { status: 400 }
+      );
     }
 
     const bookingDate = new Date(tourDate);
@@ -182,13 +194,42 @@ export async function POST(request: NextRequest) {
       timeout: 10000, // max transaction duration (ms)
     });
 
-    // Send email notification (outside transaction, non-blocking)
+    // ==== Pembayaran online, email & WhatsApp (di luar transaksi, non-blocking) ====
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
     const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
+    const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
+    const tourDateLabel = new Date(tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const expiryDate = getExpiryDate(24);
 
+    // 1. Buat transaksi Midtrans Snap untuk order FULL (jika gateway midtrans aktif)
+    let paymentUrl: string | null = null;
+    if (!result.isInstallment) {
+      try {
+        const gateway = await getPaymentGateway();
+        if (gateway === 'midtrans' && isMidtransConfigured()) {
+          const snap = await createSnapTransaction({
+            orderId: result.invoiceNo,
+            grossAmount: result.total,
+            itemName: tour.name,
+            customer: { name: customerName, email: customerEmail, phone: customerPhone },
+            expiryHours: 24,
+            finishUrl: `${siteUrl}/invoice/${result.invoiceNo}`,
+          });
+          if (snap) {
+            paymentUrl = snap.redirectUrl;
+            await prisma.order.update({
+              where: { id: result.order.id },
+              data: { snapToken: snap.token, paymentUrl: snap.redirectUrl },
+            });
+          }
+        }
+      } catch (payErr) {
+        console.error('Failed to create Midtrans transaction:', payErr);
+      }
+    }
+
+    // 2. Email ke pembeli
     try {
-      const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
-
       if (result.isInstallment && result.installmentPlanData) {
         const ipd = result.installmentPlanData;
         const installmentUrl = `${siteUrl}/invoice/${result.invoiceNo}/installments`;
@@ -221,7 +262,7 @@ export async function POST(request: NextRequest) {
           });
         }
       } else {
-        const paymentUrl = `${siteUrl}/invoice/${result.invoiceNo}`;
+        const invoicePageUrl = `${siteUrl}/invoice/${result.invoiceNo}`;
         await sendEmail({
           to: customerEmail,
           subject: `Invoice Pesanan Anda - ${tour.name}`,
@@ -229,10 +270,10 @@ export async function POST(request: NextRequest) {
             customerName,
             tourName: tour.name,
             invoiceNo: result.invoiceNo,
-            tourDate: new Date(tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+            tourDate: tourDateLabel,
             total: formatCur(result.total),
-            expiryDate: getExpiryDate(24).toLocaleString('id-ID'),
-            paymentUrl,
+            expiryDate: expiryDate.toLocaleString('id-ID'),
+            paymentUrl: invoicePageUrl,
             companyName,
           }),
         });
@@ -241,9 +282,45 @@ export async function POST(request: NextRequest) {
       console.error('Failed to send email:', emailErr);
     }
 
+    // 3. Email notifikasi pesanan baru ke admin
+    try {
+      const adminEmail = (await getSetting<string>('company_email', '')) || process.env.ADMIN_EMAIL || 'admin@tourbooking.com';
+      await sendEmail({
+        to: adminEmail,
+        subject: `Pesanan Baru: ${result.invoiceNo} - ${customerName}`,
+        html: adminOrderNotificationTemplate({
+          customerName,
+          customerEmail,
+          customerPhone,
+          tourName: tour.name,
+          invoiceNo: result.invoiceNo,
+          tourDate: tourDateLabel,
+          total: formatCur(result.total),
+          paymentType: result.isInstallment ? `Angsuran ${result.installmentPlanData?.installmentCount ?? ''}x` : 'Pembayaran Lunas',
+          adminUrl: `${siteUrl}/admin/bookings/${result.order.id}`,
+          companyName,
+        }),
+      });
+    } catch (emailErr) {
+      console.error('Failed to send admin notification email:', emailErr);
+    }
+
+    // 4. Notifikasi WhatsApp ke pembeli & admin (aman jika belum dikonfigurasi)
+    const waData = {
+      customerName,
+      customerPhone,
+      tourName: tour.name,
+      tourDateLabel,
+      invoiceNo: result.invoiceNo,
+      totalLabel: formatCur(result.total),
+      expiryLabel: expiryDate.toLocaleString('id-ID'),
+    };
+    notifyCustomerNewBooking(waData).catch((err) => console.error('WA customer notify failed:', err));
+    notifyAdminNewOrder(waData).catch((err) => console.error('WA admin notify failed:', err));
+
     return NextResponse.json({
       success: true,
-      data: { invoiceNo: result.invoiceNo, orderId: result.order.id },
+      data: { invoiceNo: result.invoiceNo, orderId: result.order.id, paymentUrl },
     }, { status: 201 });
   } catch (error) {
     if (error instanceof Error) {

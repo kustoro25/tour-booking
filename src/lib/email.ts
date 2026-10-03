@@ -102,6 +102,37 @@ export function paymentConfirmationTemplate(data: {
   `;
 }
 
+export function adminOrderNotificationTemplate(data: {
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  tourName: string;
+  invoiceNo: string;
+  tourDate: string;
+  total: string;
+  paymentType: string;
+  adminUrl: string;
+  companyName: string;
+}): string {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #2563EB;">Pesanan Baru Masuk</h2>
+      <p>Ada pesanan baru di <strong>${data.companyName}</strong>. Berikut detail pembeli:</p>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+        <tr><td style="padding: 6px 0;"><strong>Invoice</strong></td><td>${data.invoiceNo}</td></tr>
+        <tr><td style="padding: 6px 0;"><strong>Nama</strong></td><td>${data.customerName}</td></tr>
+        <tr><td style="padding: 6px 0;"><strong>Email</strong></td><td><a href="mailto:${data.customerEmail}">${data.customerEmail}</a></td></tr>
+        <tr><td style="padding: 6px 0;"><strong>WhatsApp/HP</strong></td><td>${data.customerPhone}</td></tr>
+        <tr><td style="padding: 6px 0;"><strong>Paket</strong></td><td>${data.tourName}</td></tr>
+        <tr><td style="padding: 6px 0;"><strong>Tanggal Tour</strong></td><td>${data.tourDate}</td></tr>
+        <tr><td style="padding: 6px 0;"><strong>Total</strong></td><td style="font-weight: bold;">${data.total}</td></tr>
+        <tr><td style="padding: 6px 0;"><strong>Metode</strong></td><td>${data.paymentType}</td></tr>
+      </table>
+      <a href="${data.adminUrl}" style="background: #2563EB; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">Buka di Panel Admin</a>
+    </div>
+  `;
+}
+
 export function contactNotificationTemplate(data: {
   name: string;
   email: string;

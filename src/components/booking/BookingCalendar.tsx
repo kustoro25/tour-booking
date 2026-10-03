@@ -3,6 +3,15 @@
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/Skeleton';
 
+/** Format tanggal lokal sebagai YYYY-MM-DD. Gunakan ini, bukan toISOString(),
+ *  karena toISOString() menggeser satu hari untuk zona waktu positif (WIB/UTC+7). */
+function toLocalDateStr(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 interface Slot {
   date: string;
   quota: number;
@@ -25,10 +34,6 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
 
-  useEffect(() => {
-    fetchSlots();
-  }, [year, month, tourId]);
-
   const fetchSlots = async () => {
     setLoading(true);
     try {
@@ -44,8 +49,12 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
     }
   };
 
+  useEffect(() => {
+    fetchSlots();
+  }, [year, month, tourId]);
+
   const getSlotForDate = (date: Date): Slot | undefined => {
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = toLocalDateStr(date);
     return slots.find((s) => s.date.startsWith(dateStr));
   };
 
@@ -56,7 +65,7 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
     if (date < today) return 'text-gray-400 cursor-not-allowed';
 
     const slot = getSlotForDate(date);
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = toLocalDateStr(date);
     const isSelected = selectedDate === dateStr;
 
     if (slot?.isBlackout) return 'bg-red-100 text-red-500 cursor-not-allowed';
@@ -78,7 +87,7 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
     if (slot?.isBlackout) return;
     if (slot && slot.bookedCount >= slot.quota) return;
 
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = toLocalDateStr(date);
     onDateSelect?.(dateStr);
   };
 

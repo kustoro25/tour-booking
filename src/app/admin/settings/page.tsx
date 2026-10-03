@@ -51,6 +51,8 @@ export default function AdminSettingsPage() {
     googleApiKey: '',
     googleReviewsCount: 5,
     googleReviewsMinRating: 3,
+    paymentGateway: 'manual' as 'manual' | 'midtrans',
+    whatsappEnabled: true,
   });
 
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>(DEFAULT_BANK_ACCOUNTS);
@@ -84,6 +86,9 @@ export default function AdminSettingsPage() {
             googleApiKey: (data.data.google_api_key as string) || '',
             googleReviewsCount: Number(data.data.google_reviews_count) || 5,
             googleReviewsMinRating: Number(data.data.google_reviews_min_rating) || 3,
+            paymentGateway: (data.data.payment_gateway as 'manual' | 'midtrans') || 'manual',
+            whatsappEnabled:
+              data.data.whatsapp_enabled === false || data.data.whatsapp_enabled === 'false' ? false : true,
           }));
           if (data.data.bank_accounts && Array.isArray(data.data.bank_accounts)) {
             setBankAccounts(data.data.bank_accounts);
@@ -125,6 +130,8 @@ export default function AdminSettingsPage() {
           google_api_key: form.googleApiKey,
           google_reviews_count: form.googleReviewsCount,
           google_reviews_min_rating: form.googleReviewsMinRating,
+          payment_gateway: form.paymentGateway,
+          whatsapp_enabled: form.whatsappEnabled,
           bank_accounts: bankAccounts,
         }),
       });
@@ -526,6 +533,58 @@ export default function AdminSettingsPage() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+
+        {/* ═══════════ Pembayaran Online & Notifikasi ═══════════ */}
+        <div className="border-t pt-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">💳 Pembayaran Online & Notifikasi</h2>
+          <p className="text-xs text-gray-500 mb-4">
+            Pilih metode pembayaran dan atur notifikasi otomatis untuk pesanan baru & pembayaran.
+            Kredensial gateway (Midtrans) dan WhatsApp Cloud API diatur melalui environment variables
+            (MIDTRANS_SERVER_KEY, WHATSAPP_ACCESS_TOKEN, dll.).
+          </p>
+
+          <div className="space-y-4">
+            {/* Payment Gateway */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Metode Pembayaran</label>
+              <select
+                value={form.paymentGateway}
+                onChange={(e) => setForm({ ...form, paymentGateway: e.target.value as 'manual' | 'midtrans' })}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="manual">Manual — transfer bank (konfirmasi manual)</option>
+                <option value="midtrans">Midtrans — QRIS, Virtual Account, E-Wallet (otomatis)</option>
+              </select>
+              <p className="text-xs text-gray-400 mt-1">
+                Mode Midtrans mengikuti env MIDTRANS_IS_PRODUCTION (false = sandbox, true = production).
+              </p>
+            </div>
+
+            {/* WhatsApp Notification Toggle */}
+            <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-200">
+              <div>
+                <p className="text-sm font-medium text-gray-900">Notifikasi WhatsApp Otomatis</p>
+                <p className="text-xs text-gray-500">
+                  Kirim konfirmasi booking & pembayaran ke pembeli, dan info pesanan baru ke admin
+                  (butuh WhatsApp Cloud API terkonfigurasi di environment variables)
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, whatsappEnabled: !form.whatsappEnabled })}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  form.whatsappEnabled ? 'bg-blue-600' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    form.whatsappEnabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
           </div>
         </div>
 

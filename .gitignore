@@ -43,3 +43,7 @@ prisma/dev.db
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# test artifacts (browser/test screenshots)
+test-step*.png
+snap-test-*.png

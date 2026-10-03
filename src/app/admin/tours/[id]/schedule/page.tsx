@@ -41,10 +41,6 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
       .then(d => { if (d.success) setTourName(d.data.name); });
   }, [tourId]);
 
-  useEffect(() => {
-    fetchSlots();
-  }, [viewYear, viewMonth]);
-
   const fetchSlots = async () => {
     setLoading(true);
     const m = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`;
@@ -54,10 +50,17 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
     setLoading(false);
   };
 
+  useEffect(() => {
+    fetchSlots();
+  }, [viewYear, viewMonth]);
+
   const openAdd = (date?: string) => {
     setEditingSlot(null);
     setBatchMode(false);
-    const d = date || new Date().toISOString().split('T')[0];
+    // Tanggal default "hari ini" versi lokal (hindari pergeseran timezone toISOString)
+    const now = new Date();
+    const todayLocal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const d = date || todayLocal;
     setFormDate(d);
     setFormQuota('15');
     setFormPrice('');
