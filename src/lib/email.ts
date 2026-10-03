@@ -102,6 +102,106 @@ export function paymentConfirmationTemplate(data: {
   `;
 }
 
+export function eTicketTemplate(data: {
+  customerName: string;
+  invoiceNo: string;
+  tourName: string;
+  tourDate: string;
+  duration: string;
+  destination: string;
+  adults: number;
+  children: number;
+  total: string;
+  itinerary: { day: number; title: string; description: string }[];
+  includes: string[];
+  excludes: string[];
+  companyName: string;
+  companyPhone: string;
+  companyEmail: string;
+  companyAddress: string;
+  invoiceUrl: string;
+}): string {
+  const paxLabel = data.children > 0 ? `${data.adults} dewasa + ${data.children} anak` : `${data.adults} dewasa`;
+
+  const itineraryHtml = data.itinerary.length > 0
+    ? `
+      <h3 style="margin: 24px 0 12px; font-size: 15px; color: #111827;">Rencana Perjalanan</h3>
+      ${data.itinerary.map((d) => `
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+          <tr>
+            <td style="width: 64px; vertical-align: top; padding-top: 3px;">
+              <span style="display: inline-block; background: #2563EB; color: #ffffff; border-radius: 9999px; padding: 2px 10px; font-size: 12px; font-weight: bold;">Hari ${d.day}</span>
+            </td>
+            <td>
+              <p style="margin: 0; font-size: 14px; font-weight: bold; color: #111827;">${d.title}</p>
+              <p style="margin: 4px 0 0; font-size: 13px; color: #4B5563;">${d.description}</p>
+            </td>
+          </tr>
+        </table>`).join('')}`
+    : '';
+
+  const includesHtml = data.includes.length > 0
+    ? `
+      <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 14px 16px; margin-top: 16px;">
+        <p style="margin: 0 0 8px; font-size: 13px; font-weight: bold; color: #166534;">Fasilitas Termasuk</p>
+        <ul style="margin: 0; padding-left: 18px; font-size: 13px; color: #166534;">
+          ${data.includes.map((item) => `<li style="margin-bottom: 4px;">${item}</li>`).join('')}
+        </ul>
+      </div>`
+    : '';
+
+  const excludesHtml = data.excludes.length > 0
+    ? `
+      <div style="background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 14px 16px; margin-top: 12px;">
+        <p style="margin: 0 0 8px; font-size: 13px; font-weight: bold; color: #991B1B;">Fasilitas Tidak Termasuk</p>
+        <ul style="margin: 0; padding-left: 18px; font-size: 13px; color: #991B1B;">
+          ${data.excludes.map((item) => `<li style="margin-bottom: 4px;">${item}</li>`).join('')}
+        </ul>
+      </div>`
+    : '';
+
+  const contactLines = [
+    data.companyPhone ? `Telp/WA: ${data.companyPhone}` : '',
+    data.companyEmail ? `Email: <a href="mailto:${data.companyEmail}" style="color: #2563EB;">${data.companyEmail}</a>` : '',
+    data.companyAddress ? `Alamat: ${data.companyAddress}` : '',
+  ].filter(Boolean).join(' &middot; ');
+
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #111827;">
+      <div style="background: #2563EB; border-radius: 8px 8px 0 0; padding: 22px 24px;">
+        <h1 style="margin: 0; font-size: 22px; color: #ffffff; letter-spacing: 1px;">E-TICKET</h1>
+        <p style="margin: 6px 0 0; font-size: 13px; color: #DBEAFE;">${data.companyName} &mdash; tunjukkan e-ticket ini saat keberangkatan</p>
+      </div>
+      <div style="background: #EFF6FF; border: 1px solid #DBEAFE; border-top: none; padding: 12px 24px;">
+        <span style="font-size: 13px; color: #1E40AF;">No. Invoice:&nbsp;</span>
+        <strong style="font-size: 16px; color: #1E40AF; letter-spacing: 0.5px;">${data.invoiceNo}</strong>
+      </div>
+      <div style="border: 1px solid #E5E7EB; border-top: none; border-radius: 0 0 8px 8px; padding: 24px;">
+        <p style="margin: 0 0 12px;">Halo <strong>${data.customerName}</strong>,</p>
+        <p style="margin: 0 0 16px;">Pembayaran Anda telah kami terima. Berikut detail E-Ticket Anda:</p>
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+          <tr><td style="padding: 6px 0; color: #6B7280;">Paket</td><td style="padding: 6px 0; font-weight: bold;">${data.tourName}</td></tr>
+          <tr><td style="padding: 6px 0; color: #6B7280;">Tanggal Tour</td><td style="padding: 6px 0; font-weight: bold; color: #2563EB;">${data.tourDate}</td></tr>
+          <tr><td style="padding: 6px 0; color: #6B7280;">Durasi</td><td style="padding: 6px 0;">${data.duration}</td></tr>
+          <tr><td style="padding: 6px 0; color: #6B7280;">Destinasi</td><td style="padding: 6px 0;">${data.destination}</td></tr>
+          <tr><td style="padding: 6px 0; color: #6B7280;">Peserta</td><td style="padding: 6px 0;">${paxLabel}</td></tr>
+          <tr><td style="padding: 6px 0; color: #6B7280;">Total Dibayar</td><td style="padding: 6px 0; font-weight: bold;">${data.total} <span style="color: #059669;">(LUNAS)</span></td></tr>
+        </table>
+        ${itineraryHtml}
+        ${includesHtml}
+        ${excludesHtml}
+        <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 12px 16px; margin-top: 20px; font-size: 13px; color: #92400E;">
+          Simpan email ini dan tunjukkan kepada admin/guide saat keberangkatan. Detail pesanan juga dapat dilihat di
+          <a href="${data.invoiceUrl}" style="color: #2563EB;">halaman invoice</a>.
+        </div>
+        ${contactLines ? `<p style="margin: 18px 0 0; font-size: 13px; color: #6B7280;">Butuh bantuan? Hubungi kami: ${contactLines}</p>` : ''}
+        <p style="margin: 20px 0 0;">Sampai jumpa di hari keberangkatan!</p>
+        <p style="margin: 12px 0 0;">Salam,<br/><strong>${data.companyName}</strong></p>
+      </div>
+    </div>
+  `;
+}
+
 export function adminOrderNotificationTemplate(data: {
   customerName: string;
   customerEmail: string;

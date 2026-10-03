@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { sendEmail, reviewRequestTemplate, paymentConfirmationTemplate } from '@/lib/email';
 import { notifyCustomerPaymentReceived } from '@/lib/whatsapp';
+import { sendOrderTicketEmail } from '@/lib/eticket';
 
 export async function GET(
   request: NextRequest,
@@ -116,6 +117,11 @@ export async function PUT(
         invoiceNo: currentOrder.invoiceNo,
         amountLabel: formatCur(currentOrder.total),
       }).catch((err) => console.error('Payment confirmation WA failed:', err));
+    }
+
+    // E-Ticket otomatis begitu pembayaran lunas terkonfirmasi (anti-duplikat via eticketSentAt)
+    if ((newStatus === 'CONFIRMED' || newStatus === 'COMPLETED') && currentOrder.status !== newStatus) {
+      sendOrderTicketEmail(id).catch((err) => console.error('E-ticket email failed:', err));
     }
 
     // Auto-send review request when status changes to COMPLETED

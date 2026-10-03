@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { sendEmail, installmentConfirmationTemplate } from '@/lib/email';
 import { notifyCustomerPaymentReceived } from '@/lib/whatsapp';
+import { sendOrderTicketEmail } from '@/lib/eticket';
 
 export async function POST(
   request: NextRequest,
@@ -63,6 +64,9 @@ export async function POST(
         where: { id },
         data: { status: 'COMPLETED' },
       });
+
+      // Seluruh angsuran lunas → kirim E-Ticket otomatis
+      sendOrderTicketEmail(plan.order.id).catch((err) => console.error('E-ticket email failed:', err));
     }
 
     // Send confirmation email

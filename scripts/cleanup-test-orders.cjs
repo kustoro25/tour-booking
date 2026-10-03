@@ -1,19 +1,23 @@
 // Bersihkan order test (CUI pengujian sandbox).
-// Kriteria: notes mengandung "boleh dihapus" DAN email customer test.
+// Kriteria default: notes mengandung "boleh dihapus" DAN email customer test.
+// Atau hapus order tertentu: node scripts/cleanup-test-orders.cjs <invoiceNo>
 // Kuota slot dikembalikan untuk order yang masih berstatus PENDING/CONFIRMED.
 //
-// Jalankan: node scripts/cleanup-test-orders.cjs
+// Jalankan: node scripts/cleanup-test-orders.cjs [invoiceNo]
 const { PrismaClient } = require('@prisma/client');
 const p = new PrismaClient();
 
 const TEST_EMAIL = 'kustoroterbatas@gmail.com';
+const invoiceArg = process.argv[2];
 
 async function main() {
   const orders = await p.order.findMany({
-    where: {
-      notes: { contains: 'boleh dihapus' },
-      customerEmail: TEST_EMAIL,
-    },
+    where: invoiceArg
+      ? { invoiceNo: invoiceArg }
+      : {
+          notes: { contains: 'boleh dihapus' },
+          customerEmail: TEST_EMAIL,
+        },
   });
 
   if (orders.length === 0) {

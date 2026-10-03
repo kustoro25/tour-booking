@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendEmail, paymentConfirmationTemplate, installmentConfirmationTemplate } from '@/lib/email';
+import { sendOrderTicketEmail } from '@/lib/eticket';
 import { notifyCustomerPaymentReceived } from '@/lib/whatsapp';
 import { verifyMidtransSignature, mapMidtransState, type MidtransNotificationPayload } from '@/lib/midtrans';
 
@@ -91,6 +92,9 @@ export async function POST(request: NextRequest) {
             companyName,
           }),
         }).catch((err) => console.error('Payment confirmation email failed:', err));
+
+        // E-Ticket otomatis (anti-duplikat via eticketSentAt)
+        sendOrderTicketEmail(order.id).catch((err) => console.error('E-ticket email failed:', err));
 
         notifyCustomerPaymentReceived({
           customerPhone: order.customerPhone,
@@ -285,6 +289,9 @@ async function handleInstallmentPayment(
       where: { id: plan.id },
       data: { status: 'COMPLETED' },
     });
+
+    // Seluruh angsuran lunas → kirim E-Ticket otomatis
+    sendOrderTicketEmail(order.id).catch((err) => console.error('E-ticket email failed:', err));
   }
 
   return NextResponse.json({ success: true });
