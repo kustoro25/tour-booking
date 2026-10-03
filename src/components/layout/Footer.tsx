@@ -28,15 +28,9 @@ function useCompanyInfo() {
 function useFooterCms() {
   const pathname = usePathname();
   const [cms, setCms] = useState<FooterCms>({});
-  const [fetchKey, setFetchKey] = useState(0);
 
   useEffect(() => {
-    // Re-fetch on every route change by incrementing key
-    setFetchKey((k: number) => k + 1);
-  }, [pathname]);
-
-  useEffect(() => {
-    // Cache-busting: add timestamp to URL to bypass browser cache
+    // Re-fetch on each route change, cache-busted to bypass browser cache
     const ts = Date.now();
     fetch(`/api/admin/pages/footer?_t=${ts}`, {
       cache: 'no-store',
@@ -49,7 +43,7 @@ function useFooterCms() {
         }
       })
       .catch(() => {});
-  }, [fetchKey]);
+  }, [pathname]);
   return cms;
 }
 
@@ -79,6 +73,14 @@ const footerLinks = {
     { href: '/privacy', label: 'Kebijakan Privasi' },
   ],
 };
+
+function formatPhone(phone?: string) {
+  const p = (phone || '').trim();
+  if (/^\+62\d{8,}$/.test(p)) {
+    return p.replace(/^(\+62)(\d{3})(\d{4})(\d+)$/, '$1 $2-$3-$4');
+  }
+  return p;
+}
 
 export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms }) {
   const info = useCompanyInfo();
@@ -143,7 +145,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
               </p>
               <p className="flex items-center gap-2">
                 <span className="flex-shrink-0">📞</span>
-                <span>{info.phone}</span>
+                <span>{formatPhone(info.phone)}</span>
               </p>
               <p className="flex items-center gap-2">
                 <span className="flex-shrink-0">📧</span>
@@ -151,11 +153,16 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
               </p>
             </div>
             <div className="flex gap-3">
-              {(cms.socialLinks && cms.socialLinks.length > 0 ? cms.socialLinks : [
-                { platform: 'WhatsApp', url: '#', icon: 'whatsapp' },
-                { platform: 'Instagram', url: '#', icon: 'instagram' },
-                { platform: 'Email', url: '#', icon: 'email' },
-              ]).map((s) => (
+              {(cms.socialLinks && cms.socialLinks.length > 0
+                ? cms.socialLinks.filter(
+                    (s) => s.url && (/^https?:\/\//.test(s.url) || s.url.startsWith('mailto:'))
+                  )
+                : [
+                    { platform: 'WhatsApp', url: '#', icon: 'whatsapp' },
+                    { platform: 'Instagram', url: '#', icon: 'instagram' },
+                    { platform: 'Email', url: '#', icon: 'email' },
+                  ]
+              ).map((s) => (
                 <a key={s.platform} href={s.url || '#'} aria-label={s.platform} target="_blank" rel="noopener noreferrer"
                   className="w-9 h-9 rounded-lg bg-gray-800 hover:bg-blue-600 flex items-center justify-center text-gray-400 hover:text-white transition-all duration-300 hover:scale-110"
                 >
@@ -186,7 +193,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
                   disabled={subscribing}
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors flex-shrink-0"
                 >
-                  {subscribing ? '...' : 'Subscribe'}
+                  {subscribing ? '...' : 'Berlangganan'}
                 </button>
               </form>
             </div>

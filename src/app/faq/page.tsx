@@ -18,7 +18,7 @@ const faqs = [
   {
     question: 'Bagaimana metode pembayaran yang tersedia?',
     answer:
-      'Kami menerima pembayaran melalui transfer bank (BCA, Mandiri, BRI, BNI) dan e-wallet (OVO, Dana, GoPay, ShopeePay). Detail rekening dan instruksi pembayaran akan tercantum di invoice yang Anda terima setelah booking.',
+      'Pembayaran diproses otomatis melalui gateway Midtrans — tersedia QRIS, Virtual Account berbagai bank, e-wallet (GoPay, ShopeePay, DANA, dan lainnya), serta kartu kredit/debit. Setelah pembayaran berhasil, pesanan Anda langsung terkonfirmasi otomatis. Untuk pembayaran angsuran (cicilan), transfer dilakukan ke rekening bank perusahaan dan bukti transfer dikirim melalui WhatsApp atau email. Detail lengkap tercantum di invoice Anda.',
   },
   {
     question: 'Berapa lama batas waktu pembayaran?',

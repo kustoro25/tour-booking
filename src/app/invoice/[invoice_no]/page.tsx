@@ -29,6 +29,25 @@ async function getOrder(invoiceNo: string) {
 
 type InvoiceTheme = 'premium';
 
+/** Mode tampilan blok informasi pembayaran (gateway-aware). */
+export type PaymentMode = 'online' | 'transfer' | 'paid' | 'cancelled';
+
+/** Label ramah untuk metode pembayaran dari webhook/DB (Midtrans). */
+const PAYMENT_METHOD_LABELS: Record<string, string> = {
+  credit_card: 'Kartu Kredit / Debit',
+  bank_transfer: 'Virtual Account Bank',
+  echannel: 'Mandiri Bill Payment',
+  qris: 'QRIS',
+  gopay: 'GoPay',
+  shopeepay: 'ShopeePay',
+  dana: 'DANA',
+  ovo: 'OVO',
+  cstore: 'Gerai Retail (Alfamart/Indomaret)',
+  akulaku: 'Akulaku',
+  manual_transfer: 'Transfer Bank',
+  manual: 'Transfer Bank',
+};
+
 interface StatusBadgeConfig {
   bg: string;
   text: string;
@@ -90,7 +109,7 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     headerTextColor: '#ffffff',
     accentColor: '#e59800',
     borderColor: '#333333',
-    headingBilledTo: 'Invoice to:',
+    headingBilledTo: 'Ditagihkan Kepada',
     headingInvoiceDetails: 'Detail Invoice',
     headingOrderSummary: 'Ringkasan Pesanan',
     headingPriceBreakdown: 'Rincian Biaya',
@@ -99,8 +118,8 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     headingTerms: 'Syarat & Ketentuan',
     deadlineText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan.',
     termsText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
-    paymentInstructionsText: 'Silakan lakukan transfer ke salah satu rekening bank di bawah ini. Pastikan jumlah yang ditransfer sesuai dengan total invoice. Setelah transfer, konfirmasi akan dikirim otomatis ke email Anda.',
-    labelInvoiceNo: 'Invoice#',
+    paymentInstructionsText: 'Silakan lakukan transfer ke salah satu rekening bank di bawah ini. Pastikan jumlah yang ditransfer sesuai dengan total invoice. Setelah transfer, mohon unggah bukti transfer melalui halaman Jadwal & Bayar Angsuran (khusus cicilan) atau kirim melalui WhatsApp/email agar pembayaran dapat segera kami verifikasi.',
+    labelInvoiceNo: 'No. Invoice',
     labelInvoiceDate: 'Tanggal',
     labelPaymentDeadline: 'Batas Pembayaran',
     labelPublishedDate: 'Diterbitkan:',
@@ -112,11 +131,11 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     labelPricePerChild: 'Harga / Anak',
     labelDiscount: 'Diskon',
     labelSubTotal: 'Sub Total',
-    labelTax: 'Tax',
+    labelTax: 'Pajak',
     labelTotal: 'Total',
     labelBank: 'Bank',
     labelAccountName: 'a.n.',
-    labelSignature: 'Authorised Sign',
+    labelSignature: 'Tanda Tangan',
     signatureImage: '',
     stampImage: '',
     showStamp: false,
@@ -181,6 +200,16 @@ export default async function InvoicePage({ params }: PageProps) {
       ? order.paymentUrl || `/api/invoice/${order.invoiceNo}/pay`
       : undefined;
 
+  // Mode tampilan informasi pembayaran pada invoice
+  const isPaid = order.status === 'CONFIRMED' || order.status === 'COMPLETED';
+  const paymentMode: PaymentMode = isPaid
+    ? 'paid'
+    : order.status === 'CANCELLED'
+      ? 'cancelled'
+      : payUrl
+        ? 'online'
+        : 'transfer';
+
   // Read company details from settings
   let companyPhone = '+62 812-3456-7890';
   let companyEmail = 'info@jelajahnusantara.com';
@@ -228,6 +257,7 @@ export default async function InvoicePage({ params }: PageProps) {
           expiryDate={expiryDate}
           bankAccounts={bankAccounts}
           config={config}
+          paymentMode={paymentMode}
         />
         <InvoiceActions
           invoiceNo={order.invoiceNo}
@@ -237,6 +267,7 @@ export default async function InvoicePage({ params }: PageProps) {
           companyPhone={companyPhone}
           helpLink={config.helpLink}
           payUrl={payUrl}
+          paymentMode={paymentMode}
         />
       </div>
     </>
@@ -264,14 +295,13 @@ function CustomInvoice({
   companyAddress,
   companyPhone,
   companyEmail,
-  companyTagline,
   brandIcon,
-  statusLabel,
   tourDate,
   createdDate,
   expiryDate,
   bankAccounts,
   config,
+  paymentMode,
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   order: any;
@@ -287,6 +317,7 @@ function CustomInvoice({
   expiryDate: string;
   bankAccounts: { bank: string; number: string; name: string }[];
   config: InvoiceCustomConfig;
+  paymentMode: PaymentMode;
 }) {
   const c = config;
   const H = c.headerBg || '#1e3a5f';
@@ -317,6 +348,9 @@ function CustomInvoice({
   const isIconUrl = brandIcon && (brandIcon.startsWith('http://') || brandIcon.startsWith('https://'));
 
   // Editable headings & labels
+  const methodLabel = order.paymentMethod
+    ? PAYMENT_METHOD_LABELS[order.paymentMethod] || order.paymentMethod
+    : 'Transfer Bank';
   const T = {
     billedTo: c.headingBilledTo || 'Ditagihkan Kepada',
     invoiceDetails: c.headingInvoiceDetails || 'Detail Invoice',
@@ -344,7 +378,7 @@ function CustomInvoice({
       total: c.labelTotal || 'TOTAL',
       bank: c.labelBank || 'Bank',
       accountName: c.labelAccountName || 'a.n.',
-      signature: c.labelSignature || 'Authorised Sign',
+      signature: c.labelSignature || 'Tanda Tangan',
       publishedDate: c.labelPublishedDate || 'Diterbitkan:',
     },
   };
@@ -408,7 +442,9 @@ function CustomInvoice({
               {[
                 { label: T.L.invoiceNo, value: order.invoiceNo },
                 { label: T.L.invoiceDate, value: createdDate },
-                { label: T.L.paymentDeadline, value: expiryDate },
+                ...(paymentMode === 'online' || paymentMode === 'transfer'
+                  ? [{ label: T.L.paymentDeadline, value: expiryDate }]
+                  : []),
               ].map((row) => (
                 <div key={row.label} className="flex sm:flex-col gap-2 sm:gap-0">
                   <span className="text-xs text-gray-400">{row.label}</span>
@@ -456,7 +492,7 @@ function CustomInvoice({
         </div>
 
         {/* ── Installment Summary (only for installment orders) ── */}
-        {order.paymentType === 'INSTALLMENT' && (order as any).installmentPlan && (
+        {order.paymentType === 'INSTALLMENT' && order.installmentPlan && (
           <div className="overflow-hidden mb-6 relative" style={{ border: `1px solid ${border}`, borderRadius: '12px' }}>
             <div className="px-5 py-3" style={{ backgroundColor: '#FFF7ED' }}>
               <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#E59800' }}>Pembayaran Angsuran (Cicilan)</h3>
@@ -464,10 +500,9 @@ function CustomInvoice({
             <div className="p-5">
               {/* Plan summary */}
               {(() => {
-                const plan = (order as any).installmentPlan;
-                const payments = plan.payments || [];
-                const paidCount = payments.filter((p: any) => p.status === 'CONFIRMED').length;
-                const totalPaid = payments.filter((p: any) => p.status === 'CONFIRMED').reduce((s: number, p: any) => s + p.amount, 0);
+                const plan = order.installmentPlan;
+                const payments: { id: string; installmentNumber: number; amount: number; dueDate: string; status: string }[] = plan.payments || [];
+                const paidCount = payments.filter((p) => p.status === 'CONFIRMED').length;
                 
                 return (
                   <>
@@ -502,7 +537,7 @@ function CustomInvoice({
                           </tr>
                         </thead>
                         <tbody>
-                          {payments.map((p: any) => {
+                          {payments.map((p) => {
                             const st = p.status as InstallmentPaymentStatus;
                             const dotColor = InstallmentPaymentStatusDots[st] || 'bg-gray-500';
                             const label = InstallmentPaymentStatusLabels[st] || st;
@@ -532,7 +567,7 @@ function CustomInvoice({
                           className="inline-flex items-center gap-1 text-xs font-medium px-4 py-2 rounded-lg transition-colors"
                           style={{ backgroundColor: '#E59800', color: '#fff' }}
                         >
-                          💳 Upload Bukti Transfer Angsuran
+                          💳 Lihat Jadwal & Bayar Angsuran
                         </a>
                       </div>
                     )}
@@ -611,30 +646,84 @@ function CustomInvoice({
           </div>
         </div>
 
-        {/* ── Payment Instructions ── */}
+        {/* ── Payment Instructions (gateway-aware) ── */}
         <div className="mt-6">
           <h4 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">
             {T.paymentInfo}
           </h4>
-          {/* Transfer instructions text */}
-          <p className="text-xs text-gray-600 leading-relaxed mb-4">
-            {c.paymentInstructionsText || 'Silakan lakukan transfer ke salah satu rekening bank di bawah ini. Pastikan jumlah yang ditransfer sesuai dengan total invoice. Setelah transfer, konfirmasi akan dikirim otomatis ke email Anda.'}
-          </p>
-          <div className="space-y-2 mb-4">
-            {bankAccounts.map((bank) => (
-              <div key={bank.bank} className="grid grid-cols-[100px_1fr_1fr_auto] items-center gap-x-3 text-xs">
-                <span className="font-semibold text-gray-700">{T.L.bank} {bank.bank}</span>
-                <span className="font-mono text-gray-600">{bank.number}</span>
-                <span className="text-gray-400">{T.L.accountName} {bank.name}</span>
-                <CopyButton bankNumber={bank.number} />
+
+          {paymentMode === 'online' && (
+            <div className="rounded-xl p-4 mb-4" style={{ backgroundColor: accentBg, border: `1px solid ${accent}40` }}>
+              <p className="text-xs text-gray-700 leading-relaxed">
+                <span className="font-semibold" style={{ color: accent }}>Pembayaran online otomatis.</span>{' '}
+                Klik tombol <strong>Bayar Online</strong> di bawah invoice ini untuk menyelesaikan pembayaran melalui
+                halaman pembayaran aman <strong>Midtrans</strong> — mendukung QRIS, Virtual Account berbagai bank,
+                e-wallet (GoPay, ShopeePay, DANA), dan kartu kredit/debit.
+              </p>
+              <p className="text-[10px] text-gray-500 mt-2 leading-relaxed">
+                Setelah pembayaran berhasil, status pesanan berubah menjadi <strong>Terkonfirmasi</strong> secara
+                otomatis dan E-Ticket dikirim ke email Anda. Tidak perlu konfirmasi manual.
+              </p>
+            </div>
+          )}
+
+          {paymentMode === 'transfer' && (
+            <>
+              <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                {c.paymentInstructionsText || 'Silakan lakukan transfer ke salah satu rekening bank di bawah ini. Pastikan jumlah yang ditransfer sesuai dengan total invoice. Setelah transfer, konfirmasi akan dikirim otomatis ke email Anda.'}
+              </p>
+              <div className="space-y-2 mb-4">
+                {bankAccounts.map((bank) => (
+                  <div key={bank.bank} className="grid grid-cols-[100px_1fr_1fr_auto] items-center gap-x-3 text-xs">
+                    <span className="font-semibold text-gray-700">{T.L.bank} {bank.bank}</span>
+                    <span className="font-mono text-gray-600">{bank.number}</span>
+                    <span className="text-gray-400">{T.L.accountName} {bank.name}</span>
+                    <CopyButton bankNumber={bank.number} />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
+
+          {paymentMode === 'paid' && (
+            <div className="rounded-xl p-4 mb-4" style={{ backgroundColor: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-base">✅</span>
+                <span className="text-xs font-semibold text-green-700">Pembayaran Anda telah kami terima — terima kasih!</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[10px]">
+                <div>
+                  <p className="text-gray-400 mb-0.5">Metode Pembayaran</p>
+                  <p className="font-medium text-gray-700">{methodLabel}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 mb-0.5">Waktu Pembayaran</p>
+                  <p className="font-medium text-gray-700">{order.paidAt ? formatDateTime(order.paidAt) : '—'}</p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-gray-400 mb-0.5">Referensi</p>
+                  <p className="font-medium text-gray-700 font-mono break-all">{order.paymentRef || '—'}</p>
+                </div>
+              </div>
+              <p className="text-[10px] text-gray-500 mt-3 leading-relaxed">
+                E-Ticket akan dikirim ke email <strong>{order.customerEmail}</strong>. Untuk bantuan, hubungi {companyPhone}.
+              </p>
+            </div>
+          )}
+
+          {paymentMode === 'cancelled' && (
+            <div className="rounded-xl p-4 mb-4" style={{ backgroundColor: '#FEF2F2', border: '1px solid #FECACA' }}>
+              <p className="text-xs text-red-600 leading-relaxed">
+                Pesanan ini telah <strong>dibatalkan</strong> karena melewati batas waktu pembayaran atau dibatalkan oleh admin.
+                Jika Anda sudah melakukan pembayaran atau ingin memesan ulang, silakan hubungi {companyPhone} atau {companyEmail}.
+              </p>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {/* Left: Deadline + Terms */}
             <div>
-              {c.showDeadline !== false && (
+              {c.showDeadline !== false && (paymentMode === 'online' || paymentMode === 'transfer') && (
                 <div className="rounded-xl px-3 py-2 text-[10px] mb-4" style={{ backgroundColor: accentBg, border: `1px solid ${accent}40` }}>
                   <span className="font-semibold" style={{ color: accent }}>{T.deadline}: </span>
                   <span className="text-gray-600">{formatDateTime(order.expiryAt)}</span>

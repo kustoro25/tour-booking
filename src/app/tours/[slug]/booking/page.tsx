@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import BookingCalendar from '@/components/booking/BookingCalendar';
@@ -15,6 +15,7 @@ interface Tour {
   priceChild: number;
   discount: number;
   minPax: number;
+  maxSlot: number;
   duration: string;
   destination: string;
 }
@@ -28,12 +29,8 @@ interface SlotInfo {
 
 type PaymentType = 'FULL' | 'INSTALLMENT';
 
-const INSTALLMENT_OPTIONS = [2, 3, 4, 6];
-const DP_PERCENTAGE = 30;
-
 export default function BookingPage() {
   const params = useParams();
-  const router = useRouter();
   const slug = params.slug as string;
 
   const [tour, setTour] = useState<Tour | null>(null);
@@ -60,6 +57,7 @@ export default function BookingPage() {
   const [bookingResult, setBookingResult] = useState<{ invoiceNo: string; paymentUrl?: string | null } | null>(null);
   const [slotInfo, setSlotInfo] = useState<SlotInfo | null>(null);
   const [slotLoading, setSlotLoading] = useState(false);
+  const [paymentGateway, setPaymentGateway] = useState<'midtrans' | 'manual'>('manual');
 
   useEffect(() => {
     fetch(`/api/tours/${slug}`)
@@ -76,6 +74,9 @@ export default function BookingPage() {
       .then((data) => {
         if (data.success && data.data) {
           setInstallmentEnabled(data.data.installment_enabled === true);
+          if (data.data.paymentGateway === 'midtrans') {
+            setPaymentGateway('midtrans');
+          }
           if (data.data.installment_options && Array.isArray(data.data.installment_options)) {
             setInstallmentOptions(data.data.installment_options);
             if (data.data.installment_options.length > 0) {
@@ -94,6 +95,11 @@ export default function BookingPage() {
         // Default: disabled
       });
   }, [slug]);
+
+  // Scroll ke atas setiap ganti langkah agar bagian penting tidak terlewat
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step]);
 
   const updateField = (field: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -155,6 +161,10 @@ export default function BookingPage() {
       if (Object.keys(errs).length > 0) { setErrors(errs); return; }
       setStep(3);
     } else if (step === 3) {
+      if (paymentType === 'INSTALLMENT' && !installmentAvailable) {
+        setPaymentType('FULL');
+        setAgreedToTerms(false);
+      }
       setStep(4);
     }
   };
@@ -230,6 +240,8 @@ export default function BookingPage() {
 
   const total = tour.priceAdult * formData.adults + tour.priceChild * formData.children;
   const grandTotal = total - total * (tour.discount / 100);
+  const installmentThresholdMet = minInstallmentAmount <= 0 || grandTotal >= minInstallmentAmount;
+  const installmentAvailable = installmentEnabled && installmentThresholdMet;
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
@@ -356,7 +368,7 @@ export default function BookingPage() {
                         <span className="font-semibold text-green-700">Kuota Default</span>
                       </div>
                       <p className="text-sm text-green-600">
-                        15 kursi tersedia — belum ada pemesanan untuk tanggal ini.
+                        {tour.maxSlot} kursi tersedia — belum ada pemesanan untuk tanggal ini.
                       </p>
                     </>
                   )}
@@ -542,17 +554,28 @@ export default function BookingPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900">Pembayaran Lunas</h3>
                   <p className="text-sm text-gray-500 mt-0.5">Bayar penuh sekarang sebesar <strong className="text-gray-700">{formatCurrency(grandTotal)}</strong></p>
+                  {paymentGateway === 'midtrans' ? (
+                    <p className="text-xs text-green-600 mt-1">💳 Pembayaran online instan via Midtrans — QRIS, Virtual Account, e-wallet, atau kartu. Terkonfirmasi otomatis.</p>
+                  ) : (
+                    <p className="text-xs text-gray-400 mt-1">Instruksi transfer bank akan tertera pada invoice setelah booking.</p>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Installment Payment */}
             <div
-              onClick={() => { setPaymentType('INSTALLMENT'); setAgreedToTerms(false); }}
-              className={`rounded-xl border-2 p-5 cursor-pointer transition-all ${
+              onClick={() => {
+                if (!installmentAvailable) return;
+                setPaymentType('INSTALLMENT');
+                setAgreedToTerms(false);
+              }}
+              className={`rounded-xl border-2 p-5 transition-all ${
                 paymentType === 'INSTALLMENT'
                   ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300 bg-white'
+                  : installmentAvailable
+                    ? 'cursor-pointer border-gray-200 hover:border-gray-300 bg-white'
+                    : 'cursor-not-allowed border-gray-200 bg-gray-50 opacity-70'
               }`}
             >
               <div className="flex items-start gap-4">
@@ -565,7 +588,10 @@ export default function BookingPage() {
                   <h3 className="font-semibold text-gray-900">Pembayaran Angsuran (Cicilan)</h3>
                   <p className="text-sm text-gray-500 mt-0.5">Bayar dengan DP {dpPercentage}% dan sisanya dicicil sesuai pilihan Anda</p>
                   {!installmentEnabled && (
-                    <p className="text-xs text-amber-600 mt-1">⚠ Fitur ini mungkin belum diaktifkan oleh admin. Booking akan gagal jika fitur tidak tersedia.</p>
+                    <p className="text-xs text-gray-400 mt-1">Belum tersedia saat ini.</p>
+                  )}
+                  {installmentEnabled && !installmentThresholdMet && (
+                    <p className="text-xs text-amber-600 mt-1">Minimal total transaksi {formatCurrency(minInstallmentAmount)} untuk pembayaran angsuran.</p>
                   )}
                 </div>
               </div>
@@ -626,7 +652,7 @@ export default function BookingPage() {
                 <li>Setiap angsuran harus dibayar paling lambat pada tanggal jatuh tempo. Keterlambatan lebih dari 7 hari setelah jatuh tempo dapat mengakibatkan pembatalan pesanan.</li>
                 <li>Uang muka (DP) dan angsuran yang telah dibayarkan <strong>tidak dapat dikembalikan</strong>.</li>
                 <li>Seluruh angsuran harus <strong>lunas H-7</strong> sebelum tanggal keberangkatan. Jika belum lunas, pihak tour berhak menunda atau membatalkan keberangkatan.</li>
-                <li>Bukti transfer dikirim melalui <strong>email atau WhatsApp</strong> ke admin. Admin akan mengunggah dan mengkonfirmasi pembayaran Anda.</li>
+                <li>Bukti transfer diunggah melalui halaman <strong>Jadwal & Bayar Angsuran</strong> pada invoice Anda (atau dikirim via WhatsApp/email). Admin akan memverifikasi dan mengkonfirmasi pembayaran.</li>
               </ol>
               <label className="flex items-start gap-2 mt-3 cursor-pointer">
                 <input
@@ -652,6 +678,9 @@ export default function BookingPage() {
               Lanjutkan →
             </Button>
           </div>
+          {paymentType === 'INSTALLMENT' && !agreedToTerms && (
+            <p className="text-xs text-amber-600 text-right mt-2">Centang persetujuan Syarat & Ketentuan angsuran di atas untuk melanjutkan.</p>
+          )}
         </div>
       )}
 
@@ -692,7 +721,11 @@ export default function BookingPage() {
             <div>
               <span className="text-sm text-gray-500">Metode Pembayaran</span>
               <p className="font-medium">
-                {paymentType === 'FULL' ? 'Pembayaran Lunas' : `Angsuran ${installmentCount}x`}
+                {paymentType === 'FULL'
+                  ? paymentGateway === 'midtrans'
+                    ? 'Pembayaran Lunas (Online — QRIS / VA / E-Wallet / Kartu)'
+                    : 'Pembayaran Lunas (Transfer Bank)'
+                  : `Angsuran ${installmentCount}x`}
               </p>
             </div>
             {paymentType === 'INSTALLMENT' && (
@@ -749,9 +782,18 @@ export default function BookingPage() {
         <div className="bg-white rounded-xl shadow-sm p-6 text-center">
           <div className="text-6xl mb-4">🎉</div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Berhasil!</h2>
-          <p className="text-gray-500 mb-6">
-            Invoice Anda telah diterbitkan. Silakan lakukan pembayaran sesuai instruksi yang tertera.
-          </p>
+          {bookingResult.paymentUrl ? (
+            <p className="text-gray-500 mb-6">
+              Invoice Anda telah diterbitkan. Selesaikan pembayaran melalui halaman pembayaran aman
+              (QRIS, Virtual Account, e-wallet, atau kartu kredit/debit) — pesanan Anda akan
+              terkonfirmasi otomatis setelah pembayaran berhasil.
+            </p>
+          ) : (
+            <p className="text-gray-500 mb-6">
+              Invoice Anda telah diterbitkan. Silakan transfer sesuai rekening pada invoice,
+              lalu konfirmasi pembayaran ke admin melalui WhatsApp.
+            </p>
+          )}
 
           <div className="bg-gray-50 rounded-lg p-6 mb-6">
             <p className="text-sm text-gray-500 mb-1">Nomor Invoice</p>
@@ -761,7 +803,7 @@ export default function BookingPage() {
           <div className="flex flex-wrap justify-center gap-3">
             {bookingResult.paymentUrl && (
               <Button href={bookingResult.paymentUrl} variant="accent" size="lg">
-                💳 Bayar Sekarang
+                💳 Bayar Online Sekarang
               </Button>
             )}
             <Button href={`/invoice/${bookingResult.invoiceNo}`} variant="primary">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Button from '../ui/Button';
 
 function BrandIcon({ icon, className }: { icon?: string; className?: string }) {
@@ -12,11 +13,14 @@ function BrandIcon({ icon, className }: { icon?: string; className?: string }) {
 
 const navLinks = [
   { href: '/', label: 'Beranda' },
+  { href: '/tours', label: 'Paket Wisata' },
   { href: '/destinations', label: 'Destinasi' },
+  { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'Tentang Kami' },
 ];
 
 export default function Header({ brandName, brandIcon }: { brandName?: string; brandIcon?: string }) {
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -48,24 +52,33 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-0.5">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="relative px-3 py-2 text-gray-600 hover:text-blue-600 rounded-lg text-sm font-medium transition-colors group"
-              >
-                {link.label}
-                <span className="absolute bottom-1 left-3 right-3 h-0.5 bg-blue-600 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`relative px-3 py-2 rounded-lg text-sm font-medium transition-colors group ${
+                    isActive ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
+                  }`}
+                >
+                  {link.label}
+                  <span
+                    className={`absolute bottom-1 left-3 right-3 h-0.5 bg-blue-600 rounded-full transition-transform origin-left ${
+                      isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                    }`}
+                  />
+                </Link>
+              );
+            })}
           </div>
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
-            <Button href="/tours" variant="outline" size="sm">
-              Lihat Paket
+            <Button href="/contact" variant="outline" size="sm">
+              Hubungi Kami
             </Button>
-            <Button href="/contact" variant="primary" size="sm">
+            <Button href="/tours" variant="primary" size="sm">
               Booking Sekarang
             </Button>
           </div>
@@ -90,21 +103,26 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
         {/* Mobile Nav */}
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-100 pb-4 pt-2 space-y-1 animate-fade-in">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="block px-3 py-2.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg text-base font-medium transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`block px-3 py-2.5 rounded-lg text-base font-medium transition-colors ${
+                    isActive ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
             <div className="pt-3 flex gap-2">
-              <Button href="/tours" variant="outline" size="sm" fullWidth>
-                Lihat Paket
+              <Button href="/contact" variant="outline" size="sm" fullWidth>
+                Hubungi Kami
               </Button>
-              <Button href="/contact" variant="primary" size="sm" fullWidth>
+              <Button href="/tours" variant="primary" size="sm" fullWidth>
                 Booking
               </Button>
             </div>

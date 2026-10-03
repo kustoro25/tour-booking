@@ -11,6 +11,8 @@ interface InvoiceActionsProps {
   helpLink?: string;
   /** Link pembayaran online (Midtrans) — tampil hanya jika gateway aktif & order masih PENDING */
   payUrl?: string;
+  /** Mode pembayaran order — menentukan pesan WA & tombol yang relevan */
+  paymentMode?: 'online' | 'transfer' | 'paid' | 'cancelled';
 }
 
 export default function InvoiceActions({
@@ -21,27 +23,39 @@ export default function InvoiceActions({
   companyPhone,
   helpLink,
   payUrl,
+  paymentMode = 'transfer',
 }: InvoiceActionsProps) {
   const waNumber = companyPhone.replace(/[^0-9]/g, '');
-
-  const waMessage = encodeURIComponent(
-    `Halo, saya ingin konfirmasi pembayaran untuk pesanan:\n` +
+  const orderInfo =
     `- Invoice: ${invoiceNo}\n` +
     `- Nama: ${customerName}\n` +
     `- Paket: ${tourName}\n` +
-    `- Total: Rp ${total.toLocaleString('id-ID')}\n\n` +
-    `Saya sudah melakukan transfer. Berikut bukti pembayarannya.`
+    `- Total: Rp ${total.toLocaleString('id-ID')}`;
+
+  const waMessage = encodeURIComponent(
+    paymentMode === 'online'
+      ? `Halo, saya ingin bertanya mengenai pembayaran online untuk pesanan:\n${orderInfo}`
+      : paymentMode === 'paid'
+        ? `Halo, saya ingin bertanya mengenai pesanan saya:\n${orderInfo}\n\nPesanan sudah saya bayar, mohon informasi E-Ticket-nya.`
+        : `Halo, saya ingin konfirmasi pembayaran untuk pesanan:\n${orderInfo}\n\nSaya sudah melakukan transfer. Berikut bukti pembayarannya.`
   );
 
+  const waLabel =
+    paymentMode === 'transfer'
+      ? '💬 Konfirmasi Transfer via WhatsApp'
+      : paymentMode === 'online'
+        ? '💬 Kendala Pembayaran?'
+        : '💬 Hubungi Kami';
+
   return (
-    <div className="screen-only flex flex-wrap justify-center gap-8 mt-6">
+    <div className="screen-only flex flex-wrap justify-center gap-3 sm:gap-4 mt-6">
       {payUrl && (
-        <Button href={payUrl} variant="accent">
-          💳 Bayar Online (QRIS / VA / E-Wallet)
+        <Button href={payUrl} variant="accent" size="lg">
+          💳 Bayar Online Sekarang
         </Button>
       )}
       <Button onClick={() => window.print()} variant="primary">
-        🖨️ Cetak Invoice
+        🖨️ Cetak / Simpan PDF
       </Button>
       <Button
         href={`https://wa.me/${waNumber}?text=${waMessage}`}
@@ -49,7 +63,7 @@ export default function InvoiceActions({
         rel="noopener noreferrer"
         variant="accent"
       >
-        💬 Konfirmasi Pembayaran
+        {waLabel}
       </Button>
       <Button href={helpLink || '/contact'} variant="outline">
         Butuh Bantuan?

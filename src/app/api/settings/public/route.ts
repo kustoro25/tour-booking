@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getPaymentGateway } from '@/lib/settings';
 
 export async function GET() {
   try {
     const settings = await prisma.setting.findMany();
+    const paymentGateway = await getPaymentGateway();
     const settingsMap: Record<string, unknown> = {};
 
     for (const s of settings) {
@@ -25,6 +27,8 @@ export async function GET() {
       success: true,
       data: {
         ...settingsMap,
+        // Gateway efektif (DB setting → env → default manual)
+        paymentGateway,
         // Legacy camelCase fields for existing components
         email,
         phone,
@@ -37,6 +41,7 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       data: {
+        paymentGateway: 'manual',
         email: 'info@jelajahnusantara.com',
         phone: '+62 812-3456-7890',
         address: 'Jl. Pariwisata No. 123, Jakarta Selatan',

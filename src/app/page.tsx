@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
-import { formatCurrency, formatDate, parseJsonSafe } from '@/lib/utils';
-import type { ItineraryDay } from '@/types';
+import { formatCurrency, parseJsonSafe } from '@/lib/utils';
+import { TourCategoryLabels } from '@/types';
+import type { TourCategory } from '@/types';
 import Button from '@/components/ui/Button';
 import StarRating from '@/components/ui/StarRating';
 import GalleryCarousel from '@/components/tours/GalleryCarousel';
@@ -48,7 +49,7 @@ async function getCmsFaqs(): Promise<CmsFaqData> {
 
 const FALLBACK_FAQS = [
   { question: 'Bagaimana cara melakukan booking?', answer: 'Caranya sangat mudah! Pilih paket tour yang Anda inginkan, tentukan tanggal keberangkatan dari kalender interaktif, isi data diri dan jumlah peserta, lalu klik "Booking Sekarang". Invoice akan langsung terbit dan dikirim ke email Anda.' },
-  { question: 'Metode pembayaran apa saja yang tersedia?', answer: 'Kami menerima transfer bank (BCA, Mandiri, BRI, BNI) dan e-wallet (OVO, Dana, GoPay, ShopeePay). Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan. Jika melebihi batas waktu, pesanan akan otomatis dibatalkan.' },
+  { question: 'Metode pembayaran apa saja yang tersedia?', answer: 'Pembayaran diproses otomatis melalui gateway Midtrans — tersedia QRIS, Virtual Account berbagai bank, e-wallet (GoPay, ShopeePay, DANA, dan lainnya), serta kartu kredit/debit. Setelah pembayaran berhasil, pesanan langsung terkonfirmasi otomatis. Untuk pembayaran angsuran (cicilan), transfer manual ke rekening bank perusahaan dan bukti transfer dikirim melalui WhatsApp atau email. Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan; pesanan yang melewati batas waktu akan otomatis dibatalkan.' },
   { question: 'Bagaimana kebijakan pembatalan dan refund?', answer: 'Pembatalan H-14: refund 80%. H-7: refund 50%. H-3: refund 25%. Kurang dari H-3: tidak ada refund. Jika tour dibatalkan oleh kami karena force majeure atau kuota minimal tidak terpenuhi, Anda mendapat refund 100%.' },
   { question: 'Apakah ada minimal peserta untuk setiap tour?', answer: 'Ya, setiap paket tour memiliki minimal peserta (umumnya 2 orang). Informasi ini tercantum di halaman detail masing-masing paket. Jika kuota minimal tidak terpenuhi, tim kami akan menghubungi Anda untuk opsi alternatif.' },
 ];
@@ -307,7 +308,7 @@ export default async function HomePage() {
               <Button href={hero.ctaLink || '/tours'} variant="accent" size="lg">
                 {hero.ctaText || '🚀 Lihat Paket Wisata'}
               </Button>
-              <Button href={hero.cta2Link || '/contact'} variant="outline" size="lg" className="!border-white !text-white hover:!bg-white/10">
+              <Button href={hero.cta2Link || '/tours'} variant="outline" size="lg" className="!border-white !text-white hover:!bg-white/10">
                 {hero.cta2Text || 'Booking Sekarang'}
               </Button>
             </div>
@@ -332,7 +333,7 @@ export default async function HomePage() {
             <p className="text-gray-500 max-w-2xl mx-auto">{valueData.valueSubheading || 'Kami hadir untuk memberikan pengalaman booking tour terbaik.'}</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
-            {(valueData.valueItems || []).map((item: { icon: string; title: string; desc: string; color: string }, i: number) => (
+            {(valueData.valueItems || []).map((item: { icon: string; title: string; desc: string; color: string }) => (
               <div key={item.title} className="group bg-white rounded-xl p-3 sm:p-6 shadow-card hover-lift text-center border border-gray-100 hover:border-blue-100 transition-colors">
                 <div className={`w-10 h-10 sm:w-14 sm:h-14 mx-auto mb-2 sm:mb-4 rounded-xl bg-gradient-to-br ${item.color || 'from-blue-500 to-blue-600'} flex items-center justify-center text-xl sm:text-2xl shadow-md group-hover:scale-110 transition-transform duration-300`}>
                   <span>{item.icon}</span>
@@ -352,7 +353,7 @@ export default async function HomePage() {
             <div className="text-center mb-12">
               <span className="inline-block text-orange-500 text-sm font-semibold tracking-wide uppercase mb-2">{destinationsData.label || 'Eksplorasi'}</span>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                {destinationsData.heading || 'Destinasi Impian,'}{' '}
+                {String(destinationsData.heading || '').replace(/\s*Satu Klik Saja\s*$/i, '').trim() || 'Destinasi Impian,'}{' '}
                 <span className="gradient-text">Satu Klik Saja</span>
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
@@ -402,7 +403,7 @@ export default async function HomePage() {
                       {/* View button */}
                       <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <span className="inline-flex items-center gap-1.5 bg-white/95 backdrop-blur-sm text-blue-600 text-sm font-semibold px-4 py-2 rounded-full shadow-lg hover:bg-white transition-colors">
-                          View
+                          Lihat Detail
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                           </svg>
@@ -463,7 +464,7 @@ export default async function HomePage() {
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <span className="absolute top-3 left-3 bg-white/95 text-gray-800 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
-                    {tour.category.replace('_', ' ')}
+                    {TourCategoryLabels[tour.category as TourCategory] || tour.category}
                   </span>
                 </div>
                 <div className="p-5">

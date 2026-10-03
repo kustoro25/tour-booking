@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/Skeleton';
+import CopyButton from '@/components/ui/CopyButton';
 import { InstallmentPaymentStatusLabels, InstallmentPaymentStatusColors, InstallmentPaymentStatusDots } from '@/types';
 import type { InstallmentPaymentStatus } from '@/types';
 
@@ -42,6 +43,12 @@ interface InstallmentData {
   payments: Payment[];
 }
 
+interface BankAccount {
+  bank: string;
+  number: string;
+  name: string;
+}
+
 export default function InstallmentTrackingPage() {
   const params = useParams();
   const invoiceNo = params.invoice_no as string;
@@ -49,17 +56,75 @@ export default function InstallmentTrackingPage() {
   const [data, setData] = useState<InstallmentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [banks, setBanks] = useState<BankAccount[]>([]);
+  const [companyPhone, setCompanyPhone] = useState('');
+  const [companyEmail, setCompanyEmail] = useState('');
+  const [uploadingNum, setUploadingNum] = useState<number | null>(null);
+  const [uploadMsg, setUploadMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  useEffect(() => {
-    fetch(`/api/installments/${invoiceNo}`)
+  const fetchData = useCallback(() => {
+    return fetch(`/api/installments/${invoiceNo}`)
       .then((r) => r.json())
       .then((res) => {
         if (res.success) setData(res.data);
         else setError(res.error || 'Gagal memuat data');
       })
-      .catch(() => setError('Gagal menghubungi server'))
-      .finally(() => setLoading(false));
+      .catch(() => setError('Gagal menghubungi server'));
   }, [invoiceNo]);
+
+  useEffect(() => {
+    fetchData().finally(() => setLoading(false));
+  }, [fetchData]);
+
+  // Rekening & kontak perusahaan dari settings publik
+  useEffect(() => {
+    fetch('/api/settings/public')
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success && res.data) {
+          if (Array.isArray(res.data.bank_accounts)) setBanks(res.data.bank_accounts);
+          if (typeof res.data.company_phone === 'string') setCompanyPhone(res.data.company_phone);
+          if (typeof res.data.company_email === 'string') setCompanyEmail(res.data.company_email);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleUploadProof = async (installmentNumber: number, file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setUploadMsg({ type: 'error', text: 'File harus berupa gambar (JPG, PNG, atau WebP).' });
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadMsg({ type: 'error', text: 'Ukuran file maksimal 10MB.' });
+      return;
+    }
+    setUploadMsg(null);
+    setUploadingNum(installmentNumber);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('folder', 'tour-booking/installment-proofs');
+      const up = await fetch('/api/upload', { method: 'POST', body: fd });
+      const upRes = await up.json();
+      if (!upRes.success || !upRes.url) throw new Error(upRes.error || 'Gagal mengunggah gambar');
+
+      const res = await fetch(`/api/installments/${invoiceNo}/pay/${installmentNumber}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentProof: upRes.url }),
+      });
+      const result = await res.json();
+      if (!res.ok || !result.success) throw new Error(result.error || 'Gagal menyimpan bukti transfer');
+
+      setUploadMsg({ type: 'success', text: `Bukti angsuran ke-${installmentNumber} berhasil diunggah. Menunggu konfirmasi admin.` });
+      await fetchData();
+    } catch (e) {
+      setUploadMsg({ type: 'error', text: e instanceof Error ? e.message : 'Gagal mengunggah bukti transfer' });
+    } finally {
+      setUploadingNum(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -120,6 +185,47 @@ export default function InstallmentTrackingPage() {
         </div>
       </div>
 
+      {/* Rekening Pembayaran */}
+      {banks.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+          <div className="px-5 py-3 bg-blue-50 border-b border-blue-100">
+            <h3 className="text-sm font-semibold text-blue-800">Rekening Pembayaran</h3>
+            <p className="text-xs text-blue-600 mt-0.5">
+              Transfer ke salah satu rekening berikut, lalu unggah bukti transfer pada tabel di bawah.
+            </p>
+          </div>
+          <div className="p-5 space-y-3">
+            {banks.map((b) => (
+              <div
+                key={`${b.bank}-${b.number}`}
+                className="flex flex-wrap items-center justify-between gap-2 text-sm border border-gray-100 rounded-lg px-4 py-3"
+              >
+                <div>
+                  <span className="font-semibold text-gray-800">{b.bank}</span>
+                  <span className="text-gray-300 mx-2">•</span>
+                  <span className="font-mono text-gray-700">{b.number}</span>
+                  <p className="text-xs text-gray-400 mt-0.5">{b.name}</p>
+                </div>
+                <CopyButton bankNumber={b.number} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Pesan upload */}
+      {uploadMsg && (
+        <div
+          className={`rounded-xl p-4 mb-4 text-sm border ${
+            uploadMsg.type === 'success'
+              ? 'bg-green-50 border-green-200 text-green-700'
+              : 'bg-red-50 border-red-200 text-red-700'
+          }`}
+        >
+          {uploadMsg.text}
+        </div>
+      )}
+
       {/* Payments Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
         <div className="px-5 py-3 bg-orange-50 border-b border-orange-100">
@@ -162,11 +268,39 @@ export default function InstallmentTrackingPage() {
                       </span>
                     </td>
                     <td className="py-3 px-4 text-center">
-                      {p.paymentProof && (
-                        <a href={p.paymentProof} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-xs">
-                          Lihat Bukti
-                        </a>
-                      )}
+                      <div className="flex flex-col items-center gap-1">
+                        {p.paymentProof && (
+                          <a href={p.paymentProof} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-xs">
+                            Lihat Bukti
+                          </a>
+                        )}
+                        {p.status !== 'CONFIRMED' && (
+                          <label
+                            className={`text-xs font-medium transition-colors ${
+                              uploadingNum === p.installmentNumber
+                                ? 'text-gray-400 cursor-wait'
+                                : 'text-orange-600 hover:text-orange-700 hover:underline cursor-pointer'
+                            }`}
+                          >
+                            {uploadingNum === p.installmentNumber
+                              ? 'Mengunggah…'
+                              : p.paymentProof
+                                ? 'Ganti Bukti'
+                                : 'Unggah Bukti'}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              disabled={uploadingNum !== null}
+                              onChange={(e) => {
+                                const f = e.target.files?.[0];
+                                if (f) handleUploadProof(p.installmentNumber, f);
+                                e.target.value = '';
+                              }}
+                            />
+                          </label>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -176,15 +310,18 @@ export default function InstallmentTrackingPage() {
         </div>
       </div>
 
-      {/* Upload Info */}
+      {/* Panduan Pembayaran */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 text-sm text-blue-800">
-        <h3 className="font-semibold mb-2">📤 Cara Mengirim Bukti Transfer</h3>
-        <p className="mb-2">Kirimkan bukti transfer Anda melalui:</p>
-        <ul className="list-disc list-inside space-y-1 ml-1">
-          <li><strong>Email:</strong> Kirim ke alamat email yang tertera di invoice</li>
-          <li><strong>WhatsApp:</strong> Kirim ke nomor WhatsApp admin yang tertera di invoice</li>
-        </ul>
-        <p className="mt-3 text-xs text-blue-600">Setelah admin menerima dan memverifikasi bukti transfer, status pembayaran akan diperbarui dan bukti akan muncul di tabel di atas.</p>
+        <h3 className="font-semibold mb-2">📤 Cara Membayar & Mengirim Bukti</h3>
+        <ol className="list-decimal list-inside space-y-1.5 ml-1">
+          <li>Transfer sesuai nominal angsuran ke salah satu <strong>rekening perusahaan</strong> di atas.</li>
+          <li>Unggah bukti transfer melalui tombol <strong>Unggah Bukti</strong> pada baris angsuran di tabel.</li>
+          <li>Admin akan memverifikasi dalam 1×24 jam — status berubah menjadi <strong>Terkonfirmasi</strong>.</li>
+        </ol>
+        <p className="mt-3 text-xs text-blue-600">
+          Alternatif: kirim bukti melalui WhatsApp {companyPhone || 'admin'} atau email {companyEmail || 'yang tertera pada invoice'}.
+          Pembayaran angsuran dilakukan via transfer bank; khusus pembayaran lunas, tersedia pembayaran online (QRIS / Virtual Account / e-wallet / kartu) melalui halaman invoice.
+        </p>
       </div>
     </div>
   );
