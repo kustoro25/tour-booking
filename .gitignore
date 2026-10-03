@@ -48,3 +48,6 @@ next-env.d.ts
 test-step*.png
 snap-test-*.png
 walkthrough-step*.png
+
+.vercel
+.env*
