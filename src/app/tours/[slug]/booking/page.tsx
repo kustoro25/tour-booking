@@ -587,6 +587,9 @@ export default function BookingPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900">Pembayaran Angsuran (Cicilan)</h3>
                   <p className="text-sm text-gray-500 mt-0.5">Bayar dengan DP {dpPercentage}% dan sisanya dicicil sesuai pilihan Anda</p>
+                  {paymentGateway === 'midtrans' && (
+                    <p className="text-xs text-green-600 mt-1">💳 DP &amp; angsuran dibayar online via Midtrans — terkonfirmasi otomatis, tanpa transfer manual.</p>
+                  )}
                   {!installmentEnabled && (
                     <p className="text-xs text-gray-400 mt-1">Belum tersedia saat ini.</p>
                   )}
@@ -652,7 +655,11 @@ export default function BookingPage() {
                 <li>Setiap angsuran harus dibayar paling lambat pada tanggal jatuh tempo. Keterlambatan lebih dari 7 hari setelah jatuh tempo dapat mengakibatkan pembatalan pesanan.</li>
                 <li>Uang muka (DP) dan angsuran yang telah dibayarkan <strong>tidak dapat dikembalikan</strong>.</li>
                 <li>Seluruh angsuran harus <strong>lunas H-7</strong> sebelum tanggal keberangkatan. Jika belum lunas, pihak tour berhak menunda atau membatalkan keberangkatan.</li>
-                <li>Bukti transfer diunggah melalui halaman <strong>Jadwal & Bayar Angsuran</strong> pada invoice Anda (atau dikirim via WhatsApp/email). Admin akan memverifikasi dan mengkonfirmasi pembayaran.</li>
+                <li>
+                  {paymentGateway === 'midtrans'
+                    ? <>DP dan angsuran dibayar <strong>online</strong> (QRIS / Virtual Account / e-wallet / kartu) melalui halaman <strong>Jadwal &amp; Bayar Angsuran</strong> pada invoice Anda. Status pembayaran <strong>terkonfirmasi otomatis</strong>.</>
+                    : <>Bukti transfer diunggah melalui halaman <strong>Jadwal &amp; Bayar Angsuran</strong> pada invoice Anda (atau dikirim via WhatsApp/email). Admin akan memverifikasi dan mengkonfirmasi pembayaran.</>}
+                </li>
               </ol>
               <label className="flex items-start gap-2 mt-3 cursor-pointer">
                 <input
@@ -725,7 +732,7 @@ export default function BookingPage() {
                   ? paymentGateway === 'midtrans'
                     ? 'Pembayaran Lunas (Online — QRIS / VA / E-Wallet / Kartu)'
                     : 'Pembayaran Lunas (Transfer Bank)'
-                  : `Angsuran ${installmentCount}x`}
+                  : `Angsuran ${installmentCount}x${paymentGateway === 'midtrans' ? ' (Online — DP + cicilan otomatis)' : ''}`}
               </p>
             </div>
             {paymentType === 'INSTALLMENT' && (
@@ -784,14 +791,29 @@ export default function BookingPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Berhasil!</h2>
           {bookingResult.paymentUrl ? (
             <p className="text-gray-500 mb-6">
-              Invoice Anda telah diterbitkan. Selesaikan pembayaran melalui halaman pembayaran aman
-              (QRIS, Virtual Account, e-wallet, atau kartu kredit/debit) — pesanan Anda akan
-              terkonfirmasi otomatis setelah pembayaran berhasil.
+              {paymentType === 'INSTALLMENT' ? (
+                <>
+                  Langkah terakhir: bayar <strong>DP (uang muka)</strong> melalui halaman pembayaran aman
+                  (QRIS, Virtual Account, e-wallet, atau kartu). Angsuran berikutnya dibayar melalui halaman{' '}
+                  <strong>Jadwal &amp; Bayar Angsuran</strong> — setiap pembayaran terkonfirmasi otomatis.
+                </>
+              ) : (
+                <>
+                  Invoice Anda telah diterbitkan. Selesaikan pembayaran melalui halaman pembayaran aman
+                  (QRIS, Virtual Account, e-wallet, atau kartu kredit/debit) — pesanan Anda akan
+                  terkonfirmasi otomatis setelah pembayaran berhasil.
+                </>
+              )}
+            </p>
+          ) : paymentGateway === 'midtrans' ? (
+            <p className="text-gray-500 mb-6">
+              Invoice Anda telah diterbitkan. Buka halaman invoice untuk menyelesaikan pembayaran secara online.
             </p>
           ) : (
             <p className="text-gray-500 mb-6">
-              Invoice Anda telah diterbitkan. Silakan transfer sesuai rekening pada invoice,
-              lalu konfirmasi pembayaran ke admin melalui WhatsApp.
+              {paymentType === 'INSTALLMENT'
+                ? <>Invoice Anda telah diterbitkan. Silakan transfer DP sesuai rekening pada invoice, lalu konfirmasi ke admin melalui WhatsApp.</>
+                : <>Invoice Anda telah diterbitkan. Silakan transfer sesuai rekening pada invoice, lalu konfirmasi pembayaran ke admin melalui WhatsApp.</>}
             </p>
           )}
 
@@ -803,7 +825,7 @@ export default function BookingPage() {
           <div className="flex flex-wrap justify-center gap-3">
             {bookingResult.paymentUrl && (
               <Button href={bookingResult.paymentUrl} variant="accent" size="lg">
-                💳 Bayar Online Sekarang
+                {paymentType === 'INSTALLMENT' ? '💳 Bayar DP Online' : '💳 Bayar Online Sekarang'}
               </Button>
             )}
             <Button href={`/invoice/${bookingResult.invoiceNo}`} variant="primary">

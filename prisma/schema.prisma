@@ -219,11 +219,16 @@ model InstallmentPlan {
 model InstallmentPayment {
   id               String    @id @default(cuid())
   planId           String    @map("plan_id")
-  installmentNumber Int      @map("installment_number") // 1-based
+  installmentNumber Int      @map("installment_number") // 0 = DP (uang muka), 1-based untuk angsuran
   amount           Float
   dueDate          DateTime  @map("due_date")
   status           String    @default("PENDING") // PENDING, PAID, CONFIRMED, OVERDUE
   paymentProof     String?   @map("payment_proof")
+  paymentMethod    String?   @map("payment_method") // Metode pembayaran Midtrans (qris, bank_transfer, credit_card, dst.)
+  paymentRef       String?   @map("payment_ref") // Midtrans transaction_id
+  snapToken        String?   @map("snap_token") // Midtrans Snap token
+  paymentUrl       String?   @map("payment_url") // Midtrans Snap redirect URL
+  paymentExpiryAt  DateTime? @map("payment_expiry_at") // Kedaluwarsa link pembayaran online
   adminConfirmedBy String?   @map("admin_confirmed_by")
   adminConfirmedAt DateTime? @map("admin_confirmed_at")
   notes            String?

@@ -86,6 +86,7 @@ export async function POST(request: NextRequest) {
       );
 
       const invoiceNo = generateInvoiceNo();
+      const expiryAt = getExpiryDate(24);
 
       // Create order
       const order = await tx.order.create({
@@ -103,13 +104,14 @@ export async function POST(request: NextRequest) {
           paymentType: isInstallment ? 'INSTALLMENT' : 'FULL',
           notes: notes || null,
           reviewToken: generateReviewToken(),
-          expiryAt: getExpiryDate(24),
+          expiryAt,
         },
       });
 
       // Create installment plan if applicable
       let installmentPlanData: {
         planId: string;
+        dpPaymentId: string;
         dpAmount: number;
         dpPercentage: number;
         installmentCount: number;
@@ -143,6 +145,17 @@ export async function POST(request: NextRequest) {
           },
         });
 
+        // Record DP (uang muka) sebagai pembayaran ke-0 — batas bayar sama dengan expiry order (24 jam)
+        const dpRecord = await tx.installmentPayment.create({
+          data: {
+            planId: plan.id,
+            installmentNumber: 0,
+            amount: installmentInfo.downPayment,
+            dueDate: expiryAt,
+            status: 'PENDING',
+          },
+        });
+
         // Create individual installment payment records
         for (let i = 0; i < installmentInfo.dates.length; i++) {
           await tx.installmentPayment.create({
@@ -158,6 +171,7 @@ export async function POST(request: NextRequest) {
 
         installmentPlanData = {
           planId: plan.id,
+          dpPaymentId: dpRecord.id,
           dpAmount: installmentInfo.downPayment,
           dpPercentage: dpPct,
           installmentCount: installmentNum,
@@ -201,7 +215,7 @@ export async function POST(request: NextRequest) {
     const tourDateLabel = new Date(tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
     const expiryDate = getExpiryDate(24);
 
-    // 1. Buat transaksi Midtrans Snap untuk order FULL (jika gateway midtrans aktif)
+    // 1. Buat transaksi Midtrans Snap (FULL) atau Snap DP (INSTALLMENT) jika gateway midtrans aktif
     let paymentUrl: string | null = null;
     if (!result.isInstallment) {
       try {
@@ -226,6 +240,39 @@ export async function POST(request: NextRequest) {
       } catch (payErr) {
         console.error('Failed to create Midtrans transaction:', payErr);
       }
+    } else if (result.installmentPlanData && result.installmentPlanData.dpAmount > 0) {
+      // DP dibayar online — terkonfirmasi otomatis lewat webhook (pola order_id: {invoiceNo}-INST-0)
+      try {
+        const gateway = await getPaymentGateway();
+        if (gateway === 'midtrans' && isMidtransConfigured()) {
+          const ipd = result.installmentPlanData;
+          const snap = await createSnapTransaction({
+            orderId: `${result.invoiceNo}-INST-0`,
+            grossAmount: ipd.dpAmount,
+            itemName: `DP ${ipd.dpPercentage}% - ${tour.name}`,
+            customer: { name: customerName, email: customerEmail, phone: customerPhone },
+            expiryHours: 24,
+            finishUrl: `${siteUrl}/invoice/${result.invoiceNo}/installments?pay=finish`,
+          });
+          if (snap) {
+            paymentUrl = snap.redirectUrl;
+            await prisma.installmentPayment.update({
+              where: { id: ipd.dpPaymentId },
+              data: {
+                snapToken: snap.token,
+                paymentUrl: snap.redirectUrl,
+                paymentExpiryAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+              },
+            });
+            await prisma.order.update({
+              where: { id: result.order.id },
+              data: { snapToken: snap.token, paymentUrl: snap.redirectUrl },
+            });
+          }
+        }
+      } catch (payErr) {
+        console.error('Failed to create Midtrans DP transaction:', payErr);
+      }
     }
 
     // 2. Email ke pembeli
@@ -234,33 +281,31 @@ export async function POST(request: NextRequest) {
         const ipd = result.installmentPlanData;
         const installmentUrl = `${siteUrl}/invoice/${result.invoiceNo}/installments`;
 
-        // Read bank accounts
+        // Read bank accounts (dipakai hanya saat mode transfer manual)
         let bankAccounts = [{ bank: 'BCA', number: '1234567890', name: companyName }];
         try {
           const bankSetting = await prisma.setting.findUnique({ where: { key: 'bank_accounts' } });
           if (bankSetting) bankAccounts = JSON.parse(bankSetting.value);
         } catch { /* default */ }
 
-        // Send first billing notification for the first installment
-        if (ipd.dates.length > 0) {
-          const firstDueDate = new Date(ipd.dates[0]).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-          await sendEmail({
-            to: customerEmail,
-            subject: `Penagihan Angsuran ke-1 - ${tour.name}`,
-            html: installmentBillingTemplate({
-              customerName,
-              tourName: tour.name,
-              invoiceNo: result.invoiceNo,
-              installmentNumber: 1,
-              totalInstallments: ipd.installmentCount,
-              amount: formatCur(ipd.amountPerInstallment),
-              dueDate: firstDueDate,
-              paymentUrl: installmentUrl,
-              bankAccounts,
-              companyName,
-            }),
-          });
-        }
+        // Email penagihan DP (uang muka) — tombol bayar online bila gateway aktif
+        await sendEmail({
+          to: customerEmail,
+          subject: `Pembayaran DP (Uang Muka) - ${tour.name}`,
+          html: installmentBillingTemplate({
+            customerName,
+            tourName: tour.name,
+            invoiceNo: result.invoiceNo,
+            installmentNumber: 0,
+            totalInstallments: ipd.installmentCount,
+            amount: formatCur(ipd.dpAmount),
+            dueDate: expiryDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+            paymentUrl: paymentUrl || installmentUrl,
+            bankAccounts,
+            companyName,
+            onlineMode: Boolean(paymentUrl),
+          }),
+        });
       } else {
         const invoicePageUrl = `${siteUrl}/invoice/${result.invoiceNo}`;
         await sendEmail({

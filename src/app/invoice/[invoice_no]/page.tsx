@@ -193,11 +193,14 @@ export default async function InvoicePage({ params }: PageProps) {
   const brandName = await getBrandName();
   const brandIcon = await getBrandIcon();
 
-  // Pembayaran online (Midtrans) — hanya untuk order FULL yang masih PENDING
+  // Pembayaran online (Midtrans):
+  // - FULL PENDING → direct ke halaman Snap; INSTALLMENT PENDING → halaman jadwal & bayar angsuran
   const gateway = await getPaymentGateway();
   const payUrl =
-    gateway === 'midtrans' && order.status === 'PENDING' && order.paymentType === 'FULL'
-      ? order.paymentUrl || `/api/invoice/${order.invoiceNo}/pay`
+    gateway === 'midtrans' && order.status === 'PENDING'
+      ? order.paymentType === 'INSTALLMENT'
+        ? `/invoice/${order.invoiceNo}/installments`
+        : order.paymentUrl || `/api/invoice/${order.invoiceNo}/pay`
       : undefined;
 
   // Mode tampilan informasi pembayaran pada invoice
@@ -267,6 +270,7 @@ export default async function InvoicePage({ params }: PageProps) {
           companyPhone={companyPhone}
           helpLink={config.helpLink}
           payUrl={payUrl}
+          payLabel={order.paymentType === 'INSTALLMENT' ? '💳 Bayar DP / Angsuran' : undefined}
           paymentMode={paymentMode}
         />
       </div>
@@ -502,7 +506,9 @@ function CustomInvoice({
               {(() => {
                 const plan = order.installmentPlan;
                 const payments: { id: string; installmentNumber: number; amount: number; dueDate: string; status: string }[] = plan.payments || [];
-                const paidCount = payments.filter((p) => p.status === 'CONFIRMED').length;
+                const dpPayment = payments.find((p) => p.installmentNumber === 0);
+                const paidCount = payments.filter((p) => p.installmentNumber >= 1 && p.status === 'CONFIRMED').length;
+                const hasUnpaid = payments.some((p) => p.status !== 'CONFIRMED');
                 
                 return (
                   <>
@@ -514,6 +520,11 @@ function CustomInvoice({
                       <div className="rounded-lg px-3 py-2" style={{ backgroundColor: stripeBg }}>
                         <p className="text-gray-400 mb-0.5">DP ({plan.dpPercentage}%)</p>
                         <p className="font-medium text-gray-800">{formatCurrency(plan.downPayment)}</p>
+                        {dpPayment && (
+                          <p className={`text-[10px] font-medium ${dpPayment.status === 'CONFIRMED' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                            {dpPayment.status === 'CONFIRMED' ? '✓ Lunas' : 'Menunggu'}
+                          </p>
+                        )}
                       </div>
                       <div className="rounded-lg px-3 py-2" style={{ backgroundColor: stripeBg }}>
                         <p className="text-gray-400 mb-0.5">Per Angsuran</p>
@@ -543,7 +554,9 @@ function CustomInvoice({
                             const label = InstallmentPaymentStatusLabels[st] || st;
                             return (
                               <tr key={p.id} className="border-b" style={{ borderColor: border }}>
-                                <td className="py-2 px-2 font-medium text-gray-700">Angsuran ke-{p.installmentNumber}</td>
+                                <td className="py-2 px-2 font-medium text-gray-700">
+                                  {p.installmentNumber === 0 ? `DP (${plan.dpPercentage}%)` : `Angsuran ke-${p.installmentNumber}`}
+                                </td>
                                 <td className="py-2 px-2 text-right text-gray-700">{formatCurrency(p.amount)}</td>
                                 <td className="py-2 px-2 text-right text-gray-600">{new Date(p.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</td>
                                 <td className="py-2 px-2 text-center">
@@ -559,8 +572,8 @@ function CustomInvoice({
                       </table>
                     </div>
 
-                    {/* Link to installment page for payment upload */}
-                    {paidCount < plan.installmentCount && (
+                    {/* Link ke halaman jadwal & pembayaran angsuran */}
+                    {hasUnpaid && (
                       <div className="mt-4 text-center">
                         <a
                           href={`/invoice/${order.invoiceNo}/installments`}
@@ -656,13 +669,33 @@ function CustomInvoice({
             <div className="rounded-xl p-4 mb-4" style={{ backgroundColor: accentBg, border: `1px solid ${accent}40` }}>
               <p className="text-xs text-gray-700 leading-relaxed">
                 <span className="font-semibold" style={{ color: accent }}>Pembayaran online otomatis.</span>{' '}
-                Klik tombol <strong>Bayar Online</strong> di bawah invoice ini untuk menyelesaikan pembayaran melalui
-                halaman pembayaran aman <strong>Midtrans</strong> — mendukung QRIS, Virtual Account berbagai bank,
-                e-wallet (GoPay, ShopeePay, DANA), dan kartu kredit/debit.
+                {order.paymentType === 'INSTALLMENT' ? (
+                  <>
+                    Klik tombol <strong>Bayar DP / Angsuran</strong> di bawah invoice ini untuk membayar DP dan setiap
+                    angsuran melalui halaman pembayaran aman <strong>Midtrans</strong> — mendukung QRIS, Virtual Account
+                    berbagai bank, e-wallet (GoPay, ShopeePay, DANA), dan kartu kredit/debit.
+                  </>
+                ) : (
+                  <>
+                    Klik tombol <strong>Bayar Online</strong> di bawah invoice ini untuk menyelesaikan pembayaran melalui
+                    halaman pembayaran aman <strong>Midtrans</strong> — mendukung QRIS, Virtual Account berbagai bank,
+                    e-wallet (GoPay, ShopeePay, DANA), dan kartu kredit/debit.
+                  </>
+                )}
               </p>
               <p className="text-[10px] text-gray-500 mt-2 leading-relaxed">
-                Setelah pembayaran berhasil, status pesanan berubah menjadi <strong>Terkonfirmasi</strong> secara
-                otomatis dan E-Ticket dikirim ke email Anda. Tidak perlu konfirmasi manual.
+                {order.paymentType === 'INSTALLMENT' ? (
+                  <>
+                    Setiap pembayaran (DP &amp; angsuran) <strong>terkonfirmasi otomatis</strong> setelah berhasil —
+                    tanpa upload bukti atau konfirmasi manual. Jadwal lengkap tersedia di halaman
+                    <strong> Jadwal &amp; Bayar Angsuran</strong>.
+                  </>
+                ) : (
+                  <>
+                    Setelah pembayaran berhasil, status pesanan berubah menjadi <strong>Terkonfirmasi</strong> secara
+                    otomatis dan E-Ticket dikirim ke email Anda. Tidak perlu konfirmasi manual.
+                  </>
+                )}
               </p>
             </div>
           )}
@@ -689,7 +722,11 @@ function CustomInvoice({
             <div className="rounded-xl p-4 mb-4" style={{ backgroundColor: '#F0FDF4', border: '1px solid #BBF7D0' }}>
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-base">✅</span>
-                <span className="text-xs font-semibold text-green-700">Pembayaran Anda telah kami terima — terima kasih!</span>
+                <span className="text-xs font-semibold text-green-700">
+                  {order.paymentType === 'INSTALLMENT'
+                    ? 'Pembayaran DP / angsuran Anda telah kami terima — terima kasih!'
+                    : 'Pembayaran Anda telah kami terima — terima kasih!'}
+                </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[10px]">
                 <div>
@@ -706,7 +743,16 @@ function CustomInvoice({
                 </div>
               </div>
               <p className="text-[10px] text-gray-500 mt-3 leading-relaxed">
-                E-Ticket akan dikirim ke email <strong>{order.customerEmail}</strong>. Untuk bantuan, hubungi {companyPhone}.
+                {order.paymentType === 'INSTALLMENT' ? (
+                  <>
+                    Sisa angsuran dapat dibayar kapan saja melalui halaman <strong>Jadwal &amp; Bayar Angsuran</strong>.
+                    E-Ticket dikirim setelah seluruh angsuran lunas. Untuk bantuan, hubungi {companyPhone}.
+                  </>
+                ) : (
+                  <>
+                    E-Ticket akan dikirim ke email <strong>{order.customerEmail}</strong>. Untuk bantuan, hubungi {companyPhone}.
+                  </>
+                )}
               </p>
             </div>
           )}

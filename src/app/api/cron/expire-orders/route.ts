@@ -1,5 +1,6 @@
-// Cron: batalkan otomatis order FULL yang masih PENDING melewati batas pembayaran (expiryAt)
-// dan lepaskan kuota slot-nya. Sekaligus tandai angsuran yang lewat jatuh tempo sebagai OVERDUE.
+// Cron: batalkan otomatis order yang masih PENDING melewati batas pembayaran (expiryAt)
+// — mencakup pembayaran lunas (FULL) maupun DP angsuran (INSTALLMENT) — dan lepaskan kuota slot-nya.
+// Sekaligus tandai angsuran yang lewat jatuh tempo sebagai OVERDUE.
 // Proteksi: header Authorization: Bearer <CRON_SECRET> (di-set otomatis oleh Vercel Cron).
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -21,10 +22,17 @@ export async function GET(request: NextRequest) {
     const expiredOrders = await prisma.order.findMany({
       where: {
         status: 'PENDING',
-        paymentType: 'FULL',
         expiryAt: { lt: new Date() },
       },
-      select: { id: true, invoiceNo: true, tourId: true, tourDate: true, adults: true, children: true },
+      select: {
+        id: true,
+        invoiceNo: true,
+        tourId: true,
+        tourDate: true,
+        adults: true,
+        children: true,
+        installmentPlan: { select: { id: true } },
+      },
     });
 
     let cancelled = 0;
@@ -34,6 +42,14 @@ export async function GET(request: NextRequest) {
           where: { id: order.id },
           data: { status: 'CANCELLED' },
         });
+
+        // Batalkan rencana angsuran bila ada (DP tidak dibayar sampai batas waktu)
+        if (order.installmentPlan) {
+          await prisma.installmentPlan.update({
+            where: { id: order.installmentPlan.id },
+            data: { status: 'CANCELLED' },
+          });
+        }
 
         // Lepaskan kuota slot
         const slot = await prisma.tourSlot.findUnique({

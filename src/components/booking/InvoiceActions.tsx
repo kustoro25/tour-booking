@@ -11,6 +11,8 @@ interface InvoiceActionsProps {
   helpLink?: string;
   /** Link pembayaran online (Midtrans) — tampil hanya jika gateway aktif & order masih PENDING */
   payUrl?: string;
+  /** Label tombol bayar online (mis. "Bayar DP / Angsuran" untuk cicilan) */
+  payLabel?: string;
   /** Mode pembayaran order — menentukan pesan WA & tombol yang relevan */
   paymentMode?: 'online' | 'transfer' | 'paid' | 'cancelled';
 }
@@ -23,6 +25,7 @@ export default function InvoiceActions({
   companyPhone,
   helpLink,
   payUrl,
+  payLabel = '💳 Bayar Online Sekarang',
   paymentMode = 'transfer',
 }: InvoiceActionsProps) {
   const waNumber = companyPhone.replace(/[^0-9]/g, '');
@@ -51,7 +54,7 @@ export default function InvoiceActions({
     <div className="screen-only flex flex-wrap justify-center gap-3 sm:gap-4 mt-6">
       {payUrl && (
         <Button href={payUrl} variant="accent" size="lg">
-          💳 Bayar Online Sekarang
+          {payLabel}
         </Button>
       )}
       <Button onClick={() => window.print()} variant="primary">

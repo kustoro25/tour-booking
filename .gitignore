@@ -47,3 +47,4 @@ next-env.d.ts
 # test artifacts (browser/test screenshots)
 test-step*.png
 snap-test-*.png
+walkthrough-step*.png

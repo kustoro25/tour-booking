@@ -234,14 +234,19 @@ export function installmentBillingTemplate(data: {
   customerName: string;
   tourName: string;
   invoiceNo: string;
-  installmentNumber: number;
+  installmentNumber: number; // 0 = DP (uang muka)
   totalInstallments: number;
   amount: string;
   dueDate: string;
   paymentUrl: string;
   bankAccounts: { bank: string; number: string; name: string }[];
   companyName: string;
+  onlineMode?: boolean; // true = bayar online (Midtrans), false = transfer manual
 }): string {
+  const isDp = data.installmentNumber === 0;
+  const paymentLabel = isDp ? 'DP (Uang Muka)' : `Angsuran ke-${data.installmentNumber}`;
+  const dueDateLabel = isDp ? 'Batas Pembayaran' : 'Jatuh Tempo';
+
   const bankRows = data.bankAccounts
     .map(
       (b) =>
@@ -249,29 +254,50 @@ export function installmentBillingTemplate(data: {
     )
     .join('');
 
+  const paymentSection = data.onlineMode
+    ? `<h3 style="font-size: 14px; color: #374151;">Pembayaran Online (Otomatis)</h3>
+      <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 16px;">
+        <p style="margin: 0; font-size: 13px; color: #1E40AF;">
+          Bayar melalui halaman pembayaran aman <strong>Midtrans</strong> — mendukung <strong>QRIS, Virtual Account</strong> berbagai bank,
+          <strong>e-wallet</strong> (GoPay, ShopeePay, DANA), dan <strong>kartu kredit/debit</strong>.
+          Status pembayaran terkonfirmasi <strong>otomatis</strong> — tidak perlu upload bukti transfer.
+        </p>
+      </div>`
+    : `<h3 style="font-size: 14px; color: #374151;">Informasi Rekening</h3>
+      <table style="width: 100%; border-collapse: collapse; background: #F9FAFB; border-radius: 8px; overflow: hidden;">
+        ${bankRows}
+      </table>`;
+
+  const buttonLabel = data.onlineMode
+    ? `💳 Bayar ${isDp ? 'DP' : 'Angsuran'} Online`
+    : '💳 Upload Bukti Transfer';
+
+  const footerNote = data.onlineMode
+    ? `Mohon lakukan pembayaran sebelum ${dueDateLabel.toLowerCase()} melalui tombol di atas. Pembayaran terkonfirmasi otomatis oleh sistem dan Anda akan menerima email konfirmasi.`
+    : `Mohon lakukan pembayaran sebelum tanggal jatuh tempo dan upload bukti transfer melalui link di atas. Keterlambatan pembayaran dapat mengakibatkan pembatalan pesanan.`;
+
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #E59800;">Penagihan Angsuran ke-${data.installmentNumber}</h2>
+      <h2 style="color: #E59800;">${isDp ? 'Pembayaran DP (Uang Muka)' : `Penagihan Angsuran ke-${data.installmentNumber}`}</h2>
       <p>Halo <strong>${data.customerName}</strong>,</p>
-      <p>Berikut adalah penagihan angsuran ke-<strong>${data.installmentNumber}</strong> dari <strong>${data.totalInstallments}</strong> untuk pemesanan tour <strong>${data.tourName}</strong>.</p>
+      <p>${isDp
+        ? `Untuk mengaktifkan pesanan tour <strong>${data.tourName}</strong>, silakan lakukan pembayaran <strong>DP (Uang Muka)</strong>. Sisa pembayaran dicicil sebanyak <strong>${data.totalInstallments}x</strong> sesuai jadwal.`
+        : `Berikut adalah penagihan angsuran ke-<strong>${data.installmentNumber}</strong> dari <strong>${data.totalInstallments}</strong> untuk pemesanan tour <strong>${data.tourName}</strong>.`}</p>
       
       <div style="background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 8px; padding: 16px; margin: 16px 0;">
         <table style="width: 100%; border-collapse: collapse;">
           <tr><td style="padding: 6px 0; color: #92400E;"><strong>Invoice</strong></td><td style="padding: 6px 0;">${data.invoiceNo}</td></tr>
-          <tr><td style="padding: 6px 0; color: #92400E;"><strong>Angsuran ke-</strong></td><td style="padding: 6px 0;">${data.installmentNumber} / ${data.totalInstallments}</td></tr>
+          <tr><td style="padding: 6px 0; color: #92400E;"><strong>Pembayaran</strong></td><td style="padding: 6px 0;">${paymentLabel}</td></tr>
           <tr><td style="padding: 6px 0; color: #92400E;"><strong>Jumlah</strong></td><td style="padding: 6px 0; font-size: 18px; font-weight: bold; color: #EA580C;">${data.amount}</td></tr>
-          <tr><td style="padding: 6px 0; color: #92400E;"><strong>Jatuh Tempo</strong></td><td style="padding: 6px 0; font-weight: bold; color: #DC2626;">${data.dueDate}</td></tr>
+          <tr><td style="padding: 6px 0; color: #92400E;"><strong>${dueDateLabel}</strong></td><td style="padding: 6px 0; font-weight: bold; color: #DC2626;">${data.dueDate}</td></tr>
         </table>
       </div>
 
-      <h3 style="font-size: 14px; color: #374151;">Informasi Rekening</h3>
-      <table style="width: 100%; border-collapse: collapse; background: #F9FAFB; border-radius: 8px; overflow: hidden;">
-        ${bankRows}
-      </table>
+      ${paymentSection}
 
       <br/>
-      <a href="${data.paymentUrl}" style="background: #E59800; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">💳 Upload Bukti Transfer</a>
-      <p style="margin-top: 20px; font-size: 12px; color: #666;">Mohon lakukan pembayaran sebelum tanggal jatuh tempo dan upload bukti transfer melalui link di atas. Keterlambatan pembayaran dapat mengakibatkan pembatalan pesanan.</p>
+      <a href="${data.paymentUrl}" style="background: #E59800; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">${buttonLabel}</a>
+      <p style="margin-top: 20px; font-size: 12px; color: #666;">${footerNote}</p>
       <p>Salam,<br/><strong>${data.companyName}</strong></p>
     </div>
   `;
@@ -287,6 +313,8 @@ export function installmentConfirmationTemplate(data: {
   nextDueDate: string;
   companyName: string;
 }): string {
+  const isDp = data.installmentNumber === 0;
+
   const nextBillingNote =
     data.remainingInstallments > 0
       ? `<div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 16px; margin: 16px 0;">
@@ -300,13 +328,15 @@ export function installmentConfirmationTemplate(data: {
 
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #059669;">Pembayaran Angsuran Dikonfirmasi!</h2>
+      <h2 style="color: #059669;">${isDp ? 'DP (Uang Muka) Diterima — Pesanan Aktif!' : 'Pembayaran Angsuran Dikonfirmasi!'}</h2>
       <p>Halo <strong>${data.customerName}</strong>,</p>
-      <p>Pembayaran angsuran ke-<strong>${data.installmentNumber}</strong> sebesar <strong>${data.amount}</strong> untuk pemesanan <strong>${data.tourName}</strong> telah kami terima dan konfirmasi.</p>
+      <p>${isDp
+        ? `Uang muka (DP) sebesar <strong>${data.amount}</strong> untuk pemesanan <strong>${data.tourName}</strong> telah kami terima. Pesanan Anda kini <strong>AKTIF</strong> dan slot keberangkatan telah dikunci.`
+        : `Pembayaran angsuran ke-<strong>${data.installmentNumber}</strong> sebesar <strong>${data.amount}</strong> untuk pemesanan <strong>${data.tourName}</strong> telah kami terima dan konfirmasi.`}</p>
       
       <table style="width: 100%; border-collapse: collapse;">
         <tr><td style="padding: 8px 0; color: #6B7280;">Invoice</td><td><strong>${data.invoiceNo}</strong></td></tr>
-        <tr><td style="padding: 8px 0; color: #6B7280;">Angsuran ke-</td><td><strong>${data.installmentNumber}</strong></td></tr>
+        <tr><td style="padding: 8px 0; color: #6B7280;">Pembayaran</td><td><strong>${isDp ? 'DP (Uang Muka)' : `Angsuran ke-${data.installmentNumber}`}</strong></td></tr>
         <tr><td style="padding: 8px 0; color: #6B7280;">Jumlah Dibayar</td><td style="font-weight: bold; color: #059669;">${data.amount}</td></tr>
       </table>
 

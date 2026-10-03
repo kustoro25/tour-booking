@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
-import { sendEmail, installmentConfirmationTemplate, installmentBillingTemplate } from '@/lib/email';
+import { sendEmail, installmentConfirmationTemplate } from '@/lib/email';
 import { notifyCustomerPaymentReceived } from '@/lib/whatsapp';
 
 export async function POST(
@@ -34,6 +34,14 @@ export async function POST(
       return NextResponse.json({ success: false, error: 'Installment payment not found' }, { status: 404 });
     }
 
+    // Sudah terkonfirmasi (mis. otomatis via Midtrans) — tidak perlu diproses ulang
+    if (payment.status === 'CONFIRMED') {
+      return NextResponse.json(
+        { success: false, error: `Angsuran ke-${installmentNumber} sudah terkonfirmasi` },
+        { status: 400 }
+      );
+    }
+
     // Confirm the payment
     await prisma.installmentPayment.update({
       where: { id: payment.id },
@@ -58,7 +66,6 @@ export async function POST(
     }
 
     // Send confirmation email
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
     const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
     const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 

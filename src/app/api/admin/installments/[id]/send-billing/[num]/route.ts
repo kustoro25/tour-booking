@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { sendEmail, installmentBillingTemplate } from '@/lib/email';
+import { getPaymentGateway } from '@/lib/settings';
 
 export async function POST(
   _request: NextRequest,
@@ -53,12 +54,21 @@ export async function POST(
       if (bankSetting) bankAccounts = JSON.parse(bankSetting.value);
     } catch { /* default */ }
 
-    const paymentUrl = `${siteUrl}/invoice/${plan.order.invoiceNo}/installments`;
+    // Mode online (Midtrans): tombol email langsung ke halaman pembayaran Snap angsuran ini
+    const gateway = await getPaymentGateway();
+    const onlineMode = gateway === 'midtrans';
+    const installmentsPageUrl = `${siteUrl}/invoice/${plan.order.invoiceNo}/installments`;
+    const paymentUrl = onlineMode
+      ? `${siteUrl}/api/installments/${plan.order.invoiceNo}/pay/${installmentNumber}`
+      : installmentsPageUrl;
     const dueDateStr = new Date(payment.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
     await sendEmail({
       to: plan.order.customerEmail,
-      subject: `Penagihan Angsuran ke-${installmentNumber} - ${plan.order.tour.name}`,
+      subject:
+        installmentNumber === 0
+          ? `Pembayaran DP (Uang Muka) - ${plan.order.tour.name}`
+          : `Penagihan Angsuran ke-${installmentNumber} - ${plan.order.tour.name}`,
       html: installmentBillingTemplate({
         customerName: plan.order.customerName,
         tourName: plan.order.tour.name,
@@ -70,6 +80,7 @@ export async function POST(
         paymentUrl,
         bankAccounts,
         companyName,
+        onlineMode,
       }),
     });
 

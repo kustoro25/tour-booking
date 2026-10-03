@@ -7,8 +7,24 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { InstallmentPlanStatusLabels, InstallmentPlanStatusColors } from '@/types';
 import type { InstallmentPlanStatus } from '@/types';
 
+interface AdminInstallmentOrder {
+  id: string;
+  invoiceNo: string;
+  customerName: string;
+  customerPhone: string;
+  total: number;
+  tour: { name: string };
+  installmentPlan: {
+    id: string;
+    status: string;
+    installmentCount: number;
+    amountPerInstallment: number;
+    payments?: { installmentNumber: number; status: string }[];
+  } | null;
+}
+
 export default function AdminInstallmentsPage() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<AdminInstallmentOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,7 +63,7 @@ export default function AdminInstallmentsPage() {
             {orders.map((order) => {
               const plan = order.installmentPlan;
               if (!plan) return null;
-              const paidCount = plan.payments?.filter((p: any) => p.status === 'CONFIRMED').length || 0;
+              const paidCount = plan.payments?.filter((p) => p.installmentNumber >= 1 && p.status === 'CONFIRMED').length || 0;
               return (
                 <div key={order.id} className="bg-white rounded-xl shadow-sm p-4 space-y-3">
                   <div className="flex items-start justify-between">
@@ -107,7 +123,7 @@ export default function AdminInstallmentsPage() {
                   {orders.map((order) => {
                     const plan = order.installmentPlan;
                     if (!plan) return null;
-                    const paidCount = plan.payments?.filter((p: any) => p.status === 'CONFIRMED').length || 0;
+                    const paidCount = plan.payments?.filter((p) => p.installmentNumber >= 1 && p.status === 'CONFIRMED').length || 0;
                     return (
                       <tr key={order.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 font-mono text-xs">{order.invoiceNo}</td>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useToast } from '@/components/ui/Toast';
 import {
@@ -180,7 +180,7 @@ export default function AdminInstallmentDetailPage() {
 
   const order = plan.order as Record<string, unknown> | undefined;
   const payments = (plan.payments as Array<Record<string, unknown>>) || [];
-  const paidCount = payments.filter((p) => p.status === 'CONFIRMED').length;
+  const paidCount = payments.filter((p) => (p.installmentNumber as number) >= 1 && p.status === 'CONFIRMED').length;
   const totalCount = (plan.installmentCount as number) || 0;
 
   return (

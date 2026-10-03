@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -11,11 +11,13 @@ import type { InstallmentPaymentStatus } from '@/types';
 
 interface Payment {
   id: string;
-  installmentNumber: number;
+  installmentNumber: number; // 0 = DP (uang muka)
   amount: number;
   dueDate: string;
   status: InstallmentPaymentStatus;
   paymentProof: string | null;
+  paymentMethod: string | null;
+  paymentRef: string | null;
   adminConfirmedAt: string | null;
   paidAt: string | null;
 }
@@ -51,6 +53,7 @@ interface BankAccount {
 
 export default function InstallmentTrackingPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const invoiceNo = params.invoice_no as string;
 
   const [data, setData] = useState<InstallmentData | null>(null);
@@ -59,6 +62,8 @@ export default function InstallmentTrackingPage() {
   const [banks, setBanks] = useState<BankAccount[]>([]);
   const [companyPhone, setCompanyPhone] = useState('');
   const [companyEmail, setCompanyEmail] = useState('');
+  const [gateway, setGateway] = useState<'midtrans' | 'manual'>('manual');
+  const [payNoticeDismissed, setPayNoticeDismissed] = useState(false);
   const [uploadingNum, setUploadingNum] = useState<number | null>(null);
   const [uploadMsg, setUploadMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -85,10 +90,16 @@ export default function InstallmentTrackingPage() {
           if (Array.isArray(res.data.bank_accounts)) setBanks(res.data.bank_accounts);
           if (typeof res.data.company_phone === 'string') setCompanyPhone(res.data.company_phone);
           if (typeof res.data.company_email === 'string') setCompanyEmail(res.data.company_email);
+          if (res.data.paymentGateway === 'midtrans') setGateway('midtrans');
         }
       })
       .catch(() => {});
   }, []);
+
+  // Notifikasi hasil pembayaran online (kembali dari halaman Midtrans) — dari query param
+  const payParam = searchParams.get('pay');
+  const payNotice: 'finish' | 'failed' | null =
+    !payNoticeDismissed && (payParam === 'finish' || payParam === 'failed') ? payParam : null;
 
   const handleUploadProof = async (installmentNumber: number, file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -148,7 +159,11 @@ export default function InstallmentTrackingPage() {
   }
 
   const { plan, payments, order } = data;
-  const nextUnpaid = payments.find((p) => p.status === 'PENDING');
+  const isOnline = gateway === 'midtrans';
+  const dpPayment = payments.find((p) => p.installmentNumber === 0);
+  const nextUnpaid = payments.find((p) => p.status === 'PENDING' || p.status === 'OVERDUE');
+  const labelFor = (p: Payment) =>
+    p.installmentNumber === 0 ? `DP ${plan.dpPercentage}% (Uang Muka)` : `Angsuran ke-${p.installmentNumber}`;
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
@@ -161,6 +176,40 @@ export default function InstallmentTrackingPage() {
         {order.tour.name} &bull; Invoice: {invoiceNo}
       </p>
 
+      {/* Notifikasi hasil pembayaran online */}
+      {payNotice && (
+        <div
+          className={`rounded-xl p-4 mb-6 text-sm border ${
+            payNotice === 'finish'
+              ? 'bg-blue-50 border-blue-200 text-blue-700'
+              : 'bg-red-50 border-red-200 text-red-700'
+          }`}
+        >
+          {payNotice === 'finish' ? (
+            <span>
+              💳 Pembayaran Anda sedang diproses otomatis. Status akan diperbarui dalam beberapa saat —
+              klik{' '}
+              <button
+                onClick={() => {
+                  fetchData();
+                  setPayNoticeDismissed(true);
+                  window.history.replaceState({}, '', `/invoice/${invoiceNo}/installments`);
+                }}
+                className="font-semibold underline"
+              >
+                muat ulang status
+              </button>{' '}
+              bila belum berubah.
+            </span>
+          ) : (
+            <span>
+              Pembayaran belum selesai atau dibatalkan. Silakan coba lagi melalui tombol{' '}
+              <strong>Bayar Online</strong> pada tabel di bawah.
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Summary */}
       <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
@@ -171,6 +220,11 @@ export default function InstallmentTrackingPage() {
           <div>
             <span className="text-gray-400 text-xs">DP ({plan.dpPercentage}%)</span>
             <p className="font-semibold text-orange-600">{formatCurrency(plan.downPayment)}</p>
+            {dpPayment && (
+              <span className={`text-[10px] font-medium ${dpPayment.status === 'CONFIRMED' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                {dpPayment.status === 'CONFIRMED' ? '✓ Lunas' : 'Menunggu'}
+              </span>
+            )}
           </div>
           <div>
             <span className="text-gray-400 text-xs">Angsuran</span>
@@ -185,8 +239,20 @@ export default function InstallmentTrackingPage() {
         </div>
       </div>
 
-      {/* Rekening Pembayaran */}
-      {banks.length > 0 && (
+      {/* Info pembayaran online */}
+      {isOnline && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-sm text-blue-800">
+          <p className="font-semibold mb-1">💳 Pembayaran Online (Otomatis)</p>
+          <p className="text-xs text-blue-600 leading-relaxed">
+            Bayar melalui halaman pembayaran aman <strong>Midtrans</strong> — QRIS, Virtual Account berbagai bank,
+            e-wallet (GoPay, ShopeePay, DANA), atau kartu kredit/debit. Setiap pembayaran
+            <strong> terkonfirmasi otomatis</strong> — tidak perlu upload bukti atau konfirmasi admin.
+          </p>
+        </div>
+      )}
+
+      {/* Rekening Pembayaran (mode transfer manual) */}
+      {!isOnline && banks.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
           <div className="px-5 py-3 bg-blue-50 border-b border-blue-100">
             <h3 className="text-sm font-semibold text-blue-800">Rekening Pembayaran</h3>
@@ -239,7 +305,7 @@ export default function InstallmentTrackingPage() {
                 <th className="py-2.5 px-4 text-right font-medium">Jumlah</th>
                 <th className="py-2.5 px-4 text-right font-medium">Jatuh Tempo</th>
                 <th className="py-2.5 px-4 text-center font-medium">Status</th>
-                <th className="py-2.5 px-4 text-center font-medium">Bukti</th>
+                <th className="py-2.5 px-4 text-center font-medium">{isOnline ? 'Pembayaran' : 'Bukti'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -252,7 +318,7 @@ export default function InstallmentTrackingPage() {
                 return (
                   <tr key={p.id} className={isNextDue ? 'bg-amber-50' : ''}>
                     <td className="py-3 px-4 font-medium text-gray-800">
-                      Angsuran ke-{p.installmentNumber}
+                      {labelFor(p)}
                       {isNextDue && <span className="ml-2 text-xs text-orange-500 font-normal">(Berikutnya)</span>}
                     </td>
                     <td className="py-3 px-4 text-right text-gray-700">
@@ -274,31 +340,46 @@ export default function InstallmentTrackingPage() {
                             Lihat Bukti
                           </a>
                         )}
-                        {p.status !== 'CONFIRMED' && (
-                          <label
-                            className={`text-xs font-medium transition-colors ${
-                              uploadingNum === p.installmentNumber
-                                ? 'text-gray-400 cursor-wait'
-                                : 'text-orange-600 hover:text-orange-700 hover:underline cursor-pointer'
-                            }`}
-                          >
-                            {uploadingNum === p.installmentNumber
-                              ? 'Mengunggah…'
-                              : p.paymentProof
-                                ? 'Ganti Bukti'
-                                : 'Unggah Bukti'}
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              disabled={uploadingNum !== null}
-                              onChange={(e) => {
-                                const f = e.target.files?.[0];
-                                if (f) handleUploadProof(p.installmentNumber, f);
-                                e.target.value = '';
-                              }}
-                            />
-                          </label>
+                        {isOnline ? (
+                          p.status !== 'CONFIRMED' ? (
+                            <a
+                              href={`/api/installments/${invoiceNo}/pay/${p.installmentNumber}`}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-orange-500 text-white text-xs font-semibold hover:bg-orange-600 transition-colors whitespace-nowrap"
+                            >
+                              💳 Bayar Online
+                            </a>
+                          ) : (
+                            <span className="text-[10px] text-gray-400">
+                              {p.paymentMethod ? `via ${p.paymentMethod.replace(/_/g, ' ')}` : 'Online'}
+                            </span>
+                          )
+                        ) : (
+                          p.status !== 'CONFIRMED' && (
+                            <label
+                              className={`text-xs font-medium transition-colors ${
+                                uploadingNum === p.installmentNumber
+                                  ? 'text-gray-400 cursor-wait'
+                                  : 'text-orange-600 hover:text-orange-700 hover:underline cursor-pointer'
+                              }`}
+                            >
+                              {uploadingNum === p.installmentNumber
+                                ? 'Mengunggah…'
+                                : p.paymentProof
+                                  ? 'Ganti Bukti'
+                                  : 'Unggah Bukti'}
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                disabled={uploadingNum !== null}
+                                onChange={(e) => {
+                                  const f = e.target.files?.[0];
+                                  if (f) handleUploadProof(p.installmentNumber, f);
+                                  e.target.value = '';
+                                }}
+                              />
+                            </label>
+                          )
                         )}
                       </div>
                     </td>
@@ -312,16 +393,32 @@ export default function InstallmentTrackingPage() {
 
       {/* Panduan Pembayaran */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 text-sm text-blue-800">
-        <h3 className="font-semibold mb-2">📤 Cara Membayar & Mengirim Bukti</h3>
-        <ol className="list-decimal list-inside space-y-1.5 ml-1">
-          <li>Transfer sesuai nominal angsuran ke salah satu <strong>rekening perusahaan</strong> di atas.</li>
-          <li>Unggah bukti transfer melalui tombol <strong>Unggah Bukti</strong> pada baris angsuran di tabel.</li>
-          <li>Admin akan memverifikasi dalam 1×24 jam — status berubah menjadi <strong>Terkonfirmasi</strong>.</li>
-        </ol>
-        <p className="mt-3 text-xs text-blue-600">
-          Alternatif: kirim bukti melalui WhatsApp {companyPhone || 'admin'} atau email {companyEmail || 'yang tertera pada invoice'}.
-          Pembayaran angsuran dilakukan via transfer bank; khusus pembayaran lunas, tersedia pembayaran online (QRIS / Virtual Account / e-wallet / kartu) melalui halaman invoice.
-        </p>
+        {isOnline ? (
+          <>
+            <h3 className="font-semibold mb-2">💳 Cara Membayar (Online &amp; Otomatis)</h3>
+            <ol className="list-decimal list-inside space-y-1.5 ml-1">
+              <li>Klik tombol <strong>Bayar Online</strong> pada baris DP / angsuran yang ingin dibayar.</li>
+              <li>Pilih metode pembayaran di halaman aman <strong>Midtrans</strong> — QRIS, Virtual Account, e-wallet, atau kartu.</li>
+              <li>Status pembayaran <strong>terkonfirmasi otomatis</strong> — tidak perlu upload bukti atau konfirmasi ke admin.</li>
+            </ol>
+            <p className="mt-3 text-xs text-blue-600">
+              Link pembayaran berlaku 24 jam dan dapat dibuat ulang kapan saja. Ada kendala? Hubungi WhatsApp{' '}
+              {companyPhone || 'admin'} atau email {companyEmail || 'yang tertera pada invoice'}.
+            </p>
+          </>
+        ) : (
+          <>
+            <h3 className="font-semibold mb-2">📤 Cara Membayar &amp; Mengirim Bukti</h3>
+            <ol className="list-decimal list-inside space-y-1.5 ml-1">
+              <li>Transfer sesuai nominal angsuran ke salah satu <strong>rekening perusahaan</strong> di atas.</li>
+              <li>Unggah bukti transfer melalui tombol <strong>Unggah Bukti</strong> pada baris angsuran di tabel.</li>
+              <li>Admin akan memverifikasi dalam 1×24 jam — status berubah menjadi <strong>Terkonfirmasi</strong>.</li>
+            </ol>
+            <p className="mt-3 text-xs text-blue-600">
+              Alternatif: kirim bukti melalui WhatsApp {companyPhone || 'admin'} atau email {companyEmail || 'yang tertera pada invoice'}.
+            </p>
+          </>
+        )}
       </div>
     </div>
   );

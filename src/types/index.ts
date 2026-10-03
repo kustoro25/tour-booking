@@ -198,11 +198,16 @@ export interface InstallmentPlan {
 export interface InstallmentPayment {
   id: string;
   planId: string;
-  installmentNumber: number;
+  installmentNumber: number; // 0 = DP (uang muka)
   amount: number;
   dueDate: string;
   status: InstallmentPaymentStatus;
   paymentProof: string | null;
+  paymentMethod: string | null;
+  paymentRef: string | null;
+  snapToken: string | null;
+  paymentUrl: string | null;
+  paymentExpiryAt: string | null;
   adminConfirmedBy: string | null;
   adminConfirmedAt: string | null;
   notes: string | null;
