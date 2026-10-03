@@ -4,7 +4,7 @@ import { generateInvoiceNo, calculateTotal, getExpiryDate, generateReviewToken }
 import { validateBookingForm } from '@/lib/validators';
 import { sendEmail, invoiceEmailTemplate, installmentBillingTemplate, adminOrderNotificationTemplate } from '@/lib/email';
 import { generateInstallmentDates } from '@/lib/agreement';
-import { getPaymentGateway, getSetting } from '@/lib/settings';
+import { getOwnerEmail, getPaymentGateway } from '@/lib/settings';
 import { createSnapTransaction, isMidtransConfigured } from '@/lib/midtrans';
 import { notifyCustomerNewBooking, notifyAdminNewOrder } from '@/lib/whatsapp';
 
@@ -329,7 +329,7 @@ export async function POST(request: NextRequest) {
 
     // 3. Email notifikasi pesanan baru ke admin
     try {
-      const adminEmail = (await getSetting<string>('company_email', '')) || process.env.ADMIN_EMAIL || 'admin@tourbooking.com';
+      const adminEmail = await getOwnerEmail();
       await sendEmail({
         to: adminEmail,
         subject: `Pesanan Baru: ${result.invoiceNo} - ${customerName}`,

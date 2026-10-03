@@ -26,6 +26,14 @@ export async function getPaymentGateway(): Promise<PaymentGatewayMode> {
   return mode === 'midtrans' ? 'midtrans' : 'manual';
 }
 
+/** Email pemilik bisnis untuk notifikasi (pesanan baru & contact form).
+ *  Prioritas: env OWNER_EMAIL > setting company_email > env ADMIN_EMAIL. */
+export async function getOwnerEmail(): Promise<string> {
+  const fromDb = await getSetting<string>('company_email', '');
+  const email = process.env.OWNER_EMAIL || fromDb || process.env.ADMIN_EMAIL || 'admin@tourbooking.com';
+  return email.trim();
+}
+
 /** Notifikasi WA aktif hanya jika env terkonfigurasi dan setting tidak dimatikan. */
 export async function isWhatsAppEnabled(): Promise<boolean> {
   if (!process.env.WHATSAPP_ACCESS_TOKEN || !process.env.WHATSAPP_PHONE_NUMBER_ID) return false;

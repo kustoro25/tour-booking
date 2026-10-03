@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendEmail, contactNotificationTemplate, contactAutoReplyTemplate } from '@/lib/email';
+import { getOwnerEmail } from '@/lib/settings';
 import { validateEmail } from '@/lib/validators';
 
 export async function POST(request: NextRequest) {
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
       if (phoneSetting) { const v = JSON.parse(phoneSetting.value); if (typeof v === 'string' && v.trim()) companyPhone = v.trim(); }
     } catch { /* fallback to defaults */ }
 
-    const adminEmail = process.env.ADMIN_EMAIL || companyEmail;
+    const adminEmail = await getOwnerEmail();
 
     // 1. Kirim notifikasi ke admin
     try {

@@ -25,13 +25,13 @@ export async function sendEmail(payload: EmailPayload): Promise<boolean> {
   // If SMTP credentials are configured, send real email
   if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
     try {
-      const info = await smtpTransport.sendMail({
+      await smtpTransport.sendMail({
         from: `"${process.env.COMPANY_NAME || 'Jelajah Nusantara'}" <${from}>`,
         to: payload.to,
         subject: payload.subject,
         html: payload.html,
       });
-      console.log('✅ Email sent:', info.messageId);
+      console.log(`✅ Email sent to ${payload.to} — "${payload.subject}"`);
       return true;
     } catch (error) {
       console.error('❌ Failed to send email:', error);
