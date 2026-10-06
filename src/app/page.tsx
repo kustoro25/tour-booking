@@ -56,7 +56,11 @@ const FALLBACK_FAQS = [
 
 async function getFeaturedTours() {
   const tours = await prisma.tour.findMany({
-    where: { isActive: true },
+    where: {
+      isActive: true,
+      // Layanan khusus (sewa mobil & antar-jemput) punya halaman sendiri
+      category: { notIn: ['CAR_RENTAL', 'AIRPORT_TRANSFER'] },
+    },
     orderBy: { sortOrder: 'asc' },
     take: 6,
     include: {

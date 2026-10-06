@@ -214,6 +214,194 @@ async function main() {
     console.log('Tour created:', tour.name);
   }
 
+  // ======================================================================
+  // Produk HAYBALI TRANS — Sewa Mobil, Paket Tour Bali, Antar-Jemput Bandara
+  // Catatan: harga paket tour per orang adalah placeholder — sesuaikan lewat
+  // panel admin (harga sewa mobil & antar-jemput mengikuti daftar resmi).
+  // ======================================================================
+  const haybaliProducts = [
+    // --- Sewa Mobil (harga per mobil / 12 jam, termasuk supir & BBM) ---
+    {
+      name: 'Sewa Toyota Alphard Bali',
+      slug: 'sewa-toyota-alphard-bali',
+      category: 'CAR_RENTAL',
+      destination: 'Bali',
+      duration: '12 Jam',
+      priceAdult: 1800000,
+      priceChild: 0,
+      discount: 0,
+      maxSlot: 3,
+      minPax: 1,
+      itinerary: JSON.stringify([
+        { day: 1, title: 'Sewa Alphard + Driver', description: 'Kapasitas 6-7 penumpang. Termasuk supir berpengalaman & BBM. Interior luxury dengan air mineral. Perjalanan 12 jam, area standar (Kota/Bali Selatan/Bali Tengah) — satu wilayah per hari.' },
+      ]),
+      includes: JSON.stringify(['Supir berpengalaman', 'BBM', 'Air mineral', 'Interior luxury', '12 jam pemakaian']),
+      excludes: JSON.stringify(['Tiket masuk objek wisata', 'Parkir & tol', 'Area terpencil (biaya tambahan)']),
+      terms: '<p>Harga untuk area standar. Area terpencil dikenakan biaya tambahan. Jam kerja pengemudi 07.00-23.59.</p>',
+      isActive: true,
+      sortOrder: 1,
+      coverImg: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800',
+    },
+    {
+      name: 'Sewa Innova Zenix Bali',
+      slug: 'sewa-innova-zenix-bali',
+      category: 'CAR_RENTAL',
+      destination: 'Bali',
+      duration: '12 Jam',
+      priceAdult: 850000,
+      priceChild: 0,
+      discount: 0,
+      maxSlot: 3,
+      minPax: 1,
+      itinerary: JSON.stringify([
+        { day: 1, title: 'Sewa Innova Zenix + Driver', description: 'Kapasitas 5-6 penumpang. Termasuk supir berpengalaman & BBM. Kabin modern dan nyaman. Perjalanan 12 jam, area standar (Kota/Bali Selatan/Bali Tengah) — satu wilayah per hari.' },
+      ]),
+      includes: JSON.stringify(['Supir berpengalaman', 'BBM', 'Air mineral', 'Kabin modern', '12 jam pemakaian']),
+      excludes: JSON.stringify(['Tiket masuk objek wisata', 'Parkir & tol', 'Area terpencil (biaya tambahan)']),
+      terms: '<p>Harga untuk area standar. Area terpencil dikenakan biaya tambahan. Jam kerja pengemudi 07.00-23.59.</p>',
+      isActive: true,
+      sortOrder: 2,
+      coverImg: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800',
+    },
+    {
+      name: 'Sewa Toyota HiAce Bali',
+      slug: 'sewa-toyota-hiace-bali',
+      category: 'CAR_RENTAL',
+      destination: 'Bali',
+      duration: '12 Jam',
+      priceAdult: 1100000,
+      priceChild: 0,
+      discount: 0,
+      maxSlot: 3,
+      minPax: 1,
+      itinerary: JSON.stringify([
+        { day: 1, title: 'Sewa HiAce + Driver', description: 'Kapasitas 12-15 penumpang. Termasuk supir berpengalaman & BBM. Cocok untuk rombongan/event. Perjalanan 12 jam, area standar (Kota/Bali Selatan/Bali Tengah) — satu wilayah per hari.' },
+      ]),
+      includes: JSON.stringify(['Supir berpengalaman', 'BBM', 'Air mineral', 'Kapasitas rombongan', '12 jam pemakaian']),
+      excludes: JSON.stringify(['Tiket masuk objek wisata', 'Parkir & tol', 'Area terpencil (biaya tambahan)']),
+      terms: '<p>Harga untuk area standar. Area terpencil dikenakan biaya tambahan. Jam kerja pengemudi 07.00-23.59.</p>',
+      isActive: true,
+      sortOrder: 3,
+      coverImg: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800',
+    },
+    // --- Paket Tour Bali (harga per orang, placeholder — edit via admin) ---
+    {
+      name: 'Kintamani Tour',
+      slug: 'kintamani-tour',
+      category: 'PRIVATE_TRIP',
+      destination: 'Bali',
+      duration: '1 Hari',
+      priceAdult: 750000,
+      priceChild: 500000,
+      discount: 0,
+      maxSlot: 15,
+      minPax: 2,
+      itinerary: JSON.stringify([
+        { day: 1, title: 'Kintamani & Bedugul', description: 'Nikmati panorama Gunung Batur & Danau Batur dari Kintamani, dilanjutkan ke Pura Ulun Danu Beratan, Wanagiri Hidden Hills, dan Desa Penglipuran.' },
+      ]),
+      includes: JSON.stringify(['Mobil Private + Driver', 'BBM', 'Makan Siang View Gunung', 'Tiket Masuk Objek Wisata']),
+      excludes: JSON.stringify(['Pengeluaran pribadi', 'Tips driver']),
+      terms: '<p>Minimal pemesanan 2 orang. Harga per orang.</p>',
+      isActive: true,
+      sortOrder: 4,
+      coverImg: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800',
+    },
+    {
+      name: 'Ubud Tour',
+      slug: 'ubud-tour',
+      category: 'PRIVATE_TRIP',
+      destination: 'Bali',
+      duration: '1 Hari',
+      priceAdult: 650000,
+      priceChild: 450000,
+      discount: 0,
+      maxSlot: 15,
+      minPax: 2,
+      itinerary: JSON.stringify([
+        { day: 1, title: 'Jantung Budaya Bali', description: 'Jelajahi Sawah Terasering Tegallalang, Monkey Forest, Pura Tirta Empul, dan pasar seni Ubud.' },
+      ]),
+      includes: JSON.stringify(['Mobil Private + Driver', 'BBM', 'Makan Siang', 'Tiket Masuk Objek Wisata']),
+      excludes: JSON.stringify(['Pengeluaran pribadi', 'Tips driver']),
+      terms: '<p>Minimal pemesanan 2 orang. Harga per orang.</p>',
+      isActive: true,
+      sortOrder: 5,
+      coverImg: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800',
+    },
+    {
+      name: 'Uluwatu Tour',
+      slug: 'uluwatu-tour',
+      category: 'PRIVATE_TRIP',
+      destination: 'Bali',
+      duration: '1 Hari',
+      priceAdult: 550000,
+      priceChild: 400000,
+      discount: 0,
+      maxSlot: 15,
+      minPax: 2,
+      itinerary: JSON.stringify([
+        { day: 1, title: 'Sunset Uluwatu', description: 'Saksikan matahari terbenam di Pura Uluwatu di tebing karang, kunjungi Pantai Padang-Padang, Pantai Bingin, dan pertunjukan Tari Kecak (opsional).' },
+      ]),
+      includes: JSON.stringify(['Mobil Private + Driver', 'BBM', 'Tiket Masuk', 'Tari Kecak (opsional)']),
+      excludes: JSON.stringify(['Makan siang', 'Pengeluaran pribadi']),
+      terms: '<p>Minimal pemesanan 2 orang. Harga per orang.</p>',
+      isActive: true,
+      sortOrder: 6,
+      coverImg: 'https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800',
+    },
+    {
+      name: 'Nusa Penida Tour',
+      slug: 'nusa-penida-tour',
+      category: 'PRIVATE_TRIP',
+      destination: 'Bali',
+      duration: '1 Hari',
+      priceAdult: 850000,
+      priceChild: 600000,
+      discount: 0,
+      maxSlot: 15,
+      minPax: 2,
+      itinerary: JSON.stringify([
+        { day: 1, title: 'Petualangan Pulau Eksotis', description: 'Kelingking Beach, Broken Beach, Angel\'s Billabong, dan Crystal Bay. Termasuk tiket fastboat pulang-pergi.' },
+      ]),
+      includes: JSON.stringify(['Tiket Fastboat PP', 'Mobil Private + Driver', 'Makan Siang', 'Tiket Masuk Objek Wisata']),
+      excludes: JSON.stringify(['Pengeluaran pribadi', 'Tips driver']),
+      terms: '<p>Minimal pemesanan 2 orang. Harga per orang.</p>',
+      isActive: true,
+      sortOrder: 7,
+      coverImg: 'https://images.unsplash.com/photo-1573790387438-4da905039392?w=800',
+    },
+    // --- Antar-Jemput Bandara (harga dihitung dari tabel tarif area) ---
+    {
+      name: 'Antar-Jemput Bandara Ngurah Rai',
+      slug: 'antar-jemput-bandara-bali',
+      category: 'AIRPORT_TRANSFER',
+      destination: 'Bali',
+      duration: 'Sekali Antar / Jemput',
+      priceAdult: 150000,
+      priceChild: 0,
+      discount: 0,
+      maxSlot: 50,
+      minPax: 1,
+      itinerary: JSON.stringify([
+        { day: 1, title: 'Layanan 24/7', description: 'Penjemputan dan pengantaran tepat waktu. Driver kami siap menyambut Anda langsung di area kedatangan bandara. Harga final mengikuti tabel tarif berdasarkan area tujuan dan jumlah penumpang (1-5 / 6-10 orang).' },
+      ]),
+      includes: JSON.stringify(['Driver profesional', 'Penjemputan tepat waktu', 'Bantuan bagasi']),
+      excludes: JSON.stringify(['Parkir bandara', 'Tol (bila ada)']),
+      terms: '<p>Harga dapat berubah sewaktu-waktu. Konfirmasi harga akhir via WhatsApp.</p>',
+      isActive: true,
+      sortOrder: 8,
+      coverImg: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800',
+    },
+  ];
+
+  for (const product of haybaliProducts) {
+    await prisma.tour.upsert({
+      where: { slug: product.slug },
+      update: {},
+      create: product,
+    });
+    console.log('HAYBALI product created:', product.name);
+  }
+
   // Create sample destinations (mock data with real internet images)
   const destinations = [
     {

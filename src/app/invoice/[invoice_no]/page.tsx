@@ -341,11 +341,37 @@ function CustomInvoice({
   const priceAdult = order.tour.priceAdult || 0;
   const priceChild = order.tour.priceChild || 0;
   const discountPct = order.tour.discount || 0;
-  const adultTotal = priceAdult * order.adults;
-  const childTotal = order.children > 0 ? priceChild * order.children : 0;
-  const subTotal = adultTotal + childTotal;
-  const discountAmount = subTotal * (discountPct / 100);
-  const grandTotal = subTotal - discountAmount;
+
+  // Layanan khusus HAYBALI TRANS (sewa mobil & antar-jemput): harga flat,
+  // total akhir tersimpan di order.total (sudah termasuk biaya tambahan).
+  const isCarRental = order.tour.category === 'CAR_RENTAL';
+  const isTransfer = order.tour.category === 'AIRPORT_TRANSFER';
+  const isSpecialService = isCarRental || isTransfer;
+
+  // Parse rincian layanan dari kolom extras (JSON)
+  let extrasRemoteLabel: string | null = null;
+  let extrasRemoteFee = 0;
+  let extrasLateFee = 0;
+  let extrasDirection: string | null = null;
+  let extrasTransferArea: string | null = null;
+  let extrasFlightNo: string | null = null;
+  if (order.extras) {
+    try {
+      const extras = JSON.parse(order.extras);
+      extrasRemoteLabel = typeof extras.remoteAreaLabel === 'string' ? extras.remoteAreaLabel : null;
+      extrasRemoteFee = typeof extras.remoteAreaFee === 'number' ? extras.remoteAreaFee : 0;
+      extrasLateFee = typeof extras.latePickupFee === 'number' ? extras.latePickupFee : 0;
+      extrasDirection = extras.direction === 'DROP' ? 'Antar ke Bandara' : extras.direction === 'PICKUP' ? 'Jemput di Bandara' : null;
+      extrasTransferArea = typeof extras.transferArea === 'string' ? extras.transferArea : null;
+      extrasFlightNo = typeof extras.flightNo === 'string' && extras.flightNo ? extras.flightNo : null;
+    } catch { /* extras bukan JSON valid — abaikan */ }
+  }
+
+  const adultTotal = isSpecialService ? priceAdult : priceAdult * order.adults;
+  const childTotal = isSpecialService ? 0 : order.children > 0 ? priceChild * order.children : 0;
+  const subTotal = isSpecialService ? order.total : adultTotal + childTotal;
+  const discountAmount = isSpecialService ? 0 : subTotal * (discountPct / 100);
+  const grandTotal = isSpecialService ? order.total : subTotal - discountAmount;
 
   const isLight = themeKeyForCustom(hText) === 'light';
   const logoBg = isLight ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.2)';
@@ -483,8 +509,16 @@ function CustomInvoice({
               {[
                 { label: T.L.tourDate, value: tourDate },
                 { label: T.L.duration, value: order.tour.duration },
-                { label: T.L.adults, value: `${order.adults} orang` },
-                { label: T.L.children, value: order.children > 0 ? `${order.children} orang` : '-' },
+                { label: isCarRental ? 'Unit' : T.L.adults, value: isCarRental ? '1 Mobil (Supir & BBM)' : `${order.adults} orang` },
+                { label: T.L.children, value: !isSpecialService && order.children > 0 ? `${order.children} orang` : '-' },
+                // Rincian tambahan layanan sewa mobil
+                ...(isCarRental && order.pickupTime ? [{ label: 'Jam Penjemputan', value: `${order.pickupTime} WITA` }] : []),
+                ...(isCarRental && order.pickupArea ? [{ label: 'Zona Penjemputan', value: order.pickupArea }] : []),
+                ...(isCarRental && extrasRemoteLabel ? [{ label: 'Area Tujuan', value: extrasRemoteLabel }] : []),
+                // Rincian tambahan antar-jemput bandara
+                ...(isTransfer && extrasDirection ? [{ label: 'Arah', value: extrasDirection }] : []),
+                ...(isTransfer && (extrasTransferArea || order.dropoffArea) ? [{ label: 'Area', value: extrasTransferArea || order.dropoffArea }] : []),
+                ...(isTransfer && extrasFlightNo ? [{ label: 'No. Penerbangan', value: extrasFlightNo }] : []),
               ].map((item) => (
                 <div key={item.label} className="rounded-lg px-3 py-2" style={{ backgroundColor: stripeBg }}>
                   <p className="text-gray-400 mb-0.5">{item.label}</p>
@@ -622,29 +656,73 @@ function CustomInvoice({
                 )}
               </div>
             )}
-            {/* Adult line */}
-            <div className="flex justify-between items-center py-2 text-sm">
-              <span className="text-gray-600">{T.L.adults} ({order.adults} × {formatCurrency(priceAdult)})</span>
-              <span className="font-medium text-gray-800">{formatCurrency(adultTotal)}</span>
-            </div>
-            {/* Child line */}
-            {order.children > 0 && (
-              <div className="flex justify-between items-center py-2 text-sm">
-                <span className="text-gray-600">{T.L.children} ({order.children} × {formatCurrency(priceChild)})</span>
-                <span className="font-medium text-gray-800">{formatCurrency(childTotal)}</span>
-              </div>
-            )}
-            {/* Sub Total */}
-            <div className="flex justify-between items-center py-2 text-sm border-t border-gray-100">
-              <span className="text-gray-600">{T.L.subTotal}</span>
-              <span className="font-semibold text-gray-800">{formatCurrency(subTotal)}</span>
-            </div>
-            {/* Discount */}
-            {discountPct > 0 && (
-              <div className="flex justify-between items-center py-2 text-sm">
-                <span className="text-green-600">{T.L.discount} ({discountPct}%)</span>
-                <span className="font-medium text-green-600">-{formatCurrency(discountAmount)}</span>
-              </div>
+            {isCarRental ? (
+              <>
+                {/* Harga sewa mobil (flat per mobil) */}
+                <div className="flex justify-between items-center py-2 text-sm">
+                  <span className="text-gray-600">Harga Sewa Mobil (12 Jam, Termasuk Supir & BBM)</span>
+                  <span className="font-medium text-gray-800">{formatCurrency(priceAdult)}</span>
+                </div>
+                {/* Biaya area terpencil */}
+                {extrasRemoteFee > 0 && (
+                  <div className="flex justify-between items-center py-2 text-sm">
+                    <span className="text-gray-600">Biaya Area Terpencil{extrasRemoteLabel ? ` — ${extrasRemoteLabel}` : ''}</span>
+                    <span className="font-medium text-gray-800">{formatCurrency(extrasRemoteFee)}</span>
+                  </div>
+                )}
+                {/* Biaya jam penjemputan di luar tarif normal */}
+                {extrasLateFee > 0 && (
+                  <div className="flex justify-between items-center py-2 text-sm">
+                    <span className="text-gray-600">Biaya Jam Penjemputan (setelah 10:30)</span>
+                    <span className="font-medium text-gray-800">{formatCurrency(extrasLateFee)}</span>
+                  </div>
+                )}
+                {/* Sub Total */}
+                <div className="flex justify-between items-center py-2 text-sm border-t border-gray-100">
+                  <span className="text-gray-600">{T.L.subTotal}</span>
+                  <span className="font-semibold text-gray-800">{formatCurrency(subTotal)}</span>
+                </div>
+              </>
+            ) : isTransfer ? (
+              <>
+                {/* Tarif antar-jemput sesuai jumlah penumpang */}
+                <div className="flex justify-between items-center py-2 text-sm">
+                  <span className="text-gray-600">Tarif Antar-Jemput Bandara ({order.adults} Penumpang)</span>
+                  <span className="font-medium text-gray-800">{formatCurrency(subTotal)}</span>
+                </div>
+                {/* Sub Total */}
+                <div className="flex justify-between items-center py-2 text-sm border-t border-gray-100">
+                  <span className="text-gray-600">{T.L.subTotal}</span>
+                  <span className="font-semibold text-gray-800">{formatCurrency(subTotal)}</span>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Adult line */}
+                <div className="flex justify-between items-center py-2 text-sm">
+                  <span className="text-gray-600">{T.L.adults} ({order.adults} × {formatCurrency(priceAdult)})</span>
+                  <span className="font-medium text-gray-800">{formatCurrency(adultTotal)}</span>
+                </div>
+                {/* Child line */}
+                {order.children > 0 && (
+                  <div className="flex justify-between items-center py-2 text-sm">
+                    <span className="text-gray-600">{T.L.children} ({order.children} × {formatCurrency(priceChild)})</span>
+                    <span className="font-medium text-gray-800">{formatCurrency(childTotal)}</span>
+                  </div>
+                )}
+                {/* Sub Total */}
+                <div className="flex justify-between items-center py-2 text-sm border-t border-gray-100">
+                  <span className="text-gray-600">{T.L.subTotal}</span>
+                  <span className="font-semibold text-gray-800">{formatCurrency(subTotal)}</span>
+                </div>
+                {/* Discount */}
+                {discountPct > 0 && (
+                  <div className="flex justify-between items-center py-2 text-sm">
+                    <span className="text-green-600">{T.L.discount} ({discountPct}%)</span>
+                    <span className="font-medium text-green-600">-{formatCurrency(discountAmount)}</span>
+                  </div>
+                )}
+              </>
             )}
             {/* Tax */}
             <div className="flex justify-between items-center py-2 text-sm">

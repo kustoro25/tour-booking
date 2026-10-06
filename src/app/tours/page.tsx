@@ -55,12 +55,15 @@ async function getTours(searchParams: { [key: string]: string | string[] | undef
   const category = typeof searchParams.category === 'string' ? searchParams.category : '';
   const minPrice = typeof searchParams.minPrice === 'string' ? parseFloat(searchParams.minPrice) : undefined;
   const maxPrice = typeof searchParams.maxPrice === 'string' ? parseFloat(searchParams.maxPrice) : undefined;
-  const duration = typeof searchParams.duration === 'string' ? searchParams.duration : '';
   const sort = typeof searchParams.sort === 'string' ? searchParams.sort : 'newest';
   const search = typeof searchParams.search === 'string' ? searchParams.search : '';
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const where: any = { isActive: true };
+  const where: any = {
+    isActive: true,
+    // Layanan khusus (sewa mobil & antar-jemput) punya halaman sendiri
+    category: { notIn: ['CAR_RENTAL', 'AIRPORT_TRANSFER'] },
+  };
 
   if (destination) where.destination = destination;
   if (category) where.category = category;
@@ -96,6 +99,7 @@ async function getTours(searchParams: { [key: string]: string | string[] | undef
         reviews: { select: { rating: true } },
       },
     }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     prisma.tour.count({ where: where as any }),
   ]);
 

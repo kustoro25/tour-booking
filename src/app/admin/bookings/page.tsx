@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { OrderStatusLabels, OrderStatusColors } from '@/types';
+import { OrderStatusLabels, TourCategoryLabels } from '@/types';
 import type { OrderStatus } from '@/types';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useToast } from '@/components/ui/Toast';
@@ -20,7 +20,7 @@ interface Booking {
   total: number;
   status: string;
   createdAt: string;
-  tour: { name: string };
+  tour: { name: string; category: string };
 }
 
 export default function AdminBookingsPage() {
@@ -43,9 +43,7 @@ export default function AdminBookingsPage() {
     ? '🚫 Hanya Super Admin & Admin Operasional yang bisa mengelola booking.'
     : '🚫 Hanya Super Admin yang bisa mengelola booking.';
 
-  useEffect(() => { fetchBookings(); }, [statusFilter]);
-
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     setLoading(true);
     try {
       const url = statusFilter ? `/api/admin/bookings?status=${statusFilter}` : '/api/admin/bookings';
@@ -54,7 +52,13 @@ export default function AdminBookingsPage() {
       if (data.success) setBookings(data.data || []);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  };
+  }, [statusFilter]);
+
+  // Defer via setTimeout agar setState tidak dipanggil sinkron di body effect
+  useEffect(() => {
+    const timer = setTimeout(() => { fetchBookings(); }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchBookings]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -94,6 +98,14 @@ export default function AdminBookingsPage() {
 
   const formatCurrency = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
   const formatDate = (d: string) => new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  // Badge kategori layanan khusus (HAYBALI TRANS: sewa mobil / antar-jemput)
+  const categoryBadge = (b: Booking) =>
+    b.tour.category === 'CAR_RENTAL' || b.tour.category === 'AIRPORT_TRANSFER' ? (
+      <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold bg-teal-100 text-teal-700 border border-teal-200">
+        {TourCategoryLabels[b.tour.category as keyof typeof TourCategoryLabels] || b.tour.category}
+      </span>
+    ) : null;
 
   return (
     <div>
@@ -181,7 +193,7 @@ export default function AdminBookingsPage() {
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
                       <span className="text-xs text-gray-400">Paket</span>
-                      <p className="text-gray-700">{b.tour.name}</p>
+                      <p className="text-gray-700 flex items-center gap-1.5 flex-wrap">{b.tour.name}{categoryBadge(b)}</p>
                     </div>
                     <div>
                       <span className="text-xs text-gray-400">Tgl Tour</span>
@@ -235,7 +247,10 @@ export default function AdminBookingsPage() {
                       <p className="font-medium">{b.customerName}</p>
                       <p className="text-xs text-gray-500">{b.customerPhone}</p>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{b.tour.name}</td>
+                    <td className="px-4 py-3 text-gray-600">
+                      <p>{b.tour.name}</p>
+                      {categoryBadge(b)}
+                    </td>
                     <td className="px-4 py-3">{formatDate(b.tourDate)}</td>
                     <td className="px-4 py-3 text-right font-medium">{formatCurrency(b.total)}</td>
                     <td className="px-4 py-3 text-center">

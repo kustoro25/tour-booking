@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       where,
       orderBy: { createdAt: 'desc' },
       take: limit,
-      include: { tour: { select: { name: true } } },
+      include: { tour: { select: { name: true, category: true } } },
     });
 
     return NextResponse.json({ success: true, data: bookings, total: bookings.length });

@@ -7,11 +7,37 @@ import { generateInstallmentDates } from '@/lib/agreement';
 import { getOwnerEmail, getPaymentGateway } from '@/lib/settings';
 import { createSnapTransaction, isMidtransConfigured } from '@/lib/midtrans';
 import { notifyCustomerNewBooking, notifyAdminNewOrder } from '@/lib/whatsapp';
+import {
+  PICKUP_ZONES,
+  getRemoteAreaFee,
+  getTransferPrice,
+  calcCarRentalTotal,
+  STANDARD_AREAS,
+  TRANSFER_MAX_PAX,
+} from '@/lib/haybali';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { tourId, tourDate, customerName, customerEmail, customerPhone, adults, children, notes, paymentType, installmentCount } = body;
+    const {
+      tourId,
+      tourDate,
+      customerName,
+      customerEmail,
+      customerPhone,
+      adults,
+      children,
+      notes,
+      paymentType,
+      installmentCount,
+      // Layanan HAYBALI TRANS (sewa mobil & antar-jemput bandara)
+      pickupArea,
+      dropoffArea,
+      pickupTime,
+      transferArea,
+      direction,
+      flightNo,
+    } = body;
 
     // Validate
     const errors = validateBookingForm({ customerName, customerEmail, customerPhone, adults, children });
@@ -52,8 +78,81 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // ========================================================================
+    // HAYBALI TRANS — perhitungan harga khusus layanan sewa mobil & transfer
+    // ========================================================================
+    let serviceTotal: number | null = null; // total hasil perhitungan khusus (menggantikan hitung pax)
+    let serviceSurcharge = 0; // biaya tambahan (area terpencil + jam penjemputan)
+    let orderExtras: Record<string, unknown> | null = null; // rincian yang disimpan di kolom extras
+    let forcedAdults: number | null = null; // jumlah peserta final untuk kategori khusus
+
+    if (tour.category === 'CAR_RENTAL') {
+      if (!pickupArea || !dropoffArea || !pickupTime) {
+        return NextResponse.json(
+          { success: false, error: 'Zona penjemputan, jam penjemputan, dan area tujuan wajib diisi' },
+          { status: 400 }
+        );
+      }
+      if (!(PICKUP_ZONES as readonly string[]).includes(String(pickupArea))) {
+        return NextResponse.json(
+          { success: false, error: 'Zona penjemputan tidak valid. Area lain silakan hubungi kami via WhatsApp.' },
+          { status: 400 }
+        );
+      }
+      const remoteFee = getRemoteAreaFee(String(dropoffArea));
+      const standardArea = STANDARD_AREAS.find((a) => a.id === dropoffArea);
+      if (!remoteFee && !standardArea) {
+        return NextResponse.json(
+          { success: false, error: 'Area tujuan tidak valid' },
+          { status: 400 }
+        );
+      }
+
+      const quote = calcCarRentalTotal(tour.priceAdult, String(dropoffArea), String(pickupTime));
+      serviceTotal = quote.total;
+      serviceSurcharge = quote.remoteFee + quote.latePickupFee;
+      orderExtras = {
+        remoteAreaLabel: remoteFee?.label || standardArea?.label || null,
+        remoteAreaFee: quote.remoteFee,
+        latePickupFee: quote.latePickupFee,
+      };
+      forcedAdults = 1;
+    } else if (tour.category === 'AIRPORT_TRANSFER') {
+      if (!transferArea) {
+        return NextResponse.json(
+          { success: false, error: 'Area tujuan wajib dipilih' },
+          { status: 400 }
+        );
+      }
+      const pax = Number(adults) || 1;
+      if (pax > TRANSFER_MAX_PAX) {
+        return NextResponse.json(
+          { success: false, error: 'Jumlah penumpang maksimal 10 orang' },
+          { status: 400 }
+        );
+      }
+      const price = getTransferPrice(String(transferArea), pax);
+      if (price === null) {
+        return NextResponse.json(
+          { success: false, error: 'Area ini tidak melayani 6-10 penumpang. Silakan hubungi kami via WhatsApp.' },
+          { status: 400 }
+        );
+      }
+      serviceTotal = price;
+      orderExtras = {
+        direction: direction === 'DROP' ? 'DROP' : 'PICKUP',
+        flightNo: flightNo || null,
+        transferArea: String(transferArea),
+        passengersTier: pax <= 5 ? '1-5' : '6-10',
+      };
+      forcedAdults = pax;
+    }
+
+    const finalAdults = forcedAdults ?? adults;
+    const finalChildren = forcedAdults !== null ? 0 : children;
+
     const bookingDate = new Date(tourDate);
-    const totalPax = adults + children;
+    const totalPax = finalAdults + finalChildren;
 
     // Run booking creation inside a transaction to prevent race conditions
     const result = await prisma.$transaction(async (tx) => {
@@ -77,13 +176,18 @@ export async function POST(request: NextRequest) {
       }
 
       // Calculate total price
-      const total = calculateTotal(
-        existingSlot?.priceOverride || tour.priceAdult,
-        tour.priceChild,
-        adults,
-        children,
-        tour.discount
-      );
+      // Kategori khusus (sewa mobil & transfer) memakai harga hasil perhitungan
+      // layanan; paket tour reguler memakai perhitungan pax seperti biasa.
+      const total =
+        serviceTotal !== null
+          ? serviceTotal
+          : calculateTotal(
+              existingSlot?.priceOverride || tour.priceAdult,
+              tour.priceChild,
+              finalAdults,
+              finalChildren,
+              tour.discount
+            );
 
       const invoiceNo = generateInvoiceNo();
       const expiryAt = getExpiryDate(24);
@@ -97,14 +201,20 @@ export async function POST(request: NextRequest) {
           customerEmail,
           customerPhone,
           tourDate: bookingDate,
-          adults: adults || 1,
-          children: children || 0,
+          adults: finalAdults || 1,
+          children: finalChildren || 0,
           total,
           status: 'PENDING',
           paymentType: isInstallment ? 'INSTALLMENT' : 'FULL',
           notes: notes || null,
           reviewToken: generateReviewToken(),
           expiryAt,
+          // Layanan HAYBALI TRANS
+          pickupArea: pickupArea ? String(pickupArea) : null,
+          dropoffArea: dropoffArea ? String(dropoffArea) : null,
+          pickupTime: pickupTime ? String(pickupTime) : null,
+          extras: orderExtras ? JSON.stringify(orderExtras) : null,
+          surcharge: serviceSurcharge,
         },
       });
 
@@ -212,7 +322,8 @@ export async function POST(request: NextRequest) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
     const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
     const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
-    const tourDateLabel = new Date(tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const dateLabel = new Date(tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const tourDateLabel = pickupTime ? `${dateLabel}, pukul ${pickupTime}` : dateLabel;
     const expiryDate = getExpiryDate(24);
 
     // 1. Buat transaksi Midtrans Snap (FULL) atau Snap DP (INSTALLMENT) jika gateway midtrans aktif

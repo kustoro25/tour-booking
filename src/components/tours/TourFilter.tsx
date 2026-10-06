@@ -3,8 +3,13 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { DESTINATIONS, DURATION_OPTIONS } from '@/lib/utils';
-import { TourCategoryLabels } from '@/types';
+import { TourCategoryLabels, SPECIAL_SERVICE_CATEGORIES } from '@/types';
 import type { TourCategory } from '@/types';
+
+// Kategori paket tour reguler (layanan khusus seperti sewa mobil tidak tampil di filter)
+const FILTER_CATEGORIES = (Object.keys(TourCategoryLabels) as TourCategory[]).filter(
+  (cat) => !SPECIAL_SERVICE_CATEGORIES.includes(cat)
+);
 
 interface TourFilterProps {
   currentDestination: string;
@@ -104,7 +109,7 @@ export default function TourFilter({ currentDestination, currentCategory, curren
           >
             📂 Semua Kategori
           </button>
-          {(Object.keys(TourCategoryLabels) as TourCategory[]).map((cat) => (
+          {FILTER_CATEGORIES.map((cat) => (
             <button
               key={cat}
               onClick={() => updateFilter('category', currentCategory === cat ? '' : cat)}
@@ -270,7 +275,7 @@ export default function TourFilter({ currentDestination, currentCategory, curren
                 className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
               >
                 <option value="">Semua Kategori</option>
-                {(Object.keys(TourCategoryLabels) as TourCategory[]).map((cat) => (
+                {FILTER_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>{TourCategoryLabels[cat]}</option>
                 ))}
               </select>

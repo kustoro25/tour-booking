@@ -32,7 +32,7 @@ export interface Tour {
   avgRating?: number;
 }
 
-export type TourCategory = 'OPEN_TRIP' | 'PRIVATE_TRIP' | 'HONEYMOON' | 'CORPORATE' | 'FAMILY' | 'ADVENTURE' | 'CULTURE' | 'STUDY_TOUR' | 'GROUP';
+export type TourCategory = 'OPEN_TRIP' | 'PRIVATE_TRIP' | 'HONEYMOON' | 'CORPORATE' | 'FAMILY' | 'ADVENTURE' | 'CULTURE' | 'STUDY_TOUR' | 'GROUP' | 'CAR_RENTAL' | 'AIRPORT_TRANSFER';
 
 export const TourCategoryLabels: Record<TourCategory, string> = {
   OPEN_TRIP: 'Open Trip',
@@ -44,7 +44,12 @@ export const TourCategoryLabels: Record<TourCategory, string> = {
   CULTURE: 'Wisata Budaya',
   STUDY_TOUR: 'Study Tour',
   GROUP: 'Rombongan',
+  CAR_RENTAL: 'Sewa Mobil',
+  AIRPORT_TRANSFER: 'Antar-Jemput Bandara',
 };
+
+/** Kategori layanan HAYBALI TRANS (produk dengan halaman khusus, bukan paket tour reguler). */
+export const SPECIAL_SERVICE_CATEGORIES: TourCategory[] = ['CAR_RENTAL', 'AIRPORT_TRANSFER'];
 
 // Gallery Types
 export interface GalleryImage {
@@ -125,6 +130,12 @@ export interface Order {
   expiryAt: string;
   createdAt: string;
   updatedAt: string;
+  // Layanan HAYBALI TRANS (sewa mobil & antar-jemput)
+  pickupArea: string | null;
+  dropoffArea: string | null;
+  pickupTime: string | null;
+  extras: string | null; // JSON: rincian biaya tambahan, arah transfer, no. penerbangan
+  surcharge: number;
   tour?: Tour;
   invoice?: Invoice;
   review?: Review;

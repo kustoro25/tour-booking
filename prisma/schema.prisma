@@ -112,6 +112,13 @@ model Order {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
+  // Layanan HAYBALI TRANS (sewa mobil & antar-jemput bandara)
+  pickupArea    String?  @map("pickup_area") // zona/area penjemputan
+  dropoffArea   String?  @map("dropoff_area") // area tujuan (sewa mobil) / area transfer
+  pickupTime    String?  @map("pickup_time") // "HH:mm" jam penjemputan
+  extras        String?  @map("extras") // JSON: rincian biaya tambahan, arah jemput/antar, no. penerbangan
+  surcharge     Float    @default(0) @map("surcharge") // total biaya tambahan (area terpencil + jam)
+
   tour            Tour             @relation(fields: [tourId], references: [id])
   invoice         Invoice?
   review          Review?

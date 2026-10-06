@@ -1,8 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import {
+  PICKUP_ZONES,
+  STANDARD_AREAS,
+  REMOTE_AREA_FEES,
+  AIRPORT_TRANSFER_RATES,
+  TRANSFER_MAX_PAX,
+  DRIVER_POLICY,
+  getPickupTimeOptions,
+  getTransferPrice,
+  calcCarRentalTotal,
+  calcLatePickupFee,
+} from '@/lib/haybali';
 import Button from '@/components/ui/Button';
 import BookingCalendar from '@/components/booking/BookingCalendar';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -11,6 +23,7 @@ interface Tour {
   id: string;
   name: string;
   slug: string;
+  category: string;
   priceAdult: number;
   priceChild: number;
   discount: number;
@@ -29,9 +42,31 @@ interface SlotInfo {
 
 type PaymentType = 'FULL' | 'INSTALLMENT';
 
-export default function BookingPage() {
+// Layanan khusus HAYBALI TRANS (sewa mobil & antar-jemput bandara)
+type Direction = 'PICKUP' | 'DROP';
+
+export default function BookingPageWrapper() {
+  return (
+    <Suspense fallback={<div className="max-w-3xl mx-auto px-4 py-12"><Skeleton className="h-64 w-full rounded-xl" /></div>}>
+      <BookingPage />
+    </Suspense>
+  );
+}
+
+function BookingPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const slug = params.slug as string;
+
+  // Prefill dari halaman /antar-jemput (form booking cepat): ?area=&direction=&pax=
+  // State diinisialisasi langsung dari query string agar tidak perlu setState di useEffect.
+  const queryArea = searchParams.get('area');
+  const queryDir = searchParams.get('direction');
+  const queryPax = parseInt(searchParams.get('pax') || '', 10);
+  const validQueryArea =
+    queryArea && AIRPORT_TRANSFER_RATES.some((r) => r.area === queryArea) ? queryArea : '';
+  const validQueryPax =
+    !isNaN(queryPax) && queryPax >= 1 && queryPax <= TRANSFER_MAX_PAX ? queryPax : null;
 
   const [tour, setTour] = useState<Tour | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,7 +76,7 @@ export default function BookingPage() {
     customerName: '',
     customerEmail: '',
     customerPhone: '',
-    adults: 1,
+    adults: validQueryPax ?? 1,
     children: 0,
     notes: '',
   });
@@ -58,6 +93,24 @@ export default function BookingPage() {
   const [slotInfo, setSlotInfo] = useState<SlotInfo | null>(null);
   const [slotLoading, setSlotLoading] = useState(false);
   const [paymentGateway, setPaymentGateway] = useState<'midtrans' | 'manual'>('manual');
+
+  // --- State layanan khusus HAYBALI TRANS ---
+  const [pickupTime, setPickupTime] = useState('');
+  const [pickupZone, setPickupZone] = useState('');
+  const [destinationArea, setDestinationArea] = useState(''); // area tujuan sewa mobil (id konstanta)
+  const [direction, setDirection] = useState<Direction>(queryDir === 'DROP' ? 'DROP' : 'PICKUP');
+  const [transferArea, setTransferArea] = useState(validQueryArea);
+  const [flightNo, setFlightNo] = useState('');
+
+  const isCarRental = tour?.category === 'CAR_RENTAL';
+  const isTransfer = tour?.category === 'AIRPORT_TRANSFER';
+  const isSpecialService = isCarRental || isTransfer;
+
+  // Grup area terpencil per wilayah (untuk select area tujuan sewa mobil)
+  const remoteRegions = REMOTE_AREA_FEES.reduce<Record<string, typeof REMOTE_AREA_FEES>>((acc, a) => {
+    (acc[a.region] ||= []).push(a);
+    return acc;
+  }, {});
 
   useEffect(() => {
     fetch(`/api/tours/${slug}`)
@@ -137,6 +190,12 @@ export default function BookingPage() {
   const validateStep1 = () => {
     const errs: Record<string, string> = {};
     if (!selectedDate) errs.date = 'Silakan pilih tanggal keberangkatan';
+    if (isCarRental) {
+      if (!pickupTime) errs.pickupTime = 'Pilih jam penjemputan';
+      if (!pickupZone) errs.pickupZone = 'Pilih zona penjemputan';
+      if (!destinationArea) errs.destinationArea = 'Pilih area tujuan';
+    }
+    if (isTransfer && !transferArea) errs.transferArea = 'Pilih area / tujuan';
     return errs;
   };
 
@@ -194,6 +253,13 @@ export default function BookingPage() {
           ...formData,
           paymentType,
           installmentCount: paymentType === 'INSTALLMENT' ? installmentCount : undefined,
+          // Layanan khusus HAYBALI TRANS
+          pickupTime: isCarRental ? pickupTime : undefined,
+          pickupArea: isCarRental ? pickupZone : undefined,
+          dropoffArea: isCarRental ? destinationArea : undefined,
+          transferArea: isTransfer ? transferArea : undefined,
+          direction: isTransfer ? direction : undefined,
+          flightNo: isTransfer ? flightNo : undefined,
         }),
       });
       const data = await res.json();
@@ -238,8 +304,14 @@ export default function BookingPage() {
     );
   }
 
-  const total = tour.priceAdult * formData.adults + tour.priceChild * formData.children;
-  const grandTotal = total - total * (tour.discount / 100);
+  const carQuote = isCarRental ? calcCarRentalTotal(tour.priceAdult, destinationArea, pickupTime) : null;
+  const transferPrice = isTransfer ? getTransferPrice(transferArea, formData.adults) ?? 0 : null;
+  const total = isSpecialService
+    ? isCarRental
+      ? (carQuote?.total ?? 0)
+      : transferPrice ?? 0
+    : tour.priceAdult * formData.adults + tour.priceChild * formData.children;
+  const grandTotal = isSpecialService ? total : total - total * (tour.discount / 100);
   const installmentThresholdMet = minInstallmentAmount <= 0 || grandTotal >= minInstallmentAmount;
   const installmentAvailable = installmentEnabled && installmentThresholdMet;
 
@@ -271,7 +343,13 @@ export default function BookingPage() {
       {/* Step 1: Select Date */}
       {step === 1 && (
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">Pilih Tanggal Keberangkatan</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-1">
+            {isCarRental
+              ? 'Pilih Tanggal & Detail Perjalanan'
+              : isTransfer
+                ? 'Pilih Tanggal & Tujuan'
+                : 'Pilih Tanggal Keberangkatan'}
+          </h2>
           <p className="text-gray-500 text-sm mb-6">{tour.name} &bull; {tour.duration}</p>
 
           {/* Calendar */}
@@ -381,6 +459,212 @@ export default function BookingPage() {
             <p className="text-red-500 text-sm text-center mt-3">{errors.date}</p>
           )}
 
+          {/* ==== Form khusus: Sewa Mobil ==== */}
+          {isCarRental && (
+            <div className="mt-6 max-w-md mx-auto space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Jam Penjemputan</label>
+                <select
+                  value={pickupTime}
+                  onChange={(e) => setPickupTime(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                >
+                  <option value="">— Pilih jam penjemputan —</option>
+                  {getPickupTimeOptions().map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                      {calcLatePickupFee(t) > 0 ? ` (+${formatCurrency(DRIVER_POLICY.latePickupFee)})` : ''}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-400 mt-1">
+                  Tarif normal berlaku untuk penjemputan {DRIVER_POLICY.normalPickupStart}–{DRIVER_POLICY.normalPickupEnd}.
+                </p>
+                {errors.pickupTime && <p className="text-red-500 text-sm mt-1">{errors.pickupTime}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Zona Penjemputan</label>
+                <select
+                  value={pickupZone}
+                  onChange={(e) => setPickupZone(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                >
+                  <option value="">— Pilih zona —</option>
+                  {PICKUP_ZONES.map((zone) => (
+                    <option key={zone} value={zone}>{zone}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-400 mt-1">
+                  Area lain silakan hubungi kami untuk informasi harga & ketersediaan.
+                </p>
+                {errors.pickupZone && <p className="text-red-500 text-sm mt-1">{errors.pickupZone}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Area Tujuan</label>
+                <select
+                  value={destinationArea}
+                  onChange={(e) => setDestinationArea(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                >
+                  <option value="">— Pilih area tujuan —</option>
+                  <optgroup label="Area Standar (Tanpa Biaya Tambahan)">
+                    {STANDARD_AREAS.map((a) => (
+                      <option key={a.id} value={a.id}>{a.label}</option>
+                    ))}
+                  </optgroup>
+                  {Object.entries(remoteRegions).map(([region, areas]) => (
+                    <optgroup key={region} label={`${region} (Biaya Tambahan)`}>
+                      {areas.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.label} — +{formatCurrency(a.fee)}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+                {errors.destinationArea && <p className="text-red-500 text-sm mt-1">{errors.destinationArea}</p>}
+              </div>
+
+              {/* Rincian harga sewa mobil */}
+              {pickupTime && destinationArea && (
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-1.5 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Harga Armada (12 Jam)</span>
+                    <span className="font-medium">{formatCurrency(carQuote?.base ?? 0)}</span>
+                  </div>
+                  {(carQuote?.remoteFee ?? 0) > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Biaya Area Terpencil</span>
+                      <span className="font-medium text-orange-600">+{formatCurrency(carQuote?.remoteFee ?? 0)}</span>
+                    </div>
+                  )}
+                  {(carQuote?.latePickupFee ?? 0) > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Biaya Jam di Luar Tarif Normal</span>
+                      <span className="font-medium text-orange-600">+{formatCurrency(carQuote?.latePickupFee ?? 0)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-bold pt-2 border-t border-blue-100">
+                    <span>Total</span>
+                    <span className="text-blue-700">{formatCurrency(carQuote?.total ?? 0)}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ==== Form khusus: Antar-Jemput Bandara ==== */}
+          {isTransfer && (
+            <div className="mt-6 max-w-md mx-auto space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Arah Perjalanan</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setDirection('PICKUP')}
+                    className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border-2 ${
+                      direction === 'PICKUP'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    🛬 Jemput di Bandara
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDirection('DROP')}
+                    className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border-2 ${
+                      direction === 'DROP'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    🛫 Antar ke Bandara
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Area / Tujuan</label>
+                <select
+                  value={transferArea}
+                  onChange={(e) => setTransferArea(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                >
+                  <option value="">— Pilih area —</option>
+                  {AIRPORT_TRANSFER_RATES.map((r) => (
+                    <option key={r.area} value={r.area}>
+                      {r.area} — {formatCurrency(r.priceSmall)}
+                    </option>
+                  ))}
+                </select>
+                {errors.transferArea && <p className="text-red-500 text-sm mt-1">{errors.transferArea}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Jumlah Penumpang ({formData.adults <= 5 ? '1-5 orang' : '6-10 orang'})
+                </label>
+                <div className="flex items-center">
+                  <button
+                    type="button"
+                    onClick={() => updateField('adults', Math.max(1, formData.adults - 1))}
+                    className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-l-lg bg-gray-50 text-gray-600 hover:bg-gray-100 text-lg font-semibold"
+                    aria-label="Kurangi penumpang"
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    min={1}
+                    max={TRANSFER_MAX_PAX}
+                    value={formData.adults}
+                    onChange={(e) => {
+                      const num = parseInt(e.target.value, 10);
+                      if (!isNaN(num)) updateField('adults', Math.min(TRANSFER_MAX_PAX, Math.max(1, num)));
+                    }}
+                    className="w-full px-3 py-2.5 border-y border-gray-300 text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => updateField('adults', Math.min(TRANSFER_MAX_PAX, formData.adults + 1))}
+                    className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-r-lg bg-gray-50 text-gray-600 hover:bg-gray-100 text-lg font-semibold"
+                    aria-label="Tambah penumpang"
+                  >
+                    +
+                  </button>
+                </div>
+                {AIRPORT_TRANSFER_RATES.find((r) => r.area === transferArea)?.priceBig === null && formData.adults >= 6 && (
+                  <p className="text-amber-600 text-xs mt-1.5">
+                    Area ini hanya melayani 1-5 penumpang. Untuk rombongan, silakan hubungi kami via WhatsApp.
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nomor Penerbangan (Opsional)</label>
+                <input
+                  type="text"
+                  value={flightNo}
+                  onChange={(e) => setFlightNo(e.target.value)}
+                  placeholder="Contoh: GA 402"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              {transferArea && transferPrice !== null && transferPrice > 0 && (
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center justify-between">
+                  <span className="text-sm text-blue-800">
+                    Tarif ({formData.adults <= 5 ? '1-5 orang' : '6-10 orang'}) — {direction === 'PICKUP' ? 'Jemput di Bandara' : 'Antar ke Bandara'}
+                  </span>
+                  <span className="text-xl font-bold text-blue-700">{formatCurrency(transferPrice)}</span>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex justify-end mt-6">
             <Button onClick={handleNext} variant="primary">
               Lanjutkan →
@@ -433,6 +717,7 @@ export default function BookingPage() {
               </div>
             </div>
 
+            {!isSpecialService && (
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Dewasa</label>
@@ -509,6 +794,7 @@ export default function BookingPage() {
                 {errors.children && <p className="text-red-500 text-sm mt-1">{errors.children}</p>}
               </div>
             </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Catatan Khusus (Opsional)</label>
@@ -707,10 +993,55 @@ export default function BookingPage() {
                 <p className="font-medium">{formatDate(selectedDate)}</p>
               </div>
               <div>
-                <span className="text-sm text-gray-500">Peserta</span>
-                <p className="font-medium">{formData.adults} Dewasa{formData.children > 0 ? `, ${formData.children} Anak` : ''}</p>
+                <span className="text-sm text-gray-500">{isCarRental ? 'Unit' : isTransfer ? 'Penumpang' : 'Peserta'}</span>
+                <p className="font-medium">
+                  {isCarRental
+                    ? '1 Mobil (12 Jam)'
+                    : isTransfer
+                      ? `${formData.adults} Orang (${formData.adults <= 5 ? '1-5' : '6-10'})`
+                      : `${formData.adults} Dewasa${formData.children > 0 ? `, ${formData.children} Anak` : ''}`}
+                </p>
               </div>
             </div>
+            {isCarRental && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <span className="text-sm text-gray-500">Jam Penjemputan</span>
+                  <p className="font-medium">{pickupTime}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500">Zona Penjemputan</span>
+                  <p className="font-medium">{pickupZone}</p>
+                </div>
+              </div>
+            )}
+            {isCarRental && destinationArea && (
+              <div>
+                <span className="text-sm text-gray-500">Area Tujuan</span>
+                <p className="font-medium">
+                  {REMOTE_AREA_FEES.find((a) => a.id === destinationArea)?.label ||
+                    STANDARD_AREAS.find((a) => a.id === destinationArea)?.label}
+                </p>
+              </div>
+            )}
+            {isTransfer && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <span className="text-sm text-gray-500">Arah</span>
+                  <p className="font-medium">{direction === 'PICKUP' ? 'Jemput di Bandara' : 'Antar ke Bandara'}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500">Area</span>
+                  <p className="font-medium">{transferArea}</p>
+                </div>
+              </div>
+            )}
+            {isTransfer && flightNo && (
+              <div>
+                <span className="text-sm text-gray-500">Nomor Penerbangan</span>
+                <p className="font-medium">{flightNo}</p>
+              </div>
+            )}
             <div>
               <span className="text-sm text-gray-500">Nama Pemesan</span>
               <p className="font-medium">{formData.customerName}</p>
@@ -747,21 +1078,51 @@ export default function BookingPage() {
 
           {/* Price Summary */}
           <div className="border rounded-lg p-4 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Harga Dewasa ({formData.adults} x {formatCurrency(tour.priceAdult)})</span>
-              <span>{formatCurrency(tour.priceAdult * formData.adults)}</span>
-            </div>
-            {formData.children > 0 && (
+            {isCarRental ? (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Harga Armada (12 Jam)</span>
+                  <span>{formatCurrency(carQuote?.base ?? 0)}</span>
+                </div>
+                {(carQuote?.remoteFee ?? 0) > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Biaya Area Terpencil</span>
+                    <span className="text-orange-600">+{formatCurrency(carQuote?.remoteFee ?? 0)}</span>
+                  </div>
+                )}
+                {(carQuote?.latePickupFee ?? 0) > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Biaya Jam Penjemputan</span>
+                    <span className="text-orange-600">+{formatCurrency(carQuote?.latePickupFee ?? 0)}</span>
+                  </div>
+                )}
+              </>
+            ) : isTransfer ? (
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Harga Anak ({formData.children} x {formatCurrency(tour.priceChild)})</span>
-                <span>{formatCurrency(tour.priceChild * formData.children)}</span>
+                <span className="text-gray-500">
+                  Tarif {formData.adults <= 5 ? '1-5' : '6-10'} Orang — {transferArea}
+                </span>
+                <span>{formatCurrency(transferPrice ?? 0)}</span>
               </div>
-            )}
-            {tour.discount > 0 && (
-              <div className="flex justify-between text-sm text-green-600">
-                <span>Diskon ({tour.discount}%)</span>
-                <span>-{formatCurrency(total * (tour.discount / 100))}</span>
-              </div>
+            ) : (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Harga Dewasa ({formData.adults} x {formatCurrency(tour.priceAdult)})</span>
+                  <span>{formatCurrency(tour.priceAdult * formData.adults)}</span>
+                </div>
+                {formData.children > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Harga Anak ({formData.children} x {formatCurrency(tour.priceChild)})</span>
+                    <span>{formatCurrency(tour.priceChild * formData.children)}</span>
+                  </div>
+                )}
+                {tour.discount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Diskon ({tour.discount}%)</span>
+                    <span>-{formatCurrency(total * (tour.discount / 100))}</span>
+                  </div>
+                )}
+              </>
             )}
             <div className="flex justify-between font-bold text-lg pt-2 border-t">
               <span>Total</span>

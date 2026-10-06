@@ -14,6 +14,8 @@ function BrandIcon({ icon, className }: { icon?: string; className?: string }) {
 const navLinks = [
   { href: '/', label: 'Beranda' },
   { href: '/tours', label: 'Paket Wisata' },
+  { href: '/sewa-mobil', label: 'Sewa Mobil' },
+  { href: '/antar-jemput', label: 'Antar-Jemput' },
   { href: '/destinations', label: 'Destinasi' },
   { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'Tentang Kami' },

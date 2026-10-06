@@ -47,6 +47,20 @@ export default function BookingDetailPage() {
   );
   if (!booking) return <div className="text-center py-12 text-gray-500">Booking tidak ditemukan</div>;
 
+  // Rincian layanan khusus (sewa mobil / antar-jemput) dari kolom extras (JSON)
+  let extras: Record<string, unknown> | null = null;
+  try {
+    if (booking.extras) extras = JSON.parse(String(booking.extras));
+  } catch { /* abaikan jika bukan JSON valid */ }
+  const extrasDirection =
+    extras?.direction === 'DROP' ? 'Antar ke Bandara' : extras?.direction === 'PICKUP' ? 'Jemput di Bandara' : null;
+  const extrasFlightNo = typeof extras?.flightNo === 'string' && extras.flightNo ? extras.flightNo : null;
+  const extrasTransferArea = typeof extras?.transferArea === 'string' ? extras.transferArea : null;
+  const extrasRemoteLabel = typeof extras?.remoteAreaLabel === 'string' ? extras.remoteAreaLabel : null;
+  const hasServiceDetails = Boolean(
+    booking.pickupTime || booking.pickupArea || booking.dropoffArea || extrasDirection || extrasTransferArea || extrasFlightNo
+  );
+
   return (
     <div className="max-w-3xl">
       <div className="flex items-center gap-3 mb-6">
@@ -110,6 +124,35 @@ export default function BookingDetailPage() {
           <div>
             <p className="text-sm text-gray-500">Catatan Tamu</p>
             <p className="text-gray-700 text-sm bg-gray-50 p-3 rounded">{String(booking.notes)}</p>
+          </div>
+        ) : null}
+
+        {hasServiceDetails ? (
+          <div>
+            <p className="text-sm text-gray-500 mb-2">Detail Layanan (Sewa Mobil / Antar-Jemput)</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 p-3 rounded text-sm">
+              {booking.pickupTime ? (
+                <p className="text-gray-700"><span className="text-gray-400">Jam Penjemputan: </span>{String(booking.pickupTime)} WITA</p>
+              ) : null}
+              {booking.pickupArea ? (
+                <p className="text-gray-700"><span className="text-gray-400">Zona Penjemputan: </span>{String(booking.pickupArea)}</p>
+              ) : null}
+              {booking.dropoffArea || extrasRemoteLabel ? (
+                <p className="text-gray-700"><span className="text-gray-400">Area Tujuan: </span>{extrasRemoteLabel || String(booking.dropoffArea)}</p>
+              ) : null}
+              {extrasDirection ? (
+                <p className="text-gray-700"><span className="text-gray-400">Arah: </span>{extrasDirection}</p>
+              ) : null}
+              {extrasTransferArea ? (
+                <p className="text-gray-700"><span className="text-gray-400">Area Transfer: </span>{extrasTransferArea}</p>
+              ) : null}
+              {extrasFlightNo ? (
+                <p className="text-gray-700"><span className="text-gray-400">No. Penerbangan: </span>{extrasFlightNo}</p>
+              ) : null}
+              {(booking.surcharge as number) > 0 ? (
+                <p className="text-gray-700"><span className="text-gray-400">Biaya Tambahan: </span>{formatCurrency(booking.surcharge as number)}</p>
+              ) : null}
+            </div>
           </div>
         ) : null}
 
