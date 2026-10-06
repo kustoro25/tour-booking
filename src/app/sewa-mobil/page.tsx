@@ -48,18 +48,16 @@ export default async function SewaMobilPage() {
   return (
     <div className="bg-gray-50">
       {/* Hero HAYBALI TRANS */}
-      <section className="relative text-white overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900">
-        <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] blob bg-white/5 animate-float" />
-        <div className="absolute bottom-[-15%] left-[-5%] w-[350px] h-[350px] blob bg-white/5 animate-float" style={{ animationDelay: '1s' }} />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-24">
-          <span className="inline-block bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm mb-4 tracking-wide">
+      <section className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-24">
+          <span className="inline-block bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-4 py-1.5 text-sm mb-4 tracking-wide">
             {HAYBALI_BRAND} • {HAYBALI_TAGLINE}
           </span>
-          <h1 className="text-3xl sm:text-5xl font-extrabold leading-tight mb-4 max-w-2xl">
+          <h1 className="text-3xl sm:text-5xl font-extrabold leading-tight mb-4 max-w-2xl text-gray-900">
             Jelajahi Pesona Bali dengan{' '}
-            <span className="text-amber-400">Kenyamanan VIP</span>
+            <span className="text-amber-500">Kenyamanan VIP</span>
           </h1>
-          <p className="text-white/85 text-base sm:text-lg mb-8 max-w-2xl leading-relaxed">
+          <p className="text-gray-600 text-base sm:text-lg mb-8 max-w-2xl leading-relaxed">
             Layanan sewa mobil mewah & paket tur privat terbaik di Bali. Supir
             berpengalaman, kendaraan prima, dan pelayanan profesional.
           </p>
@@ -71,7 +69,7 @@ export default async function SewaMobilPage() {
               href={waLink(`Halo ${HAYBALI_BRAND}, saya ingin bertanya harga sewa mobil.`)}
               variant="outline"
               size="lg"
-              className="!border-white !text-white hover:!bg-white/10"
+              className="!border-gray-300 !text-gray-700 hover:!bg-gray-50"
               target="_blank"
             >
               Chat WhatsApp
