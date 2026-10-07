@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -61,7 +61,7 @@ type PageData = {
 const defaultData: Record<string, PageData> = {
   'home-hero': {
     tagline: '🔥 Ribuan wisatawan telah berangkat bersama kami',
-    heading: 'Jelajahi Destinasi',
+    heading: 'Jelajahi Pesona Bali',
     headingHighlight: 'Impian',
     headingAfter: 'Anda Tanpa Ribet!',
     subheading: 'Paket tour terbaik dengan pelayanan premium, harga transparan, dan sistem booking instan. Pilih jadwalmu, amankan kursimu, dan bersiaplah untuk petualangan tak terlupakan.',
@@ -409,9 +409,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
   const isInvoicePremium = slug === 'invoice-premium';
   const isGeneric = !isHero && !isValue && !isFaq && !isHtml && !isAbout && !isContact && !isTestimonials && !isFooter && !isCta && !isGallery && !isTours && !isDestinations && !isDestinationsPage && !isDestinationsCta && !isToursPage && !isBlog && !isInvoicePremium;
 
-  useEffect(() => { fetchPage(); }, [slug]);
-
-  const fetchPage = async () => {
+  const fetchPage = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/pages/${slug}`);
@@ -428,7 +426,12 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
       }
     } catch { /* ignore */ }
     finally { setLoading(false); }
-  };
+  }, [slug]);
+
+  useEffect(() => {
+    const t = setTimeout(() => { fetchPage(); }, 0);
+    return () => clearTimeout(t);
+  }, [fetchPage]);
 
   const update = (key: string, value: string | number | boolean | object | null | undefined | string[] | Record<string, unknown>[]) => setData({ ...data, [key]: value });
 
@@ -1035,13 +1038,13 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             <SectionCard icon="⭐" title="Judul Section">
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Judul "Destinasi Unggulan"</label>
+                  <label className="text-xs text-gray-500 mb-1 block">Judul {"Destinasi Unggulan"}</label>
                   <input type="text" value={data.highlightTitle || ''} onChange={e => update('highlightTitle', e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                     placeholder="Destinasi Unggulan" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Judul "Semua Destinasi"</label>
+                  <label className="text-xs text-gray-500 mb-1 block">Judul {"Semua Destinasi"}</label>
                   <input type="text" value={data.allTitle || ''} onChange={e => update('allTitle', e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                     placeholder="Semua Destinasi" />
@@ -1195,7 +1198,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             {/* 2. STATUS BAR */}
             <SectionCard icon="📋" title="② Status Bar — Badge & Tanggal Diterbitkan">
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">Label "Diterbitkan:"</label>
+                <label className="text-xs text-gray-500 mb-1 block">Label {"Diterbitkan:"}</label>
                 <input type="text" value={(data.labelPublishedDate as string) || ''} onChange={e => update('labelPublishedDate', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Diterbitkan:" />
               </div>
@@ -1207,7 +1210,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                 <div className="space-y-3">
                   <p className="text-xs font-semibold text-gray-600 border-b pb-1">Kolom Kiri</p>
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Heading "Invoice to:" (premium style)</label>
+                    <label className="text-xs text-gray-500 mb-1 block">Heading {"Invoice to:"} (premium style)</label>
                     <input type="text" value={(data.headingBilledTo as string) || ''} onChange={e => update('headingBilledTo', e.target.value)}
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Invoice to:" />
                   </div>
@@ -1215,22 +1218,22 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                 <div className="space-y-3">
                   <p className="text-xs font-semibold text-gray-600 border-b pb-1">Kolom Kanan</p>
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Heading "Detail Invoice"</label>
+                    <label className="text-xs text-gray-500 mb-1 block">Heading {"Detail Invoice"}</label>
                     <input type="text" value={(data.headingInvoiceDetails as string) || ''} onChange={e => update('headingInvoiceDetails', e.target.value)}
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Detail Invoice" />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Label "Invoice#" (premium style)</label>
+                    <label className="text-xs text-gray-500 mb-1 block">Label {"Invoice#"} (premium style)</label>
                     <input type="text" value={(data.labelInvoiceNo as string) || ''} onChange={e => update('labelInvoiceNo', e.target.value)}
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Invoice#" />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Label "Tanggal"</label>
+                    <label className="text-xs text-gray-500 mb-1 block">Label {"Tanggal"}</label>
                     <input type="text" value={(data.labelInvoiceDate as string) || ''} onChange={e => update('labelInvoiceDate', e.target.value)}
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Tanggal" />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Label "Batas Pembayaran"</label>
+                    <label className="text-xs text-gray-500 mb-1 block">Label {"Batas Pembayaran"}</label>
                     <input type="text" value={(data.labelPaymentDeadline as string) || ''} onChange={e => update('labelPaymentDeadline', e.target.value)}
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Batas Pembayaran" />
                   </div>
@@ -1241,7 +1244,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             {/* 4. RINGKASAN PESANAN */}
             <SectionCard icon="📦" title="④ Ringkasan Pesanan">
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">Heading "Ringkasan Pesanan"</label>
+                <label className="text-xs text-gray-500 mb-1 block">Heading {"Ringkasan Pesanan"}</label>
                 <input type="text" value={(data.headingOrderSummary as string) || ''} onChange={e => update('headingOrderSummary', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-3" placeholder="Ringkasan Pesanan" />
               </div>
@@ -1265,7 +1268,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             <SectionCard icon="💰" title="⑤ Rincian Biaya">
               <p className="text-xs text-gray-400 mb-3">Bagian ini menampilkan detail biaya: Dewasa (qty × harga), Anak, Sub Total, Diskon, Tax, dan Total.</p>
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">Heading "Rincian Biaya"</label>
+                <label className="text-xs text-gray-500 mb-1 block">Heading {"Rincian Biaya"}</label>
                 <input type="text" value={(data.headingPriceBreakdown as string) || ''} onChange={e => update('headingPriceBreakdown', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-3" placeholder="Rincian Biaya" />
               </div>
@@ -1289,7 +1292,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
 
             {/* 5½. STAMPEL LUNAS */}
             <SectionCard icon="🛡️" title="⑤½ Stempel LUNAS (Tampil di Tengah Rincian Biaya)">
-              <p className="text-xs text-gray-400 mb-3">Stempel hanya muncul saat status pesanan <strong>COMPLETED / Selesai</strong>. Upload gambar stempel atau biarkan kosong untuk tampil teks "LUNAS".</p>
+              <p className="text-xs text-gray-400 mb-3">Stempel hanya muncul saat status pesanan <strong>COMPLETED / Selesai</strong>. Upload gambar stempel atau biarkan kosong untuk tampil teks {"LUNAS"}.</p>
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Upload Gambar Stempel (PNG transparan disarankan)</label>
                 <ImageUpload
@@ -1299,7 +1302,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                   folder="tour-booking/stamps"
                   placeholder="Upload gambar stempel LUNAS"
                 />
-                <p className="text-[10px] text-gray-400 mt-1">Kosongkan untuk tampil teks "LUNAS" dengan aksen warna tema.</p>
+                <p className="text-[10px] text-gray-400 mt-1">Kosongkan untuk tampil teks {"LUNAS"} dengan aksen warna tema.</p>
               </div>
               <div className="mt-3">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -1314,7 +1317,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             <SectionCard icon="🏦" title="⑥ Informasi Pembayaran">
               <p className="text-xs text-gray-400 mb-3">Rekening bank dikelola di <strong>Settings → Bank Accounts</strong>.</p>
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">Heading "Informasi Pembayaran"</label>
+                <label className="text-xs text-gray-500 mb-1 block">Heading {"Informasi Pembayaran"}</label>
                 <input type="text" value={(data.headingPaymentInfo as string) || ''} onChange={e => update('headingPaymentInfo', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-3" placeholder="Informasi Pembayaran" />
               </div>
@@ -1341,7 +1344,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             {/* 7. BATAS PEMBAYARAN */}
             <SectionCard icon="⏰" title="⑦ Batas Pembayaran">
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">Heading "Batas Pembayaran"</label>
+                <label className="text-xs text-gray-500 mb-1 block">Heading {"Batas Pembayaran"}</label>
                 <input type="text" value={(data.headingDeadline as string) || ''} onChange={e => update('headingDeadline', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-3" placeholder="Batas Pembayaran" />
               </div>
@@ -1366,7 +1369,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                 <div className="space-y-3">
                   <p className="text-xs font-semibold text-gray-600 border-b pb-1">Kolom Kiri</p>
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Heading "Syarat & Ketentuan"</label>
+                    <label className="text-xs text-gray-500 mb-1 block">Heading {"Syarat & Ketentuan"}</label>
                     <input type="text" value={(data.headingTerms as string) || ''} onChange={e => update('headingTerms', e.target.value)}
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Syarat & Ketentuan" />
                   </div>
@@ -1396,7 +1399,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                     <p className="text-[10px] text-gray-400 mt-1">Kosongkan untuk tampil garis + teks.</p>
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Label "Authorised Sign"</label>
+                    <label className="text-xs text-gray-500 mb-1 block">Label {"Authorised Sign"}</label>
                     <input type="text" value={(data.labelSignature as string) || ''} onChange={e => update('labelSignature', e.target.value)}
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Authorised Sign" />
                   </div>
@@ -1419,7 +1422,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                   placeholder="Terima kasih telah memilih layanan kami..." />
               </div>
               <div className="mt-3">
-                <label className="text-xs text-gray-500 mb-1 block">Link Tombol "Butuh Bantuan?"</label>
+                <label className="text-xs text-gray-500 mb-1 block">Link Tombol {"Butuh Bantuan?"}</label>
                 <input type="text" value={(data.helpLink as string) || ''} onChange={e => update('helpLink', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none"
                   placeholder="/contact" />

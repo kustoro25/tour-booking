@@ -8,8 +8,8 @@ export async function GET(
   try {
     const { slug } = await params;
 
-    const destination = await prisma.destination.findUnique({
-      where: { slug },
+    const destination = await prisma.destination.findFirst({
+      where: { slug, isActive: true },
       include: {
         _count: { select: { tours: true } },
         tours: {

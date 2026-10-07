@@ -74,7 +74,7 @@ export async function POST(
     }
 
     // Send confirmation email
-    const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
+    const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
     const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 
     const remaining = updatedPayments.filter((p) => p.status !== 'CONFIRMED').length;

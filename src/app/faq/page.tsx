@@ -72,7 +72,7 @@ export default function FaqPage() {
         </h1>
         <p className="text-gray-500 max-w-2xl mx-auto">
           Temukan jawaban untuk pertanyaan-pertanyaan umum seputar pemesanan, pembayaran, dan
-          perjalanan tour bersama Jelajah Nusantara.
+          perjalanan tour bersama HAYBALI TRANS.
         </p>
       </div>
 

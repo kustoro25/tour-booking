@@ -19,9 +19,9 @@ export async function GET() {
     // Map to legacy camelCase fields for backward compatibility
     const email = settingsMap['company_email'] || 'info@jelajahnusantara.com';
     const phone = settingsMap['company_phone'] || '+62 812-3456-7890';
-    const address = settingsMap['company_address'] || 'Jl. Pariwisata No. 123, Jakarta Selatan';
-    const brandName = settingsMap['company_name'] || 'Jelajah Nusantara';
-    const brandIcon = settingsMap['company_icon'] || 'JN';
+    const address = settingsMap['company_address'] || 'Denpasar / Kuta, Bali - Indonesia';
+    const brandName = settingsMap['company_name'] || 'HAYBALI TRANS';
+    const brandIcon = settingsMap['company_icon'] || 'HB';
 
     return NextResponse.json({
       success: true,
@@ -44,9 +44,9 @@ export async function GET() {
         paymentGateway: 'manual',
         email: 'info@jelajahnusantara.com',
         phone: '+62 812-3456-7890',
-        address: 'Jl. Pariwisata No. 123, Jakarta Selatan',
-        brandName: 'Jelajah Nusantara',
-        brandIcon: 'JN',
+        address: 'Denpasar / Kuta, Bali - Indonesia',
+        brandName: 'HAYBALI TRANS',
+        brandIcon: 'HB',
       },
     });
   }

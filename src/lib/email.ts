@@ -26,7 +26,7 @@ export async function sendEmail(payload: EmailPayload): Promise<boolean> {
   if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
     try {
       await smtpTransport.sendMail({
-        from: `"${process.env.COMPANY_NAME || 'Jelajah Nusantara'}" <${from}>`,
+        from: `"${process.env.COMPANY_NAME || 'HAYBALI TRANS'}" <${from}>`,
         to: payload.to,
         subject: payload.subject,
         html: payload.html,

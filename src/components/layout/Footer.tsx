@@ -13,7 +13,7 @@ export interface FooterCms {
 }
 
 function useCompanyInfo() {
-  const [info, setInfo] = useState({ email: 'info@jelajahnusantara.com', phone: '+62 812-3456-7890', address: 'Jl. Pariwisata No. 123, Jakarta Selatan', brandName: 'Jelajah Nusantara', brandIcon: 'JN' });
+  const [info, setInfo] = useState({ email: 'info@haybalitrans.com', phone: '+62 812-3456-7890', address: 'Denpasar / Kuta, Bali - Indonesia', brandName: 'HAYBALI TRANS', brandIcon: 'HB' });
   useEffect(() => {
     fetch('/api/settings/public')
       .then(r => r.json())
@@ -116,32 +116,32 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
   };
   return (
     <footer className="bg-gray-900 text-gray-300 relative">
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-teal-500 to-orange-500" />
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-teal-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/20">
+              <div className="w-9 h-9 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-md shadow-amber-500/20">
                 {info.brandIcon ? (
-                  info.brandIcon.startsWith('http') ? (
+                  (info.brandIcon.startsWith('http') || info.brandIcon.startsWith('/')) ? (
                     <img src={info.brandIcon} alt="brand" className="w-full h-full object-cover rounded-xl" />
                   ) : (
                     <span className="text-white font-bold text-sm">{info.brandIcon.substring(0, 2).toUpperCase()}</span>
                   )
                 ) : (
-                  <span className="text-white font-bold text-sm">JN</span>
+                  <span className="text-white font-bold text-sm">HB</span>
                 )}
               </div>
-              <span className="text-xl font-bold text-white">{info.brandName || 'Jelajah Nusantara'}</span>
+              <span className="text-xl font-bold text-white">{info.brandName || 'HAYBALI TRANS'}</span>
             </div>
             <p className="text-gray-400 mb-4 max-w-md leading-relaxed">
-              {cms.text || 'Platform booking tour terpercaya untuk menjelajahi destinasi terbaik di Indonesia. Harga transparan, booking instan, dan guide profesional.'}
+              {cms.text || 'Mitra transportasi dan privat tur tepercaya di Bali. Mengutamakan keselamatan, kenyamanan, dan pelayanan VIP bagi seluruh pelanggan.'}
             </p>
             <div className="space-y-1.5 text-sm text-gray-400 mb-4">
               <p className="flex items-start gap-2">
                 <span className="mt-0.5 flex-shrink-0">📍</span>
-                <span>{info.address || 'Jl. Pariwisata No. 123, Jakarta Selatan'}</span>
+                <span>{info.address || 'Denpasar / Kuta, Bali - Indonesia'}</span>
               </p>
               <p className="flex items-center gap-2">
                 <span className="flex-shrink-0">📞</span>
@@ -164,7 +164,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
                   ]
               ).map((s) => (
                 <a key={s.platform} href={s.url || '#'} aria-label={s.platform} target="_blank" rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-lg bg-gray-800 hover:bg-blue-600 flex items-center justify-center text-gray-400 hover:text-white transition-all duration-300 hover:scale-110"
+                  className="w-9 h-9 rounded-lg bg-gray-800 hover:bg-amber-600 flex items-center justify-center text-gray-400 hover:text-white transition-all duration-300 hover:scale-110"
                 >
                   {socialIcons[s.icon] || socialIcons.globe}
                 </a>
@@ -186,12 +186,12 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   placeholder="email@anda.com"
                   required
-                  className="flex-1 min-w-0 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
+                  className="flex-1 min-w-0 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-shadow"
                 />
                 <button
                   type="submit"
                   disabled={subscribing}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors flex-shrink-0"
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors flex-shrink-0"
                 >
                   {subscribing ? '...' : 'Berlangganan'}
                 </button>
@@ -204,7 +204,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
             <div key={category}>
               <h3 className="text-white font-semibold mb-4 relative inline-block">
                 {category}
-                <span className="absolute -bottom-1 left-0 w-8 h-0.5 bg-gradient-to-r from-blue-500 to-teal-500 rounded-full" />
+                <span className="absolute -bottom-1 left-0 w-8 h-0.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full" />
               </h3>
               <ul className="space-y-2.5">
                 {links.map((link) => (
@@ -221,7 +221,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
 
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-10 pt-6 text-center text-sm text-gray-500">
-          {cms.copyright || `© ${new Date().getFullYear()} ${info.brandName || 'Jelajah Nusantara'} Tour. All rights reserved.`}
+          {cms.copyright || `© ${new Date().getFullYear()} ${info.brandName || 'HAYBALI TRANS'} Tour. All rights reserved.`}
         </div>
       </div>
     </footer>

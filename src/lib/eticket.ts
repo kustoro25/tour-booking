@@ -36,7 +36,7 @@ export async function sendOrderTicketEmail(orderId: string): Promise<boolean> {
     }
 
     const [companyName, companyPhone, companyEmail, companyAddress] = await Promise.all([
-      getSetting('company_name', process.env.COMPANY_NAME || 'Jelajah Nusantara Tour'),
+      getSetting('company_name', process.env.COMPANY_NAME || 'HAYBALI TRANS'),
       getSetting('company_phone', process.env.COMPANY_PHONE || ''),
       getSetting('company_email', process.env.COMPANY_EMAIL || ''),
       getSetting('company_address', process.env.COMPANY_ADDRESS || ''),

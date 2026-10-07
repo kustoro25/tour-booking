@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/Skeleton';
 
@@ -18,7 +18,7 @@ const pageSlugs = [
   { slug: 'home-value', title: 'Home - Value Proposition' },
   { slug: 'home-destinations', title: 'Home - Destinasi Impian' },
   { slug: 'home-tours', title: 'Home - Paket Wisata Unggulan' },
-  { slug: 'home-gallery', title: 'Home - Jelajah Visual' },
+  { slug: 'home-gallery', title: 'Home - Galeri' },
   { slug: 'testimonials', title: 'Home - Testimoni' },
   { slug: 'home-faq', title: 'Home - FAQ Section' },
   { slug: 'home-cta', title: 'Home - CTA (Siap Berpetualang?)' },
@@ -40,11 +40,7 @@ export default function AdminPagesPage() {
   const [pages, setPages] = useState<CmsPage[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchPages();
-  }, []);
-
-  const fetchPages = async () => {
+  const fetchPages = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch('/api/admin/pages');
@@ -55,7 +51,12 @@ export default function AdminPagesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => { fetchPages(); }, 0);
+    return () => clearTimeout(t);
+  }, [fetchPages]);
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString('id-ID', {

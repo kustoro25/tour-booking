@@ -6,8 +6,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { ToastProvider } from '@/components/ui/Toast';
 
 function BrandIcon({ icon, className }: { icon: string; className?: string }) {
-  if (!icon) return <div className={`${className} flex items-center justify-center text-sm font-bold`}>JN</div>;
-  if (icon.startsWith('http')) {
+  if (!icon) return <div className={`${className} flex items-center justify-center text-sm font-bold`}>HB</div>;
+  if (icon.startsWith('http') || icon.startsWith('/')) {
     return <img src={icon} alt="brand" className={`${className} object-cover`} />;
   }
   return <div className={`${className} flex items-center justify-center text-sm font-bold`}>{icon.substring(0, 2).toUpperCase()}</div>;

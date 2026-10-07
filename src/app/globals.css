@@ -3,9 +3,9 @@
 :root {
   --background: #f8fafc;
   --foreground: #1e293b;
-  --primary: #2563eb;
-  --primary-light: #3b82f6;
-  --primary-dark: #1d4ed8;
+  --primary: #d97706;
+  --primary-light: #f59e0b;
+  --primary-dark: #b45309;
   --accent: #f97316;
   --accent-light: #fb923c;
   --teal: #0d9488;
@@ -126,7 +126,7 @@ img { image-rendering: auto; }
               0 20px 40px rgba(0,0,0,0.06);
 }
 .shadow-glow-blue {
-  box-shadow: 0 0 30px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.15);
 }
 .shadow-glow-teal {
   box-shadow: 0 0 30px rgba(13, 148, 136, 0.15);
@@ -142,7 +142,7 @@ img { image-rendering: auto; }
 
 /* ============ GRADIENT TEXT ============ */
 .gradient-text {
-  background: linear-gradient(135deg, #2563eb, #0d9488);
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

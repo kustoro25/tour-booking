@@ -6,8 +6,8 @@ import { usePathname } from 'next/navigation';
 import Button from '../ui/Button';
 
 function BrandIcon({ icon, className }: { icon?: string; className?: string }) {
-  if (!icon) return <span className="text-white font-bold text-sm">JN</span>;
-  if (icon.startsWith('http')) return <img src={icon} alt="brand" className={`${className} object-cover`} />;
+  if (!icon) return <span className="text-white font-bold text-sm">HB</span>;
+  if (icon.startsWith('http') || icon.startsWith('/')) return <img src={icon} alt="brand" className={`${className} object-cover`} />;
   return <span className="text-white font-bold text-sm">{icon.substring(0, 2).toUpperCase()}</span>;
 }
 
@@ -16,8 +16,6 @@ const navLinks = [
   { href: '/tours', label: 'Paket Wisata' },
   { href: '/sewa-mobil', label: 'Sewa Mobil' },
   { href: '/antar-jemput', label: 'Antar-Jemput' },
-  { href: '/destinations', label: 'Destinasi' },
-  { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'Tentang Kami' },
 ];
 
@@ -44,11 +42,11 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-teal-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/30 group-hover:shadow-lg group-hover:shadow-blue-500/40 transition-shadow duration-300">
-              <BrandIcon icon={brandIcon} className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold bg-gradient-to-br from-blue-600 to-teal-600 shadow-md" />
+            <div className="w-9 h-9 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-md shadow-amber-500/30 group-hover:shadow-lg group-hover:shadow-amber-500/40 transition-shadow duration-300">
+              <BrandIcon icon={brandIcon} className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold bg-gradient-to-br from-amber-500 to-orange-600 shadow-md" />
             </div>
             <span className="text-base sm:text-xl font-bold text-gray-900">
-              <span className="gradient-text">{brandName || 'Jelajah Nusantara'}</span>
+              <span className="gradient-text">{brandName || 'HAYBALI TRANS'}</span>
             </span>
           </Link>
 
@@ -61,12 +59,12 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
                   key={link.href}
                   href={link.href}
                   className={`relative px-3 py-2 rounded-lg text-sm font-medium transition-colors group ${
-                    isActive ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
+                    isActive ? 'text-amber-600' : 'text-gray-600 hover:text-amber-600'
                   }`}
                 >
                   {link.label}
                   <span
-                    className={`absolute bottom-1 left-3 right-3 h-0.5 bg-blue-600 rounded-full transition-transform origin-left ${
+                    className={`absolute bottom-1 left-3 right-3 h-0.5 bg-amber-500 rounded-full transition-transform origin-left ${
                       isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                     }`}
                   />
@@ -88,7 +86,7 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
           {/* Mobile menu button */}
           <button
             type="button"
-            className="md:hidden p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+            className="md:hidden p-2 rounded-lg text-gray-600 hover:text-amber-600 hover:bg-amber-50 transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -112,7 +110,7 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
                   key={link.href}
                   href={link.href}
                   className={`block px-3 py-2.5 rounded-lg text-base font-medium transition-colors ${
-                    isActive ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                    isActive ? 'text-amber-600 bg-amber-50' : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50'
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >

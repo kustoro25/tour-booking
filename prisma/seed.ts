@@ -240,7 +240,7 @@ async function main() {
       terms: '<p>Harga untuk area standar. Area terpencil dikenakan biaya tambahan. Jam kerja pengemudi 07.00-23.59.</p>',
       isActive: true,
       sortOrder: 1,
-      coverImg: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800',
+      coverImg: '/images/haybali/alphard.png',
     },
     {
       name: 'Sewa Innova Zenix Bali',
@@ -261,7 +261,7 @@ async function main() {
       terms: '<p>Harga untuk area standar. Area terpencil dikenakan biaya tambahan. Jam kerja pengemudi 07.00-23.59.</p>',
       isActive: true,
       sortOrder: 2,
-      coverImg: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800',
+      coverImg: '/images/haybali/innova-zenix.png',
     },
     {
       name: 'Sewa Toyota HiAce Bali',
@@ -282,7 +282,7 @@ async function main() {
       terms: '<p>Harga untuk area standar. Area terpencil dikenakan biaya tambahan. Jam kerja pengemudi 07.00-23.59.</p>',
       isActive: true,
       sortOrder: 3,
-      coverImg: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800',
+      coverImg: '/images/haybali/hiace.png',
     },
     // --- Paket Tour Bali (harga per orang, placeholder — edit via admin) ---
     {
@@ -304,7 +304,7 @@ async function main() {
       terms: '<p>Minimal pemesanan 2 orang. Harga per orang.</p>',
       isActive: true,
       sortOrder: 4,
-      coverImg: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800',
+      coverImg: '/images/haybali/kintamani-daytour.png',
     },
     {
       name: 'Ubud Tour',
@@ -325,7 +325,7 @@ async function main() {
       terms: '<p>Minimal pemesanan 2 orang. Harga per orang.</p>',
       isActive: true,
       sortOrder: 5,
-      coverImg: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800',
+      coverImg: '/images/haybali/ubud-daytour.png',
     },
     {
       name: 'Uluwatu Tour',
@@ -346,7 +346,7 @@ async function main() {
       terms: '<p>Minimal pemesanan 2 orang. Harga per orang.</p>',
       isActive: true,
       sortOrder: 6,
-      coverImg: 'https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800',
+      coverImg: '/images/haybali/uluwatu-daytour.png',
     },
     {
       name: 'Nusa Penida Tour',
@@ -367,7 +367,7 @@ async function main() {
       terms: '<p>Minimal pemesanan 2 orang. Harga per orang.</p>',
       isActive: true,
       sortOrder: 7,
-      coverImg: 'https://images.unsplash.com/photo-1573790387438-4da905039392?w=800',
+      coverImg: '/images/haybali/nusapenida-daytour.png',
     },
     // --- Antar-Jemput Bandara (harga dihitung dari tabel tarif area) ---
     {
@@ -396,7 +396,7 @@ async function main() {
   for (const product of haybaliProducts) {
     await prisma.tour.upsert({
       where: { slug: product.slug },
-      update: {},
+      update: { isActive: product.isActive },
       create: product,
     });
     console.log('HAYBALI product created:', product.name);
@@ -611,7 +611,87 @@ async function main() {
     },
   ];
 
+  // HAYBALI rebrand: destinasi nasional lama tidak dipakai lagi.
+  // Yang sudah ada dinonaktifkan, yang belum ada tidak dibuat ulang.
   for (const dest of destinations) {
+    const existing = await prisma.destination.findUnique({ where: { slug: dest.slug } });
+    if (existing) {
+      await prisma.destination.update({ where: { slug: dest.slug }, data: { ...dest, isActive: false } });
+      console.log('Destination deactivated:', dest.name);
+    } else {
+      console.log('Destination skipped (legacy):', dest.name);
+    }
+  }
+
+  // 4 destinasi HAYBALI TRANS yang aktif
+  const haybaliDestinations = [
+    {
+      name: 'Kintamani',
+      slug: 'kintamani',
+      shortDescription: 'Dataran tinggi dengan panorama Gunung Batur dan Danau Batur yang menakjubkan.',
+      description: '<h2>Panorama Gunung & Danau Batur</h2><p>Kintamani adalah dataran tinggi di Bali tengah yang menyajikan pemandangan Gunung Batur dan Danau Batur dari ketinggian. Udara sejuknya menjadikan kawasan ini favorit untuk makan siang sambil menikmati panorama.</p><h3>Yang Wajib Dikunjungi</h3><ul><li>Penelokan Viewpoint</li><li>Gunung Batur</li><li>Desa Trunyan</li><li>Pemandian Air Panas Toya Devasya</li></ul>',
+      location: 'Bali, Indonesia',
+      imageUrl: '/images/haybali/kintamani.png',
+      gallery: JSON.stringify(['/images/haybali/kintamani.png', '/images/haybali/bedugul.png']),
+      rating: 4.8,
+      reviewCount: 120,
+      bestTimeToVisit: 'April - Oktober',
+      activities: JSON.stringify(['Trekking', 'Fotografi', 'Air Panas', 'Wisata Desa']),
+      highlight: true,
+      isActive: true,
+      sortOrder: 1,
+    },
+    {
+      name: 'Ubud',
+      slug: 'ubud',
+      shortDescription: 'Jantung budaya Bali dengan sawah terasering, seni, dan suasana villa yang menenangkan.',
+      description: '<h2>Jantung Budaya Bali</h2><p>Ubud adalah pusat seni dan spiritual Bali. Dikelilingi sawah terasering hijau dan hutan tropis, Ubud menawarkan pengalaman yang menenangkan — yoga, spa, galeri seni, dan kuliner sehat.</p><h3>Yang Wajib Dikunjungi</h3><ul><li>Tegallalang Rice Terrace</li><li>Monkey Forest Ubud</li><li>Pura Tirta Empul</li><li>Pasar Seni Ubud</li><li>Campuhan Ridge Walk</li></ul>',
+      location: 'Bali, Indonesia',
+      imageUrl: '/images/haybali/ubud.png',
+      gallery: JSON.stringify(['/images/haybali/ubud.png', '/images/haybali/honeymoon-ubud.png']),
+      rating: 4.9,
+      reviewCount: 150,
+      bestTimeToVisit: 'April - Oktober',
+      activities: JSON.stringify(['Wisata Budaya', 'Spa & Yoga', 'Fotografi', 'Wisata Kuliner', 'Bersepeda']),
+      highlight: true,
+      isActive: true,
+      sortOrder: 2,
+    },
+    {
+      name: 'Uluwatu',
+      slug: 'uluwatu',
+      shortDescription: 'Tebing karang megah, pantai surfing legendaris, dan sunset Tari Kecak yang memukau.',
+      description: '<h2>Tebing Karang & Sunset Legendaris</h2><p>Uluwatu di ujung selatan Bali adalah rumah bagi Pura Luhur Uluwatu yang bertengger di tebing setinggi 70 meter. Setiap sore, pertunjukan Tari Kecak dengan latar matahari terbenam menjadi momen yang tak terlupakan.</p><h3>Yang Wajib Dikunjungi</h3><ul><li>Pura Luhur Uluwatu</li><li>Pantai Padang-Padang</li><li>Pantai Bingin</li><li>Pantai Melasti</li><li>Suluban Beach</li></ul>',
+      location: 'Bali, Indonesia',
+      imageUrl: '/images/haybali/bali-roundtrip.png',
+      gallery: JSON.stringify(['/images/haybali/bali-roundtrip.png', '/images/haybali/uluwatu-beach.png']),
+      rating: 4.7,
+      reviewCount: 90,
+      bestTimeToVisit: 'April - Oktober',
+      activities: JSON.stringify(['Surfing', 'Tari Kecak', 'Fotografi Sunset', 'Beach Club']),
+      highlight: true,
+      isActive: true,
+      sortOrder: 3,
+    },
+    {
+      name: 'Nusa Penida',
+      slug: 'nusa-penida',
+      shortDescription: 'Pulau eksotis dengan tebing dramatis, pantai tersembunyi, dan snorkeling kelas dunia.',
+      description: '<h2>Petualangan Pulau Eksotis</h2><p>Nusa Penida adalah pulau di tenggara Bali yang terkenal dengan Kelingking Beach — tebing berbentuk T-Rex yang ikonik. Pulau ini juga menawarkan snorkeling bersama manta dan pantai-pantai tersembunyi yang menakjubkan.</p><h3>Yang Wajib Dikunjungi</h3><ul><li>Kelingking Beach</li><li>Angel\'s Billabong & Broken Beach</li><li>Crystal Bay</li><li>Manta Point</li><li>Diamond Beach</li></ul>',
+      location: 'Bali, Indonesia',
+      imageUrl: '/images/haybali/nusa-penida.png',
+      gallery: JSON.stringify(['/images/haybali/nusa-penida.png', '/images/haybali/nusa-penida-bay.png']),
+      rating: 4.9,
+      reviewCount: 130,
+      bestTimeToVisit: 'April - November',
+      activities: JSON.stringify(['Snorkeling', 'Fotografi', 'Island Hopping', 'Trekking Ringan']),
+      highlight: true,
+      isActive: true,
+      sortOrder: 4,
+    },
+  ];
+
+  for (const dest of haybaliDestinations) {
     const existing = await prisma.destination.findUnique({ where: { slug: dest.slug } });
     if (existing) {
       await prisma.destination.update({ where: { slug: dest.slug }, data: dest });

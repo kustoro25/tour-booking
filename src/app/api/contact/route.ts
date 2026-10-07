@@ -26,8 +26,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Read company info from settings (same source as admin/settings page)
-    let companyName = 'Jelajah Nusantara Tour';
-    let companyEmail = 'info@tourbooking.com';
+    let companyName = 'HAYBALI TRANS';
+    let companyEmail = 'info@haybalitrans.com';
     let companyPhone = '+6281234567890';
     try {
       const [nameSetting, emailSetting, phoneSetting] = await Promise.all([

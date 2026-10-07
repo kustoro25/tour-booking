@@ -320,7 +320,7 @@ export async function POST(request: NextRequest) {
 
     // ==== Pembayaran online, email & WhatsApp (di luar transaksi, non-blocking) ====
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
+    const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
     const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
     const dateLabel = new Date(tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
     const tourDateLabel = pickupTime ? `${dateLabel}, pukul ${pickupTime}` : dateLabel;

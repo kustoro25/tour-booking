@@ -100,7 +100,7 @@ export async function PUT(
 
     // Notifikasi pembayaran dikonfirmasi (email + WA) saat status berubah ke CONFIRMED
     if (newStatus === 'CONFIRMED' && currentOrder.status !== 'CONFIRMED' && currentOrder.status !== 'COMPLETED') {
-      const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
+      const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
       const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 
       after(() =>
@@ -135,7 +135,7 @@ export async function PUT(
     // Auto-send review request when status changes to COMPLETED
     if (newStatus === 'COMPLETED' && currentOrder.status !== 'COMPLETED' && !currentOrder.reviewSentAt) {
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-      const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
+      const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
 
       // Send review email (non-blocking, tetap jalan via after())
       after(() =>

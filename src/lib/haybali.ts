@@ -39,7 +39,7 @@ export const FLEET: FleetItem[] = [
     maxPax: 7,
     price: 1800000,
     features: ['Termasuk Supir & BBM', 'Interior Luxury & Air Mineral'],
-    imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800',
+    imageUrl: '/images/haybali/alphard.png',
   },
   {
     slug: 'sewa-innova-zenix-bali',
@@ -49,7 +49,7 @@ export const FLEET: FleetItem[] = [
     maxPax: 6,
     price: 850000,
     features: ['Termasuk Supir & BBM', 'Kabin Modern & Nyaman'],
-    imageUrl: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800',
+    imageUrl: '/images/haybali/innova-zenix.png',
   },
   {
     slug: 'sewa-toyota-hiace-bali',
@@ -59,7 +59,7 @@ export const FLEET: FleetItem[] = [
     maxPax: 15,
     price: 1100000,
     features: ['Termasuk Supir & BBM', 'Cocok untuk Rombongan / Event'],
-    imageUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800',
+    imageUrl: '/images/haybali/hiace.png',
   },
 ];
 

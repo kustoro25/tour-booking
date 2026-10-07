@@ -14,8 +14,8 @@ interface BankAccount {
 }
 
 const DEFAULT_BANK_ACCOUNTS: BankAccount[] = [
-  { bank: 'BCA', number: '1234567890', name: 'PT Jelajah Nusantara' },
-  { bank: 'Mandiri', number: '0987654321', name: 'PT Jelajah Nusantara' },
+  { bank: 'BCA', number: '1234567890', name: 'HAYBALI TRANS' },
+  { bank: 'Mandiri', number: '0987654321', name: 'HAYBALI TRANS' },
 ];
 
 export default function AdminSettingsPage() {
@@ -31,7 +31,7 @@ export default function AdminSettingsPage() {
   const [pwSaving, setPwSaving] = useState(false);
   const [pwError, setPwError] = useState('');
   const [pwSaved, setPwSaved] = useState(false);
-  const [pwShowBlocked, setPwShowBlocked] = useState(false);
+  const [pwShowBlocked] = useState(false);
 
   const [form, setForm] = useState({
     siteTitle: '',
@@ -185,9 +185,9 @@ export default function AdminSettingsPage() {
                 value={form.siteTitle}
                 onChange={(e) => setForm({ ...form, siteTitle: e.target.value })}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Jelajah Nusantara - Booking Tour & Aktivitas"
+                placeholder="HAYBALI TRANS — Sewa Mobil & Tour Bali"
               />
-              <p className="text-xs text-gray-400 mt-1">Contoh: Jelajah Nusantara — Booking Tour Terpercaya</p>
+              <p className="text-xs text-gray-400 mt-1">Contoh: HAYBALI TRANS — Sewa Mobil & Tour Bali</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Favicon (32×32 PNG)</label>
@@ -215,7 +215,7 @@ export default function AdminSettingsPage() {
                 value={form.companyName}
                 onChange={(e) => setForm({ ...form, companyName: e.target.value })}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Jelajah Nusantara"
+                placeholder="HAYBALI TRANS"
               />
             </div>
             <div>
@@ -373,7 +373,7 @@ export default function AdminSettingsPage() {
                     value={editingBank.name}
                     onChange={(e) => setEditingBank({ ...editingBank, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="PT Jelajah Nusantara"
+                    placeholder="HAYBALI TRANS"
                   />
                 </div>
               </div>

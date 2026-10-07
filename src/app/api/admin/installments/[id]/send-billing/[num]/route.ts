@@ -44,7 +44,7 @@ export async function POST(
 
     // Send billing email
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
+    const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
     const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 
     // Read bank accounts

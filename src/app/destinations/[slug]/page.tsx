@@ -13,7 +13,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const destination = await prisma.destination.findUnique({ where: { slug } });
+  const destination = await prisma.destination.findFirst({ where: { slug, isActive: true } });
   if (!destination) return { title: 'Destinasi Tidak Ditemukan' };
   return {
     title: destination.name,
@@ -28,8 +28,8 @@ export default async function DestinationDetailPage({
 }) {
   const { slug } = await params;
 
-  const destination = await prisma.destination.findUnique({
-    where: { slug },
+  const destination = await prisma.destination.findFirst({
+    where: { slug, isActive: true },
     include: {
       tours: {
         where: { isActive: true },

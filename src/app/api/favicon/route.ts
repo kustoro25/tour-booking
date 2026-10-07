@@ -6,8 +6,8 @@ export const dynamic = 'force-dynamic';
 async function defaultFavicon() {
   return new NextResponse(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-      <rect width="32" height="32" rx="8" fill="#2563eb"/>
-      <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="bold" fill="white">JN</text>
+      <rect width="32" height="32" rx="8" fill="#f59e0b"/>
+      <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="bold" fill="white">HB</text>
     </svg>`,
     {
       headers: {

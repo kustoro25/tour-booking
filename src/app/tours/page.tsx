@@ -23,7 +23,7 @@ interface ToursPageData {
 const FALLBACK: ToursPageData = {
   label: 'Koleksi Kami',
   heading: 'Paket Wisata',
-  subheading: 'Jelajahi berbagai pilihan paket tour ke destinasi terbaik di Indonesia',
+  subheading: 'Jelajahi berbagai pilihan paket tour HAYBALI TRANS ke destinasi terbaik di Bali',
 };
 
 async function getToursPageData(): Promise<ToursPageData> {

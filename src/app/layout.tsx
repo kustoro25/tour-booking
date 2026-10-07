@@ -17,10 +17,14 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${title.split(' - ')[0] || title}`,
     },
     description:
-      'Platform booking tour terpercaya untuk menjelajahi destinasi terbaik di Indonesia. Harga transparan, booking instan, dan guide profesional.',
-    keywords: ['tour', 'travel', 'booking', 'wisata', 'indonesia', 'liburan', 'paket tour'],
+      'Sewa mobil mewah & paket tur privat di Bali. Supir berpengalaman, kendaraan prima, antar-jemput bandara 24/7.',
+    keywords: ['sewa mobil bali', 'tour bali', 'antar jemput bandara', 'haybali trans', 'paket wisata bali', 'supir pribadi bali'],
     icons: {
-      icon: '/api/favicon',
+      icon: [
+        { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+        { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      ],
+      apple: { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     },
   };
 }
@@ -44,7 +48,7 @@ export default async function RootLayout({
 
   return (
     <html lang="id">
-      <body className={`${inter.className} antialiased bg-gray-50 text-gray-800 min-h-screen flex flex-col selection:bg-blue-100 selection:text-blue-900`}>
+      <body className={`${inter.className} antialiased bg-gray-50 text-gray-800 min-h-screen flex flex-col selection:bg-amber-100 selection:text-amber-900`}>
         <ToastProvider>
           <PublicLayout brandName={brandName} brandIcon={brandIcon} footerCms={footerCms}>{children}</PublicLayout>
           <FloatingActions />

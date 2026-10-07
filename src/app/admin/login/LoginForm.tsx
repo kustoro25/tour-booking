@@ -45,7 +45,7 @@ export default function LoginForm({ brandName, brandIcon }: Props) {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          {brandIcon.startsWith('http') ? (
+          {(brandIcon.startsWith('http') || brandIcon.startsWith('/')) ? (
             <img src={brandIcon} alt={brandName} className="w-14 h-14 rounded-xl object-cover mx-auto mb-4" />
           ) : (
             <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">

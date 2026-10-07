@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Notifikasi ke pembeli (email + WhatsApp) — non-blocking
-        const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
+        const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
         const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 
         after(() =>
@@ -207,7 +207,7 @@ async function handleInstallmentPayment(
     },
   });
 
-  const companyName = process.env.COMPANY_NAME || 'Jelajah Nusantara Tour';
+  const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
   const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 
   if (installmentNumber === 0) {

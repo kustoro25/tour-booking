@@ -178,8 +178,8 @@ export default async function InvoicePage({ params }: PageProps) {
 
   // Read bank accounts from settings
   let bankAccounts = [
-    { bank: 'BCA', number: '1234567890', name: 'PT Jelajah Nusantara' },
-    { bank: 'Mandiri', number: '0987654321', name: 'PT Jelajah Nusantara' },
+    { bank: 'BCA', number: '1234567890', name: 'HAYBALI TRANS' },
+    { bank: 'Mandiri', number: '0987654321', name: 'HAYBALI TRANS' },
   ];
   try {
     const bankSetting = await prisma.setting.findUnique({ where: { key: 'bank_accounts' } });
@@ -375,7 +375,7 @@ function CustomInvoice({
 
   const isLight = themeKeyForCustom(hText) === 'light';
   const logoBg = isLight ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.2)';
-  const isIconUrl = brandIcon && (brandIcon.startsWith('http://') || brandIcon.startsWith('https://'));
+  const isIconUrl = brandIcon && (brandIcon.startsWith('http://') || brandIcon.startsWith('https://') || brandIcon.startsWith('/'));
 
   // Editable headings & labels
   const methodLabel = order.paymentMethod

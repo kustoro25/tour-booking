@@ -1,8 +1,8 @@
 import { prisma } from '@/lib/prisma';
 
-const DEFAULT_TITLE = 'Jelajah Nusantara - Booking Tour & Aktivitas';
-const DEFAULT_BRAND = 'Jelajah Nusantara';
-const DEFAULT_ICON = 'JN';
+const DEFAULT_TITLE = 'HAYBALI TRANS — Sewa Mobil & Tour Bali';
+const DEFAULT_BRAND = 'HAYBALI TRANS';
+const DEFAULT_ICON = 'HB';
 
 async function getSetting(key: string): Promise<string> {
   try {
