@@ -9,6 +9,10 @@ import { prisma } from '@/lib/prisma';
 
 const inter = Inter({ subsets: ['latin'] });
 
+// Layout membaca brand & footer CMS dari DB — wajib dinamis agar perubahan
+// di admin (mis. link WhatsApp footer) langsung tampil tanpa redeploy.
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata(): Promise<Metadata> {
   const title = await getSiteTitle();
   return {
