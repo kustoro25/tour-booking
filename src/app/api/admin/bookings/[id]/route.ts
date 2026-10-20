@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/auth';
 import { sendEmail, reviewRequestTemplate, paymentConfirmationTemplate } from '@/lib/email';
 import { notifyCustomerPaymentReceived } from '@/lib/whatsapp';
 import { sendOrderTicketEmail } from '@/lib/eticket';
+import { getPaymentGateway } from '@/lib/settings';
 
 // Notifikasi pasca-response dijalankan via after() agar serverless tetap
 // mengerjakannya sampai selesai (waitUntil), tidak dibekukan setelah response.
@@ -91,12 +92,25 @@ export async function PUT(
     if (status) updateData.status = status;
     if (adminNotes !== undefined) updateData.adminNotes = adminNotes;
 
+    const newStatus = status || currentOrder.status;
+
+    // Konfirmasi pembayaran manual oleh admin: catat waktu bayar & metode pembayaran
+    // bila belum ada (gateway-aware: mode manual → "manual_transfer").
+    if (
+      (newStatus === 'CONFIRMED' || newStatus === 'COMPLETED') &&
+      currentOrder.status !== newStatus
+    ) {
+      if (!currentOrder.paidAt) updateData.paidAt = new Date();
+      if (!currentOrder.paymentMethod) {
+        const gateway = await getPaymentGateway();
+        updateData.paymentMethod = gateway === 'manual' ? 'manual_transfer' : 'manual';
+      }
+    }
+
     const booking = await prisma.order.update({
       where: { id },
       data: updateData,
     });
-
-    const newStatus = status || currentOrder.status;
 
     // Notifikasi pembayaran dikonfirmasi (email + WA) saat status berubah ke CONFIRMED
     if (newStatus === 'CONFIRMED' && currentOrder.status !== 'CONFIRMED' && currentOrder.status !== 'COMPLETED') {

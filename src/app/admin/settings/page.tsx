@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Skeleton } from '@/components/ui/Skeleton';
 import ImageUpload from '@/components/ui/ImageUpload';
 import { useAdminRole } from '@/lib/useAdminRole';
@@ -558,7 +559,10 @@ export default function AdminSettingsPage() {
                 <option value="midtrans">Midtrans — QRIS, Virtual Account, E-Wallet (otomatis)</option>
               </select>
               <p className="text-xs text-gray-400 mt-1">
-                Mode Midtrans mengikuti env MIDTRANS_IS_PRODUCTION (false = sandbox, true = production).
+                Mode Midtrans mengikuti env MIDTRANS_IS_PRODUCTION (false = sandbox, true = production).{' '}
+                <Link href="/admin/payments" className="text-blue-600 hover:underline font-medium">
+                  Kelola metode pembayaran di menu Pembayaran →
+                </Link>
               </p>
             </div>
 

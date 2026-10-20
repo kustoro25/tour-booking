@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { OrderStatusLabels } from '@/types';
@@ -12,20 +12,44 @@ export default function BookingDetailPage() {
   const id = params.id as string;
   const [booking, setBooking] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [confirming, setConfirming] = useState(false);
 
-  useEffect(() => {
-    fetch(`/api/admin/bookings/${id}`)
-      .then(r => r.json())
-      .then(data => { if (data.success) setBooking(data.data); })
-      .finally(() => setLoading(false));
+  const fetchBooking = useCallback(async () => {
+    const r = await fetch(`/api/admin/bookings/${id}`);
+    const data = await r.json();
+    if (data.success) setBooking(data.data);
   }, [id]);
 
+  // Defer via setTimeout agar setState tidak dipanggil sinkron di body effect
+  useEffect(() => {
+    const timer = setTimeout(() => { fetchBooking().finally(() => setLoading(false)); }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchBooking]);
+
   const handleStatusUpdate = async (newStatus: string) => {
-    await fetch(`/api/admin/bookings/${id}`, {
+    const res = await fetch(`/api/admin/bookings/${id}`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: newStatus }),
     });
-    setBooking(prev => prev ? { ...prev, status: newStatus } : null);
+    const data = await res.json();
+    if (data.success && data.data) setBooking(data.data);
+  };
+
+  const handleConfirmPayment = async () => {
+    if (!confirm('Konfirmasi pembayaran sudah diterima? Status berubah menjadi Terkonfirmasi, lalu email/WA otomatis dikirim ke customer.')) return;
+    setConfirming(true);
+    try {
+      const res = await fetch(`/api/admin/bookings/${id}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'CONFIRMED' }),
+      });
+      const data = await res.json();
+      if (data.success && data.data) setBooking(data.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setConfirming(false);
+    }
   };
 
   const formatCurrency = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
@@ -74,7 +98,7 @@ export default function BookingDetailPage() {
             <p className="text-sm text-gray-500">Nomor Invoice</p>
             <p className="text-xl font-bold text-blue-600">{booking.invoiceNo as string}</p>
           </div>
-          <div>
+          <div className="flex flex-col items-start sm:items-end gap-2">
             <select
               value={booking.status as string}
               onChange={e => handleStatusUpdate(e.target.value)}
@@ -82,6 +106,24 @@ export default function BookingDetailPage() {
             >
               {Object.keys(OrderStatusLabels).map(s => <option key={s} value={s}>{OrderStatusLabels[s as OrderStatus]}</option>)}
             </select>
+            {/* Aksi konfirmasi pembayaran manual (mode transfer) */}
+            {booking.status === 'PENDING' && booking.paymentType === 'FULL' && (
+              <button
+                onClick={handleConfirmPayment}
+                disabled={confirming}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {confirming ? 'Mengonfirmasi...' : '✅ Konfirmasi Pembayaran'}
+              </button>
+            )}
+            {booking.status === 'PENDING' && booking.paymentType === 'INSTALLMENT' && (
+              <Link
+                href="/admin/installments"
+                className="bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-600 transition-colors"
+              >
+                💳 Kelola Angsuran
+              </Link>
+            )}
           </div>
         </div>
 
@@ -114,6 +156,22 @@ export default function BookingDetailPage() {
             <p className="text-sm text-gray-500">Total</p>
             <p className="font-bold text-lg text-blue-600">{formatCurrency(booking.total as number)}</p>
           </div>
+          {booking.paymentMethod ? (
+            <div>
+              <p className="text-sm text-gray-500">Metode Pembayaran</p>
+              <p className="font-medium">
+                {String(booking.paymentMethod) === 'manual_transfer' ? 'Transfer Bank (manual)' : String(booking.paymentMethod)}
+              </p>
+            </div>
+          ) : null}
+          {booking.paidAt ? (
+            <div>
+              <p className="text-sm text-gray-500">Waktu Bayar</p>
+              <p className="font-medium">
+                {new Date(booking.paidAt as string).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              </p>
+            </div>
+          ) : null}
           <div>
             <p className="text-sm text-gray-500">Tanggal Booking</p>
             <p className="font-medium">{new Date(booking.createdAt as string).toLocaleDateString('id-ID')}</p>
