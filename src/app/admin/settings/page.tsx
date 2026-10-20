@@ -87,7 +87,10 @@ export default function AdminSettingsPage() {
             googleApiKey: (data.data.google_api_key as string) || '',
             googleReviewsCount: Number(data.data.google_reviews_count) || 5,
             googleReviewsMinRating: Number(data.data.google_reviews_min_rating) || 3,
-            paymentGateway: (data.data.payment_gateway as 'manual' | 'midtrans') || 'manual',
+            paymentGateway:
+              (data.data.payment_gateway_effective as 'manual' | 'midtrans') ||
+              (data.data.payment_gateway as 'manual' | 'midtrans') ||
+              'manual',
             whatsappEnabled:
               data.data.whatsapp_enabled === false || data.data.whatsapp_enabled === 'false' ? false : true,
           }));

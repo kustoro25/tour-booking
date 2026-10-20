@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, requireSuperAdmin } from '@/lib/auth';
+import { getPaymentGateway } from '@/lib/settings';
 
 export async function GET() {
   try {
@@ -14,6 +15,9 @@ export async function GET() {
         settingsMap[s.key] = s.value;
       }
     }
+    // Mode gateway yang benar-benar aktif (DB → env → manual) — dipakai halaman
+    // admin agar badge AKTIF sesuai kenyataan, bukan nilai mentah DB (bisa kosong).
+    settingsMap['payment_gateway_effective'] = await getPaymentGateway();
     return NextResponse.json({ success: true, data: settingsMap });
   } catch (error: unknown) {
     if (error instanceof Error && error.message === 'Unauthorized') {

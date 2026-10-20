@@ -843,7 +843,7 @@ function BookingPage() {
                   {paymentGateway === 'midtrans' ? (
                     <p className="text-xs text-green-600 mt-1">💳 Pembayaran online instan via Midtrans — QRIS, Virtual Account, e-wallet, atau kartu. Terkonfirmasi otomatis.</p>
                   ) : (
-                    <p className="text-xs text-gray-400 mt-1">Instruksi transfer bank akan tertera pada invoice setelah booking.</p>
+                    <p className="text-xs text-gray-500 mt-1">🏦 Transfer bank ke rekening pada invoice, lalu konfirmasi pembayaran ke admin via WhatsApp. Status diaktifkan manual oleh admin.</p>
                   )}
                 </div>
               </div>
@@ -873,8 +873,10 @@ function BookingPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900">Pembayaran Angsuran (Cicilan)</h3>
                   <p className="text-sm text-gray-500 mt-0.5">Bayar dengan DP {dpPercentage}% dan sisanya dicicil sesuai pilihan Anda</p>
-                  {paymentGateway === 'midtrans' && (
+                  {paymentGateway === 'midtrans' ? (
                     <p className="text-xs text-green-600 mt-1">💳 DP &amp; angsuran dibayar online via Midtrans — terkonfirmasi otomatis, tanpa transfer manual.</p>
+                  ) : (
+                    <p className="text-xs text-gray-500 mt-1">🏦 DP &amp; angsuran dibayar via transfer bank — unggah bukti transfer di halaman jadwal angsuran, konfirmasi oleh admin.</p>
                   )}
                   {!installmentEnabled && (
                     <p className="text-xs text-gray-400 mt-1">Belum tersedia saat ini.</p>

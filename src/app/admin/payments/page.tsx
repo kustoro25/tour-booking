@@ -52,6 +52,7 @@ export default function AdminPaymentsPage() {
   const { isSuperAdmin, role, loading: roleLoading } = useAdminRole();
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<PaymentGatewayMode | null>(null);
+  const [savedMode, setSavedMode] = useState<PaymentGatewayMode | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
@@ -62,7 +63,9 @@ export default function AdminPaymentsPage() {
       .then((r) => r.json())
       .then((data) => {
         if (data.success && data.data) {
-          const current = data.data.payment_gateway === 'midtrans' ? 'midtrans' : 'manual';
+          // payment_gateway_effective = mode yang benar-benar aktif (DB → env → manual)
+          const current = data.data.payment_gateway_effective === 'midtrans' ? 'midtrans' : 'manual';
+          setSavedMode(current as PaymentGatewayMode);
           setMode(current as PaymentGatewayMode);
         }
       })
@@ -88,6 +91,7 @@ export default function AdminPaymentsPage() {
       });
       const data = await res.json();
       if (data.success) {
+        setSavedMode(mode);
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
       } else {
@@ -137,10 +141,15 @@ export default function AdminPaymentsPage() {
                 active ? opt.activeClass : 'border-gray-200 hover:border-gray-300'
               }`}
             >
-              {/* Badge AKTIF */}
-              {active && (
+              {/* Badge mode tersimpan (AKTIF) vs pilihan yang belum disimpan */}
+              {savedMode === opt.value && (
                 <span className={`absolute -top-3 right-4 text-xs font-semibold text-white px-3 py-1 rounded-full ${opt.badge}`}>
                   ✓ AKTIF
+                </span>
+              )}
+              {savedMode !== opt.value && mode === opt.value && (
+                <span className="absolute -top-3 right-4 text-xs font-semibold text-amber-800 bg-amber-100 border border-amber-300 px-3 py-1 rounded-full">
+                  Dipilih — belum disimpan
                 </span>
               )}
 
@@ -175,7 +184,9 @@ export default function AdminPaymentsPage() {
       {/* Catatan tambahan */}
       <div className="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
         <p className="text-xs text-gray-500 leading-relaxed">
-          <strong>Catatan:</strong> Setting ini menang atas environment variable <code>PAYMENT_GATEWAY</code>.
+          <strong>Catatan:</strong> badge ✓ AKTIF menunjukkan mode yang sedang berlaku.
+          Pilih mode lain lalu klik <strong>Simpan Metode Pembayaran</strong> untuk menggantinya.
+          Setting ini menang atas environment variable <code>PAYMENT_GATEWAY</code>.
           Mode Midtrans mengikuti <code>MIDTRANS_IS_PRODUCTION</code> (false = sandbox, true = production).
           Rekening bank untuk mode Transfer Manual dikelola di{' '}
           <Link href="/admin/settings" className="text-blue-600 hover:underline font-medium">
@@ -194,6 +205,11 @@ export default function AdminPaymentsPage() {
         >
           {saving ? 'Menyimpan...' : 'Simpan Metode Pembayaran'}
         </button>
+        {mode !== null && mode !== savedMode && !saving && (
+          <span className="text-amber-600 text-sm font-medium animate-fade-in">
+            ⚠️ Perubahan belum disimpan
+          </span>
+        )}
         {saved && (
           <span className="text-green-600 text-sm font-medium animate-fade-in">
             ✅ Metode pembayaran disimpan!
