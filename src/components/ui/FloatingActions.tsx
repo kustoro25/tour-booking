@@ -11,8 +11,8 @@ export default function FloatingActions() {
     fetch('/api/settings/public')
       .then(r => r.json())
       .then(data => {
-        if (data.success && data.data?.phone) {
-          const cleaned = data.data.phone.replace(/[+\s-]/g, '');
+        if (data.success && data.data) {
+          const cleaned = (data.data.whatsappNumber || data.data.phone || '').replace(/[+\s-]/g, '');
           if (cleaned) setPhoneNumber(cleaned);
         }
       })

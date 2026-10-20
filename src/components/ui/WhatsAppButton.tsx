@@ -10,9 +10,9 @@ export default function WhatsAppButton() {
     fetch('/api/settings/public')
       .then(r => r.json())
       .then(data => {
-        if (data.success && data.data?.phone) {
+        if (data.success && data.data) {
           // Strip +, spaces, and dashes for wa.me format
-          const cleaned = data.data.phone.replace(/[+\s-]/g, '');
+          const cleaned = (data.data.whatsappNumber || data.data.phone || '').replace(/[+\s-]/g, '');
           if (cleaned) setPhoneNumber(cleaned);
         }
       })
