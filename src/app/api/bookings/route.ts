@@ -10,7 +10,9 @@ import { notifyCustomerNewBooking, notifyAdminNewOrder } from '@/lib/whatsapp';
 import {
   PICKUP_ZONES,
   getRemoteAreaFee,
+  getFleetBySlug,
   getTransferPrice,
+  getCarRentalBasePrice,
   calcCarRentalTotal,
   STANDARD_AREAS,
   TRANSFER_MAX_PAX,
@@ -34,6 +36,7 @@ export async function POST(request: NextRequest) {
       pickupArea,
       dropoffArea,
       pickupTime,
+      duration,
       transferArea,
       direction,
       flightNo,
@@ -108,10 +111,25 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const quote = calcCarRentalTotal(tour.priceAdult, String(dropoffArea), String(pickupTime));
+      // Durasi sewa: 6 jam hanya berlaku untuk armada dengan tarif 6 jam
+      const rentalFleet = getFleetBySlug(tour.slug);
+      const rentalDuration = duration === '6' ? 6 : 12;
+      if (rentalDuration === 6 && (!rentalFleet || rentalFleet.price6h === null)) {
+        return NextResponse.json(
+          { success: false, error: 'Durasi 6 jam tidak tersedia untuk armada ini. Silakan pilih 12 jam.' },
+          { status: 400 }
+        );
+      }
+
+      const quote = calcCarRentalTotal(
+        getCarRentalBasePrice(tour.slug, rentalDuration),
+        String(dropoffArea),
+        String(pickupTime)
+      );
       serviceTotal = quote.total;
       serviceSurcharge = quote.remoteFee + quote.latePickupFee;
       orderExtras = {
+        durationLabel: `${rentalDuration} Jam`,
         remoteAreaLabel: remoteFee?.label || standardArea?.label || null,
         remoteAreaFee: quote.remoteFee,
         latePickupFee: quote.latePickupFee,

@@ -352,6 +352,7 @@ function CustomInvoice({
   let extrasRemoteLabel: string | null = null;
   let extrasRemoteFee = 0;
   let extrasLateFee = 0;
+  let extrasDuration: string | null = null;
   let extrasDirection: string | null = null;
   let extrasTransferArea: string | null = null;
   let extrasFlightNo: string | null = null;
@@ -361,6 +362,7 @@ function CustomInvoice({
       extrasRemoteLabel = typeof extras.remoteAreaLabel === 'string' ? extras.remoteAreaLabel : null;
       extrasRemoteFee = typeof extras.remoteAreaFee === 'number' ? extras.remoteAreaFee : 0;
       extrasLateFee = typeof extras.latePickupFee === 'number' ? extras.latePickupFee : 0;
+      extrasDuration = typeof extras.durationLabel === 'string' ? extras.durationLabel : null;
       extrasDirection = extras.direction === 'DROP' ? 'Antar ke Bandara' : extras.direction === 'PICKUP' ? 'Jemput di Bandara' : null;
       extrasTransferArea = typeof extras.transferArea === 'string' ? extras.transferArea : null;
       extrasFlightNo = typeof extras.flightNo === 'string' && extras.flightNo ? extras.flightNo : null;
@@ -512,6 +514,7 @@ function CustomInvoice({
                 { label: isCarRental ? 'Unit' : T.L.adults, value: isCarRental ? '1 Mobil (Supir & BBM)' : `${order.adults} orang` },
                 { label: T.L.children, value: !isSpecialService && order.children > 0 ? `${order.children} orang` : '-' },
                 // Rincian tambahan layanan sewa mobil
+                ...(isCarRental && extrasDuration ? [{ label: 'Durasi Sewa', value: extrasDuration }] : []),
                 ...(isCarRental && order.pickupTime ? [{ label: 'Jam Penjemputan', value: `${order.pickupTime} WITA` }] : []),
                 ...(isCarRental && order.pickupArea ? [{ label: 'Zona Penjemputan', value: order.pickupArea }] : []),
                 ...(isCarRental && extrasRemoteLabel ? [{ label: 'Area Tujuan', value: extrasRemoteLabel }] : []),
@@ -660,7 +663,7 @@ function CustomInvoice({
               <>
                 {/* Harga sewa mobil (flat per mobil) */}
                 <div className="flex justify-between items-center py-2 text-sm">
-                  <span className="text-gray-600">Harga Sewa Mobil (12 Jam, Termasuk Supir & BBM)</span>
+                  <span className="text-gray-600">Harga Sewa Mobil ({extrasDuration || '12 Jam'}, Termasuk Supir & BBM)</span>
                   <span className="font-medium text-gray-800">{formatCurrency(priceAdult)}</span>
                 </div>
                 {/* Biaya area terpencil */}

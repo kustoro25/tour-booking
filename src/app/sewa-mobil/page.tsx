@@ -33,6 +33,7 @@ async function getFleetTours() {
 
 const REGION_COLORS: Record<string, string> = {
   'Bali Utara': 'bg-blue-100 text-blue-700',
+  'Bali Tengah': 'bg-emerald-100 text-emerald-700',
   'Bali Tengah-Utara': 'bg-teal-100 text-teal-700',
   'Bali Barat': 'bg-orange-100 text-orange-700',
   'Bali Timur': 'bg-purple-100 text-purple-700',
@@ -54,12 +55,28 @@ export default async function SewaMobilPage() {
             {HAYBALI_BRAND} • {HAYBALI_TAGLINE}
           </span>
           <h1 className="text-3xl sm:text-5xl font-extrabold leading-tight mb-4 max-w-2xl text-gray-900">
-            Jelajahi Pesona Bali dengan{' '}
-            <span className="text-amber-500">Kenyamanan VIP</span>
+            Sewa Mobil Dengan Sopir /{' '}
+            <span className="text-amber-500">Lepas Kunci</span>
           </h1>
+          <p className="text-gray-600 text-base sm:text-lg mb-4 max-w-2xl leading-relaxed">
+            Berpergian ke mana saja selama 12 jam dengan bahan bakar dan jarak tempuh tak
+            terbatas. Pemesanan memerlukan <strong>deposit 50%</strong> terlebih dahulu untuk
+            mengamankan jadwal &amp; pengemudi Anda. Pelunasan sisa pembayaran dapat dilakukan
+            tunai saat bertemu dengan driver.
+          </p>
           <p className="text-gray-600 text-base sm:text-lg mb-8 max-w-2xl leading-relaxed">
-            Layanan sewa mobil mewah & paket tur privat terbaik di Bali. Supir
-            berpengalaman, kendaraan prima, dan pelayanan profesional.
+            Pesan mobil dan pengemudi Anda dengan mengklik tombol{' '}
+            <strong>&ldquo;PESAN MOBIL INI&rdquo;</strong> pada setiap model mobil di bawah ini,
+            atau cukup klik{' '}
+            <a
+              href={waLink(`Halo ${HAYBALI_BRAND}, saya ingin booking sewa mobil.`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-600 font-semibold underline hover:text-amber-700"
+            >
+              nomor ini
+            </a>{' '}
+            untuk menghubungi kami melalui WhatsApp atau booking langsung melalui WEBSITE.
           </p>
           <div className="flex flex-wrap gap-4">
             <Button href="#armada" variant="accent" size="lg">
@@ -84,7 +101,8 @@ export default async function SewaMobilPage() {
           <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">Armada Mobil Utama</span>
           <h2 className="text-3xl font-bold text-gray-900 mb-3">Kendaraan bersih, wangi, dan terawat</h2>
           <p className="text-gray-500 max-w-2xl mx-auto">
-            Semua harga sudah termasuk supir & BBM untuk pemakaian 12 jam di area standar (Area Kota, Bali Selatan, Bali Tengah).
+            Semua harga sudah termasuk supir &amp; BBM, tanpa batasan jarak tempuh. Pilih durasi
+            6 jam atau 12 jam sesuai armada, berlaku di area standar (Area Kota, Bali Selatan, Bali Tengah).
           </p>
         </div>
 
@@ -107,13 +125,30 @@ export default async function SewaMobilPage() {
                   <span className="absolute top-3 left-3 bg-white/95 text-gray-800 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
                     {fleet?.capacityLabel}
                   </span>
+                  {fleet && (
+                    <span className="absolute top-3 right-3 bg-amber-500/95 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">
+                      {fleet.tier}
+                    </span>
+                  )}
                 </div>
                 <div className="p-5 flex flex-col flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">{tour.name}</h3>
-                  <p className="text-blue-600 font-bold text-2xl mb-4">
-                    {formatCurrency(tour.priceAdult)}
-                    <span className="text-gray-400 text-sm font-medium"> / 12 Jam</span>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{tour.name}</h3>
+                  <div className="mb-2">
+                    {fleet?.price6h != null && (
+                      <p className="text-sm text-gray-500">
+                        {formatCurrency(fleet.price6h)}
+                        <span className="text-xs text-gray-400"> / 6 Jam</span>
+                      </p>
+                    )}
+                    <p className="text-blue-600 font-bold text-2xl">
+                      {formatCurrency(fleet?.price12h ?? tour.priceAdult)}
+                      <span className="text-gray-400 text-sm font-medium"> / 12 Jam</span>
+                    </p>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-1">
+                    Lembur: {fleet?.overtimePct ?? 10}% dari harga/jam
                   </p>
+                  <p className="text-xs text-gray-500 mb-3">{fleet?.paxNote}</p>
                   <ul className="space-y-1.5 text-sm text-gray-600 mb-6 flex-1">
                     {(fleet?.features || []).map((feat) => (
                       <li key={feat} className="flex items-start gap-2">
@@ -122,7 +157,7 @@ export default async function SewaMobilPage() {
                     ))}
                   </ul>
                   <Button href={`/tours/${tour.slug}/booking`} variant="primary" fullWidth>
-                    Pesan {tour.name.replace('Sewa ', '').replace(' Bali', '')}
+                    PESAN MOBIL INI
                   </Button>
                 </div>
               </div>
@@ -143,9 +178,10 @@ export default async function SewaMobilPage() {
             <span className="inline-block text-orange-500 text-sm font-semibold tracking-wide uppercase mb-2">Kebijakan Daerah Terpencil</span>
             <h2 className="text-3xl font-bold text-gray-900 mb-3">Biaya Tambahan di Luar Area Standar</h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Harga standar berlaku untuk area umum dan hanya memungkinkan menjelajahi{' '}
+              Harga standar pemakaian 12 jam berlaku untuk area umum (Area Kota, Bali Selatan,
+              dan Bali Tengah) dan hanya memungkinkan menjelajahi{' '}
               <strong>satu wilayah dalam satu hari</strong>. Anda juga dapat bepergian ke luar
-              area ini dengan biaya tambahan (di luar harga yang telah disepakati untuk 10 jam) sebagai berikut:
+              area ini dengan biaya tambahan (di luar harga yang telah disepakati untuk 12 jam) sebagai berikut:
             </p>
           </div>
 
@@ -244,8 +280,9 @@ export default async function SewaMobilPage() {
           <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6">
             <h3 className="text-lg font-bold text-blue-900 mb-3">💳 Pembayaran</h3>
             <ul className="space-y-2 text-sm text-blue-900/80">
-              <li>• Pembayaran dapat dilakukan secara online saat booking (QRIS, Virtual Account, e-wallet, kartu) atau di tempat penjemputan.</li>
-              <li>• Dalam setiap pemesanan tidak dikenakan biaya deposit, kecuali bila diperlukan — kami pasti akan memberikan informasi terlebih dahulu, terutama pada saat high dan peak season.</li>
+              <li>• Pemesanan memerlukan deposit 50% terlebih dahulu untuk mengamankan jadwal &amp; pengemudi Anda.</li>
+              <li>• Pelunasan sisa pembayaran dapat dilakukan tunai saat bertemu dengan driver.</li>
+              <li>• Pembayaran online saat booking tersedia melalui QRIS, Virtual Account, e-wallet, atau kartu.</li>
             </ul>
           </div>
           <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6">

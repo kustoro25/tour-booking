@@ -16,87 +16,157 @@ export function waLink(text?: string): string {
 }
 
 // ----------------------------------------------------------------------------
-// 1. Armada Sewa Mobil (harga per mobil / 12 jam, termasuk supir & BBM)
+// 1. Armada Sewa Mobil (harga per mobil per durasi, termasuk supir & BBM)
+//    Revisi spesifikasi: 6 model — durasi 6 jam / 12 jam sesuai armada,
+//    lembur 10% dari harga per jam, deposit 50% saat pemesanan.
 // ----------------------------------------------------------------------------
 
 export interface FleetItem {
   slug: string;
-  name: string;
-  capacityLabel: string; // '6 - 7 Penumpang'
-  minPax: number;
+  name: string; // 'Innova Zenix Q (LUX)'
+  tier: 'LUX' | 'CITY';
+  recommendedPax: number;
   maxPax: number;
-  price: number; // per mobil / 12 jam
+  capacityLabel: string; // badge singkat: '4 Penumpang (Maks. 7)'
+  paxNote: string; // 'Direkomendasikan untuk 4 penumpang (maksimum 7 tanpa bagasi)'
+  price6h: number | null; // null = armada ini hanya tersedia 12 jam
+  price12h: number;
+  overtimePct: number; // biaya lembur: % dari harga / jam
   features: string[];
   imageUrl: string;
 }
 
 export const FLEET: FleetItem[] = [
   {
-    slug: 'sewa-toyota-alphard-bali',
-    name: 'Toyota Alphard',
-    capacityLabel: '6 - 7 Penumpang',
-    minPax: 6,
+    slug: 'sewa-innova-zenix-bali',
+    name: 'Innova Zenix Q (LUX)',
+    tier: 'LUX',
+    recommendedPax: 4,
     maxPax: 7,
-    price: 1800000,
-    features: ['Termasuk Supir & BBM', 'Interior Luxury & Air Mineral'],
+    capacityLabel: '4 Penumpang (Maks. 7)',
+    paxNote: 'Direkomendasikan untuk 4 penumpang (maksimum 7 tanpa bagasi)',
+    price6h: 1400000,
+    price12h: 1800000,
+    overtimePct: 10,
+    features: ['Pengemudi & Bahan Bakar Termasuk', 'Air Mineral'],
+    imageUrl: '/images/haybali/innova-zenix.png',
+  },
+  {
+    slug: 'sewa-innova-zenix-v-bali',
+    name: 'Innova Zenix V (LUX)',
+    tier: 'LUX',
+    recommendedPax: 4,
+    maxPax: 7,
+    capacityLabel: '4 Penumpang (Maks. 7)',
+    paxNote: 'Direkomendasikan untuk 4 penumpang (maksimum 7 tanpa bagasi)',
+    price6h: 1300000,
+    price12h: 1500000,
+    overtimePct: 10,
+    features: ['Pengemudi & Bahan Bakar Termasuk', 'Air Mineral'],
+    imageUrl: '/images/haybali/innova-zenix-v.png',
+  },
+  {
+    slug: 'sewa-innova-reborn-bali',
+    name: 'Innova Reborn (CITY)',
+    tier: 'CITY',
+    recommendedPax: 4,
+    maxPax: 7,
+    capacityLabel: '4 Penumpang (Maks. 7)',
+    paxNote: 'Direkomendasikan untuk 4 penumpang (maksimum 7 tanpa bagasi)',
+    price6h: null,
+    price12h: 1200000,
+    overtimePct: 10,
+    features: ['Pengemudi & Bahan Bakar Termasuk', 'Air Mineral'],
+    imageUrl: '/images/haybali/innova-reborn.png',
+  },
+  {
+    slug: 'sewa-toyota-alphard-bali',
+    name: 'Alphard Vellfire (LUX)',
+    tier: 'LUX',
+    recommendedPax: 4,
+    maxPax: 5,
+    capacityLabel: '4 Penumpang (Maks. 5)',
+    paxNote: 'Direkomendasikan untuk 4 penumpang (maksimum 5 tanpa bagasi)',
+    price6h: 1400000,
+    price12h: 2300000,
+    overtimePct: 10,
+    features: ['Pengemudi & Bahan Bakar Termasuk', 'Air Mineral'],
     imageUrl: '/images/haybali/alphard.png',
   },
   {
-    slug: 'sewa-innova-zenix-bali',
-    name: 'Innova Zenix',
-    capacityLabel: '5 - 6 Penumpang',
-    minPax: 5,
-    maxPax: 6,
-    price: 850000,
-    features: ['Termasuk Supir & BBM', 'Kabin Modern & Nyaman'],
-    imageUrl: '/images/haybali/innova-zenix.png',
+    slug: 'sewa-alphard-hev-bali',
+    name: 'Alphard HEV (LUX)',
+    tier: 'LUX',
+    recommendedPax: 4,
+    maxPax: 5,
+    capacityLabel: '4 Penumpang (Maks. 5)',
+    paxNote: 'Direkomendasikan untuk 4 penumpang (maksimum 5 tanpa bagasi)',
+    price6h: 2600000,
+    price12h: 3500000,
+    overtimePct: 10,
+    features: ['Pengemudi & Bahan Bakar Termasuk', 'Air Mineral'],
+    imageUrl: '/images/haybali/alphard-hev.png',
   },
   {
     slug: 'sewa-toyota-hiace-bali',
     name: 'Toyota HiAce',
-    capacityLabel: '12 - 15 Penumpang',
-    minPax: 12,
-    maxPax: 15,
-    price: 1100000,
-    features: ['Termasuk Supir & BBM', 'Cocok untuk Rombongan / Event'],
+    tier: 'CITY',
+    recommendedPax: 10,
+    maxPax: 14,
+    capacityLabel: '10 Penumpang (Maks. 14)',
+    paxNote: 'Direkomendasikan untuk 10 penumpang (maksimum 14 tanpa bagasi)',
+    price6h: null,
+    price12h: 1300000,
+    overtimePct: 10,
+    features: ['Pengemudi & Bahan Bakar Termasuk', 'Air Mineral'],
     imageUrl: '/images/haybali/hiace.png',
   },
 ];
 
+/** Cari data armada berdasarkan slug produk sewa mobil. */
+export function getFleetBySlug(slug: string): FleetItem | undefined {
+  return FLEET.find((f) => f.slug === slug);
+}
+
+/**
+ * Harga dasar sewa mobil untuk durasi tertentu.
+ * Durasi 6 jam hanya berlaku bila armada menyediakan tarif 6 jam.
+ */
+export function getCarRentalBasePrice(slug: string, durationHours: number): number {
+  const fleet = getFleetBySlug(slug);
+  if (!fleet) return 0;
+  if (durationHours === 6 && fleet.price6h !== null) return fleet.price6h;
+  return fleet.price12h;
+}
+
 // ----------------------------------------------------------------------------
-// 2. Biaya Tambahan Daerah Terpencil (di luar harga sewa 10 jam yang disepakati)
+// 2. Biaya Tambahan Daerah (di luar harga sewa 12 jam yang disepakati)
+//    Revisi spesifikasi: tarif per destinasi — Ubud/Klungkung/Kintamani/
+//    Bedugul +Rp 100.000, Singaraja/Karangasem +Rp 200.000, Negara +Rp 300.000.
 // ----------------------------------------------------------------------------
 
 export interface RemoteAreaFee {
   id: string; // key stabil untuk API booking
-  region: string; // Bali Utara / Bali Tengah-Utara / Bali Barat / Bali Timur
+  region: string; // Bali Utara / Bali Tengah / Bali Tengah-Utara / Bali Barat / Bali Timur
   label: string; // nama area tujuan
   fee: number; // biaya tambahan (Rp)
 }
 
 export const REMOTE_AREA_FEES: RemoteAreaFee[] = [
-  { id: 'tanah-lot-taman-ayun-bedugul-baturiti', region: 'Bali Utara', label: 'Tanah Lot, Taman Ayun, Bedugul, Baturiti', fee: 100000 },
-  { id: 'munduk-banyumala-tamblingan-buyan', region: 'Bali Utara', label: 'Munduk, Air Terjun Banyumala, Danau Kembar Tamblingan & Buyan', fee: 150000 },
-  { id: 'lovina-singaraja-gitgit-sekumpul-aling-aling', region: 'Bali Utara', label: 'Lovina, Singaraja, Gitgit, Sekumpul, Aling-Aling', fee: 250000 },
-  { id: 'banjar-temoekoes-gerogak', region: 'Bali Utara', label: 'Banjar, Temoekoes, Gerogak', fee: 350000 },
-  { id: 'kintamani-penelokan-puhu-bangli', region: 'Bali Tengah-Utara', label: 'Pemandangan Penelokan Dataran Tinggi Kintamani, Puhu, Bangli', fee: 100000 },
-  { id: 'songan', region: 'Bali Tengah-Utara', label: 'Area Songan', fee: 250000 },
-  { id: 'besakih-tembuku-tukad-cepung', region: 'Bali Tengah-Utara', label: 'Besakih, Tembuku, Tukad Cepung', fee: 150000 },
-  { id: 'batukaru', region: 'Bali Barat', label: 'Batukaru', fee: 250000 },
-  { id: 'jatiluwih', region: 'Bali Barat', label: 'Jatiluwih', fee: 150000 },
-  { id: 'silemadeg-belimbing-pudjungan-medewi', region: 'Bali Barat', label: 'Silemadeg, Belimbing, Pudjungan, Medewi', fee: 300000 },
-  { id: 'gilimanuk-menjangan-pemuteran-banyuwedang', region: 'Bali Barat', label: 'Gilimanuk, Menjangan, Pemuteran, Banyuwedang', fee: 450000 },
-  { id: 'padang-bai-selat-sidemen', region: 'Bali Timur', label: 'Padang Bai, Selat, Sidemen', fee: 150000 },
-  { id: 'candidasa', region: 'Bali Timur', label: 'Candidasa', fee: 250000 },
-  { id: 'amed-lempuyang-tirta-gangga-chulik-lahangan-sweet', region: 'Bali Timur', label: 'Amed, Lempuyang, Tirta Gangga, Chulik, Lahangan Sweet', fee: 300000 },
-  { id: 'tulamben-tejakula-tianyar-kubu-gretek', region: 'Bali Timur', label: 'Tulamben, Tejakula, Tianyar, Kubu, Gretek', fee: 400000 },
+  { id: 'ubud', region: 'Bali Tengah', label: 'Ubud', fee: 100000 },
+  { id: 'klungkung', region: 'Bali Timur', label: 'Klungkung', fee: 100000 },
+  { id: 'kintamani', region: 'Bali Tengah-Utara', label: 'Kintamani', fee: 100000 },
+  { id: 'bedugul', region: 'Bali Tengah-Utara', label: 'Bedugul', fee: 100000 },
+  { id: 'singaraja', region: 'Bali Utara', label: 'Singaraja', fee: 200000 },
+  { id: 'karangasem', region: 'Bali Timur', label: 'Karangasem', fee: 200000 },
+  { id: 'negara', region: 'Bali Barat', label: 'Negara', fee: 300000 },
 ];
 
 /** Area standar (tanpa biaya tambahan) — satu wilayah per hari. */
 export const STANDARD_AREAS = [
   { id: 'area-kota', label: 'AREA KOTA — Jimbaran, Nusa Dua, Kuta, Seminyak, Denpasar, Sanur' },
   { id: 'bali-selatan', label: 'BALI SELATAN — Jimbaran, Nusa Dua, Uluwatu, Pecatu, Bukit' },
-  { id: 'bali-tengah', label: 'BALI TENGAH — Wilayah Ubud' },
+  { id: 'bali-tengah', label: 'BALI TENGAH — Gianyar & sekitarnya' },
 ] as const;
 
 export function getRemoteAreaFee(id: string): RemoteAreaFee | undefined {

@@ -7,11 +7,13 @@ import {
   PICKUP_ZONES,
   STANDARD_AREAS,
   REMOTE_AREA_FEES,
+  FLEET,
   AIRPORT_TRANSFER_RATES,
   TRANSFER_MAX_PAX,
   DRIVER_POLICY,
   getPickupTimeOptions,
   getTransferPrice,
+  getCarRentalBasePrice,
   calcCarRentalTotal,
   calcLatePickupFee,
 } from '@/lib/haybali';
@@ -98,6 +100,7 @@ function BookingPage() {
   const [pickupTime, setPickupTime] = useState('');
   const [pickupZone, setPickupZone] = useState('');
   const [destinationArea, setDestinationArea] = useState(''); // area tujuan sewa mobil (id konstanta)
+  const [rentalDuration, setRentalDuration] = useState<'6' | '12'>('12'); // durasi sewa mobil
   const [direction, setDirection] = useState<Direction>(queryDir === 'DROP' ? 'DROP' : 'PICKUP');
   const [transferArea, setTransferArea] = useState(validQueryArea);
   const [flightNo, setFlightNo] = useState('');
@@ -105,6 +108,9 @@ function BookingPage() {
   const isCarRental = tour?.category === 'CAR_RENTAL';
   const isTransfer = tour?.category === 'AIRPORT_TRANSFER';
   const isSpecialService = isCarRental || isTransfer;
+
+  // Data armada untuk produk sewa mobil (harga 6/12 jam sesuai konstanta resmi)
+  const fleetCar = isCarRental && tour ? FLEET.find((f) => f.slug === tour.slug) : undefined;
 
   // Grup area terpencil per wilayah (untuk select area tujuan sewa mobil)
   const remoteRegions = REMOTE_AREA_FEES.reduce<Record<string, typeof REMOTE_AREA_FEES>>((acc, a) => {
@@ -257,6 +263,7 @@ function BookingPage() {
           pickupTime: isCarRental ? pickupTime : undefined,
           pickupArea: isCarRental ? pickupZone : undefined,
           dropoffArea: isCarRental ? destinationArea : undefined,
+          duration: isCarRental ? rentalDuration : undefined,
           transferArea: isTransfer ? transferArea : undefined,
           direction: isTransfer ? direction : undefined,
           flightNo: isTransfer ? flightNo : undefined,
@@ -304,7 +311,12 @@ function BookingPage() {
     );
   }
 
-  const carQuote = isCarRental ? calcCarRentalTotal(tour.priceAdult, destinationArea, pickupTime) : null;
+  const carBasePrice = isCarRental
+    ? getCarRentalBasePrice(slug, rentalDuration === '6' ? 6 : 12)
+    : 0;
+  const carQuote = isCarRental
+    ? calcCarRentalTotal(carBasePrice, destinationArea, pickupTime)
+    : null;
   const transferPrice = isTransfer ? getTransferPrice(transferArea, formData.adults) ?? 0 : null;
   const total = isSpecialService
     ? isCarRental
@@ -463,6 +475,43 @@ function BookingPage() {
           {isCarRental && (
             <div className="mt-6 max-w-md mx-auto space-y-4">
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Durasi Sewa</label>
+                {fleetCar?.price6h != null ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setRentalDuration('6')}
+                      className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border-2 ${
+                        rentalDuration === '6'
+                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                          : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                      }`}
+                    >
+                      6 Jam — {formatCurrency(fleetCar.price6h)}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRentalDuration('12')}
+                      className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border-2 ${
+                        rentalDuration === '12'
+                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                          : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                      }`}
+                    >
+                      12 Jam — {formatCurrency(fleetCar.price12h)}
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5">
+                    12 Jam — {formatCurrency(fleetCar?.price12h ?? tour.priceAdult)}
+                  </p>
+                )}
+                <p className="text-xs text-gray-400 mt-1">
+                  Lembur dikenakan {fleetCar?.overtimePct ?? 10}% dari harga/jam.
+                </p>
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Jam Penjemputan</label>
                 <select
                   value={pickupTime}
@@ -531,7 +580,7 @@ function BookingPage() {
               {pickupTime && destinationArea && (
                 <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-1.5 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Harga Armada (12 Jam)</span>
+                    <span className="text-gray-600">Harga Armada ({rentalDuration} Jam)</span>
                     <span className="font-medium">{formatCurrency(carQuote?.base ?? 0)}</span>
                   </div>
                   {(carQuote?.remoteFee ?? 0) > 0 && (
@@ -1083,7 +1132,7 @@ function BookingPage() {
             {isCarRental ? (
               <>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Harga Armada (12 Jam)</span>
+                  <span className="text-gray-500">Harga Armada ({rentalDuration} Jam)</span>
                   <span>{formatCurrency(carQuote?.base ?? 0)}</span>
                 </div>
                 {(carQuote?.remoteFee ?? 0) > 0 && (

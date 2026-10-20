@@ -17,7 +17,7 @@ import {
 export const dynamic = 'force-dynamic';
 
 const HERO_STATS = [
-  { num: '3', label: 'Armada Mewah' },
+  { num: '10+', label: 'Armada Mewah' },
   { num: '10+', label: 'Paket Tour Bali' },
   { num: '24/7', label: 'Layanan Driver' },
 ];
@@ -31,7 +31,7 @@ const VALUE_ITEMS = [
 
 const FAQ_ITEMS = [
   { question: 'Bagaimana cara melakukan booking?', answer: 'Pilih paket tour atau layanan yang Anda inginkan, tentukan tanggal dari kalender, isi data diri, lalu klik "Booking Sekarang". Invoice langsung terbit dan pembayaran diproses aman melalui Midtrans (QRIS, Virtual Account, e-wallet, atau kartu).' },
-  { question: 'Apakah sewa mobil sudah termasuk supir dan BBM?', answer: 'Ya. Semua harga sewa mobil HAYBALI TRANS sudah termasuk supir berpengalaman dan BBM untuk pemakaian 12 jam. Area terpencil di luar area standar dikenakan biaya tambahan sesuai tabel yang tertera.' },
+  { question: 'Apakah sewa mobil sudah termasuk supir dan BBM?', answer: 'Ya. Semua harga sewa mobil HAYBALI TRANS sudah termasuk supir berpengalaman dan BBM. Pilih durasi 6 jam atau 12 jam sesuai armada, tanpa batasan jarak tempuh. Area di luar standar dikenakan biaya tambahan sesuai tabel yang tertera.' },
   { question: 'Bagaimana kebijakan jam kerja pengemudi?', answer: 'Jam kerja pengemudi adalah 07.00–23.59 WITA. Penjemputan 07.00–10.30 tanpa biaya tambahan; di luar jam tersebut dikenakan Rp 50.000/mobil. Lewat tengah malam dikenakan Rp 150.000/jam, dan bila menginap di luar kota dikenakan Rp 350.000/malam.' },
   { question: 'Bagaimana kebijakan pembatalan?', answer: 'Pembatalan dilakukan minimal 3 jam sebelum jam pemberangkatan dan dikenakan biaya 50% dari tiket. Mohon informasikan segera bila pesawat Anda mengalami delay agar kami dapat menyesuaikan penjemputan.' },
 ];
@@ -119,6 +119,31 @@ export default async function HomePage() {
       {/* ================= KEUNGGULAN ================= */}
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+          {/* Sambutan HAYBALI TRANS — di atas tulisan "Mengapa Memilih Kami?" */}
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+              Selamat datang di {HAYBALI_BRAND}
+            </h2>
+            <p className="text-gray-600 leading-relaxed mb-4">
+              Nikmati perjalanan bebas khawatir ke mana saja di Bali selama{' '}
+              <strong>12 jam full</strong>, sudah include bahan bakar dan mineral water{' '}
+              <strong>tanpa batasan jarak tempuh</strong>!
+            </p>
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900 text-left">
+              <p className="font-semibold mb-1">Catatan:</p>
+              <p>
+                Pemesanan memerlukan <strong>deposit 50%</strong> terlebih dahulu untuk mengamankan
+                jadwal &amp; pengemudi Anda. Pelunasan sisa pembayaran dapat dilakukan tunai saat
+                bertemu dengan driver.
+              </p>
+            </div>
+            <p className="text-gray-600 mt-4 leading-relaxed">
+              Jelajahi Bali dengan sopir pribadi berbahasa Inggris, kondisi mobil bagus dan bersih.
+              Dapatkan harga dan layanan terbaik dengan jarak tempuh tak terbatas untuk pergi ke
+              mana pun Anda mau.
+            </p>
+          </div>
+
           <div className="text-center mb-12">
             <span className="inline-block text-amber-600 text-sm font-semibold tracking-wide uppercase mb-2">Mengapa Memilih Kami?</span>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Pelayanan VIP, Tanpa Repot</h2>
@@ -168,10 +193,32 @@ export default async function HomePage() {
                   </span>
                 </div>
                 <div className="p-5">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{car.name}</h3>
-                  <p className="text-xl font-bold text-amber-600 mb-3">
-                    {formatCurrency(car.price)} <span className="text-sm font-normal text-gray-400">/ 12 Jam</span>
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <h3 className="text-lg font-semibold text-gray-900">{car.name}</h3>
+                    <span
+                      className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
+                        car.tier === 'LUX' ? 'bg-amber-100 text-amber-700' : 'bg-gray-200 text-gray-700'
+                      }`}
+                    >
+                      {car.tier}
+                    </span>
+                  </div>
+                  <div className="mb-2">
+                    {car.price6h !== null && (
+                      <p className="text-sm text-gray-500">
+                        {formatCurrency(car.price6h)}{' '}
+                        <span className="text-xs text-gray-400">/ 6 Jam</span>
+                      </p>
+                    )}
+                    <p className="text-xl font-bold text-amber-600">
+                      {formatCurrency(car.price12h)}{' '}
+                      <span className="text-sm font-normal text-gray-400">/ 12 Jam</span>
+                    </p>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-1">
+                    Lembur: {car.overtimePct}% dari harga/jam
                   </p>
+                  <p className="text-xs text-gray-500 mb-3">{car.paxNote}</p>
                   <ul className="space-y-1.5 mb-4">
                     {car.features.map((f) => (
                       <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
@@ -341,8 +388,8 @@ export default async function HomePage() {
               </h3>
               <ul className="space-y-3 text-sm text-gray-600 leading-relaxed">
                 <li>• Booking online aman melalui Midtrans — tersedia QRIS, Virtual Account, e-wallet (GoPay, ShopeePay, DANA), dan kartu kredit/debit.</li>
+                <li>• Pemesanan memerlukan deposit 50% terlebih dahulu untuk mengamankan jadwal &amp; pengemudi Anda. Pelunasan sisa pembayaran dapat dilakukan tunai saat bertemu dengan driver.</li>
                 <li>• Tersedia opsi DP 30% dengan cicilan untuk paket tour tertentu.</li>
-                <li>• Tanpa biaya tersembunyi — rincian biaya jelas di invoice sebelum pembayaran.</li>
                 <li>• Batas pembayaran 24 jam sejak invoice terbit; pesanan melewati batas waktu otomatis dibatalkan.</li>
               </ul>
             </div>

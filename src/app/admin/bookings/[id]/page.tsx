@@ -81,8 +81,9 @@ export default function BookingDetailPage() {
   const extrasFlightNo = typeof extras?.flightNo === 'string' && extras.flightNo ? extras.flightNo : null;
   const extrasTransferArea = typeof extras?.transferArea === 'string' ? extras.transferArea : null;
   const extrasRemoteLabel = typeof extras?.remoteAreaLabel === 'string' ? extras.remoteAreaLabel : null;
+  const extrasDurationLabel = typeof extras?.durationLabel === 'string' ? extras.durationLabel : null;
   const hasServiceDetails = Boolean(
-    booking.pickupTime || booking.pickupArea || booking.dropoffArea || extrasDirection || extrasTransferArea || extrasFlightNo
+    booking.pickupTime || booking.pickupArea || booking.dropoffArea || extrasDirection || extrasTransferArea || extrasFlightNo || extrasDurationLabel
   );
 
   return (
@@ -189,6 +190,9 @@ export default function BookingDetailPage() {
           <div>
             <p className="text-sm text-gray-500 mb-2">Detail Layanan (Sewa Mobil / Antar-Jemput)</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 p-3 rounded text-sm">
+              {extrasDurationLabel ? (
+                <p className="text-gray-700"><span className="text-gray-400">Durasi Sewa: </span>{extrasDurationLabel}</p>
+              ) : null}
               {booking.pickupTime ? (
                 <p className="text-gray-700"><span className="text-gray-400">Jam Penjemputan: </span>{String(booking.pickupTime)} WITA</p>
               ) : null}
