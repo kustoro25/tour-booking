@@ -1283,8 +1283,8 @@ function BookingPage() {
           ) : (
             <p className="text-gray-500 mb-6">
               {paymentType === 'INSTALLMENT'
-                ? <>Invoice Anda telah diterbitkan dan detail booking sudah dikirim langsung ke WhatsApp admin. Silakan transfer DP sesuai rekening pada invoice — tombol hijau di bawah bila chat belum terbuka.</>
-                : <>Invoice Anda telah diterbitkan dan detail booking sudah dikirim langsung ke WhatsApp admin. Silakan transfer sesuai rekening pada invoice — tombol hijau di bawah bila chat belum terbuka.</>}
+                ? <>Invoice Anda telah diterbitkan. Chat WhatsApp berisi detail booking Anda akan terbuka otomatis — tinggal tekan kirim (atau klik tombol hijau bila chat tidak terbuka), lalu transfer DP sesuai rekening pada invoice.</>
+                : <>Invoice Anda telah diterbitkan. Chat WhatsApp berisi detail booking Anda akan terbuka otomatis — tinggal tekan kirim (atau klik tombol hijau bila chat tidak terbuka), lalu transfer sesuai rekening pada invoice.</>}
             </p>
           )}
 
