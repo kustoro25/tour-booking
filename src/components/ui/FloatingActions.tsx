@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-export default function FloatingActions() {
+export default function FloatingActions({ waNumber: initialWaNumber }: { waNumber?: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [showWaTooltip, setShowWaTooltip] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState('6281234567890');
+  const [phoneNumber, setPhoneNumber] = useState(initialWaNumber || '6281234567890');
 
   useEffect(() => {
     fetch('/api/settings/public')
@@ -33,7 +33,7 @@ export default function FloatingActions() {
   };
 
   const waMessage = encodeURIComponent(
-    'Halo Jelajah Nusantara, saya ingin bertanya tentang paket tour.'
+    'Halo HAYBALI TRANS, saya ingin bertanya tentang paket tour.'
   );
 
   return (

@@ -5,6 +5,7 @@ import { ToastProvider } from '@/components/ui/Toast';
 import FloatingActions from '@/components/ui/FloatingActions';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { getBrandName, getBrandIcon, getSiteTitle } from '@/lib/brand';
+import { getWhatsAppNumber } from '@/lib/settings';
 import { prisma } from '@/lib/prisma';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -40,6 +41,7 @@ export default async function RootLayout({
 }) {
   const brandName = await getBrandName();
   const brandIcon = await getBrandIcon();
+  const waNumber = await getWhatsAppNumber();
 
   // Fetch footer CMS data server-side for instant rendering
   let footerCms: Record<string, unknown> = {};
@@ -55,7 +57,7 @@ export default async function RootLayout({
       <body className={`${inter.className} antialiased bg-gray-50 text-gray-800 min-h-screen flex flex-col selection:bg-amber-100 selection:text-amber-900`}>
         <ToastProvider>
           <PublicLayout brandName={brandName} brandIcon={brandIcon} footerCms={footerCms}>{children}</PublicLayout>
-          <FloatingActions />
+          <FloatingActions waNumber={waNumber} />
         </ToastProvider>
       </body>
     </html>
