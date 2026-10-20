@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getPaymentGateway } from '@/lib/settings';
+import { getPaymentGateway, normalizeWaNumber } from '@/lib/settings';
+import { WA_NUMBER } from '@/lib/haybali';
 
 export async function GET() {
   try {
@@ -22,6 +23,8 @@ export async function GET() {
     const address = settingsMap['company_address'] || 'Denpasar / Kuta, Bali - Indonesia';
     const brandName = settingsMap['company_name'] || 'HAYBALI TRANS';
     const brandIcon = settingsMap['company_icon'] || 'HB';
+    // Nomor WhatsApp bisnis (dari pengaturan admin) untuk link wa.me di komponen client
+    const whatsappNumber = normalizeWaNumber(String(settingsMap['company_phone'] || '')) || WA_NUMBER;
 
     return NextResponse.json({
       success: true,
@@ -35,6 +38,7 @@ export async function GET() {
         address,
         brandName,
         brandIcon,
+        whatsappNumber,
       },
     });
   } catch {
@@ -47,6 +51,7 @@ export async function GET() {
         address: 'Denpasar / Kuta, Bali - Indonesia',
         brandName: 'HAYBALI TRANS',
         brandIcon: 'HB',
+        whatsappNumber: WA_NUMBER,
       },
     });
   }

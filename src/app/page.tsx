@@ -13,6 +13,7 @@ import {
   AIRPORT_TRANSFER_RATES,
   waLink,
 } from '@/lib/haybali';
+import { getWhatsAppNumber } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -72,7 +73,11 @@ async function getLatestReviews() {
 }
 
 export default async function HomePage() {
-  const [tours, reviews] = await Promise.all([getBaliTours(), getLatestReviews()]);
+  const [tours, reviews, waNumber] = await Promise.all([
+    getBaliTours(),
+    getLatestReviews(),
+    getWhatsAppNumber(),
+  ]);
 
   return (
     <>
@@ -100,7 +105,7 @@ export default async function HomePage() {
               <Button href="/tours" variant="accent" size="lg">
                 Booking Sekarang
               </Button>
-              <Button href={waLink('Halo HAYBALI TRANS, saya ingin bertanya tentang layanan Anda')} variant="outline" size="lg" className="!border-white !text-white hover:!bg-white/10">
+              <Button href={waLink('Halo HAYBALI TRANS, saya ingin bertanya tentang layanan Anda', waNumber)} variant="outline" size="lg" className="!border-white !text-white hover:!bg-white/10">
                 Chat WhatsApp
               </Button>
             </div>
@@ -365,7 +370,7 @@ export default async function HomePage() {
             <Button href="/antar-jemput" variant="primary" size="lg">
               Booking Antar-Jemput
             </Button>
-            <Button href={waLink('Halo HAYBALI TRANS, saya ingin bertanya harga antar-jemput bandara')} variant="outline" size="lg">
+            <Button href={waLink('Halo HAYBALI TRANS, saya ingin bertanya harga antar-jemput bandara', waNumber)} variant="outline" size="lg">
               Tanya Harga via WhatsApp
             </Button>
           </div>
@@ -506,7 +511,7 @@ export default async function HomePage() {
             <Button href="/tours" variant="accent" size="lg">
               Booking Sekarang
             </Button>
-            <Button href={waLink('Halo HAYBALI TRANS, saya ingin konsultasi layanan')} variant="outline" size="lg" className="!border-white !text-white hover:!bg-white/10">
+            <Button href={waLink('Halo HAYBALI TRANS, saya ingin konsultasi layanan', waNumber)} variant="outline" size="lg" className="!border-white !text-white hover:!bg-white/10">
               Chat WhatsApp
             </Button>
           </div>

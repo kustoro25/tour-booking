@@ -19,7 +19,7 @@ const TRANSFER_TOUR_SLUG = 'antar-jemput-bandara-bali';
  * pilih area & jumlah penumpang → harga tampil langsung → lanjut ke
  * halaman booking resmi (tanggal & data pemesan dilengkapi di sana).
  */
-export default function TransferQuickForm() {
+export default function TransferQuickForm({ waNumber }: { waNumber?: string }) {
   const router = useRouter();
   const [area, setArea] = useState('');
   const [direction, setDirection] = useState<'PICKUP' | 'DROP'>('PICKUP');
@@ -143,7 +143,7 @@ export default function TransferQuickForm() {
           Lanjut Booking →
         </Button>
         <Button
-          href={waLink(`Halo ${HAYBALI_BRAND}, saya ingin bertanya tarif antar-jemput bandara.`)}
+          href={waLink(`Halo ${HAYBALI_BRAND}, saya ingin bertanya tarif antar-jemput bandara.`, waNumber)}
           variant="outline"
           fullWidth
           target="_blank"

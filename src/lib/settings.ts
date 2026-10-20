@@ -2,6 +2,7 @@
 // Nilai setting disimpan sebagai JSON string (mis. true, "teks", ["a","b"]).
 
 import { prisma } from './prisma';
+import { WA_NUMBER } from './haybali';
 
 export async function getSetting<T>(key: string, fallback: T): Promise<T> {
   try {
@@ -15,6 +16,24 @@ export async function getSetting<T>(key: string, fallback: T): Promise<T> {
   } catch {
     return fallback;
   }
+}
+
+/** Normalisasi nomor HP ke format wa.me (tanpa +, diawali 62). Murni & aman untuk client. */
+export function normalizeWaNumber(value: string): string {
+  const digits = (value || '').replace(/\D/g, '');
+  if (!digits) return '';
+  if (digits.startsWith('62')) return digits;
+  if (digits.startsWith('0')) return `62${digits.slice(1)}`;
+  if (digits.startsWith('8')) return `62${digits}`;
+  return digits;
+}
+
+/** Nomor WhatsApp bisnis untuk semua link publik (wa.me).
+ *  Prioritas: setting admin `company_phone` (kolom "Nomor WhatsApp") > konstanta WA_NUMBER. */
+export async function getWhatsAppNumber(): Promise<string> {
+  const fromDb = await getSetting<string>('company_phone', '');
+  const normalized = normalizeWaNumber(fromDb);
+  return normalized || WA_NUMBER;
 }
 
 export type PaymentGatewayMode = 'manual' | 'midtrans';

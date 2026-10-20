@@ -13,6 +13,7 @@ import {
   DRIVER_POLICY,
   waLink,
 } from '@/lib/haybali';
+import { getWhatsAppNumber } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,7 +41,7 @@ const REGION_COLORS: Record<string, string> = {
 };
 
 export default async function SewaMobilPage() {
-  const fleetTours = await getFleetTours();
+  const [fleetTours, waNumber] = await Promise.all([getFleetTours(), getWhatsAppNumber()]);
   const regionGroups = REMOTE_AREA_FEES.reduce<Record<string, typeof REMOTE_AREA_FEES>>((acc, area) => {
     (acc[area.region] ||= []).push(area);
     return acc;
@@ -69,7 +70,7 @@ export default async function SewaMobilPage() {
             <strong>&ldquo;PESAN MOBIL INI&rdquo;</strong> pada setiap model mobil di bawah ini,
             atau cukup klik{' '}
             <a
-              href={waLink(`Halo ${HAYBALI_BRAND}, saya ingin booking sewa mobil.`)}
+              href={waLink(`Halo ${HAYBALI_BRAND}, saya ingin booking sewa mobil.`, waNumber)}
               target="_blank"
               rel="noopener noreferrer"
               className="text-amber-600 font-semibold underline hover:text-amber-700"
@@ -83,7 +84,7 @@ export default async function SewaMobilPage() {
               Lihat Armada
             </Button>
             <Button
-              href={waLink(`Halo ${HAYBALI_BRAND}, saya ingin bertanya harga sewa mobil.`)}
+              href={waLink(`Halo ${HAYBALI_BRAND}, saya ingin bertanya harga sewa mobil.`, waNumber)}
               variant="outline"
               size="lg"
               className="!border-gray-300 !text-gray-700 hover:!bg-gray-50"
@@ -305,7 +306,7 @@ export default async function SewaMobilPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button
-              href={waLink(`Halo ${HAYBALI_BRAND}, saya ingin bertanya tentang sewa mobil & tour Bali.`)}
+              href={waLink(`Halo ${HAYBALI_BRAND}, saya ingin bertanya tentang sewa mobil & tour Bali.`, waNumber)}
               variant="accent"
               size="lg"
               target="_blank"

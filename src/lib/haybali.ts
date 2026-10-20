@@ -9,9 +9,9 @@ export const HAYBALI_BRAND = 'HAYBALI TRANS';
 export const HAYBALI_TAGLINE = 'Sewa Mobil & Tour Bali';
 export const WA_NUMBER = '6281234567890'; // +62 812-3456-7890
 
-/** Buat link WhatsApp dengan teks prefill. */
-export function waLink(text?: string): string {
-  const base = `https://wa.me/${WA_NUMBER}`;
+/** Buat link WhatsApp dengan teks prefill. Nomor bisa di-override dari pengaturan admin. */
+export function waLink(text?: string, phoneNumber?: string): string {
+  const base = `https://wa.me/${phoneNumber || WA_NUMBER}`;
   return text ? `${base}?text=${encodeURIComponent(text)}` : base;
 }
 
@@ -46,8 +46,8 @@ export function buildBookingWaMessage(data: BookingWaMessageData): string {
 }
 
 /** Link wa.me berisi pesan booking lengkap + nomor invoice (prefill). */
-export function waBookingLink(data: BookingWaMessageData): string {
-  return waLink(buildBookingWaMessage(data));
+export function waBookingLink(data: BookingWaMessageData, phoneNumber?: string): string {
+  return waLink(buildBookingWaMessage(data), phoneNumber);
 }
 
 // ----------------------------------------------------------------------------

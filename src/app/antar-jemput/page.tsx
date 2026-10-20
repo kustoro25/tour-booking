@@ -6,6 +6,7 @@ import {
   AIRPORT_TRANSFER_RATES,
   waLink,
 } from '@/lib/haybali';
+import { getWhatsAppNumber } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +16,9 @@ export const metadata: Metadata = {
     'Layanan penjemputan dan pengantaran bandara Ngurah Rai 24/7 tepat waktu. Daftar harga sesuai jumlah penumpang.',
 };
 
-export default function AntarJemputPage() {
+export default async function AntarJemputPage() {
+  const waNumber = await getWhatsAppNumber();
+
   return (
     <div className="bg-gray-50">
       {/* Hero */}
@@ -70,7 +73,7 @@ export default function AntarJemputPage() {
             </div>
             <div className="p-4 text-xs text-gray-500 bg-gray-50">
               Harga dapat berubah sewaktu-waktu. Konfirmasi harga akhir via WhatsApp.{' '}
-              <a href={waLink(`Halo ${HAYBALI_BRAND}, saya ingin bertanya harga antar jemput bandara.`)} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-medium hover:underline">
+              <a href={waLink(`Halo ${HAYBALI_BRAND}, saya ingin bertanya harga antar jemput bandara.`, waNumber)} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-medium hover:underline">
                 Tanya Harga via WhatsApp
               </a>
             </div>
@@ -79,7 +82,7 @@ export default function AntarJemputPage() {
           {/* Sidebar form */}
           <div className="lg:col-span-1">
             <div className="space-y-6 lg:sticky lg:top-24">
-              <TransferQuickForm />
+              <TransferQuickForm waNumber={waNumber} />
 
               <div className="bg-white rounded-2xl shadow-card p-6 border border-gray-100 text-sm text-gray-600 space-y-3">
                 <h3 className="font-bold text-gray-900 text-base">ℹ️ Informasi Layanan</h3>

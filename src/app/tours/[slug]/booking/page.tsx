@@ -11,6 +11,7 @@ import {
   AIRPORT_TRANSFER_RATES,
   TRANSFER_MAX_PAX,
   DRIVER_POLICY,
+  WA_NUMBER,
   getPickupTimeOptions,
   getTransferPrice,
   getCarRentalBasePrice,
@@ -96,6 +97,7 @@ function BookingPage() {
   const [slotInfo, setSlotInfo] = useState<SlotInfo | null>(null);
   const [slotLoading, setSlotLoading] = useState(false);
   const [paymentGateway, setPaymentGateway] = useState<'midtrans' | 'manual'>('manual');
+  const [waNumber, setWaNumber] = useState<string>(WA_NUMBER); // nomor WA bisnis dari pengaturan admin
 
   // --- State layanan khusus HAYBALI TRANS ---
   const [pickupTime, setPickupTime] = useState('');
@@ -136,6 +138,9 @@ function BookingPage() {
           setInstallmentEnabled(data.data.installment_enabled === true);
           if (data.data.paymentGateway === 'midtrans') {
             setPaymentGateway('midtrans');
+          }
+          if (typeof data.data.whatsappNumber === 'string' && data.data.whatsappNumber) {
+            setWaNumber(data.data.whatsappNumber);
           }
           if (data.data.installment_options && Array.isArray(data.data.installment_options)) {
             setInstallmentOptions(data.data.installment_options);
@@ -274,17 +279,11 @@ function BookingPage() {
       if (data.success) {
         setBookingResult(data.data);
         setStep(5);
-        // Pembayaran manual: langsung arahkan customer ke WhatsApp dengan
-        // info booking lengkap + nomor invoice (fallback: tombol hijau di layar sukses)
+        // Pembayaran manual: langsung alihkan ke WhatsApp dengan info booking
+        // lengkap + nomor invoice (layar "Booking Berhasil!" tidak ditampilkan)
         if (paymentGateway === 'manual' && tour) {
           const waUrl = buildManualWaLink(data.data.invoiceNo);
-          if (waUrl) {
-            try {
-              window.open(waUrl, '_blank', 'noopener');
-            } catch {
-              // Popup diblokir browser — customer tinggal klik tombol di layar sukses
-            }
-          }
+          if (waUrl) window.location.assign(waUrl);
         }
       } else {
         if (data.errors && typeof data.errors === 'object') {
@@ -371,15 +370,18 @@ function BookingPage() {
       paymentType === 'INSTALLMENT'
         ? `Cicilan ${installmentCount}x (DP ${dpPercentage}%)`
         : 'Pembayaran Lunas (Transfer Bank)';
-    return waBookingLink({
-      invoiceNo,
-      customerName: formData.customerName,
-      serviceLabel: tour.name,
-      dateLabel: formatDate(selectedDate),
-      totalLabel: formatCurrency(grandTotal),
-      paymentLabel,
-      extraLines,
-    });
+    return waBookingLink(
+      {
+        invoiceNo,
+        customerName: formData.customerName,
+        serviceLabel: tour.name,
+        dateLabel: formatDate(selectedDate),
+        totalLabel: formatCurrency(grandTotal),
+        paymentLabel,
+        extraLines,
+      },
+      waNumber
+    );
   };
   const manualWaUrl =
     step === 5 && bookingResult && paymentGateway === 'manual'
