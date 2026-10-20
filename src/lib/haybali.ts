@@ -27,6 +27,7 @@ export interface BookingWaMessageData {
   totalLabel: string;
   paymentLabel?: string; // mis. 'Pembayaran Lunas (Transfer Bank)' / 'Cicilan 3x (DP 50%)'
   extraLines?: string[]; // rincian tambahan: durasi, jam jemput, area, penumpang, dll.
+  invoiceUrl?: string; // link halaman invoice — otomatis bisa diklik di WhatsApp
 }
 
 export function buildBookingWaMessage(data: BookingWaMessageData): string {
@@ -34,6 +35,7 @@ export function buildBookingWaMessage(data: BookingWaMessageData): string {
     `Halo ${HAYBALI_BRAND}, saya baru saja melakukan booking:`,
     '',
     `• Invoice: ${data.invoiceNo}`,
+    ...(data.invoiceUrl ? [`• Link Invoice: ${data.invoiceUrl}`] : []),
     `• Nama: ${data.customerName}`,
     `• Layanan: ${data.serviceLabel}`,
     `• Tanggal: ${data.dateLabel}`,

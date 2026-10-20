@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
 import { OrderStatusLabels, OrderStatusColors, OrderStatusIcons, OrderStatusDotColors, type OrderStatus, type InstallmentPaymentStatus } from '@/types';
@@ -243,6 +244,12 @@ export default async function InvoicePage({ params }: PageProps) {
   const createdDate = new Date(order.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
   const expiryDate = new Date(order.expiryAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
+  // URL halaman invoice ini — disertakan di pesan WhatsApp agar bisa diklik
+  const hdrs = await headers();
+  const proto = hdrs.get('x-forwarded-proto') || 'http';
+  const host = hdrs.get('x-forwarded-host') || hdrs.get('host') || '';
+  const invoiceUrl = host ? `${proto}://${host}/invoice/${order.invoiceNo}` : undefined;
+
   return (
     <>
       <div className="max-w-[210mm] mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
@@ -272,6 +279,7 @@ export default async function InvoicePage({ params }: PageProps) {
           payUrl={payUrl}
           payLabel={order.paymentType === 'INSTALLMENT' ? '💳 Bayar DP / Angsuran' : undefined}
           tourDate={tourDate}
+          invoiceUrl={invoiceUrl}
           paymentMode={paymentMode}
         />
       </div>

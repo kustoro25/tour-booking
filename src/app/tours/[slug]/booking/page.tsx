@@ -342,6 +342,8 @@ function BookingPage() {
   // Link WhatsApp prefill untuk pembayaran manual — berisi info booking + nomor invoice
   const buildManualWaLink = (invoiceNo: string): string => {
     if (!tour) return '';
+    // Origin browser customer — link invoice akan mengarah ke situs yang sama
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const extraLines: string[] = [];
     if (isCarRental) {
       extraLines.push(`• Durasi: ${rentalDuration} Jam`);
@@ -373,6 +375,7 @@ function BookingPage() {
     return waBookingLink(
       {
         invoiceNo,
+        invoiceUrl: origin ? `${origin}/invoice/${invoiceNo}` : undefined,
         customerName: formData.customerName,
         serviceLabel: tour.name,
         dateLabel: formatDate(selectedDate),
