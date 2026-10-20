@@ -13,6 +13,8 @@ interface InvoiceActionsProps {
   payUrl?: string;
   /** Label tombol bayar online (mis. "Bayar DP / Angsuran" untuk cicilan) */
   payLabel?: string;
+  /** Tanggal perjalanan — ditambahkan ke pesan WhatsApp */
+  tourDate?: string;
   /** Mode pembayaran order — menentukan pesan WA & tombol yang relevan */
   paymentMode?: 'online' | 'transfer' | 'paid' | 'cancelled';
 }
@@ -26,6 +28,7 @@ export default function InvoiceActions({
   helpLink,
   payUrl,
   payLabel = '💳 Bayar Online Sekarang',
+  tourDate,
   paymentMode = 'transfer',
 }: InvoiceActionsProps) {
   const waNumber = companyPhone.replace(/[^0-9]/g, '');
@@ -33,6 +36,7 @@ export default function InvoiceActions({
     `- Invoice: ${invoiceNo}\n` +
     `- Nama: ${customerName}\n` +
     `- Paket: ${tourName}\n` +
+    (tourDate ? `- Tanggal: ${tourDate}\n` : '') +
     `- Total: Rp ${total.toLocaleString('id-ID')}`;
 
   const waMessage = encodeURIComponent(

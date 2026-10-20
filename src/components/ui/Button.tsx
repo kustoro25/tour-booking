@@ -3,7 +3,7 @@
 import { ButtonHTMLAttributes, AnchorHTMLAttributes } from 'react';
 import Link from 'next/link';
 
-type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'outline' | 'danger';
+type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'outline' | 'danger' | 'success';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonBaseProps {
@@ -31,6 +31,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   accent: 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30',
   outline: 'border-2 border-amber-600 text-amber-600 hover:bg-amber-50 hover:border-amber-700 hover:text-amber-700',
   danger: 'bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 shadow-md shadow-red-500/20 hover:shadow-lg hover:shadow-red-500/30',
+  success: 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 shadow-md shadow-green-500/20 hover:shadow-lg hover:shadow-green-500/30',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

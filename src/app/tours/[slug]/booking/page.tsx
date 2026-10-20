@@ -16,6 +16,7 @@ import {
   getCarRentalBasePrice,
   calcCarRentalTotal,
   calcLatePickupFee,
+  waBookingLink,
 } from '@/lib/haybali';
 import Button from '@/components/ui/Button';
 import BookingCalendar from '@/components/booking/BookingCalendar';
@@ -273,6 +274,18 @@ function BookingPage() {
       if (data.success) {
         setBookingResult(data.data);
         setStep(5);
+        // Pembayaran manual: langsung arahkan customer ke WhatsApp dengan
+        // info booking lengkap + nomor invoice (fallback: tombol hijau di layar sukses)
+        if (paymentGateway === 'manual' && tour) {
+          const waUrl = buildManualWaLink(data.data.invoiceNo);
+          if (waUrl) {
+            try {
+              window.open(waUrl, '_blank', 'noopener');
+            } catch {
+              // Popup diblokir browser — customer tinggal klik tombol di layar sukses
+            }
+          }
+        }
       } else {
         if (data.errors && typeof data.errors === 'object') {
           setErrors((prev) => ({ ...prev, ...data.errors }));
@@ -326,6 +339,52 @@ function BookingPage() {
   const grandTotal = isSpecialService ? total : total - total * (tour.discount / 100);
   const installmentThresholdMet = minInstallmentAmount <= 0 || grandTotal >= minInstallmentAmount;
   const installmentAvailable = installmentEnabled && installmentThresholdMet;
+
+  // Link WhatsApp prefill untuk pembayaran manual — berisi info booking + nomor invoice
+  const buildManualWaLink = (invoiceNo: string): string => {
+    if (!tour) return '';
+    const extraLines: string[] = [];
+    if (isCarRental) {
+      extraLines.push(`• Durasi: ${rentalDuration} Jam`);
+      if (pickupTime) extraLines.push(`• Jam Penjemputan: ${pickupTime}`);
+      if (pickupZone) extraLines.push(`• Zona Penjemputan: ${pickupZone}`);
+      const areaLabel = destinationArea
+        ? (REMOTE_AREA_FEES.find((a) => a.id === destinationArea)?.label ||
+            STANDARD_AREAS.find((a) => a.id === destinationArea)?.label ||
+            '')
+        : '';
+      if (areaLabel) extraLines.push(`• Area Tujuan: ${areaLabel}`);
+    }
+    if (isTransfer) {
+      extraLines.push(
+        `• Rute: ${direction === 'DROP' ? 'Antar ke Bandara' : 'Jemput di Bandara'} — ${transferArea || '-'}`
+      );
+      extraLines.push(`• Penumpang: ${formData.adults} orang`);
+      if (flightNo) extraLines.push(`• No. Penerbangan: ${flightNo}`);
+    }
+    if (!isSpecialService) {
+      extraLines.push(
+        `• Peserta: ${formData.adults} dewasa${formData.children > 0 ? `, ${formData.children} anak` : ''}`
+      );
+    }
+    const paymentLabel =
+      paymentType === 'INSTALLMENT'
+        ? `Cicilan ${installmentCount}x (DP ${dpPercentage}%)`
+        : 'Pembayaran Lunas (Transfer Bank)';
+    return waBookingLink({
+      invoiceNo,
+      customerName: formData.customerName,
+      serviceLabel: tour.name,
+      dateLabel: formatDate(selectedDate),
+      totalLabel: formatCurrency(grandTotal),
+      paymentLabel,
+      extraLines,
+    });
+  };
+  const manualWaUrl =
+    step === 5 && bookingResult && paymentGateway === 'manual'
+      ? buildManualWaLink(bookingResult.invoiceNo)
+      : '';
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
@@ -1224,8 +1283,8 @@ function BookingPage() {
           ) : (
             <p className="text-gray-500 mb-6">
               {paymentType === 'INSTALLMENT'
-                ? <>Invoice Anda telah diterbitkan. Silakan transfer DP sesuai rekening pada invoice, lalu konfirmasi ke admin melalui WhatsApp.</>
-                : <>Invoice Anda telah diterbitkan. Silakan transfer sesuai rekening pada invoice, lalu konfirmasi pembayaran ke admin melalui WhatsApp.</>}
+                ? <>Invoice Anda telah diterbitkan dan detail booking sudah dikirim langsung ke WhatsApp admin. Silakan transfer DP sesuai rekening pada invoice — tombol hijau di bawah bila chat belum terbuka.</>
+                : <>Invoice Anda telah diterbitkan dan detail booking sudah dikirim langsung ke WhatsApp admin. Silakan transfer sesuai rekening pada invoice — tombol hijau di bawah bila chat belum terbuka.</>}
             </p>
           )}
 
@@ -1235,6 +1294,17 @@ function BookingPage() {
           </div>
 
           <div className="flex flex-wrap justify-center gap-3">
+            {paymentGateway === 'manual' && manualWaUrl && (
+              <Button
+                href={manualWaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="success"
+                size="lg"
+              >
+                💬 Kirim Booking via WhatsApp
+              </Button>
+            )}
             {bookingResult.paymentUrl && (
               <Button href={bookingResult.paymentUrl} variant="accent" size="lg">
                 {paymentType === 'INSTALLMENT' ? '💳 Bayar DP Online' : '💳 Bayar Online Sekarang'}

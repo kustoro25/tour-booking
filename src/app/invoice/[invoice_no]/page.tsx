@@ -271,6 +271,7 @@ export default async function InvoicePage({ params }: PageProps) {
           helpLink={config.helpLink}
           payUrl={payUrl}
           payLabel={order.paymentType === 'INSTALLMENT' ? '💳 Bayar DP / Angsuran' : undefined}
+          tourDate={tourDate}
           paymentMode={paymentMode}
         />
       </div>

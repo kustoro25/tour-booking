@@ -15,6 +15,41 @@ export function waLink(text?: string): string {
   return text ? `${base}?text=${encodeURIComponent(text)}` : base;
 }
 
+/**
+ * Susun pesan WhatsApp prefill untuk konfirmasi booking pembayaran manual.
+ * Dipakai halaman sukses booking (client) dan halaman invoice (server).
+ */
+export interface BookingWaMessageData {
+  invoiceNo: string;
+  customerName: string;
+  serviceLabel: string;
+  dateLabel: string;
+  totalLabel: string;
+  paymentLabel?: string; // mis. 'Pembayaran Lunas (Transfer Bank)' / 'Cicilan 3x (DP 50%)'
+  extraLines?: string[]; // rincian tambahan: durasi, jam jemput, area, penumpang, dll.
+}
+
+export function buildBookingWaMessage(data: BookingWaMessageData): string {
+  const lines = [
+    `Halo ${HAYBALI_BRAND}, saya baru saja melakukan booking:`,
+    '',
+    `• Invoice: ${data.invoiceNo}`,
+    `• Nama: ${data.customerName}`,
+    `• Layanan: ${data.serviceLabel}`,
+    `• Tanggal: ${data.dateLabel}`,
+    `• Total: ${data.totalLabel}`,
+  ];
+  if (data.extraLines?.length) lines.push('', ...data.extraLines);
+  if (data.paymentLabel) lines.push('', `• Metode: ${data.paymentLabel}`);
+  lines.push('', 'Mohon konfirmasi booking & info pembayarannya. Terima kasih.');
+  return lines.join('\n');
+}
+
+/** Link wa.me berisi pesan booking lengkap + nomor invoice (prefill). */
+export function waBookingLink(data: BookingWaMessageData): string {
+  return waLink(buildBookingWaMessage(data));
+}
+
 // ----------------------------------------------------------------------------
 // 1. Armada Sewa Mobil (harga per mobil per durasi, termasuk supir & BBM)
 //    Revisi spesifikasi: 6 model — durasi 6 jam / 12 jam sesuai armada,
