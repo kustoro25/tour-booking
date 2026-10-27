@@ -8,7 +8,6 @@ import Button from '@/components/ui/Button';
 import StarRating from '@/components/ui/StarRating';
 import {
   HAYBALI_BRAND,
-  HAYBALI_TAGLINE,
   FLEET,
   AIRPORT_TRANSFER_RATES,
   waLink,
@@ -82,40 +81,31 @@ export default async function HomePage() {
   return (
     <>
       {/* ================= HERO ================= */}
-      <section className="relative text-ivory overflow-hidden bg-cover bg-center bg-no-repeat border-b border-gold-500/20"
-        style={{ backgroundImage: "url('/images/haybali/hero-banner.jpg')" }}
-      >
-        {/* Kiri gelap agar teks terbaca, kanan lebih terang agar banner armada tetap terlihat */}
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-950/95 via-ink-950/70 to-ink-950/25" />
-        <div className="absolute inset-0 bg-gradient-to-b from-ink-950/60 via-transparent to-ink-950/40" />
-        <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] blob bg-gold-400/15 animate-float" />
-        <div className="absolute bottom-[-15%] left-[-5%] w-[350px] h-[350px] blob bg-gold-200/5 animate-float" style={{ animationDelay: '1s' }} />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-20 sm:py-28 md:py-36">
-          <div className="max-w-2xl">
-            <span className="inline-block bg-gold-400/15 backdrop-blur-sm border border-gold-400/40 rounded-full px-4 py-1.5 text-sm mb-6 tracking-wide text-gold-200 animate-fade-in">
-              {HAYBALI_BRAND} • {HAYBALI_TAGLINE}
-            </span>
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6 text-ivory animate-fade-in-up drop-shadow-lg">
-              Jelajahi Pesona Bali dengan <span className="gradient-text">Kenyamanan VIP</span>
-            </h1>
-            <p className="text-base sm:text-xl text-mist mb-8 leading-relaxed animate-fade-in-up animate-delay-200 drop-shadow">
-              Layanan sewa mobil mewah, paket tur privat terbaik, dan antar-jemput bandara 24/7.
-              Supir berpengalaman, kendaraan prima, dan pelayanan profesional.
-            </p>
-            <div className="flex flex-wrap gap-4 animate-fade-in-up animate-delay-300">
-              <Button href="/tours" variant="accent" size="lg">
+      <section className="relative overflow-hidden border-b border-gold-500/20 bg-ink-950">
+        <h1 className="sr-only">HAYBALI TRANS – Luxury Transport in Bali</h1>
+        {/* Banner tampil utuh (tanpa crop) dan responsif mengikuti lebar layar */}
+        <img
+          src="/images/haybali/hero-banner.jpg"
+          alt="HAYBALI TRANS – Luxury Transport in Bali"
+          className="block w-full h-auto"
+          fetchPriority="high"
+        />
+        {/* Bar CTA singkat di bawah banner agar tombol booking tetap mudah diakses */}
+        <div className="border-t border-gold-500/20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-5 flex flex-wrap items-center justify-center sm:justify-between gap-4">
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button href="/tours" variant="accent" size="md">
                 Booking Sekarang
               </Button>
-              <Button href={waLink('Halo HAYBALI TRANS, saya ingin bertanya tentang layanan Anda', waNumber)} variant="outline" size="lg" className="!border-gold-400/60 !text-gold-200 hover:!bg-gold-400/10">
+              <Button href={waLink('Halo HAYBALI TRANS, saya ingin bertanya tentang layanan Anda', waNumber)} variant="outline" size="md" className="!border-gold-400/60 !text-gold-200 hover:!bg-gold-400/10">
                 Chat WhatsApp
               </Button>
             </div>
-            <div className="flex flex-wrap items-center gap-6 mt-10 pt-8 border-t border-gold-500/20 animate-fade-in-up animate-delay-400">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
               {HERO_STATS.map((stat) => (
-                <div key={stat.label}>
-                  <p className="text-2xl sm:text-3xl font-bold text-gold-300">{stat.num}</p>
-                  <p className="text-sm text-mist-dim">{stat.label}</p>
+                <div key={stat.label} className="flex items-baseline gap-2">
+                  <p className="text-xl font-bold text-gold-300">{stat.num}</p>
+                  <p className="text-xs text-mist-dim">{stat.label}</p>
                 </div>
               ))}
             </div>
