@@ -115,30 +115,30 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
     }
   };
   return (
-    <footer className="bg-gray-900 text-gray-300 relative">
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500" />
+    <footer className="bg-ink-950 text-mist relative">
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold-600 via-gold-300 to-gold-600" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-md shadow-amber-500/20">
+              <div className="w-9 h-9 bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 rounded-xl flex items-center justify-center shadow-md shadow-gold-500/20">
                 {info.brandIcon ? (
                   (info.brandIcon.startsWith('http') || info.brandIcon.startsWith('/')) ? (
                     <img src={info.brandIcon} alt="brand" className="w-full h-full object-cover rounded-xl" />
                   ) : (
-                    <span className="text-white font-bold text-sm">{info.brandIcon.substring(0, 2).toUpperCase()}</span>
+                    <span className="text-ink-950 font-bold text-sm">{info.brandIcon.substring(0, 2).toUpperCase()}</span>
                   )
                 ) : (
-                  <span className="text-white font-bold text-sm">HB</span>
+                  <span className="text-ink-950 font-bold text-sm">HB</span>
                 )}
               </div>
               <span className="text-xl font-bold text-white">{info.brandName || 'HAYBALI TRANS'}</span>
             </div>
-            <p className="text-gray-400 mb-4 max-w-md leading-relaxed">
+            <p className="text-mist-dim mb-4 max-w-md leading-relaxed">
               {cms.text || 'Mitra transportasi dan privat tur tepercaya di Bali. Mengutamakan keselamatan, kenyamanan, dan pelayanan VIP bagi seluruh pelanggan.'}
             </p>
-            <div className="space-y-1.5 text-sm text-gray-400 mb-4">
+            <div className="space-y-1.5 text-sm text-mist-dim mb-4">
               <p className="flex items-start gap-2">
                 <span className="mt-0.5 flex-shrink-0">📍</span>
                 <span>{info.address || 'Denpasar / Kuta, Bali - Indonesia'}</span>
@@ -164,7 +164,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
                   ]
               ).map((s) => (
                 <a key={s.platform} href={s.url || '#'} aria-label={s.platform} target="_blank" rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-lg bg-gray-800 hover:bg-amber-600 flex items-center justify-center text-gray-400 hover:text-white transition-all duration-300 hover:scale-110"
+                  className="w-10 h-10 rounded-xl bg-ink-800 border border-ink-600 hover:bg-gold-400 hover:border-gold-400 flex items-center justify-center text-mist-dim hover:text-ink-950 transition-all duration-300 hover:scale-110"
                 >
                   {socialIcons[s.icon] || socialIcons.globe}
                 </a>
@@ -172,11 +172,11 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
             </div>
 
             {/* Newsletter */}
-            <div className="mt-6 pt-6 border-t border-gray-800">
+            <div className="mt-6 pt-6 border-t border-ink-700">
               <h4 className="text-white font-semibold text-sm mb-2">
                 Dapatkan Info Terbaru ✉️
               </h4>
-              <p className="text-gray-400 text-xs mb-3">
+              <p className="text-mist-dim text-xs mb-3">
                 Berlangganan newsletter untuk info promo & paket terbaru.
               </p>
               <form onSubmit={handleSubscribe} className="flex gap-2">
@@ -186,12 +186,12 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   placeholder="email@anda.com"
                   required
-                  className="flex-1 min-w-0 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-shadow"
+                  className="flex-1 min-w-0 h-11 px-4 bg-ink-800 border border-ink-600 rounded-xl text-sm text-ivory placeholder-mist-dim focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400 transition-shadow"
                 />
                 <button
                   type="submit"
                   disabled={subscribing}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors flex-shrink-0"
+                  className="h-11 px-5 inline-flex items-center bg-gold-400 hover:bg-gold-300 disabled:opacity-50 disabled:cursor-not-allowed text-ink-950 text-sm font-semibold rounded-xl transition-colors flex-shrink-0"
                 >
                   {subscribing ? '...' : 'Berlangganan'}
                 </button>
@@ -204,12 +204,12 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
             <div key={category}>
               <h3 className="text-white font-semibold mb-4 relative inline-block">
                 {category}
-                <span className="absolute -bottom-1 left-0 w-8 h-0.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full" />
+                <span className="absolute -bottom-1 left-0 w-8 h-0.5 bg-gradient-to-r from-gold-300 to-gold-500 rounded-full" />
               </h3>
               <ul className="space-y-2.5">
                 {links.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className="text-gray-400 hover:text-white transition-all duration-200 text-sm hover:translate-x-1 inline-block">
+                    <Link href={link.href} className="text-mist-dim hover:text-gold-200 transition-all duration-200 text-sm hover:translate-x-1 inline-block">
                       {link.label}
                     </Link>
                   </li>
@@ -220,7 +220,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-800 mt-10 pt-6 text-center text-sm text-gray-500">
+        <div className="border-t border-ink-700 mt-10 pt-6 text-center text-sm text-mist-dim">
           {cms.copyright || `© ${new Date().getFullYear()} ${info.brandName || 'HAYBALI TRANS'} Tour. All rights reserved.`}
         </div>
       </div>

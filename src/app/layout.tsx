@@ -54,7 +54,7 @@ export default async function RootLayout({
 
   return (
     <html lang="id">
-      <body className={`${inter.className} antialiased bg-gray-50 text-gray-800 min-h-screen flex flex-col selection:bg-amber-100 selection:text-amber-900`}>
+      <body className={`${inter.className} antialiased bg-ink-950 text-ivory min-h-screen flex flex-col selection:bg-gold-400/25 selection:text-gold-100`}>
         <ToastProvider>
           <PublicLayout brandName={brandName} brandIcon={brandIcon} footerCms={footerCms}>{children}</PublicLayout>
           <FloatingActions waNumber={waNumber} />

@@ -28,10 +28,10 @@ export default function ScrollToTop() {
         fixed bottom-24 right-6 z-50
         w-11 h-11 sm:w-12 sm:h-12
         rounded-full
-        bg-gradient-to-br from-blue-600 to-teal-600
-        text-white
-        shadow-lg shadow-blue-500/30
-        hover:shadow-xl hover:shadow-blue-500/40 hover:scale-110
+        bg-gradient-to-br from-gold-300 to-gold-600
+        text-ink-950
+        shadow-lg shadow-gold-500/30
+        hover:shadow-xl hover:shadow-gold-400/40 hover:scale-110
         active:scale-95
         flex items-center justify-center
         transition-all duration-300 ease-out

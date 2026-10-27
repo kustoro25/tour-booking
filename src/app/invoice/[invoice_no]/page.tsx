@@ -425,7 +425,7 @@ function CustomInvoice({
   };
 
   return (
-    <div className={`invoice-document bg-white ${headerIsLight ? 'border border-gray-200' : 'shadow-xl'} ${headerIsLight ? '' : 'rounded-xl overflow-hidden'}`} id="invoice-print">
+    <div className={`invoice-document bg-white text-gray-900 ${headerIsLight ? 'border border-gray-200' : 'shadow-xl'} ${headerIsLight ? '' : 'rounded-xl overflow-hidden'}`} id="invoice-print">
       {/* ── Header ── */}
       <div className="px-6 sm:px-10 py-8 sm:py-10" style={{ background: headerBg, ...(headerIsLight ? { borderBottom: `2px solid ${c.borderColor || '#111827'}` } : {}) }}>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">

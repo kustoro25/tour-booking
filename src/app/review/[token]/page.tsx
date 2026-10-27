@@ -76,7 +76,7 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
   if (loading) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+        <div className="bg-ink-850 rounded-xl shadow-sm p-6 space-y-6">
           <Skeleton className="h-8 w-64 mx-auto" />
           <Skeleton className="h-20 w-full rounded-lg" />
           <div className="space-y-4">
@@ -97,8 +97,8 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
         <div className="text-6xl mb-4">😔</div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Oops!</h1>
-        <p className="text-gray-600 mb-6">{error}</p>
+        <h1 className="text-2xl font-bold text-ivory mb-2">Oops!</h1>
+        <p className="text-mist mb-6">{error}</p>
         <Button href="/" variant="outline">Kembali ke Beranda</Button>
       </div>
     );
@@ -108,9 +108,9 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
         <div className="text-6xl mb-4">🎉</div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Terima Kasih!</h1>
-        <p className="text-gray-600 mb-2">{message}</p>
-        <p className="text-gray-500 text-sm mb-8">
+        <h1 className="text-2xl font-bold text-ivory mb-2">Terima Kasih!</h1>
+        <p className="text-mist mb-2">{message}</p>
+        <p className="text-mist-dim text-sm mb-8">
           Review Anda akan ditinjau oleh tim kami sebelum ditampilkan di halaman publik.
         </p>
         <div className="flex justify-center gap-3">
@@ -123,14 +123,14 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 md:px-8 py-12">
-      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 text-center">
+      <h1 className="text-2xl sm:text-3xl font-bold text-ivory mb-6 text-center">
         Bagaimana Pengalaman Liburan Anda?
       </h1>
 
       {info && (
-        <div className="bg-blue-50 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
-          <p className="text-sm text-blue-700 mb-1">Hai, <strong>{info.customerName}</strong>!</p>
-          <p className="text-sm text-blue-600">
+        <div className="bg-gold-400/10 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
+          <p className="text-sm text-gold-200 mb-1">Hai, <strong>{info.customerName}</strong>!</p>
+          <p className="text-sm text-gold-300">
             Ceritakan pengalaman Anda mengikuti tour{' '}
             <strong>{info.tourName}</strong> ke{' '}
             <strong>{info.destination}</strong> pada tanggal{' '}
@@ -144,10 +144,10 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-5 sm:p-8 space-y-6">
+      <form onSubmit={handleSubmit} className="bg-ink-850 rounded-xl shadow-sm p-5 sm:p-8 space-y-6">
         {/* Star Rating */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-3">
+          <label className="block text-sm font-semibold text-mist mb-3">
             Rating Anda <span className="text-red-500">*</span>
           </label>
           <div className="flex items-center gap-1">
@@ -161,7 +161,7 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
               >
                 <svg
                   className={`w-8 h-8 ${
-                    star <= rating ? 'text-yellow-400' : 'text-gray-300'
+                    star <= rating ? 'text-yellow-400' : 'text-mist'
                   }`}
                   fill="currentColor"
                   viewBox="0 0 20 20"
@@ -170,7 +170,7 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
                 </svg>
               </button>
             ))}
-            <span className="ml-3 text-sm text-gray-500">
+            <span className="ml-3 text-sm text-mist-dim">
               {rating === 0 ? 'Pilih rating' : `${rating} / 5`}
             </span>
           </div>
@@ -178,7 +178,7 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
 
         {/* Review Text */}
         <div>
-          <label htmlFor="review" className="block text-sm font-semibold text-gray-700 mb-3">
+          <label htmlFor="review" className="block text-sm font-semibold text-mist mb-3">
             Ceritakan Pengalaman Anda <span className="text-red-500">*</span>
           </label>
           <textarea
@@ -187,14 +187,14 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
             placeholder="Ceritakan pengalaman seru Anda selama tour... (min. 10 karakter)"
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-y"
+            className="w-full border border-ink-600 rounded-lg px-4 py-3 text-mist focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none transition resize-y"
             maxLength={1000}
           />
           <div className="flex justify-between mt-1">
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-mist-dim">
               {reviewText.length < 10 ? 'Minimal 10 karakter' : ''}
             </span>
-            <span className="text-xs text-gray-400">{reviewText.length}/1000</span>
+            <span className="text-xs text-mist-dim">{reviewText.length}/1000</span>
           </div>
         </div>
 
@@ -203,8 +203,8 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
           <div
             className={`p-3 rounded-lg text-sm ${
               message.includes('Terima kasih')
-                ? 'bg-green-50 text-green-700'
-                : 'bg-red-50 text-red-700'
+                ? 'bg-green-500/10 text-green-300'
+                : 'bg-red-500/10 text-red-300'
             }`}
           >
             {message}
@@ -245,7 +245,7 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
         </Button>
       </form>
 
-      <p className="text-center text-xs text-gray-400 mt-6">
+      <p className="text-center text-xs text-mist-dim mt-6">
         Review Anda akan dimoderasi oleh tim kami sebelum ditampilkan di halaman publik.
       </p>
     </div>

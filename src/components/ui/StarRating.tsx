@@ -38,13 +38,13 @@ export default function StarRating({
             ) : halfFilled ? (
               <span className="text-yellow-400">★</span>
             ) : (
-              <span className="text-gray-300">★</span>
+              <span className="text-mist">★</span>
             )}
           </button>
         );
       })}
       {!interactive && (
-        <span className="ml-1 text-sm text-gray-500">({rating.toFixed(1)})</span>
+        <span className="ml-1 text-sm text-mist-dim">({rating.toFixed(1)})</span>
       )}
     </div>
   );

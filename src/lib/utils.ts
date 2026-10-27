@@ -91,6 +91,67 @@ export function parseJsonSafe<T>(json: string, fallback: T): T {
   }
 }
 
+const LEGACY_HUES =
+  'slate|gray|zinc|neutral|stone|red|rose|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink';
+
+const LEGACY_CLASS = new RegExp(
+  `^(bg|text|border|from|via|to|ring|shadow)-(${LEGACY_HUES})-\\d{2,3}(?:\\/\\d{1,3})?$`
+);
+
+const NEUTRAL_HUES = 'slate|gray|zinc|neutral|stone';
+
+const NOIR_REPLACEMENT: Record<string, string> = {
+  bg: 'bg-gold-400/10',
+  text: 'text-gold-300',
+  border: 'border-gold-500/30',
+  from: 'from-gold-300',
+  via: 'via-gold-400',
+  to: 'to-gold-600',
+  ring: 'ring-gold-400/30',
+  shadow: 'shadow-gold-500/25',
+};
+
+const INK_REPLACEMENT: Record<string, string> = {
+  bg: 'bg-ink-800',
+  text: 'text-mist',
+  border: 'border-ink-700',
+  from: 'from-ink-700',
+  via: 'via-ink-800',
+  to: 'to-ink-900',
+  ring: 'ring-gold-400/30',
+  shadow: 'shadow-gold-500/25',
+};
+
+const BARE_LEGACY: Record<string, string> = {
+  'bg-white': 'bg-ink-850',
+  'bg-black': 'bg-ink-950',
+  'text-black': 'text-ivory',
+  'text-gray-900': 'text-ivory',
+  'text-gray-800': 'text-mist',
+};
+
+/**
+ * Menormalkan kelas warna tema terang (mis. `bg-amber-50 text-amber-600`)
+ * menjadi palet noir/gold. Dipakai untuk konten yang tersimpan di database.
+ */
+export function noirTheme(classes?: string | null): string {
+  if (!classes) return '';
+  return classes
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((cls) => {
+      if (BARE_LEGACY[cls]) return BARE_LEGACY[cls];
+      const match = cls.match(LEGACY_CLASS);
+      if (!match) return cls;
+      const [, utility, hue] = match;
+      const palette = new RegExp(`^(${NEUTRAL_HUES})$`).test(hue)
+        ? INK_REPLACEMENT
+        : NOIR_REPLACEMENT;
+      return palette[utility];
+    })
+    .join(' ');
+}
+
 export const DESTINATIONS = [
   'Bali',
   'Lombok',

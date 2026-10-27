@@ -59,8 +59,8 @@ export default async function DestinationDetailPage({
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center">
         <div className="text-6xl mb-4">🗺️</div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Destinasi Tidak Ditemukan</h1>
-        <p className="text-gray-500 mb-6">Maaf, destinasi yang Anda cari tidak tersedia.</p>
+        <h1 className="text-2xl font-bold text-ivory mb-2">Destinasi Tidak Ditemukan</h1>
+        <p className="text-mist-dim mb-6">Maaf, destinasi yang Anda cari tidak tersedia.</p>
         <Button href="/destinations" variant="primary">Lihat Semua Destinasi</Button>
       </div>
     );
@@ -104,7 +104,7 @@ export default async function DestinationDetailPage({
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 md:p-10">
           <div className="max-w-7xl mx-auto">
-            <p className="text-blue-200 text-xs sm:text-sm mb-1 sm:mb-2">{destination.location}</p>
+            <p className="text-gold-200 text-xs sm:text-sm mb-1 sm:mb-2">{destination.location}</p>
             <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3">
               {destination.name}
             </h1>
@@ -113,7 +113,7 @@ export default async function DestinationDetailPage({
                 {[1, 2, 3, 4, 5].map((star) => (
                   <svg
                     key={star}
-                    className={`w-5 h-5 ${star <= Math.round(avgRating) ? 'text-yellow-400' : 'text-gray-500'}`}
+                    className={`w-5 h-5 ${star <= Math.round(avgRating) ? 'text-yellow-400' : 'text-mist-dim'}`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -121,14 +121,14 @@ export default async function DestinationDetailPage({
                   </svg>
                 ))}
                 <span className="text-white ml-1 font-semibold">{avgRating.toFixed(1)}</span>
-                <span className="text-gray-300 ml-1">({reviewCount} ulasan)</span>
+                <span className="text-mist ml-1">({reviewCount} ulasan)</span>
               </span>
-              <span className="text-gray-300">•</span>
-              <span className="text-gray-200">{tourCount} Paket Tour</span>
+              <span className="text-mist">•</span>
+              <span className="text-mist">{tourCount} Paket Tour</span>
               {destination.bestTimeToVisit && (
                 <>
-                  <span className="text-gray-300">•</span>
-                  <span className="text-gray-200">🕐 {destination.bestTimeToVisit}</span>
+                  <span className="text-mist">•</span>
+                  <span className="text-mist">🕐 {destination.bestTimeToVisit}</span>
                 </>
               )}
             </div>
@@ -141,18 +141,18 @@ export default async function DestinationDetailPage({
           {/* Main Content */}
           <div className="md:col-span-2 space-y-8">
             {/* Description */}
-            <div className="bg-white rounded-xl shadow-sm p-6 sm:p-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Tentang {destination.name}</h2>
+            <div className="bg-ink-850 rounded-xl shadow-sm p-6 sm:p-8">
+              <h2 className="text-xl font-semibold text-ivory mb-4">Tentang {destination.name}</h2>
               <div
-                className="prose prose-gray max-w-none text-gray-600 leading-relaxed"
+                className="prose prose-gray max-w-none text-mist leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: destination.description }}
               />
             </div>
 
             {/* Gallery */}
             {gallery.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm p-6 sm:p-8">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Galeri Foto</h2>
+              <div className="bg-ink-850 rounded-xl shadow-sm p-6 sm:p-8">
+                <h2 className="text-xl font-semibold text-ivory mb-4">Galeri Foto</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {gallery.map((url, i) => (
                     <div key={i} className="aspect-[4/3] rounded-lg overflow-hidden relative">
@@ -171,17 +171,17 @@ export default async function DestinationDetailPage({
 
             {/* Activities */}
             {activities.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm p-6 sm:p-8">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              <div className="bg-ink-850 rounded-xl shadow-sm p-6 sm:p-8">
+                <h2 className="text-xl font-semibold text-ivory mb-4">
                   Aktivitas di {destination.name}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {activities.map((act, i) => (
-                    <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                      <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">
+                    <div key={i} className="flex items-center gap-3 p-3 bg-ink-900 rounded-lg">
+                      <span className="w-8 h-8 bg-gold-400/15 text-gold-300 rounded-full flex items-center justify-center text-sm font-bold">
                         {i + 1}
                       </span>
-                      <span className="text-sm text-gray-700">{act}</span>
+                      <span className="text-sm text-mist">{act}</span>
                     </div>
                   ))}
                 </div>
@@ -192,37 +192,37 @@ export default async function DestinationDetailPage({
           {/* Sidebar */}
           <div className="space-y-6 md:sticky md:top-20">
             {/* Quick Info */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Informasi Destinasi</h3>
+            <div className="bg-ink-850 rounded-xl shadow-sm p-6">
+              <h3 className="font-semibold text-ivory mb-4">Informasi Destinasi</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <span className="text-lg">📍</span>
                   <div>
-                    <p className="text-xs text-gray-500">Lokasi</p>
-                    <p className="text-sm font-medium text-gray-900">{destination.location}</p>
+                    <p className="text-xs text-mist-dim">Lokasi</p>
+                    <p className="text-sm font-medium text-ivory">{destination.location}</p>
                   </div>
                 </div>
                 {destination.bestTimeToVisit && (
                   <div className="flex items-center gap-3">
                     <span className="text-lg">📅</span>
                     <div>
-                      <p className="text-xs text-gray-500">Waktu Terbaik</p>
-                      <p className="text-sm font-medium text-gray-900">{destination.bestTimeToVisit}</p>
+                      <p className="text-xs text-mist-dim">Waktu Terbaik</p>
+                      <p className="text-sm font-medium text-ivory">{destination.bestTimeToVisit}</p>
                     </div>
                   </div>
                 )}
                 <div className="flex items-center gap-3">
                   <span className="text-lg">🎯</span>
                   <div>
-                    <p className="text-xs text-gray-500">Paket Tour</p>
-                    <p className="text-sm font-medium text-gray-900">{tourCount} tersedia</p>
+                    <p className="text-xs text-mist-dim">Paket Tour</p>
+                    <p className="text-sm font-medium text-ivory">{tourCount} tersedia</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-lg">⭐</span>
                   <div>
-                    <p className="text-xs text-gray-500">Rating</p>
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-xs text-mist-dim">Rating</p>
+                    <p className="text-sm font-medium text-ivory">
                       {avgRating.toFixed(1)} / 5.0 ({reviewCount} ulasan)
                     </p>
                   </div>
@@ -231,9 +231,9 @@ export default async function DestinationDetailPage({
             </div>
 
             {/* CTA */}
-            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl shadow-sm p-6 text-white">
-              <h3 className="font-semibold text-lg mb-2">{ctaHeading}</h3>
-              <p className="text-blue-100 text-sm mb-4">
+            <div className="bg-gradient-to-br from-gold-400/15 to-ink-850 rounded-xl shadow-sm p-6 border border-gold-500/30">
+              <h3 className="font-semibold text-lg mb-2 text-ivory">{ctaHeading}</h3>
+              <p className="text-mist text-sm mb-4">
                 {ctaSubheading.replace('{{name}}', destination.name)}
               </p>
               <Button href={ctaButtonLink} variant="accent" size="sm" fullWidth>
@@ -243,8 +243,8 @@ export default async function DestinationDetailPage({
 
             {/* Related Tours */}
             {destination.tours && destination.tours.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">
+              <div className="bg-ink-850 rounded-xl shadow-sm p-6">
+                <h3 className="font-semibold text-ivory mb-4">
                   Paket Tour ke {destination.name}
                 </h3>
                 <div className="space-y-3">
@@ -259,9 +259,9 @@ export default async function DestinationDetailPage({
                     <Link
                       key={tour.id}
                       href={`/tours/${tour.slug}`}
-                      className="flex gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors group"
+                      className="flex gap-3 p-2 rounded-lg hover:bg-ink-800 transition-colors group"
                     >
-                      <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-200 relative">
+                      <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-ink-700 relative">
                         {tour.coverImg && (
                           <Image
                             src={tour.coverImg}
@@ -273,10 +273,10 @@ export default async function DestinationDetailPage({
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 truncate">
+                        <p className="text-sm font-medium text-ivory group-hover:text-gold-300 truncate">
                           {tour.name}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-mist-dim">
                           {tour.duration} · {formatCurrency(tour.priceAdult)}
                         </p>
                       </div>
@@ -285,7 +285,7 @@ export default async function DestinationDetailPage({
                   {tourCount > 6 && (
                     <Link
                       href={`/tours?destination=${encodeURIComponent(destination.name)}`}
-                      className="block text-center text-sm text-blue-600 hover:text-blue-700 mt-2"
+                      className="block text-center text-sm text-gold-300 hover:text-gold-200 mt-2"
                     >
                       Lihat {tourCount - 6} paket lainnya →
                     </Link>

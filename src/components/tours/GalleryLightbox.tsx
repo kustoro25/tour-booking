@@ -100,7 +100,7 @@ export default function GalleryLightbox({
           {/* Close */}
           <button
             onClick={onClose}
-            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all"
+            className="w-10 h-10 rounded-full bg-ink-850/70 hover:bg-ink-700/90 border border-gold-500/25 text-gold-200 flex items-center justify-center transition-all"
             aria-label="Tutup galeri"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -127,7 +127,7 @@ export default function GalleryLightbox({
         {images.length > 1 && (
           <button
             onClick={(e) => { e.stopPropagation(); goPrev(); }}
-            className="absolute left-2 sm:left-4 z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition-all backdrop-blur-sm shadow-lg"
+            className="absolute left-2 sm:left-4 z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-ink-850/70 hover:bg-ink-700/90 border border-gold-500/25 text-gold-200 flex items-center justify-center transition-all backdrop-blur-sm shadow-lg"
             aria-label="Foto sebelumnya"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -150,7 +150,7 @@ export default function GalleryLightbox({
         {images.length > 1 && (
           <button
             onClick={(e) => { e.stopPropagation(); goNext(); }}
-            className="absolute right-2 sm:right-4 z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition-all backdrop-blur-sm shadow-lg"
+            className="absolute right-2 sm:right-4 z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-ink-850/70 hover:bg-ink-700/90 border border-gold-500/25 text-gold-200 flex items-center justify-center transition-all backdrop-blur-sm shadow-lg"
             aria-label="Foto berikutnya"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -173,8 +173,8 @@ export default function GalleryLightbox({
                 onClick={() => goTo(i)}
                 className={`flex-shrink-0 w-14 h-10 sm:w-20 sm:h-14 rounded-lg overflow-hidden border-2 transition-all duration-200 snap-center relative ${
                   i === currentIndex
-                    ? 'border-white shadow-lg scale-105 ring-2 ring-white/30'
-                    : 'border-white/15 opacity-50 hover:opacity-80 hover:border-white/40'
+                    ? 'border-gold-400 shadow-lg shadow-gold-500/30 scale-105 ring-2 ring-gold-400/30'
+                    : 'border-white/15 opacity-50 hover:opacity-80 hover:border-gold-400/50'
                 }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -197,7 +197,7 @@ export default function GalleryLightbox({
             <div
               key={i}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                i === currentIndex ? 'bg-white scale-125' : 'bg-white/40'
+                i === currentIndex ? 'bg-gold-400 scale-125' : 'bg-ink-700'
               }`}
             />
           ))}

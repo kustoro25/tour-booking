@@ -27,7 +27,7 @@ export default function WhatsAppButton() {
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
       {/* Tooltip */}
       {showTooltip && (
-        <div className="bg-white shadow-lg rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 animate-fade-in whitespace-nowrap">
+        <div className="bg-ink-850 shadow-lg rounded-xl px-4 py-2.5 text-sm font-medium text-mist animate-fade-in whitespace-nowrap">
           Chat via WhatsApp 💬
         </div>
       )}

@@ -26,18 +26,18 @@ type ButtonAsLink = ButtonBaseProps &
 type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 shadow-md shadow-amber-500/20 hover:shadow-lg hover:shadow-amber-500/30',
-  secondary: 'bg-gradient-to-r from-slate-700 to-slate-800 text-white hover:from-slate-800 hover:to-slate-900 shadow-md shadow-slate-500/20 hover:shadow-lg hover:shadow-slate-500/30',
-  accent: 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30',
-  outline: 'border-2 border-amber-600 text-amber-600 hover:bg-amber-50 hover:border-amber-700 hover:text-amber-700',
+  primary: 'bg-gradient-to-r from-gold-200 via-gold-400 to-gold-600 text-ink-950 hover:from-gold-100 hover:via-gold-300 hover:to-gold-500 shadow-md shadow-gold-500/25 hover:shadow-lg hover:shadow-gold-400/40',
+  secondary: 'bg-gradient-to-r from-ink-700 to-ink-800 text-ivory border border-ink-600 hover:from-ink-600 hover:to-ink-700 hover:border-gold-500/40 shadow-md shadow-ink-950/40 hover:shadow-lg hover:shadow-ink-950/50',
+  accent: 'bg-gradient-to-r from-gold-200 via-gold-400 to-gold-600 text-ink-950 hover:from-gold-100 hover:via-gold-300 hover:to-gold-500 shadow-md shadow-gold-500/25 hover:shadow-lg hover:shadow-gold-400/40',
+  outline: 'border-2 border-gold-500/70 text-gold-300 hover:bg-gold-400/10 hover:border-gold-400 hover:text-gold-200',
   danger: 'bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 shadow-md shadow-red-500/20 hover:shadow-lg hover:shadow-red-500/30',
   success: 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 shadow-md shadow-green-500/20 hover:shadow-lg hover:shadow-green-500/30',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-5 py-2.5 text-base',
-  lg: 'px-7 py-3 text-lg',
+  sm: 'h-9 px-3.5 sm:px-4 text-sm',
+  md: 'h-11 px-5 sm:px-6 text-sm sm:text-base',
+  lg: 'h-12 px-6 sm:px-8 text-base sm:text-lg',
 };
 
 export default function Button(props: ButtonProps) {
@@ -52,8 +52,9 @@ export default function Button(props: ButtonProps) {
   } = props;
 
   const classes = `
-    inline-flex items-center justify-center gap-2 rounded-xl font-semibold 
+    inline-flex items-center justify-center gap-2 rounded-xl font-semibold whitespace-nowrap
     transition-all duration-200 active:scale-[0.97]
+    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-300/80 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950
     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
     ${variantClasses[variant]}
     ${sizeClasses[size]}

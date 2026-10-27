@@ -22,7 +22,7 @@ export default async function TermsPage() {
   if (content) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-12">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 text-center">Syarat & Ketentuan</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold text-ivory mb-4 text-center">Syarat & Ketentuan</h1>
         <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content }} />
       </div>
     );
@@ -31,7 +31,7 @@ export default async function TermsPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-12">
-      <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 text-center">Syarat & Ketentuan</h1>
+      <h1 className="text-3xl sm:text-4xl font-bold text-ivory mb-4 text-center">Syarat & Ketentuan</h1>
       <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content || defaultHtml }} />
     </div>
   );

@@ -119,7 +119,7 @@ export default function AdminShell({ brandName, brandIcon, children }: Props) {
       )}
 
       {/* Main Content */}
-      <div className="lg:ml-56 min-h-screen">
+      <div className="lg:ml-56 min-h-screen bg-gray-50 text-gray-800">
         <main className="p-4 sm:p-6 lg:p-8">
           <ToastProvider>{children}</ToastProvider>
         </main>

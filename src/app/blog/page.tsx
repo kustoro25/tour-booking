@@ -83,13 +83,13 @@ export default async function BlogPage({ searchParams }: PageProps) {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-12">
       {/* Header */}
       <div className="text-center mb-10">
-        <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">
+        <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">
           {cms.label}
         </span>
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+        <h1 className="text-3xl sm:text-4xl font-bold text-ivory mb-4">
           {cms.heading}
         </h1>
-        <p className="text-gray-500 max-w-2xl mx-auto">
+        <p className="text-mist-dim max-w-2xl mx-auto">
           {cms.subheading}
         </p>
       </div>
@@ -99,7 +99,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
         <Link
           href="/blog"
           className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-            !category ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'
+            !category ? 'bg-gold-400 text-ink-950' : 'bg-ink-850 text-mist border border-ink-600 hover:bg-ink-800'
           }`}
         >
           Semua
@@ -109,7 +109,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
             key={cat}
             href={`/blog?category=${encodeURIComponent(cat)}`}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              category === cat ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'
+              category === cat ? 'bg-gold-400 text-ink-950' : 'bg-ink-850 text-mist border border-ink-600 hover:bg-ink-800'
             }`}
           >
             {cat}
@@ -119,14 +119,14 @@ export default async function BlogPage({ searchParams }: PageProps) {
 
       {/* Blog Grid */}
       {posts.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-xl shadow-sm">
+        <div className="text-center py-20 bg-ink-850 rounded-xl shadow-sm">
           <div className="text-6xl mb-4">📝</div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">Belum ada artikel</h3>
-          <p className="text-gray-500">Artikel baru akan segera hadir. Kunjungi lagi nanti!</p>
+          <h3 className="text-xl font-semibold text-mist mb-2">Belum ada artikel</h3>
+          <p className="text-mist-dim">Artikel baru akan segera hadir. Kunjungi lagi nanti!</p>
         </div>
       ) : (
         <>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-mist-dim mb-4">
             Menampilkan {posts.length} dari {total} artikel
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -134,10 +134,10 @@ export default async function BlogPage({ searchParams }: PageProps) {
               <Link
                 key={post.id}
                 href={`/blog/${post.slug}`}
-                className="group bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300 border border-gray-100"
+                className="group bg-ink-850 rounded-xl shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300 border border-ink-700"
               >
                 {/* Cover */}
-                <div className="h-44 bg-gray-200 relative overflow-hidden">
+                <div className="h-44 bg-ink-700 relative overflow-hidden">
                   {post.coverImg ? (
                     <Image
                       src={post.coverImg}
@@ -147,28 +147,28 @@ export default async function BlogPage({ searchParams }: PageProps) {
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-teal-400">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gold-300 to-gold-600">
                       <span className="text-white text-3xl">📝</span>
                     </div>
                   )}
                   {/* Category badge */}
-                  <span className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
+                  <span className="absolute top-3 left-3 bg-ink-900/95 backdrop-blur-sm text-mist text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
                     {post.category}
                   </span>
                 </div>
 
                 {/* Content */}
                 <div className="p-5">
-                  <div className="flex items-center gap-3 text-xs text-gray-400 mb-2">
+                  <div className="flex items-center gap-3 text-xs text-mist-dim mb-2">
                     <span>{formatDate(post.createdAt)}</span>
                     <span>•</span>
                     <span>{post.viewCount} views</span>
                   </div>
-                  <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2">
+                  <h3 className="font-semibold text-ivory group-hover:text-gold-300 transition-colors line-clamp-2 mb-2">
                     {post.title}
                   </h3>
                   {post.excerpt && (
-                    <p className="text-sm text-gray-500 line-clamp-2">{post.excerpt}</p>
+                    <p className="text-sm text-mist-dim line-clamp-2">{post.excerpt}</p>
                   )}
                 </div>
               </Link>

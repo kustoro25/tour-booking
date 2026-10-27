@@ -25,8 +25,8 @@ export default function GalleryCarousel({ photos }: GalleryCarouselProps) {
     <div className="flex flex-col gap-4">
       {/* Top row — scroll left */}
       <div className="relative overflow-hidden group/row">
-        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 z-10 bg-gradient-to-r from-white to-transparent pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 z-10 bg-gradient-to-r from-transparent to-white pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 z-10 bg-gradient-to-r from-ink-850 to-transparent pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 z-10 bg-gradient-to-r from-transparent to-ink-950 pointer-events-none" />
 
         <div
           className="flex animate-scroll-left group-hover/row:[animation-play-state:paused]"
@@ -38,7 +38,7 @@ export default function GalleryCarousel({ photos }: GalleryCarouselProps) {
               href={`/destinations/${photo.destinationSlug}`}
               className="flex-shrink-0 w-56 sm:w-64 md:w-72 mx-2 sm:mx-3 group/photo"
             >
-              <div className="relative h-40 sm:h-48 rounded-xl overflow-hidden shadow-md transition-all duration-300 group-hover/photo:shadow-xl group-hover/photo:ring-2 group-hover/photo:ring-blue-400 group-hover/photo:ring-offset-2 group-hover/photo:ring-offset-white">
+              <div className="relative h-40 sm:h-48 rounded-xl overflow-hidden shadow-md transition-all duration-300 group-hover/photo:shadow-xl group-hover/photo:ring-2 group-hover/photo:ring-gold-400 group-hover/photo:ring-offset-2 group-hover/photo:ring-offset-white">
                 <Image
                   src={photo.url}
                   alt={photo.alt}
@@ -52,9 +52,9 @@ export default function GalleryCarousel({ photos }: GalleryCarouselProps) {
                     {photo.destinationName}
                   </p>
                 </div>
-                <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover/photo:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gold-400/10 opacity-0 group-hover/photo:opacity-100 transition-opacity duration-300" />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-opacity duration-300">
-                  <span className="bg-white/95 backdrop-blur-sm text-gray-800 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg">
+                  <span className="bg-ink-900/95 backdrop-blur-sm text-ivory text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg">
                     Lihat Destinasi
                   </span>
                 </div>
@@ -66,8 +66,8 @@ export default function GalleryCarousel({ photos }: GalleryCarouselProps) {
 
       {/* Bottom row — scroll right */}
       <div className="relative overflow-hidden group/row">
-        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 z-10 bg-gradient-to-r from-white to-transparent pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 z-10 bg-gradient-to-r from-transparent to-white pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 z-10 bg-gradient-to-r from-ink-850 to-transparent pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 z-10 bg-gradient-to-r from-transparent to-ink-950 pointer-events-none" />
 
         <div
           className="flex animate-scroll-right group-hover/row:[animation-play-state:paused]"
@@ -79,7 +79,7 @@ export default function GalleryCarousel({ photos }: GalleryCarouselProps) {
               href={`/destinations/${photo.destinationSlug}`}
               className="flex-shrink-0 w-56 sm:w-64 md:w-72 mx-2 sm:mx-3 group/photo"
             >
-              <div className="relative h-40 sm:h-48 rounded-xl overflow-hidden shadow-md transition-all duration-300 group-hover/photo:shadow-xl group-hover/photo:ring-2 group-hover/photo:ring-blue-400 group-hover/photo:ring-offset-2 group-hover/photo:ring-offset-white">
+              <div className="relative h-40 sm:h-48 rounded-xl overflow-hidden shadow-md transition-all duration-300 group-hover/photo:shadow-xl group-hover/photo:ring-2 group-hover/photo:ring-gold-400 group-hover/photo:ring-offset-2 group-hover/photo:ring-offset-white">
                 <Image
                   src={photo.url}
                   alt={photo.alt}
@@ -93,9 +93,9 @@ export default function GalleryCarousel({ photos }: GalleryCarouselProps) {
                     {photo.destinationName}
                   </p>
                 </div>
-                <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover/photo:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gold-400/10 opacity-0 group-hover/photo:opacity-100 transition-opacity duration-300" />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-opacity duration-300">
-                  <span className="bg-white/95 backdrop-blur-sm text-gray-800 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg">
+                  <span className="bg-ink-900/95 backdrop-blur-sm text-ivory text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg">
                     Lihat Destinasi
                   </span>
                 </div>

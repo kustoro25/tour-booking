@@ -88,34 +88,34 @@ export default async function TestimonialsPage({ searchParams }: PageProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-12">
       <div className="text-center mb-12">
-        <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">{cms.label}</span>
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+        <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">{cms.label}</span>
+        <h1 className="text-3xl sm:text-4xl font-bold text-ivory mb-4">
           {cms.heading}
         </h1>
-        <p className="text-gray-500 max-w-2xl mx-auto">
+        <p className="text-mist-dim max-w-2xl mx-auto">
           {cms.subheading}
         </p>
       </div>
 
       {/* Rating Summary */}
       {reviews.length > 0 && (
-        <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-card p-6 sm:p-8 mb-8 flex flex-col sm:flex-row items-center gap-6 sm:gap-10 border border-blue-100">
+        <div className="bg-gradient-to-br from-gold-400/10 to-ink-950 rounded-xl shadow-card p-6 sm:p-8 mb-8 flex flex-col sm:flex-row items-center gap-6 sm:gap-10 border border-gold-500/20">
           <div className="text-center flex-shrink-0">
             <p className="text-5xl font-extrabold gradient-text">{avgRating.toFixed(1)}</p>
             <StarRating rating={avgRating} size="md" />
-            <p className="text-sm text-gray-500 mt-2 font-medium">{total} review</p>
+            <p className="text-sm text-mist-dim mt-2 font-medium">{total} review</p>
           </div>
           <div className="flex-1 w-full space-y-2">
             {distribution.map((d) => (
               <div key={d.star} className="flex items-center gap-3 text-sm">
-                <span className="w-10 text-right text-gray-600 font-medium">{d.star} ★</span>
-                <div className="flex-1 bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                <span className="w-10 text-right text-mist font-medium">{d.star} ★</span>
+                <div className="flex-1 bg-ink-700 rounded-full h-2.5 overflow-hidden">
                   <div
-                    className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-2.5 rounded-full transition-all duration-700"
+                    className="bg-gradient-to-r from-gold-300 to-gold-400 h-2.5 rounded-full transition-all duration-700"
                     style={{ width: `${d.percentage}%` }}
                   />
                 </div>
-                <span className="w-8 text-gray-500 text-xs">{d.count}</span>
+                <span className="w-8 text-mist-dim text-xs">{d.count}</span>
               </div>
             ))}
           </div>
@@ -125,21 +125,21 @@ export default async function TestimonialsPage({ searchParams }: PageProps) {
       {/* Reviews Grid */}
       {reviews.length > 0 ? (
         <>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-mist-dim mb-4">
             Menampilkan {reviews.length} dari {total} testimoni
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {reviews.map((review) => (
-              <div key={review.id} className="bg-white rounded-xl shadow-card p-6 border border-gray-100 hover-lift">
-                <div className="text-4xl text-blue-200 mb-2 leading-none">&ldquo;</div>
+              <div key={review.id} className="bg-ink-850 rounded-xl shadow-card p-6 border border-ink-700 hover-lift">
+                <div className="text-4xl text-gold-200 mb-2 leading-none">&ldquo;</div>
                 <StarRating rating={review.rating} size="sm" />
-                <p className="text-gray-600 mt-3 text-sm leading-relaxed">
+                <p className="text-mist mt-3 text-sm leading-relaxed">
                   {review.reviewText}
                 </p>
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="font-semibold text-gray-900 text-sm">{review.order.customerName}</p>
-                  <p className="text-xs text-gray-500">{review.tour.name}</p>
-                  <p className="text-xs text-gray-400 mt-1">
+                <div className="mt-4 pt-4 border-t border-ink-700">
+                  <p className="font-semibold text-ivory text-sm">{review.order.customerName}</p>
+                  <p className="text-xs text-mist-dim">{review.tour.name}</p>
+                  <p className="text-xs text-mist-dim mt-1">
                     {new Date(review.createdAt).toLocaleDateString('id-ID')}
                   </p>
                 </div>
@@ -154,10 +154,10 @@ export default async function TestimonialsPage({ searchParams }: PageProps) {
           />
         </>
       ) : (
-        <div className="text-center py-16 bg-white rounded-xl shadow-card border border-gray-100">
+        <div className="text-center py-16 bg-ink-850 rounded-xl shadow-card border border-ink-700">
           <div className="text-6xl mb-4">📝</div>
-          <p className="text-lg text-gray-600 font-medium">Belum ada testimoni.</p>
-          <p className="text-sm text-gray-400 mt-1">Jadilah yang pertama memberikan ulasan!</p>
+          <p className="text-lg text-mist font-medium">Belum ada testimoni.</p>
+          <p className="text-sm text-mist-dim mt-1">Jadilah yang pertama memberikan ulasan!</p>
         </div>
       )}
 

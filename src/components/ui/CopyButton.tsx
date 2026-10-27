@@ -26,7 +26,7 @@ export default function CopyButton({ bankNumber }: { bankNumber: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="text-blue-600 text-sm hover:text-blue-700 font-medium transition-colors"
+      className="text-gold-300 text-sm hover:text-gold-200 font-medium transition-colors"
     >
       {copied ? '✓ Tersalin' : 'Salin'}
     </button>

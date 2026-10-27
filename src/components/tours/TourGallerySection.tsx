@@ -20,8 +20,8 @@ export default function TourGallerySection({ images, tourName }: TourGallerySect
 
   if (images.length === 0) {
     return (
-      <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-        <div className="w-full h-56 sm:h-80 bg-gradient-to-br from-blue-400 to-teal-400 flex items-center justify-center">
+      <div className="bg-ink-850 rounded-xl overflow-hidden shadow-sm">
+        <div className="w-full h-56 sm:h-80 bg-gradient-to-br from-gold-300 to-gold-600 flex items-center justify-center">
           <span className="text-white text-5xl sm:text-6xl">🏝️</span>
         </div>
       </div>
@@ -35,7 +35,7 @@ export default function TourGallerySection({ images, tourName }: TourGallerySect
 
   return (
     <>
-      <div className="bg-white rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-ink-850 rounded-xl overflow-hidden shadow-sm">
         {/* === MOBILE: horizontal scroll carousel === */}
         <div className="sm:hidden relative">
           <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-none">
@@ -66,7 +66,7 @@ export default function TourGallerySection({ images, tourName }: TourGallerySect
             {images.map((_, i) => (
               <div
                 key={i}
-                className="w-1.5 h-1.5 rounded-full bg-white/60"
+                className="w-1.5 h-1.5 rounded-full bg-gold-200/70"
               />
             ))}
           </div>

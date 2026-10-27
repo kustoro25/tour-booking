@@ -140,7 +140,7 @@ export default function InstallmentTrackingPage() {
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+        <div className="bg-ink-850 rounded-xl shadow-sm p-6 space-y-4">
           <Skeleton className="h-8 w-64" />
           <Skeleton className="h-5 w-48" />
           <Skeleton className="h-64 w-full rounded-xl" />
@@ -152,8 +152,8 @@ export default function InstallmentTrackingPage() {
   if (error || !data) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-20 text-center">
-        <h2 className="text-2xl font-bold text-gray-700 mb-2">{error || 'Data tidak ditemukan'}</h2>
-        <Link href="/" className="text-blue-600 hover:underline">Kembali ke Beranda</Link>
+        <h2 className="text-2xl font-bold text-mist mb-2">{error || 'Data tidak ditemukan'}</h2>
+        <Link href="/" className="text-gold-300 hover:underline">Kembali ke Beranda</Link>
       </div>
     );
   }
@@ -167,12 +167,12 @@ export default function InstallmentTrackingPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-      <Link href={`/invoice/${invoiceNo}`} className="text-blue-600 hover:underline text-sm mb-4 inline-block">
+      <Link href={`/invoice/${invoiceNo}`} className="text-gold-300 hover:underline text-sm mb-4 inline-block">
         ← Kembali ke Invoice
       </Link>
 
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">Pembayaran Angsuran</h1>
-      <p className="text-gray-500 text-sm mb-6">
+      <h1 className="text-2xl font-bold text-ivory mb-1">Pembayaran Angsuran</h1>
+      <p className="text-mist-dim text-sm mb-6">
         {order.tour.name} &bull; Invoice: {invoiceNo}
       </p>
 
@@ -181,8 +181,8 @@ export default function InstallmentTrackingPage() {
         <div
           className={`rounded-xl p-4 mb-6 text-sm border ${
             payNotice === 'finish'
-              ? 'bg-blue-50 border-blue-200 text-blue-700'
-              : 'bg-red-50 border-red-200 text-red-700'
+              ? 'bg-gold-400/10 border-gold-500/30 text-gold-200'
+              : 'bg-red-500/10 border-red-500/30 text-red-300'
           }`}
         >
           {payNotice === 'finish' ? (
@@ -211,28 +211,28 @@ export default function InstallmentTrackingPage() {
       )}
 
       {/* Summary */}
-      <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+      <div className="bg-ink-850 rounded-xl shadow-sm p-6 mb-6">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
           <div>
-            <span className="text-gray-400 text-xs">Total</span>
+            <span className="text-mist-dim text-xs">Total</span>
             <p className="font-semibold">{formatCurrency(plan.totalAmount)}</p>
           </div>
           <div>
-            <span className="text-gray-400 text-xs">DP ({plan.dpPercentage}%)</span>
-            <p className="font-semibold text-orange-600">{formatCurrency(plan.downPayment)}</p>
+            <span className="text-mist-dim text-xs">DP ({plan.dpPercentage}%)</span>
+            <p className="font-semibold text-gold-300">{formatCurrency(plan.downPayment)}</p>
             {dpPayment && (
-              <span className={`text-[10px] font-medium ${dpPayment.status === 'CONFIRMED' ? 'text-emerald-600' : 'text-amber-600'}`}>
+              <span className={`text-[10px] font-medium ${dpPayment.status === 'CONFIRMED' ? 'text-emerald-300' : 'text-gold-300'}`}>
                 {dpPayment.status === 'CONFIRMED' ? '✓ Lunas' : 'Menunggu'}
               </span>
             )}
           </div>
           <div>
-            <span className="text-gray-400 text-xs">Angsuran</span>
+            <span className="text-mist-dim text-xs">Angsuran</span>
             <p className="font-semibold">{plan.installmentCount}x @ {formatCurrency(plan.amountPerInstallment)}</p>
           </div>
           <div>
-            <span className="text-gray-400 text-xs">Status</span>
-            <p className={`font-semibold ${plan.status === 'COMPLETED' ? 'text-green-600' : plan.status === 'CANCELLED' ? 'text-red-600' : 'text-blue-600'}`}>
+            <span className="text-mist-dim text-xs">Status</span>
+            <p className={`font-semibold ${plan.status === 'COMPLETED' ? 'text-green-300' : plan.status === 'CANCELLED' ? 'text-red-300' : 'text-gold-300'}`}>
               {plan.status === 'ACTIVE' ? 'Aktif' : plan.status === 'COMPLETED' ? 'Lunas' : 'Dibatalkan'}
             </p>
           </div>
@@ -241,9 +241,9 @@ export default function InstallmentTrackingPage() {
 
       {/* Info pembayaran online */}
       {isOnline && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-sm text-blue-800">
+        <div className="bg-gold-400/10 border border-gold-500/30 rounded-xl p-4 mb-6 text-sm text-gold-200">
           <p className="font-semibold mb-1">💳 Pembayaran Online (Otomatis)</p>
-          <p className="text-xs text-blue-600 leading-relaxed">
+          <p className="text-xs text-gold-300 leading-relaxed">
             Bayar melalui halaman pembayaran aman <strong>Midtrans</strong> — QRIS, Virtual Account berbagai bank,
             e-wallet (GoPay, ShopeePay, DANA), atau kartu kredit/debit. Setiap pembayaran
             <strong> terkonfirmasi otomatis</strong> — tidak perlu upload bukti atau konfirmasi admin.
@@ -253,10 +253,10 @@ export default function InstallmentTrackingPage() {
 
       {/* Rekening Pembayaran (mode transfer manual) */}
       {!isOnline && banks.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-          <div className="px-5 py-3 bg-blue-50 border-b border-blue-100">
-            <h3 className="text-sm font-semibold text-blue-800">Rekening Pembayaran</h3>
-            <p className="text-xs text-blue-600 mt-0.5">
+        <div className="bg-ink-850 rounded-xl shadow-sm overflow-hidden mb-6">
+          <div className="px-5 py-3 bg-gold-400/10 border-b border-gold-500/20">
+            <h3 className="text-sm font-semibold text-gold-200">Rekening Pembayaran</h3>
+            <p className="text-xs text-gold-300 mt-0.5">
               Transfer ke salah satu rekening berikut, lalu unggah bukti transfer pada tabel di bawah.
             </p>
           </div>
@@ -264,13 +264,13 @@ export default function InstallmentTrackingPage() {
             {banks.map((b) => (
               <div
                 key={`${b.bank}-${b.number}`}
-                className="flex flex-wrap items-center justify-between gap-2 text-sm border border-gray-100 rounded-lg px-4 py-3"
+                className="flex flex-wrap items-center justify-between gap-2 text-sm border border-ink-700 rounded-lg px-4 py-3"
               >
                 <div>
-                  <span className="font-semibold text-gray-800">{b.bank}</span>
-                  <span className="text-gray-300 mx-2">•</span>
-                  <span className="font-mono text-gray-700">{b.number}</span>
-                  <p className="text-xs text-gray-400 mt-0.5">{b.name}</p>
+                  <span className="font-semibold text-ivory">{b.bank}</span>
+                  <span className="text-mist mx-2">•</span>
+                  <span className="font-mono text-mist">{b.number}</span>
+                  <p className="text-xs text-mist-dim mt-0.5">{b.name}</p>
                 </div>
                 <CopyButton bankNumber={b.number} />
               </div>
@@ -284,8 +284,8 @@ export default function InstallmentTrackingPage() {
         <div
           className={`rounded-xl p-4 mb-4 text-sm border ${
             uploadMsg.type === 'success'
-              ? 'bg-green-50 border-green-200 text-green-700'
-              : 'bg-red-50 border-red-200 text-red-700'
+              ? 'bg-green-500/10 border-green-500/30 text-green-300'
+              : 'bg-red-500/10 border-red-500/30 text-red-300'
           }`}
         >
           {uploadMsg.text}
@@ -293,13 +293,13 @@ export default function InstallmentTrackingPage() {
       )}
 
       {/* Payments Table */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-        <div className="px-5 py-3 bg-orange-50 border-b border-orange-100">
+      <div className="bg-ink-850 rounded-xl shadow-sm overflow-hidden mb-6">
+        <div className="px-5 py-3 bg-gold-400/10 border-b border-orange-100">
           <h3 className="text-sm font-semibold text-orange-800">Jadwal Angsuran</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-xs">
+            <thead className="bg-ink-900 text-mist-dim text-xs">
               <tr>
                 <th className="py-2.5 px-4 text-left font-medium">Angsuran</th>
                 <th className="py-2.5 px-4 text-right font-medium">Jumlah</th>
@@ -308,7 +308,7 @@ export default function InstallmentTrackingPage() {
                 <th className="py-2.5 px-4 text-center font-medium">{isOnline ? 'Pembayaran' : 'Bukti'}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-ink-700">
               {payments.map((p) => {
                 const st = p.status as InstallmentPaymentStatus;
                 const dotColor = InstallmentPaymentStatusDots[st] || 'bg-gray-500';
@@ -316,15 +316,15 @@ export default function InstallmentTrackingPage() {
                 const isNextDue = nextUnpaid?.installmentNumber === p.installmentNumber;
 
                 return (
-                  <tr key={p.id} className={isNextDue ? 'bg-amber-50' : ''}>
-                    <td className="py-3 px-4 font-medium text-gray-800">
+                  <tr key={p.id} className={isNextDue ? 'bg-gold-400/10' : ''}>
+                    <td className="py-3 px-4 font-medium text-ivory">
                       {labelFor(p)}
-                      {isNextDue && <span className="ml-2 text-xs text-orange-500 font-normal">(Berikutnya)</span>}
+                      {isNextDue && <span className="ml-2 text-xs text-gold-400 font-normal">(Berikutnya)</span>}
                     </td>
-                    <td className="py-3 px-4 text-right text-gray-700">
+                    <td className="py-3 px-4 text-right text-mist">
                       {formatCurrency(p.amount)}
                     </td>
-                    <td className="py-3 px-4 text-right text-gray-600">
+                    <td className="py-3 px-4 text-right text-mist">
                       {new Date(p.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </td>
                     <td className="py-3 px-4 text-center">
@@ -336,7 +336,7 @@ export default function InstallmentTrackingPage() {
                     <td className="py-3 px-4 text-center">
                       <div className="flex flex-col items-center gap-1">
                         {p.paymentProof && (
-                          <a href={p.paymentProof} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-xs">
+                          <a href={p.paymentProof} target="_blank" rel="noopener noreferrer" className="text-gold-300 hover:underline text-xs">
                             Lihat Bukti
                           </a>
                         )}
@@ -344,12 +344,12 @@ export default function InstallmentTrackingPage() {
                           p.status !== 'CONFIRMED' ? (
                             <a
                               href={`/api/installments/${invoiceNo}/pay/${p.installmentNumber}`}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-orange-500 text-white text-xs font-semibold hover:bg-orange-600 transition-colors whitespace-nowrap"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gold-400 text-ink-950 text-xs font-semibold hover:bg-gold-300 transition-colors whitespace-nowrap"
                             >
                               💳 Bayar Online
                             </a>
                           ) : (
-                            <span className="text-[10px] text-gray-400">
+                            <span className="text-[10px] text-mist-dim">
                               {p.paymentMethod ? `via ${p.paymentMethod.replace(/_/g, ' ')}` : 'Online'}
                             </span>
                           )
@@ -358,8 +358,8 @@ export default function InstallmentTrackingPage() {
                             <label
                               className={`text-xs font-medium transition-colors ${
                                 uploadingNum === p.installmentNumber
-                                  ? 'text-gray-400 cursor-wait'
-                                  : 'text-orange-600 hover:text-orange-700 hover:underline cursor-pointer'
+                                  ? 'text-mist-dim cursor-wait'
+                                  : 'text-gold-300 hover:text-gold-300 hover:underline cursor-pointer'
                               }`}
                             >
                               {uploadingNum === p.installmentNumber
@@ -392,7 +392,7 @@ export default function InstallmentTrackingPage() {
       </div>
 
       {/* Panduan Pembayaran */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 text-sm text-blue-800">
+      <div className="bg-gold-400/10 border border-gold-500/30 rounded-xl p-5 text-sm text-gold-200">
         {isOnline ? (
           <>
             <h3 className="font-semibold mb-2">💳 Cara Membayar (Online &amp; Otomatis)</h3>
@@ -401,7 +401,7 @@ export default function InstallmentTrackingPage() {
               <li>Pilih metode pembayaran di halaman aman <strong>Midtrans</strong> — QRIS, Virtual Account, e-wallet, atau kartu.</li>
               <li>Status pembayaran <strong>terkonfirmasi otomatis</strong> — tidak perlu upload bukti atau konfirmasi ke admin.</li>
             </ol>
-            <p className="mt-3 text-xs text-blue-600">
+            <p className="mt-3 text-xs text-gold-300">
               Link pembayaran berlaku 24 jam dan dapat dibuat ulang kapan saja. Ada kendala? Hubungi WhatsApp{' '}
               {companyPhone || 'admin'} atau email {companyEmail || 'yang tertera pada invoice'}.
             </p>
@@ -414,7 +414,7 @@ export default function InstallmentTrackingPage() {
               <li>Unggah bukti transfer melalui tombol <strong>Unggah Bukti</strong> pada baris angsuran di tabel.</li>
               <li>Admin akan memverifikasi dalam 1×24 jam — status berubah menjadi <strong>Terkonfirmasi</strong>.</li>
             </ol>
-            <p className="mt-3 text-xs text-blue-600">
+            <p className="mt-3 text-xs text-gold-300">
               Alternatif: kirim bukti melalui WhatsApp {companyPhone || 'admin'} atau email {companyEmail || 'yang tertera pada invoice'}.
             </p>
           </>

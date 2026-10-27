@@ -24,10 +24,10 @@ const HERO_STATS = [
 ];
 
 const VALUE_ITEMS = [
-  { icon: '🚙', title: 'Armada Prima', desc: 'Kendaraan bersih, wangi, dan terawat untuk kenyamanan perjalanan Anda.', color: 'from-amber-500 to-orange-600' },
-  { icon: '👨‍✈️', title: 'Supir Profesional', desc: 'Berpengalaman, ramah, dan siap melayani dari jam 07.00 hingga tengah malam.', color: 'from-green-500 to-emerald-600' },
-  { icon: '💰', title: 'Harga Transparan', desc: 'Tarif jelas tanpa biaya tersembunyi — apa yang Anda lihat, itulah yang Anda bayar.', color: 'from-purple-500 to-purple-600' },
-  { icon: '⚡', title: 'Booking Instan', desc: 'Pesan online via Midtrans, invoice langsung terbit dan masuk ke email Anda.', color: 'from-blue-500 to-blue-600' },
+  { icon: '🚙', title: 'Armada Prima', desc: 'Kendaraan bersih, wangi, dan terawat untuk kenyamanan perjalanan Anda.', color: 'from-gold-200 via-gold-400 to-gold-600' },
+  { icon: '👨‍✈️', title: 'Supir Profesional', desc: 'Berpengalaman, ramah, dan siap melayani dari jam 07.00 hingga tengah malam.', color: 'from-gold-300 to-gold-700' },
+  { icon: '💰', title: 'Harga Transparan', desc: 'Tarif jelas tanpa biaya tersembunyi — apa yang Anda lihat, itulah yang Anda bayar.', color: 'from-ink-600 to-ink-800' },
+  { icon: '⚡', title: 'Booking Instan', desc: 'Pesan online via Midtrans, invoice langsung terbit dan masuk ke email Anda.', color: 'from-gold-400 to-gold-600' },
 ];
 
 const FAQ_ITEMS = [
@@ -82,22 +82,22 @@ export default async function HomePage() {
   return (
     <>
       {/* ================= HERO ================= */}
-      <section className="relative text-white overflow-hidden bg-cover bg-center bg-no-repeat"
+      <section className="relative text-ivory overflow-hidden bg-cover bg-center bg-no-repeat border-b border-gold-500/20"
         style={{ backgroundImage: "url('/images/haybali/hero-bali.png')" }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/85 via-slate-900/70 to-amber-900/60" />
-        <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] blob bg-amber-400/10 animate-float" />
-        <div className="absolute bottom-[-15%] left-[-5%] w-[350px] h-[350px] blob bg-white/5 animate-float" style={{ animationDelay: '1s' }} />
+        <div className="absolute inset-0 bg-gradient-to-br from-ink-950/95 via-ink-950/80 to-gold-800/45" />
+        <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] blob bg-gold-400/15 animate-float" />
+        <div className="absolute bottom-[-15%] left-[-5%] w-[350px] h-[350px] blob bg-gold-200/5 animate-float" style={{ animationDelay: '1s' }} />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-20 sm:py-28 md:py-36">
           <div className="max-w-2xl">
-            <span className="inline-block bg-amber-400/15 backdrop-blur-sm border border-amber-300/30 rounded-full px-4 py-1.5 text-sm mb-6 tracking-wide animate-fade-in">
+            <span className="inline-block bg-gold-400/15 backdrop-blur-sm border border-gold-400/40 rounded-full px-4 py-1.5 text-sm mb-6 tracking-wide text-gold-200 animate-fade-in">
               {HAYBALI_BRAND} • {HAYBALI_TAGLINE}
             </span>
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6 animate-fade-in-up drop-shadow-lg">
-              Jelajahi Pesona Bali dengan <span className="text-amber-400">Kenyamanan VIP</span>
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6 text-ivory animate-fade-in-up drop-shadow-lg">
+              Jelajahi Pesona Bali dengan <span className="gradient-text">Kenyamanan VIP</span>
             </h1>
-            <p className="text-base sm:text-xl text-white/90 mb-8 leading-relaxed animate-fade-in-up animate-delay-200 drop-shadow">
+            <p className="text-base sm:text-xl text-mist mb-8 leading-relaxed animate-fade-in-up animate-delay-200 drop-shadow">
               Layanan sewa mobil mewah, paket tur privat terbaik, dan antar-jemput bandara 24/7.
               Supir berpengalaman, kendaraan prima, dan pelayanan profesional.
             </p>
@@ -105,15 +105,15 @@ export default async function HomePage() {
               <Button href="/tours" variant="accent" size="lg">
                 Booking Sekarang
               </Button>
-              <Button href={waLink('Halo HAYBALI TRANS, saya ingin bertanya tentang layanan Anda', waNumber)} variant="outline" size="lg" className="!border-white !text-white hover:!bg-white/10">
+              <Button href={waLink('Halo HAYBALI TRANS, saya ingin bertanya tentang layanan Anda', waNumber)} variant="outline" size="lg" className="!border-gold-400/60 !text-gold-200 hover:!bg-gold-400/10">
                 Chat WhatsApp
               </Button>
             </div>
-            <div className="flex flex-wrap items-center gap-6 mt-10 pt-8 border-t border-white/15 animate-fade-in-up animate-delay-400">
+            <div className="flex flex-wrap items-center gap-6 mt-10 pt-8 border-t border-gold-500/20 animate-fade-in-up animate-delay-400">
               {HERO_STATS.map((stat) => (
                 <div key={stat.label}>
-                  <p className="text-2xl sm:text-3xl font-bold text-amber-400">{stat.num}</p>
-                  <p className="text-sm text-white/70">{stat.label}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gold-300">{stat.num}</p>
+                  <p className="text-sm text-mist-dim">{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -122,19 +122,19 @@ export default async function HomePage() {
       </section>
 
       {/* ================= KEUNGGULAN ================= */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-ink-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           {/* Sambutan HAYBALI TRANS — di atas tulisan "Mengapa Memilih Kami?" */}
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+            <h2 className="text-2xl sm:text-3xl font-bold text-ivory mb-3">
               Selamat datang di {HAYBALI_BRAND}
             </h2>
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-mist leading-relaxed mb-4">
               Nikmati perjalanan bebas khawatir ke mana saja di Bali selama{' '}
               <strong>12 jam full</strong>, sudah include bahan bakar dan mineral water{' '}
               <strong>tanpa batasan jarak tempuh</strong>!
             </p>
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900 text-left">
+            <div className="bg-gold-400/10 border border-gold-500/30 rounded-xl p-4 text-sm text-gold-200 text-left">
               <p className="font-semibold mb-1">Catatan:</p>
               <p>
                 Pemesanan memerlukan <strong>deposit 50%</strong> terlebih dahulu untuk mengamankan
@@ -142,7 +142,7 @@ export default async function HomePage() {
                 bertemu dengan driver.
               </p>
             </div>
-            <p className="text-gray-600 mt-4 leading-relaxed">
+            <p className="text-mist mt-4 leading-relaxed">
               Jelajahi Bali dengan sopir pribadi berbahasa Inggris, kondisi mobil bagus dan bersih.
               Dapatkan harga dan layanan terbaik dengan jarak tempuh tak terbatas untuk pergi ke
               mana pun Anda mau.
@@ -150,20 +150,20 @@ export default async function HomePage() {
           </div>
 
           <div className="text-center mb-12">
-            <span className="inline-block text-amber-600 text-sm font-semibold tracking-wide uppercase mb-2">Mengapa Memilih Kami?</span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Pelayanan VIP, Tanpa Repot</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">
+            <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">Mengapa Memilih Kami?</span>
+            <h2 className="text-2xl sm:text-3xl font-bold text-ivory mb-4">Pelayanan VIP, Tanpa Repot</h2>
+            <p className="text-mist-dim max-w-2xl mx-auto">
               Kami hadir untuk memberikan pengalaman perjalanan terbaik di Bali dengan standar pelayanan premium.
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             {VALUE_ITEMS.map((item) => (
-              <div key={item.title} className="group bg-white rounded-xl p-3 sm:p-6 shadow-card hover-lift text-center border border-gray-100 hover:border-amber-100 transition-colors">
+              <div key={item.title} className="group bg-ink-850 rounded-xl p-3 sm:p-6 shadow-card hover-lift text-center border border-ink-700 hover:border-gold-500/20 transition-colors">
                 <div className={`w-10 h-10 sm:w-14 sm:h-14 mx-auto mb-2 sm:mb-4 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center text-xl sm:text-2xl shadow-md group-hover:scale-110 transition-transform duration-300`}>
                   <span>{item.icon}</span>
                 </div>
-                <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">{item.title}</h3>
-                <p className="text-gray-500 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="text-sm sm:text-lg font-semibold text-ivory mb-1 sm:mb-2">{item.title}</h3>
+                <p className="text-mist-dim text-xs sm:text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -171,19 +171,19 @@ export default async function HomePage() {
       </section>
 
       {/* ================= ARMADA ================= */}
-      <section className="py-16 sm:py-20 bg-gray-50">
+      <section className="py-16 sm:py-20 bg-ink-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block text-amber-600 text-sm font-semibold tracking-wide uppercase mb-2">Sewa Mobil</span>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Armada Mobil Utama</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">
+            <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">Sewa Mobil</span>
+            <h2 className="text-3xl font-bold text-ivory mb-4">Armada Mobil Utama</h2>
+            <p className="text-mist-dim max-w-2xl mx-auto">
               Kendaraan bersih, wangi, dan terawat untuk kenyamanan perjalanan Anda
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {FLEET.map((car) => (
-              <div key={car.slug} className="group bg-white rounded-xl overflow-hidden shadow-card hover-lift">
+              <div key={car.slug} className="group bg-ink-850 rounded-xl overflow-hidden shadow-card hover-lift">
                 <div className="relative h-52 overflow-hidden">
                   <Image
                     src={car.imageUrl}
@@ -193,16 +193,16 @@ export default async function HomePage() {
                     sizes="(max-width: 768px) 100vw, 33vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                  <span className="absolute bottom-3 left-3 bg-white/95 text-gray-800 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
+                  <span className="absolute bottom-3 left-3 bg-ink-900/95 text-ivory text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
                     {car.capacityLabel}
                   </span>
                 </div>
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 className="text-lg font-semibold text-gray-900">{car.name}</h3>
+                    <h3 className="text-lg font-semibold text-ivory">{car.name}</h3>
                     <span
                       className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
-                        car.tier === 'LUX' ? 'bg-amber-100 text-amber-700' : 'bg-gray-200 text-gray-700'
+                        car.tier === 'LUX' ? 'bg-gold-400/15 text-gold-300' : 'bg-ink-700 text-mist'
                       }`}
                     >
                       {car.tier}
@@ -210,32 +210,32 @@ export default async function HomePage() {
                   </div>
                   <div className="mb-2">
                     {car.price6h !== null && (
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-mist-dim">
                         {formatCurrency(car.price6h)}{' '}
-                        <span className="text-xs text-gray-400">/ 6 Jam</span>
+                        <span className="text-xs text-mist-dim">/ 6 Jam</span>
                       </p>
                     )}
-                    <p className="text-xl font-bold text-amber-600">
+                    <p className="text-xl font-bold text-gold-300">
                       {formatCurrency(car.price12h)}{' '}
-                      <span className="text-sm font-normal text-gray-400">/ 12 Jam</span>
+                      <span className="text-sm font-normal text-mist-dim">/ 12 Jam</span>
                     </p>
                   </div>
-                  <p className="text-xs text-gray-500 mb-1">
+                  <p className="text-xs text-mist-dim mb-1">
                     Lembur: {car.overtimePct}% dari harga/jam
                   </p>
-                  <p className="text-xs text-gray-500 mb-3">{car.paxNote}</p>
+                  <p className="text-xs text-mist-dim mb-3">{car.paxNote}</p>
                   <ul className="space-y-1.5 mb-4">
                     {car.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                        <span className="text-amber-500">✓</span> {f}
+                      <li key={f} className="flex items-center gap-2 text-sm text-mist">
+                        <span className="text-gold-400">✓</span> {f}
                       </li>
                     ))}
                   </ul>
-                  <div className="flex gap-2">
-                    <Button href={`/tours/${car.slug}/booking`} variant="primary" size="sm" fullWidth>
+                  <div className="flex flex-wrap gap-2">
+                    <Button href={`/tours/${car.slug}/booking`} variant="primary" size="sm" className="flex-1">
                       Sewa Sekarang
                     </Button>
-                    <Button href="/sewa-mobil" variant="outline" size="sm" fullWidth>
+                    <Button href="/sewa-mobil" variant="outline" size="sm" className="flex-1">
                       Detail
                     </Button>
                   </div>
@@ -247,12 +247,12 @@ export default async function HomePage() {
       </section>
 
       {/* ================= PAKET TOUR ================= */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-ink-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block text-amber-600 text-sm font-semibold tracking-wide uppercase mb-2">Paket Tour</span>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Paket Tour Destinasi Pilihan</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">
+            <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">Paket Tour</span>
+            <h2 className="text-3xl font-bold text-ivory mb-4">Paket Tour Destinasi Pilihan</h2>
+            <p className="text-mist-dim max-w-2xl mx-auto">
               Nikmati liburan seru di Bali tanpa khawatir rute perjalanan
             </p>
           </div>
@@ -262,7 +262,7 @@ export default async function HomePage() {
               <Link
                 key={tour.id}
                 href={`/tours/${tour.slug}`}
-                className="group bg-white rounded-xl overflow-hidden shadow-card hover-lift border border-gray-100"
+                className="group bg-ink-850 rounded-xl overflow-hidden shadow-card hover-lift border border-ink-700"
               >
                 <div className="relative h-48 overflow-hidden">
                   {tour.coverImg ? (
@@ -274,36 +274,36 @@ export default async function HomePage() {
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-400 to-orange-500">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gold-300 to-gold-600">
                       <span className="text-white text-4xl">🏝️</span>
                     </div>
                   )}
-                  <span className="absolute top-3 left-3 bg-white/95 text-gray-800 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
+                  <span className="absolute top-3 left-3 bg-ink-900/95 text-ivory text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
                     {TourCategoryLabels[tour.category as TourCategory] || tour.category}
                   </span>
                 </div>
                 <div className="p-5">
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                  <div className="flex items-center gap-2 text-sm text-mist-dim mb-1">
                     <span className="flex items-center gap-1"><span>🕐</span> {tour.duration}</span>
                     <span>•</span>
                     <span className="flex items-center gap-1"><span>📍</span> {tour.destination}</span>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors line-clamp-2">
+                  <h3 className="text-lg font-semibold text-ivory mb-2 group-hover:text-gold-300 transition-colors line-clamp-2">
                     {tour.name}
                   </h3>
                   <div className="flex items-center gap-2 mb-3">
                     {tour.avgRating > 0 ? (
                       <StarRating rating={tour.avgRating} size="sm" />
                     ) : (
-                      <span className="text-sm text-gray-400">Belum ada review</span>
+                      <span className="text-sm text-mist-dim">Belum ada review</span>
                     )}
                   </div>
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                  <div className="flex items-center justify-between pt-3 border-t border-ink-700">
                     <div>
-                      <span className="text-xs text-gray-400">Mulai dari</span>
-                      <p className="text-lg font-bold text-amber-600">{formatCurrency(tour.priceAdult)}</p>
+                      <span className="text-xs text-mist-dim">Mulai dari</span>
+                      <p className="text-lg font-bold text-gold-300">{formatCurrency(tour.priceAdult)}</p>
                     </div>
-                    <span className="inline-flex items-center text-sm font-medium text-amber-600 group-hover:translate-x-1 transition-transform duration-200">
+                    <span className="inline-flex items-center text-sm font-medium text-gold-300 group-hover:translate-x-1 transition-transform duration-200">
                       Lihat Detail →
                     </span>
                   </div>
@@ -313,7 +313,7 @@ export default async function HomePage() {
           </div>
 
           {tours.length === 0 && (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-mist-dim">
               Belum ada paket tour tersedia saat ini.
             </div>
           )}
@@ -327,20 +327,20 @@ export default async function HomePage() {
       </section>
 
       {/* ================= ANTAR-JEMPUT ================= */}
-      <section className="py-16 sm:py-20 bg-gray-50">
+      <section className="py-16 sm:py-20 bg-ink-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block text-amber-600 text-sm font-semibold tracking-wide uppercase mb-2">Layanan 24/7</span>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Antar-Jemput Bandara Ngurah Rai</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">
+            <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">Layanan 24/7</span>
+            <h2 className="text-3xl font-bold text-ivory mb-4">Antar-Jemput Bandara Ngurah Rai</h2>
+            <p className="text-mist-dim max-w-2xl mx-auto">
               Layanan penjemputan dan pengantaran tepat waktu. Harga per sekali antar/jemput, sesuai jumlah penumpang.
             </p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-card border border-gray-100 overflow-hidden max-w-3xl mx-auto">
+          <div className="bg-ink-850 rounded-xl shadow-card border border-ink-700 overflow-hidden max-w-3xl mx-auto">
             <div className="max-h-[420px] overflow-y-auto">
               <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-amber-500 text-white">
+                <thead className="sticky top-0 bg-gold-400 text-ink-950">
                   <tr>
                     <th className="text-left px-4 py-3 font-semibold">Area / Tujuan</th>
                     <th className="text-right px-4 py-3 font-semibold">1 - 5 Orang</th>
@@ -349,10 +349,10 @@ export default async function HomePage() {
                 </thead>
                 <tbody>
                   {AIRPORT_TRANSFER_RATES.map((r) => (
-                    <tr key={r.area} className="border-t border-gray-100 hover:bg-amber-50/50 transition-colors">
-                      <td className="px-4 py-2.5 text-gray-700">{r.area}</td>
-                      <td className="px-4 py-2.5 text-right font-medium text-gray-900">{formatCurrency(r.priceSmall)}</td>
-                      <td className="px-4 py-2.5 text-right text-gray-600">
+                    <tr key={r.area} className="border-t border-ink-700 hover:bg-gold-400/5 transition-colors">
+                      <td className="px-4 py-2.5 text-mist">{r.area}</td>
+                      <td className="px-4 py-2.5 text-right font-medium text-ivory">{formatCurrency(r.priceSmall)}</td>
+                      <td className="px-4 py-2.5 text-right text-mist">
                         {r.priceBig !== null ? formatCurrency(r.priceBig) : '—'}
                       </td>
                     </tr>
@@ -362,7 +362,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <p className="text-center text-xs text-gray-400 mt-4">
+          <p className="text-center text-xs text-mist-dim mt-4">
             Harga dapat berubah sewaktu-waktu. Konfirmasi harga akhir via WhatsApp.
           </p>
 
@@ -378,32 +378,32 @@ export default async function HomePage() {
       </section>
 
       {/* ================= KEBIJAKAN ================= */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-ink-950">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block text-amber-600 text-sm font-semibold tracking-wide uppercase mb-2">Informasi Penting</span>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Pembayaran & Syarat Ketentuan</h2>
+            <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">Informasi Penting</span>
+            <h2 className="text-3xl font-bold text-ivory mb-4">Pembayaran & Syarat Ketentuan</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="w-8 h-8 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center">💳</span>
+            <div className="bg-ink-900 rounded-xl p-6 border border-ink-700">
+              <h3 className="text-lg font-semibold text-ivory mb-4 flex items-center gap-2">
+                <span className="w-8 h-8 bg-gold-400/15 text-gold-300 rounded-lg flex items-center justify-center">💳</span>
                 Pembayaran
               </h3>
-              <ul className="space-y-3 text-sm text-gray-600 leading-relaxed">
+              <ul className="space-y-3 text-sm text-mist leading-relaxed">
                 <li>• Booking online aman melalui Midtrans — tersedia QRIS, Virtual Account, e-wallet (GoPay, ShopeePay, DANA), dan kartu kredit/debit.</li>
                 <li>• Pemesanan memerlukan deposit 50% terlebih dahulu untuk mengamankan jadwal &amp; pengemudi Anda. Pelunasan sisa pembayaran dapat dilakukan tunai saat bertemu dengan driver.</li>
                 <li>• Tersedia opsi DP 30% dengan cicilan untuk paket tour tertentu.</li>
                 <li>• Batas pembayaran 24 jam sejak invoice terbit; pesanan melewati batas waktu otomatis dibatalkan.</li>
               </ul>
             </div>
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="w-8 h-8 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center">📋</span>
+            <div className="bg-ink-900 rounded-xl p-6 border border-ink-700">
+              <h3 className="text-lg font-semibold text-ivory mb-4 flex items-center gap-2">
+                <span className="w-8 h-8 bg-gold-400/15 text-gold-300 rounded-lg flex items-center justify-center">📋</span>
                 Syarat & Ketentuan
               </h3>
-              <ul className="space-y-3 text-sm text-gray-600 leading-relaxed">
+              <ul className="space-y-3 text-sm text-mist leading-relaxed">
                 <li>• Mohon memberikan data yang jelas untuk mempermudah penjemputan.</li>
                 <li>• Pembatalan minimal 3 jam sebelum pemberangkatan, dikenakan biaya 50% dari tiket.</li>
                 <li>• Informasikan bila pesawat Anda delay agar kami dapat menyesuaikan jadwal.</li>
@@ -416,26 +416,26 @@ export default async function HomePage() {
 
       {/* ================= TESTIMONI ================= */}
       {reviews.length > 0 && (
-        <section className="py-16 sm:py-20 bg-gray-50">
+        <section className="py-16 sm:py-20 bg-ink-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div className="text-center mb-12">
-              <span className="inline-block text-amber-600 text-sm font-semibold tracking-wide uppercase mb-2">Testimoni</span>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Cerita dari Mereka yang Telah Berpetualang</h2>
-              <p className="text-gray-500 max-w-2xl mx-auto">
+              <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">Testimoni</span>
+              <h2 className="text-3xl font-bold text-ivory mb-4">Cerita dari Mereka yang Telah Berpetualang</h2>
+              <p className="text-mist-dim max-w-2xl mx-auto">
                 Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka yang sudah merasakan pelayanan HAYBALI TRANS.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {reviews.map((review) => (
-                <div key={review.id} className="bg-white rounded-xl p-6 shadow-card hover-lift border border-gray-100">
-                  <div className="text-4xl text-amber-200 mb-2 leading-none">&ldquo;</div>
+                <div key={review.id} className="bg-ink-850 rounded-xl p-6 shadow-card hover-lift border border-ink-700">
+                  <div className="text-4xl text-gold-600/60 mb-2 leading-none">&ldquo;</div>
                   <StarRating rating={review.rating} size="sm" />
-                  <p className="text-gray-600 mt-3 text-sm leading-relaxed line-clamp-4">
+                  <p className="text-mist mt-3 text-sm leading-relaxed line-clamp-4">
                     {review.reviewText}
                   </p>
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <p className="font-semibold text-gray-900 text-sm">{review.order.customerName}</p>
-                    <p className="text-xs text-gray-500">{review.tour.name}</p>
+                  <div className="mt-4 pt-4 border-t border-ink-700">
+                    <p className="font-semibold text-ivory text-sm">{review.order.customerName}</p>
+                    <p className="text-xs text-mist-dim">{review.tour.name}</p>
                   </div>
                 </div>
               ))}
@@ -450,12 +450,12 @@ export default async function HomePage() {
       )}
 
       {/* ================= FAQ ================= */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-ink-950">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block text-amber-600 text-sm font-semibold tracking-wide uppercase mb-2">Bantuan</span>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Pertanyaan yang Sering Diajukan</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">
+            <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">Bantuan</span>
+            <h2 className="text-3xl font-bold text-ivory mb-4">Pertanyaan yang Sering Diajukan</h2>
+            <p className="text-mist-dim max-w-2xl mx-auto">
               Temukan jawaban untuk pertanyaan umum seputar pemesanan, pembayaran, dan perjalanan bersama HAYBALI TRANS.
             </p>
           </div>
@@ -464,17 +464,17 @@ export default async function HomePage() {
             {FAQ_ITEMS.map((faq, index) => (
               <details
                 key={index}
-                className="bg-white rounded-xl shadow-card group overflow-hidden border border-gray-100 hover:border-amber-100 transition-colors"
+                className="bg-ink-850 rounded-xl shadow-card group overflow-hidden border border-ink-700 hover:border-gold-500/20 transition-colors"
               >
-                <summary className="px-5 sm:px-6 py-4 cursor-pointer flex items-center justify-between gap-4 font-semibold text-gray-900 hover:text-amber-600 transition-colors text-sm sm:text-base [&::-webkit-details-marker]:hidden">
+                <summary className="px-5 sm:px-6 py-4 cursor-pointer flex items-center justify-between gap-4 font-semibold text-ivory hover:text-gold-300 transition-colors text-sm sm:text-base [&::-webkit-details-marker]:hidden">
                   <span className="flex items-center gap-3">
-                    <span className="w-7 h-7 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">
+                    <span className="w-7 h-7 bg-gold-400/10 text-gold-300 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">
                       {String(index + 1).padStart(2, '0')}
                     </span>
                     {faq.question}
                   </span>
                   <svg
-                    className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform duration-300 flex-shrink-0"
+                    className="w-5 h-5 text-mist-dim group-open:rotate-180 transition-transform duration-300 flex-shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -487,7 +487,7 @@ export default async function HomePage() {
                     />
                   </svg>
                 </summary>
-                <div className="px-5 sm:px-6 pb-5 text-gray-600 leading-relaxed text-sm sm:text-base border-t border-gray-100 pt-4 ml-14 sm:ml-16">
+                <div className="px-5 sm:px-6 pb-5 text-mist leading-relaxed text-sm sm:text-base border-t border-ink-700 pt-4 ml-14 sm:ml-16">
                   {faq.answer}
                 </div>
               </details>
@@ -497,25 +497,26 @@ export default async function HomePage() {
       </section>
 
       {/* ================= CTA KONTAK ================= */}
-      <section className="relative py-16 sm:py-20 bg-gradient-to-br from-amber-500 via-orange-500 to-orange-600 text-white overflow-hidden">
-        <div className="absolute top-[-30%] right-[-10%] w-[400px] h-[400px] blob bg-white/10 animate-float" />
-        <div className="absolute bottom-[-20%] left-[-5%] w-[300px] h-[300px] blob bg-white/10 animate-float" style={{ animationDelay: '1.5s' }} />
+      <section className="relative py-16 sm:py-20 bg-ink-900 border-y border-gold-500/25 text-ivory overflow-hidden">
+        <div className="absolute inset-0 gold-panel" />
+        <div className="absolute top-[-30%] right-[-10%] w-[400px] h-[400px] blob bg-gold-400/10 animate-float" />
+        <div className="absolute bottom-[-20%] left-[-5%] w-[300px] h-[300px] blob bg-gold-400/10 animate-float" style={{ animationDelay: '1.5s' }} />
         <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 md:px-8">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
             Siap Menjelajahi Bali dengan {HAYBALI_BRAND}?
           </h2>
-          <p className="text-white/90 mb-8 text-lg max-w-2xl mx-auto">
+          <p className="text-mist mb-8 text-lg max-w-2xl mx-auto">
             Hubungi kami untuk konsultasi gratis — tim kami siap membantu memilihkan layanan terbaik untuk perjalanan Anda.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             <Button href="/tours" variant="accent" size="lg">
               Booking Sekarang
             </Button>
-            <Button href={waLink('Halo HAYBALI TRANS, saya ingin konsultasi layanan', waNumber)} variant="outline" size="lg" className="!border-white !text-white hover:!bg-white/10">
+            <Button href={waLink('Halo HAYBALI TRANS, saya ingin konsultasi layanan', waNumber)} variant="outline" size="lg" className="!border-gold-400/60 !text-gold-200 hover:!bg-gold-400/10">
               Chat WhatsApp
             </Button>
           </div>
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-white/90">
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-mist-dim">
             <span>📍 Denpasar / Kuta, Bali - Indonesia</span>
             <span>📞 +62 812-3456-7890</span>
             <span>📧 info@haybalitrans.com</span>

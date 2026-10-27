@@ -46,10 +46,10 @@ export default function FloatingActions({ waNumber: initialWaNumber }: { waNumbe
         className={`
           w-11 h-11 sm:w-12 sm:h-12
           rounded-full
-          bg-gradient-to-br from-blue-600 to-teal-600
-          text-white
-          shadow-lg shadow-blue-500/30
-          hover:shadow-xl hover:shadow-blue-500/40 hover:scale-110
+          bg-gradient-to-br from-gold-300 to-gold-600
+          text-ink-950
+          shadow-lg shadow-gold-500/30
+          hover:shadow-xl hover:shadow-gold-400/40 hover:scale-110
           active:scale-95
           flex items-center justify-center
           flex-shrink-0
@@ -79,7 +79,7 @@ export default function FloatingActions({ waNumber: initialWaNumber }: { waNumbe
       <div className="flex flex-col items-end gap-2">
         {/* Tooltip */}
         {showWaTooltip && (
-          <div className="bg-white shadow-lg rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 animate-fade-in whitespace-nowrap">
+          <div className="bg-ink-850 shadow-lg rounded-xl px-4 py-2.5 text-sm font-medium text-mist animate-fade-in whitespace-nowrap">
             Chat via WhatsApp 💬
           </div>
         )}

@@ -64,23 +64,23 @@ export default async function BlogDetailPage({ params }: PageProps) {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
       {/* Breadcrumb */}
-      <nav className="text-sm text-gray-500 mb-6">
-        <Link href="/" className="hover:text-blue-600">Beranda</Link>
+      <nav className="text-sm text-mist-dim mb-6">
+        <Link href="/" className="hover:text-gold-300">Beranda</Link>
         <span className="mx-2">/</span>
-        <Link href="/blog" className="hover:text-blue-600">Blog</Link>
+        <Link href="/blog" className="hover:text-gold-300">Blog</Link>
         <span className="mx-2">/</span>
-        <span className="text-gray-800">{post.title}</span>
+        <span className="text-ivory">{post.title}</span>
       </nav>
 
       {/* Article Header */}
       <div className="mb-8">
-        <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mb-4">
+        <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-gold-400/15 text-gold-200 mb-4">
           {post.category}
         </span>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-ivory mb-4 leading-tight">
           {post.title}
         </h1>
-        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+        <div className="flex flex-wrap items-center gap-4 text-sm text-mist-dim">
           <span className="flex items-center gap-1">👤 {post.author}</span>
           <span className="flex items-center gap-1">📅 {formatDate(post.createdAt)}</span>
           <span className="flex items-center gap-1">👁️ {post.viewCount + 1} views</span>
@@ -102,15 +102,15 @@ export default async function BlogDetailPage({ params }: PageProps) {
       )}
 
       {/* Article Content */}
-      <article className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-blue-600 prose-img:rounded-xl prose-img:shadow-md mb-12">
+      <article className="prose prose-lg max-w-none prose-headings:text-ivory prose-p:text-mist prose-a:text-gold-300 prose-img:rounded-xl prose-img:shadow-md mb-12">
         <div dangerouslySetInnerHTML={{ __html: post.content }} />
       </article>
 
       {/* Tags */}
       {tags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-12 pt-8 border-t border-gray-100">
+        <div className="flex flex-wrap gap-2 mb-12 pt-8 border-t border-ink-700">
           {tags.map((tag, i) => (
-            <span key={i} className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">
+            <span key={i} className="px-3 py-1 bg-ink-800 text-mist text-sm rounded-full">
               #{tag}
             </span>
           ))}
@@ -119,27 +119,27 @@ export default async function BlogDetailPage({ params }: PageProps) {
 
       {/* Related Posts */}
       {related.length > 0 && (
-        <div className="pt-8 border-t border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Artikel Terkait</h2>
+        <div className="pt-8 border-t border-ink-700">
+          <h2 className="text-xl font-bold text-ivory mb-6">Artikel Terkait</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {related.map((r) => (
               <Link
                 key={r.id}
                 href={`/blog/${r.slug}`}
-                className="group bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100"
+                className="group bg-ink-850 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-ink-700"
               >
-                <div className="h-36 bg-gray-200 relative overflow-hidden">
+                <div className="h-36 bg-ink-700 relative overflow-hidden">
                   {r.coverImg ? (
                     <Image src={r.coverImg} alt={r.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, 33vw" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-teal-400">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gold-300 to-gold-600">
                       <span className="text-white text-2xl">📝</span>
                     </div>
                   )}
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 text-sm line-clamp-2">{r.title}</h3>
-                  <p className="text-xs text-gray-400 mt-1">{formatDate(r.createdAt)}</p>
+                  <h3 className="font-semibold text-ivory group-hover:text-gold-300 text-sm line-clamp-2">{r.title}</h3>
+                  <p className="text-xs text-mist-dim mt-1">{formatDate(r.createdAt)}</p>
                 </div>
               </Link>
             ))}
@@ -148,8 +148,8 @@ export default async function BlogDetailPage({ params }: PageProps) {
       )}
 
       {/* Back link */}
-      <div className="mt-12 pt-6 border-t border-gray-100">
-        <Link href="/blog" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+      <div className="mt-12 pt-6 border-t border-ink-700">
+        <Link href="/blog" className="text-gold-300 hover:text-gold-200 text-sm font-medium">
           ← Kembali ke Blog
         </Link>
       </div>

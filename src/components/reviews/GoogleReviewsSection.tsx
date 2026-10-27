@@ -39,7 +39,7 @@ export default function GoogleReviewsSection() {
 
   if (loading) {
     return (
-      <section className="py-16 sm:py-20 bg-gray-50">
+      <section className="py-16 sm:py-20 bg-ink-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center mb-12">
             <Skeleton className="h-5 w-32 mx-auto mb-3" />
@@ -59,23 +59,23 @@ export default function GoogleReviewsSection() {
   if (!data) return null;
 
   return (
-    <section className="py-16 sm:py-20 bg-gray-50">
+    <section className="py-16 sm:py-20 bg-ink-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 mb-3">
             <span className="text-2xl">⭐</span>
-            <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase">
+            <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase">
               Google Reviews
             </span>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl font-bold text-ivory mb-4">
             Apa Kata Mereka di Google Maps
           </h2>
           <div className="flex items-center justify-center gap-3 mb-2">
-            <span className="text-4xl font-bold text-gray-900">{data.placeRating.toFixed(1)}</span>
+            <span className="text-4xl font-bold text-ivory">{data.placeRating.toFixed(1)}</span>
             <div>
               <StarRating rating={data.placeRating} size="md" />
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-mist-dim mt-0.5">
                 {data.totalRatings.toLocaleString('id-ID')} ulasan di Google
               </p>
             </div>
@@ -95,7 +95,7 @@ export default function GoogleReviewsSection() {
             {[...data.reviews, ...data.reviews].map((review, i) => (
               <div
                 key={i}
-                className="bg-white rounded-xl p-5 shadow-card border border-gray-100 flex-shrink-0"
+                className="bg-ink-850 rounded-xl p-5 shadow-card border border-ink-700 flex-shrink-0"
                 style={{ width: '340px' }}
               >
               {/* Header: avatar + name */}
@@ -108,13 +108,13 @@ export default function GoogleReviewsSection() {
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
+                  <div className="w-10 h-10 rounded-full bg-gold-400/15 flex items-center justify-center text-gold-300 font-bold text-sm">
                     {review.authorName.charAt(0)}
                   </div>
                 )}
                 <div>
-                  <p className="font-semibold text-gray-900 text-sm">{review.authorName}</p>
-                  <p className="text-xs text-gray-400">{review.relativeTime}</p>
+                  <p className="font-semibold text-ivory text-sm">{review.authorName}</p>
+                  <p className="text-xs text-mist-dim">{review.relativeTime}</p>
                 </div>
               </div>
 
@@ -122,12 +122,12 @@ export default function GoogleReviewsSection() {
               <StarRating rating={review.rating} size="sm" />
 
               {/* Review text */}
-              <p className="text-gray-600 text-sm mt-2 leading-relaxed line-clamp-5">
+              <p className="text-mist text-sm mt-2 leading-relaxed line-clamp-5">
                 {review.text}
               </p>
 
               {/* Google logo */}
-              <div className="mt-4 pt-3 border-t border-gray-100 flex items-center gap-1.5 text-xs text-gray-400">
+              <div className="mt-4 pt-3 border-t border-ink-700 flex items-center gap-1.5 text-xs text-mist-dim">
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>

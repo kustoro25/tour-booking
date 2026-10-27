@@ -302,7 +302,7 @@ function BookingPage() {
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+        <div className="bg-ink-850 rounded-xl shadow-sm p-6 space-y-6">
           <Skeleton className="h-8 w-64 mx-auto" />
           <Skeleton className="h-5 w-48 mx-auto" />
           <div className="max-w-md mx-auto">
@@ -317,7 +317,7 @@ function BookingPage() {
   if (!tour) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-20 text-center">
-        <h2 className="text-2xl font-bold text-gray-700 mb-2">Paket tidak ditemukan</h2>
+        <h2 className="text-2xl font-bold text-mist mb-2">Paket tidak ditemukan</h2>
         <Button href="/tours" variant="primary">Lihat Paket Lain</Button>
       </div>
     );
@@ -400,16 +400,16 @@ function BookingPage() {
             {['Pilih Tanggal', 'Isi Data', 'Metode Bayar', 'Konfirmasi'].map((label, i) => (
               <div key={label} className="flex items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                    step > i + 1 ? 'bg-green-500 text-white' : step === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
+                  className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-sm font-bold ${
+                    step > i + 1 ? 'bg-green-500 text-white' : step === i + 1 ? 'bg-gold-400 text-ink-950' : 'bg-ink-700 text-mist-dim'
                   }`}
                 >
                   {step > i + 1 ? '✓' : i + 1}
                 </div>
-                <span className={`ml-2 text-sm hidden sm:inline ${step >= i + 1 ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
+                <span className={`ml-2 text-sm hidden sm:inline ${step >= i + 1 ? 'text-ivory font-medium' : 'text-mist-dim'}`}>
                   {label}
                 </span>
-                {i < 3 && <div className={`flex-1 h-0.5 mx-2 ${step > i + 1 ? 'bg-green-500' : 'bg-gray-200'}`} />}
+                {i < 3 && <div className={`flex-1 h-0.5 mx-2 ${step > i + 1 ? 'bg-green-500' : 'bg-ink-700'}`} />}
               </div>
             ))}
           </div>
@@ -418,15 +418,15 @@ function BookingPage() {
 
       {/* Step 1: Select Date */}
       {step === 1 && (
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">
+        <div className="bg-ink-850 rounded-xl shadow-sm p-6">
+          <h2 className="text-xl font-bold text-ivory mb-1">
             {isCarRental
               ? 'Pilih Tanggal & Detail Perjalanan'
               : isTransfer
                 ? 'Pilih Tanggal & Tujuan'
                 : 'Pilih Tanggal Keberangkatan'}
           </h2>
-          <p className="text-gray-500 text-sm mb-6">{tour.name} &bull; {tour.duration}</p>
+          <p className="text-mist-dim text-sm mb-6">{tour.name} &bull; {tour.duration}</p>
 
           {/* Calendar */}
           <div className="max-w-md mx-auto">
@@ -441,29 +441,29 @@ function BookingPage() {
           {selectedDate && (
             <div className="mt-4 max-w-md mx-auto">
               {slotLoading ? (
-                <div className="flex items-center gap-2 text-sm text-gray-400 p-3">
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-400 border-t-transparent" />
+                <div className="flex items-center gap-2 text-sm text-mist-dim p-3">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-gold-400 border-t-transparent" />
                   Mengecek ketersediaan...
                 </div>
               ) : (
                 <div
                   className={`rounded-xl p-4 border ${
                     slotInfo?.isBlackout
-                      ? 'bg-red-50 border-red-200'
+                      ? 'bg-red-500/10 border-red-500/30'
                       : slotInfo && slotInfo.bookedCount >= slotInfo.quota
-                      ? 'bg-red-50 border-red-200'
+                      ? 'bg-red-500/10 border-red-500/30'
                       : slotInfo && slotInfo.quota - slotInfo.bookedCount <= 3
-                      ? 'bg-amber-50 border-amber-200'
-                      : 'bg-green-50 border-green-200'
+                      ? 'bg-gold-400/10 border-gold-500/30'
+                      : 'bg-green-500/10 border-green-500/30'
                   }`}
                 >
                   {slotInfo?.isBlackout ? (
                     <>
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-xl">🚫</span>
-                        <span className="font-semibold text-red-700">Tanggal Tidak Tersedia</span>
+                        <span className="font-semibold text-red-300">Tanggal Tidak Tersedia</span>
                       </div>
-                      <p className="text-sm text-red-600">
+                      <p className="text-sm text-red-300">
                         Tanggal ini tidak menerima booking. Silakan pilih tanggal lain.
                       </p>
                     </>
@@ -471,9 +471,9 @@ function BookingPage() {
                     <>
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-xl">😞</span>
-                        <span className="font-semibold text-red-700">Slot Penuh</span>
+                        <span className="font-semibold text-red-300">Slot Penuh</span>
                       </div>
-                      <p className="text-sm text-red-600">
+                      <p className="text-sm text-red-300">
                         Semua {slotInfo.quota} kursi telah dipesan. Silakan pilih tanggal lain.
                       </p>
                     </>
@@ -485,28 +485,28 @@ function BookingPage() {
                             {slotInfo.quota - slotInfo.bookedCount <= 3 ? '⚠️' : '✅'}
                           </span>
                           <div>
-                            <span className="font-semibold text-gray-900">
+                            <span className="font-semibold text-ivory">
                               {slotInfo.quota - slotInfo.bookedCount <= 3
                                 ? 'Hampir Penuh'
                                 : 'Tersedia'}
                             </span>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-mist">
                               {slotInfo.quota - slotInfo.bookedCount} dari {slotInfo.quota} kursi tersisa
                             </p>
                           </div>
                         </div>
                         {slotInfo.priceOverride && (
-                          <span className="text-sm font-semibold text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
+                          <span className="text-sm font-semibold text-gold-200 bg-gold-400/15 px-3 py-1 rounded-full">
                             {formatCurrency(slotInfo.priceOverride)}
                           </span>
                         )}
                       </div>
                       {/* Progress bar */}
-                      <div className="mt-3 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="mt-3 h-2 bg-ink-700 rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all duration-500 ${
                             slotInfo.quota - slotInfo.bookedCount <= 3
-                              ? 'bg-amber-500'
+                              ? 'bg-gold-400'
                               : 'bg-green-500'
                           }`}
                           style={{
@@ -519,9 +519,9 @@ function BookingPage() {
                     <>
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-xl">✅</span>
-                        <span className="font-semibold text-green-700">Kuota Default</span>
+                        <span className="font-semibold text-green-300">Kuota Default</span>
                       </div>
-                      <p className="text-sm text-green-600">
+                      <p className="text-sm text-green-300">
                         {tour.maxSlot} kursi tersedia — belum ada pemesanan untuk tanggal ini.
                       </p>
                     </>
@@ -539,16 +539,16 @@ function BookingPage() {
           {isCarRental && (
             <div className="mt-6 max-w-md mx-auto space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Durasi Sewa</label>
+                <label className="block text-sm font-medium text-mist mb-1">Durasi Sewa</label>
                 {fleetCar?.price6h != null ? (
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-2">
                     <button
                       type="button"
                       onClick={() => setRentalDuration('6')}
-                      className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border-2 ${
+                      className={`h-11 px-4 rounded-xl text-sm font-medium transition-all duration-200 border-2 ${
                         rentalDuration === '6'
-                          ? 'border-blue-500 bg-blue-50 text-blue-700'
-                          : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                          ? 'border-gold-400 bg-gold-400/10 text-gold-200'
+                          : 'border-ink-700 text-mist hover:border-ink-600'
                       }`}
                     >
                       6 Jam — {formatCurrency(fleetCar.price6h)}
@@ -556,31 +556,31 @@ function BookingPage() {
                     <button
                       type="button"
                       onClick={() => setRentalDuration('12')}
-                      className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border-2 ${
+                      className={`h-11 px-4 rounded-xl text-sm font-medium transition-all duration-200 border-2 ${
                         rentalDuration === '12'
-                          ? 'border-blue-500 bg-blue-50 text-blue-700'
-                          : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                          ? 'border-gold-400 bg-gold-400/10 text-gold-200'
+                          : 'border-ink-700 text-mist hover:border-ink-600'
                       }`}
                     >
                       12 Jam — {formatCurrency(fleetCar.price12h)}
                     </button>
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5">
+                  <p className="text-sm text-mist bg-ink-900 border border-ink-700 rounded-lg px-4 py-2.5">
                     12 Jam — {formatCurrency(fleetCar?.price12h ?? tour.priceAdult)}
                   </p>
                 )}
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-mist-dim mt-1">
                   Lembur dikenakan {fleetCar?.overtimePct ?? 10}% dari harga/jam.
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Jam Penjemputan</label>
+                <label className="block text-sm font-medium text-mist mb-1">Jam Penjemputan</label>
                 <select
                   value={pickupTime}
                   onChange={(e) => setPickupTime(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
                 >
                   <option value="">— Pilih jam penjemputan —</option>
                   {getPickupTimeOptions().map((t) => (
@@ -590,36 +590,36 @@ function BookingPage() {
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-mist-dim mt-1">
                   Tarif normal berlaku untuk penjemputan {DRIVER_POLICY.normalPickupStart}–{DRIVER_POLICY.normalPickupEnd}.
                 </p>
                 {errors.pickupTime && <p className="text-red-500 text-sm mt-1">{errors.pickupTime}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Zona Penjemputan</label>
+                <label className="block text-sm font-medium text-mist mb-1">Zona Penjemputan</label>
                 <select
                   value={pickupZone}
                   onChange={(e) => setPickupZone(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
                 >
                   <option value="">— Pilih zona —</option>
                   {PICKUP_ZONES.map((zone) => (
                     <option key={zone} value={zone}>{zone}</option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-mist-dim mt-1">
                   Area lain silakan hubungi kami untuk informasi harga & ketersediaan.
                 </p>
                 {errors.pickupZone && <p className="text-red-500 text-sm mt-1">{errors.pickupZone}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Area Tujuan</label>
+                <label className="block text-sm font-medium text-mist mb-1">Area Tujuan</label>
                 <select
                   value={destinationArea}
                   onChange={(e) => setDestinationArea(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
                 >
                   <option value="">— Pilih area tujuan —</option>
                   <optgroup label="Area Standar (Tanpa Biaya Tambahan)">
@@ -642,26 +642,26 @@ function BookingPage() {
 
               {/* Rincian harga sewa mobil */}
               {pickupTime && destinationArea && (
-                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-1.5 text-sm">
+                <div className="bg-gold-400/10 border border-gold-500/20 rounded-xl p-4 space-y-1.5 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Harga Armada ({rentalDuration} Jam)</span>
+                    <span className="text-mist">Harga Armada ({rentalDuration} Jam)</span>
                     <span className="font-medium">{formatCurrency(carQuote?.base ?? 0)}</span>
                   </div>
                   {(carQuote?.remoteFee ?? 0) > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Biaya Area Terpencil</span>
-                      <span className="font-medium text-orange-600">+{formatCurrency(carQuote?.remoteFee ?? 0)}</span>
+                      <span className="text-mist">Biaya Area Terpencil</span>
+                      <span className="font-medium text-gold-300">+{formatCurrency(carQuote?.remoteFee ?? 0)}</span>
                     </div>
                   )}
                   {(carQuote?.latePickupFee ?? 0) > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Biaya Jam di Luar Tarif Normal</span>
-                      <span className="font-medium text-orange-600">+{formatCurrency(carQuote?.latePickupFee ?? 0)}</span>
+                      <span className="text-mist">Biaya Jam di Luar Tarif Normal</span>
+                      <span className="font-medium text-gold-300">+{formatCurrency(carQuote?.latePickupFee ?? 0)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between font-bold pt-2 border-t border-blue-100">
+                  <div className="flex justify-between font-bold pt-2 border-t border-gold-500/20">
                     <span>Total</span>
-                    <span className="text-blue-700">{formatCurrency(carQuote?.total ?? 0)}</span>
+                    <span className="text-gold-200">{formatCurrency(carQuote?.total ?? 0)}</span>
                   </div>
                 </div>
               )}
@@ -672,15 +672,15 @@ function BookingPage() {
           {isTransfer && (
             <div className="mt-6 max-w-md mx-auto space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Arah Perjalanan</label>
+                <label className="block text-sm font-medium text-mist mb-1">Arah Perjalanan</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setDirection('PICKUP')}
-                    className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border-2 ${
+                    className={`h-11 px-4 rounded-xl text-sm font-medium transition-all duration-200 border-2 ${
                       direction === 'PICKUP'
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                        ? 'border-gold-400 bg-gold-400/10 text-gold-200'
+                        : 'border-ink-700 text-mist hover:border-ink-600'
                     }`}
                   >
                     🛬 Jemput di Bandara
@@ -688,10 +688,10 @@ function BookingPage() {
                   <button
                     type="button"
                     onClick={() => setDirection('DROP')}
-                    className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border-2 ${
+                    className={`h-11 px-4 rounded-xl text-sm font-medium transition-all duration-200 border-2 ${
                       direction === 'DROP'
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                        ? 'border-gold-400 bg-gold-400/10 text-gold-200'
+                        : 'border-ink-700 text-mist hover:border-ink-600'
                     }`}
                   >
                     🛫 Antar ke Bandara
@@ -700,11 +700,11 @@ function BookingPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Area / Tujuan</label>
+                <label className="block text-sm font-medium text-mist mb-1">Area / Tujuan</label>
                 <select
                   value={transferArea}
                   onChange={(e) => setTransferArea(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
                 >
                   <option value="">— Pilih area —</option>
                   {AIRPORT_TRANSFER_RATES.map((r) => (
@@ -717,14 +717,14 @@ function BookingPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-mist mb-1">
                   Jumlah Penumpang ({formData.adults <= 5 ? '1-5 orang' : '6-10 orang'})
                 </label>
                 <div className="flex items-center">
                   <button
                     type="button"
                     onClick={() => updateField('adults', Math.max(1, formData.adults - 1))}
-                    className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-l-lg bg-gray-50 text-gray-600 hover:bg-gray-100 text-lg font-semibold"
+                    className="w-11 h-11 flex items-center justify-center border border-ink-600 rounded-l-xl bg-ink-900 text-mist hover:bg-ink-800 text-lg font-semibold"
                     aria-label="Kurangi penumpang"
                   >
                     −
@@ -738,41 +738,41 @@ function BookingPage() {
                       const num = parseInt(e.target.value, 10);
                       if (!isNaN(num)) updateField('adults', Math.min(TRANSFER_MAX_PAX, Math.max(1, num)));
                     }}
-                    className="w-full px-3 py-2.5 border-y border-gray-300 text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full h-11 px-3 border-y border-ink-600 rounded-none text-center focus:ring-2 focus:ring-gold-400 focus:border-gold-400 focus:z-10 bg-ink-900 [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button
                     type="button"
                     onClick={() => updateField('adults', Math.min(TRANSFER_MAX_PAX, formData.adults + 1))}
-                    className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-r-lg bg-gray-50 text-gray-600 hover:bg-gray-100 text-lg font-semibold"
+                    className="w-11 h-11 flex items-center justify-center border border-ink-600 rounded-r-xl bg-ink-900 text-mist hover:bg-ink-800 text-lg font-semibold"
                     aria-label="Tambah penumpang"
                   >
                     +
                   </button>
                 </div>
                 {AIRPORT_TRANSFER_RATES.find((r) => r.area === transferArea)?.priceBig === null && formData.adults >= 6 && (
-                  <p className="text-amber-600 text-xs mt-1.5">
+                  <p className="text-gold-300 text-xs mt-1.5">
                     Area ini hanya melayani 1-5 penumpang. Untuk rombongan, silakan hubungi kami via WhatsApp.
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nomor Penerbangan (Opsional)</label>
+                <label className="block text-sm font-medium text-mist mb-1">Nomor Penerbangan (Opsional)</label>
                 <input
                   type="text"
                   value={flightNo}
                   onChange={(e) => setFlightNo(e.target.value)}
                   placeholder="Contoh: GA 402"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
                 />
               </div>
 
               {transferArea && transferPrice !== null && transferPrice > 0 && (
-                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center justify-between">
-                  <span className="text-sm text-blue-800">
+                <div className="bg-gold-400/10 border border-gold-500/20 rounded-xl p-4 flex items-center justify-between">
+                  <span className="text-sm text-gold-200">
                     Tarif ({formData.adults <= 5 ? '1-5 orang' : '6-10 orang'}) — {direction === 'PICKUP' ? 'Jemput di Bandara' : 'Antar ke Bandara'}
                   </span>
-                  <span className="text-xl font-bold text-blue-700">{formatCurrency(transferPrice)}</span>
+                  <span className="text-xl font-bold text-gold-200">{formatCurrency(transferPrice)}</span>
                 </div>
               )}
             </div>
@@ -788,43 +788,43 @@ function BookingPage() {
 
       {/* Step 2: Fill Data */}
       {step === 2 && (
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">Isi Data Diri & Peserta</h2>
-          <p className="text-gray-500 text-sm mb-6">Lengkapi data berikut untuk melanjutkan booking</p>
+        <div className="bg-ink-850 rounded-xl shadow-sm p-6">
+          <h2 className="text-xl font-bold text-ivory mb-1">Isi Data Diri & Peserta</h2>
+          <p className="text-mist-dim text-sm mb-6">Lengkapi data berikut untuk melanjutkan booking</p>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+              <label className="block text-sm font-medium text-mist mb-1">Nama Lengkap</label>
               <input
                 type="text"
                 value={formData.customerName}
                 onChange={(e) => updateField('customerName', e.target.value)}
                 placeholder="Masukkan nama lengkap Anda"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
               />
               {errors.customerName && <p className="text-red-500 text-sm mt-1">{errors.customerName}</p>}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-mist mb-1">Email</label>
                 <input
                   type="email"
                   value={formData.customerEmail}
                   onChange={(e) => updateField('customerEmail', e.target.value)}
                   placeholder="contoh@email.com"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
                 />
                 {errors.customerEmail && <p className="text-red-500 text-sm mt-1">{errors.customerEmail}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nomor HP / WhatsApp</label>
+                <label className="block text-sm font-medium text-mist mb-1">Nomor HP / WhatsApp</label>
                 <input
                   type="tel"
                   value={formData.customerPhone}
                   onChange={(e) => updateField('customerPhone', e.target.value)}
                   placeholder="081234567890"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
                 />
                 {errors.customerPhone && <p className="text-red-500 text-sm mt-1">{errors.customerPhone}</p>}
               </div>
@@ -833,12 +833,12 @@ function BookingPage() {
             {!isSpecialService && (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Dewasa</label>
+                <label className="block text-sm font-medium text-mist mb-1">Jumlah Dewasa</label>
                 <div className="flex items-center">
                   <button
                     type="button"
                     onClick={() => updateField('adults', Math.max(1, formData.adults - 1))}
-                    className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-l-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors text-lg font-semibold"
+                    className="w-11 h-11 flex items-center justify-center border border-ink-600 rounded-l-xl bg-ink-900 text-mist hover:bg-ink-800 transition-colors text-lg font-semibold"
                     aria-label="Kurangi dewasa"
                   >
                     −
@@ -856,12 +856,12 @@ function BookingPage() {
                         if (!isNaN(num)) updateField('adults', num);
                       }
                     }}
-                    className="w-full px-3 py-2.5 border-y border-gray-300 text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full h-11 px-3 border-y border-ink-600 rounded-none text-center focus:ring-2 focus:ring-gold-400 focus:border-gold-400 focus:z-10 bg-ink-900 [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button
                     type="button"
                     onClick={() => updateField('adults', formData.adults + 1)}
-                    className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-r-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors text-lg font-semibold"
+                    className="w-11 h-11 flex items-center justify-center border border-ink-600 rounded-r-xl bg-ink-900 text-mist hover:bg-ink-800 transition-colors text-lg font-semibold"
                     aria-label="Tambah dewasa"
                   >
                     +
@@ -870,12 +870,12 @@ function BookingPage() {
                 {errors.adults && <p className="text-red-500 text-sm mt-1">{errors.adults}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Anak</label>
+                <label className="block text-sm font-medium text-mist mb-1">Jumlah Anak</label>
                 <div className="flex items-center">
                   <button
                     type="button"
                     onClick={() => updateField('children', Math.max(0, formData.children - 1))}
-                    className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-l-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors text-lg font-semibold"
+                    className="w-11 h-11 flex items-center justify-center border border-ink-600 rounded-l-xl bg-ink-900 text-mist hover:bg-ink-800 transition-colors text-lg font-semibold"
                     aria-label="Kurangi anak"
                   >
                     −
@@ -893,12 +893,12 @@ function BookingPage() {
                         if (!isNaN(num)) updateField('children', num);
                       }
                     }}
-                    className="w-full px-3 py-2.5 border-y border-gray-300 text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full h-11 px-3 border-y border-ink-600 rounded-none text-center focus:ring-2 focus:ring-gold-400 focus:border-gold-400 focus:z-10 bg-ink-900 [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button
                     type="button"
                     onClick={() => updateField('children', formData.children + 1)}
-                    className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-r-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors text-lg font-semibold"
+                    className="w-11 h-11 flex items-center justify-center border border-ink-600 rounded-r-xl bg-ink-900 text-mist hover:bg-ink-800 transition-colors text-lg font-semibold"
                     aria-label="Tambah anak"
                   >
                     +
@@ -910,13 +910,13 @@ function BookingPage() {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Catatan Khusus (Opsional)</label>
+              <label className="block text-sm font-medium text-mist mb-1">Catatan Khusus (Opsional)</label>
               <textarea
                 value={formData.notes}
                 onChange={(e) => updateField('notes', e.target.value)}
                 placeholder="Ada permintaan khusus? Tulis di sini..."
                 rows={3}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2.5 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900 resize-y"
               />
             </div>
           </div>
@@ -930,9 +930,9 @@ function BookingPage() {
 
       {/* Step 3: Payment Method */}
       {step === 3 && (
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">Pilih Metode Pembayaran</h2>
-          <p className="text-gray-500 text-sm mb-6">Pilih cara pembayaran yang sesuai untuk Anda</p>
+        <div className="bg-ink-850 rounded-xl shadow-sm p-6">
+          <h2 className="text-xl font-bold text-ivory mb-1">Pilih Metode Pembayaran</h2>
+          <p className="text-mist-dim text-sm mb-6">Pilih cara pembayaran yang sesuai untuk Anda</p>
 
           <div className="space-y-4 mb-6">
             {/* Full Payment */}
@@ -940,23 +940,23 @@ function BookingPage() {
               onClick={() => { setPaymentType('FULL'); setAgreedToTerms(false); }}
               className={`rounded-xl border-2 p-5 cursor-pointer transition-all ${
                 paymentType === 'FULL'
-                  ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300 bg-white'
+                  ? 'border-gold-400 ring-2 ring-gold-400/30 bg-gold-400/10'
+                  : 'border-ink-700 hover:border-ink-600 bg-ink-850'
               }`}
             >
               <div className="flex items-start gap-4">
                 <div className={`w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                  paymentType === 'FULL' ? 'border-blue-500' : 'border-gray-300'
+                  paymentType === 'FULL' ? 'border-gold-400' : 'border-ink-600'
                 }`}>
-                  {paymentType === 'FULL' && <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />}
+                  {paymentType === 'FULL' && <div className="w-2.5 h-2.5 rounded-full bg-gold-500" />}
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">Pembayaran Lunas</h3>
-                  <p className="text-sm text-gray-500 mt-0.5">Bayar penuh sekarang sebesar <strong className="text-gray-700">{formatCurrency(grandTotal)}</strong></p>
+                  <h3 className="font-semibold text-ivory">Pembayaran Lunas</h3>
+                  <p className="text-sm text-mist-dim mt-0.5">Bayar penuh sekarang sebesar <strong className="text-mist">{formatCurrency(grandTotal)}</strong></p>
                   {paymentGateway === 'midtrans' ? (
-                    <p className="text-xs text-green-600 mt-1">💳 Pembayaran online instan via Midtrans — QRIS, Virtual Account, e-wallet, atau kartu. Terkonfirmasi otomatis.</p>
+                    <p className="text-xs text-green-300 mt-1">💳 Pembayaran online instan via Midtrans — QRIS, Virtual Account, e-wallet, atau kartu. Terkonfirmasi otomatis.</p>
                   ) : (
-                    <p className="text-xs text-gray-500 mt-1">🏦 Transfer bank ke rekening pada invoice, lalu konfirmasi pembayaran ke admin via WhatsApp. Status diaktifkan manual oleh admin.</p>
+                    <p className="text-xs text-mist-dim mt-1">🏦 Transfer bank ke rekening pada invoice, lalu konfirmasi pembayaran ke admin via WhatsApp. Status diaktifkan manual oleh admin.</p>
                   )}
                 </div>
               </div>
@@ -971,31 +971,31 @@ function BookingPage() {
               }}
               className={`rounded-xl border-2 p-5 transition-all ${
                 paymentType === 'INSTALLMENT'
-                  ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50'
+                  ? 'border-gold-400 ring-2 ring-gold-400/30 bg-gold-400/10'
                   : installmentAvailable
-                    ? 'cursor-pointer border-gray-200 hover:border-gray-300 bg-white'
-                    : 'cursor-not-allowed border-gray-200 bg-gray-50 opacity-70'
+                    ? 'cursor-pointer border-ink-700 hover:border-ink-600 bg-ink-850'
+                    : 'cursor-not-allowed border-ink-700 bg-ink-900 opacity-70'
               }`}
             >
               <div className="flex items-start gap-4">
                 <div className={`w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                  paymentType === 'INSTALLMENT' ? 'border-blue-500' : 'border-gray-300'
+                  paymentType === 'INSTALLMENT' ? 'border-gold-400' : 'border-ink-600'
                 }`}>
-                  {paymentType === 'INSTALLMENT' && <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />}
+                  {paymentType === 'INSTALLMENT' && <div className="w-2.5 h-2.5 rounded-full bg-gold-500" />}
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">Pembayaran Angsuran (Cicilan)</h3>
-                  <p className="text-sm text-gray-500 mt-0.5">Bayar dengan DP {dpPercentage}% dan sisanya dicicil sesuai pilihan Anda</p>
+                  <h3 className="font-semibold text-ivory">Pembayaran Angsuran (Cicilan)</h3>
+                  <p className="text-sm text-mist-dim mt-0.5">Bayar dengan DP {dpPercentage}% dan sisanya dicicil sesuai pilihan Anda</p>
                   {paymentGateway === 'midtrans' ? (
-                    <p className="text-xs text-green-600 mt-1">💳 DP &amp; angsuran dibayar online via Midtrans — terkonfirmasi otomatis, tanpa transfer manual.</p>
+                    <p className="text-xs text-green-300 mt-1">💳 DP &amp; angsuran dibayar online via Midtrans — terkonfirmasi otomatis, tanpa transfer manual.</p>
                   ) : (
-                    <p className="text-xs text-gray-500 mt-1">🏦 DP &amp; angsuran dibayar via transfer bank — unggah bukti transfer di halaman jadwal angsuran, konfirmasi oleh admin.</p>
+                    <p className="text-xs text-mist-dim mt-1">🏦 DP &amp; angsuran dibayar via transfer bank — unggah bukti transfer di halaman jadwal angsuran, konfirmasi oleh admin.</p>
                   )}
                   {!installmentEnabled && (
-                    <p className="text-xs text-gray-400 mt-1">Belum tersedia saat ini.</p>
+                    <p className="text-xs text-mist-dim mt-1">Belum tersedia saat ini.</p>
                   )}
                   {installmentEnabled && !installmentThresholdMet && (
-                    <p className="text-xs text-amber-600 mt-1">Minimal total transaksi {formatCurrency(minInstallmentAmount)} untuk pembayaran angsuran.</p>
+                    <p className="text-xs text-gold-300 mt-1">Minimal total transaksi {formatCurrency(minInstallmentAmount)} untuk pembayaran angsuran.</p>
                   )}
                 </div>
               </div>
@@ -1003,17 +1003,17 @@ function BookingPage() {
                 {paymentType === 'INSTALLMENT' && (
                   <div className="mt-4 ml-9 space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Jumlah Angsuran</label>
+                      <label className="block text-sm font-medium text-mist mb-2">Jumlah Angsuran</label>
                       <div className="flex flex-wrap gap-2">
                         {installmentOptions.map((opt) => (
                           <button
                             key={opt}
                             type="button"
                             onClick={(e) => { e.stopPropagation(); setInstallmentCount(opt); }}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            className={`h-9 px-4 rounded-lg text-sm font-medium transition-colors ${
                               installmentCount === opt
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                                ? 'bg-gold-400 text-ink-950'
+                                : 'bg-ink-850 border border-ink-600 text-mist hover:bg-ink-800'
                             }`}
                           >
                             {opt}x
@@ -1028,17 +1028,17 @@ function BookingPage() {
                       const remaining = grandTotal - dp;
                       const perInstallment = Math.round(remaining / installmentCount);
                       return (
-                        <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-2">
-                          <h4 className="text-sm font-semibold text-gray-700">Simulasi Angsuran</h4>
+                        <div className="bg-ink-850 border border-ink-700 rounded-lg p-4 space-y-2">
+                          <h4 className="text-sm font-semibold text-mist">Simulasi Angsuran</h4>
                           <div className="grid grid-cols-2 gap-y-1.5 text-sm">
-                            <span className="text-gray-500">Total Harga</span>
+                            <span className="text-mist-dim">Total Harga</span>
                             <span className="text-right font-medium">{formatCurrency(grandTotal)}</span>
-                            <span className="text-gray-500">DP ({dpPercentage}%)</span>
-                            <span className="text-right font-medium text-orange-600">{formatCurrency(dp)}</span>
-                            <span className="text-gray-500">Sisa</span>
+                            <span className="text-mist-dim">DP ({dpPercentage}%)</span>
+                            <span className="text-right font-medium text-gold-300">{formatCurrency(dp)}</span>
+                            <span className="text-mist-dim">Sisa</span>
                             <span className="text-right font-medium">{formatCurrency(remaining)}</span>
-                            <span className="text-gray-500 pt-2 border-t">Angsuran / Bulan</span>
-                            <span className="text-right font-bold text-blue-600 pt-2 border-t">{installmentCount}x {formatCurrency(perInstallment)}</span>
+                            <span className="text-mist-dim pt-2 border-t">Angsuran / Bulan</span>
+                            <span className="text-right font-bold text-gold-300 pt-2 border-t">{installmentCount}x {formatCurrency(perInstallment)}</span>
                           </div>
                         </div>
                       );
@@ -1049,9 +1049,9 @@ function BookingPage() {
           </div>
 
           {paymentType === 'INSTALLMENT' && (
-            <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <h4 className="text-sm font-semibold text-amber-800 mb-2">Syarat & Ketentuan Angsuran</h4>
-              <ol className="text-xs text-amber-700 space-y-1.5 list-decimal list-inside leading-relaxed">
+            <div className="mt-4 p-4 bg-gold-400/10 border border-gold-500/30 rounded-lg">
+              <h4 className="text-sm font-semibold text-gold-200 mb-2">Syarat & Ketentuan Angsuran</h4>
+              <ol className="text-xs text-gold-300 space-y-1.5 list-decimal list-inside leading-relaxed">
                 <li>Pembayaran angsuran wajib dilakukan sesuai jadwal jatuh tempo yang telah disepakati.</li>
                 <li>Setiap angsuran harus dibayar paling lambat pada tanggal jatuh tempo. Keterlambatan lebih dari 7 hari setelah jatuh tempo dapat mengakibatkan pembatalan pesanan.</li>
                 <li>Uang muka (DP) dan angsuran yang telah dibayarkan <strong>tidak dapat dikembalikan</strong>.</li>
@@ -1067,9 +1067,9 @@ function BookingPage() {
                   type="checkbox"
                   checked={agreedToTerms}
                   onChange={(e) => setAgreedToTerms(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="mt-0.5 w-4 h-4 text-gold-300 border-ink-600 rounded focus:ring-gold-400"
                 />
-                <span className="text-sm text-amber-800">
+                <span className="text-sm text-gold-200">
                   Saya telah membaca dan menyetujui syarat & ketentuan pembayaran angsuran di atas
                 </span>
               </label>
@@ -1087,28 +1087,28 @@ function BookingPage() {
             </Button>
           </div>
           {paymentType === 'INSTALLMENT' && !agreedToTerms && (
-            <p className="text-xs text-amber-600 text-right mt-2">Centang persetujuan Syarat & Ketentuan angsuran di atas untuk melanjutkan.</p>
+            <p className="text-xs text-gold-300 text-right mt-2">Centang persetujuan Syarat & Ketentuan angsuran di atas untuk melanjutkan.</p>
           )}
         </div>
       )}
 
       {/* Step 4: Confirmation */}
       {step === 4 && (
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Konfirmasi Pemesanan</h2>
+        <div className="bg-ink-850 rounded-xl shadow-sm p-6">
+          <h2 className="text-xl font-bold text-ivory mb-4">Konfirmasi Pemesanan</h2>
 
-          <div className="border rounded-lg p-4 space-y-3 bg-gray-50 mb-6">
+          <div className="border border-ink-700 rounded-lg p-4 space-y-3 bg-ink-900 mb-6">
             <div>
-              <span className="text-sm text-gray-500">Paket Tour</span>
-              <p className="font-semibold text-gray-900">{tour.name}</p>
+              <span className="text-sm text-mist-dim">Paket Tour</span>
+              <p className="font-semibold text-ivory">{tour.name}</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="text-sm text-gray-500">Tanggal</span>
+                <span className="text-sm text-mist-dim">Tanggal</span>
                 <p className="font-medium">{formatDate(selectedDate)}</p>
               </div>
               <div>
-                <span className="text-sm text-gray-500">{isCarRental ? 'Unit' : isTransfer ? 'Penumpang' : 'Peserta'}</span>
+                <span className="text-sm text-mist-dim">{isCarRental ? 'Unit' : isTransfer ? 'Penumpang' : 'Peserta'}</span>
                 <p className="font-medium">
                   {isCarRental
                     ? '1 Mobil (12 Jam)'
@@ -1121,18 +1121,18 @@ function BookingPage() {
             {isCarRental && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm text-gray-500">Jam Penjemputan</span>
+                  <span className="text-sm text-mist-dim">Jam Penjemputan</span>
                   <p className="font-medium">{pickupTime}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-500">Zona Penjemputan</span>
+                  <span className="text-sm text-mist-dim">Zona Penjemputan</span>
                   <p className="font-medium">{pickupZone}</p>
                 </div>
               </div>
             )}
             {isCarRental && destinationArea && (
               <div>
-                <span className="text-sm text-gray-500">Area Tujuan</span>
+                <span className="text-sm text-mist-dim">Area Tujuan</span>
                 <p className="font-medium">
                   {REMOTE_AREA_FEES.find((a) => a.id === destinationArea)?.label ||
                     STANDARD_AREAS.find((a) => a.id === destinationArea)?.label}
@@ -1142,37 +1142,37 @@ function BookingPage() {
             {isTransfer && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm text-gray-500">Arah</span>
+                  <span className="text-sm text-mist-dim">Arah</span>
                   <p className="font-medium">{direction === 'PICKUP' ? 'Jemput di Bandara' : 'Antar ke Bandara'}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-500">Area</span>
+                  <span className="text-sm text-mist-dim">Area</span>
                   <p className="font-medium">{transferArea}</p>
                 </div>
               </div>
             )}
             {isTransfer && flightNo && (
               <div>
-                <span className="text-sm text-gray-500">Nomor Penerbangan</span>
+                <span className="text-sm text-mist-dim">Nomor Penerbangan</span>
                 <p className="font-medium">{flightNo}</p>
               </div>
             )}
             <div>
-              <span className="text-sm text-gray-500">Nama Pemesan</span>
+              <span className="text-sm text-mist-dim">Nama Pemesan</span>
               <p className="font-medium">{formData.customerName}</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="min-w-0">
-                <span className="text-sm text-gray-500">Email</span>
+                <span className="text-sm text-mist-dim">Email</span>
                 <p className="font-medium text-sm break-all">{formData.customerEmail}</p>
               </div>
               <div>
-                <span className="text-sm text-gray-500">No. HP</span>
+                <span className="text-sm text-mist-dim">No. HP</span>
                 <p className="font-medium">{formData.customerPhone}</p>
               </div>
             </div>
             <div>
-              <span className="text-sm text-gray-500">Metode Pembayaran</span>
+              <span className="text-sm text-mist-dim">Metode Pembayaran</span>
               <p className="font-medium">
                 {paymentType === 'FULL'
                   ? paymentGateway === 'midtrans'
@@ -1182,9 +1182,9 @@ function BookingPage() {
               </p>
             </div>
             {paymentType === 'INSTALLMENT' && (
-              <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
-                <p className="text-sm font-medium text-blue-800">Detail Angsuran:</p>
-                <p className="text-xs text-blue-600 mt-1">
+              <div className="bg-gold-400/10 rounded-lg p-3 border border-gold-500/20">
+                <p className="text-sm font-medium text-gold-200">Detail Angsuran:</p>
+                <p className="text-xs text-gold-300 mt-1">
                   DP {dpPercentage}%: {formatCurrency(Math.round(grandTotal * (dpPercentage / 100)))} &bull; Sisa {installmentCount}x @ {formatCurrency(Math.round((grandTotal - Math.round(grandTotal * (dpPercentage / 100))) / installmentCount))}/bulan
                 </p>
               </div>
@@ -1196,25 +1196,25 @@ function BookingPage() {
             {isCarRental ? (
               <>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Harga Armada ({rentalDuration} Jam)</span>
+                  <span className="text-mist-dim">Harga Armada ({rentalDuration} Jam)</span>
                   <span>{formatCurrency(carQuote?.base ?? 0)}</span>
                 </div>
                 {(carQuote?.remoteFee ?? 0) > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Biaya Area Terpencil</span>
-                    <span className="text-orange-600">+{formatCurrency(carQuote?.remoteFee ?? 0)}</span>
+                    <span className="text-mist-dim">Biaya Area Terpencil</span>
+                    <span className="text-gold-300">+{formatCurrency(carQuote?.remoteFee ?? 0)}</span>
                   </div>
                 )}
                 {(carQuote?.latePickupFee ?? 0) > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Biaya Jam Penjemputan</span>
-                    <span className="text-orange-600">+{formatCurrency(carQuote?.latePickupFee ?? 0)}</span>
+                    <span className="text-mist-dim">Biaya Jam Penjemputan</span>
+                    <span className="text-gold-300">+{formatCurrency(carQuote?.latePickupFee ?? 0)}</span>
                   </div>
                 )}
               </>
             ) : isTransfer ? (
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">
+                <span className="text-mist-dim">
                   Tarif {formData.adults <= 5 ? '1-5' : '6-10'} Orang — {transferArea}
                 </span>
                 <span>{formatCurrency(transferPrice ?? 0)}</span>
@@ -1222,17 +1222,17 @@ function BookingPage() {
             ) : (
               <>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Harga Dewasa ({formData.adults} x {formatCurrency(tour.priceAdult)})</span>
+                  <span className="text-mist-dim">Harga Dewasa ({formData.adults} x {formatCurrency(tour.priceAdult)})</span>
                   <span>{formatCurrency(tour.priceAdult * formData.adults)}</span>
                 </div>
                 {formData.children > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Harga Anak ({formData.children} x {formatCurrency(tour.priceChild)})</span>
+                    <span className="text-mist-dim">Harga Anak ({formData.children} x {formatCurrency(tour.priceChild)})</span>
                     <span>{formatCurrency(tour.priceChild * formData.children)}</span>
                   </div>
                 )}
                 {tour.discount > 0 && (
-                  <div className="flex justify-between text-sm text-green-600">
+                  <div className="flex justify-between text-sm text-green-300">
                     <span>Diskon ({tour.discount}%)</span>
                     <span>-{formatCurrency(total * (tour.discount / 100))}</span>
                   </div>
@@ -1241,17 +1241,17 @@ function BookingPage() {
             )}
             <div className="flex justify-between font-bold text-lg pt-2 border-t">
               <span>Total</span>
-              <span className="text-blue-600">{formatCurrency(grandTotal)}</span>
+              <span className="text-gold-300">{formatCurrency(grandTotal)}</span>
             </div>
           </div>
 
           {errors.submit && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            <div className="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-300 text-sm">
               {errors.submit}
             </div>
           )}
 
-          <div className="flex justify-between mt-6">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3 mt-6">
             <Button onClick={() => setStep(3)} variant="outline">← Kembali</Button>
             <Button onClick={handleSubmit} variant="accent" size="lg" isLoading={submitting}>
               Booking Sekarang
@@ -1262,11 +1262,11 @@ function BookingPage() {
 
       {/* Step 5: Success / Invoice */}
       {step === 5 && bookingResult && (
-        <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+        <div className="bg-ink-850 rounded-xl shadow-sm p-6 text-center">
           <div className="text-6xl mb-4">🎉</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Berhasil!</h2>
+          <h2 className="text-2xl font-bold text-ivory mb-2">Booking Berhasil!</h2>
           {bookingResult.paymentUrl ? (
-            <p className="text-gray-500 mb-6">
+            <p className="text-mist-dim mb-6">
               {paymentType === 'INSTALLMENT' ? (
                 <>
                   Langkah terakhir: bayar <strong>DP (uang muka)</strong> melalui halaman pembayaran aman
@@ -1282,20 +1282,20 @@ function BookingPage() {
               )}
             </p>
           ) : paymentGateway === 'midtrans' ? (
-            <p className="text-gray-500 mb-6">
+            <p className="text-mist-dim mb-6">
               Invoice Anda telah diterbitkan. Buka halaman invoice untuk menyelesaikan pembayaran secara online.
             </p>
           ) : (
-            <p className="text-gray-500 mb-6">
+            <p className="text-mist-dim mb-6">
               {paymentType === 'INSTALLMENT'
                 ? <>Invoice Anda telah diterbitkan. Chat WhatsApp berisi detail booking Anda akan terbuka otomatis — tinggal tekan kirim (atau klik tombol hijau bila chat tidak terbuka), lalu transfer DP sesuai rekening pada invoice.</>
                 : <>Invoice Anda telah diterbitkan. Chat WhatsApp berisi detail booking Anda akan terbuka otomatis — tinggal tekan kirim (atau klik tombol hijau bila chat tidak terbuka), lalu transfer sesuai rekening pada invoice.</>}
             </p>
           )}
 
-          <div className="bg-gray-50 rounded-lg p-6 mb-6">
-            <p className="text-sm text-gray-500 mb-1">Nomor Invoice</p>
-            <p className="text-2xl font-bold text-blue-600">{bookingResult.invoiceNo}</p>
+          <div className="bg-ink-900 rounded-lg p-6 mb-6">
+            <p className="text-sm text-mist-dim mb-1">Nomor Invoice</p>
+            <p className="text-2xl font-bold text-gold-300">{bookingResult.invoiceNo}</p>
           </div>
 
           <div className="flex flex-wrap justify-center gap-3">

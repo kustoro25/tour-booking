@@ -143,9 +143,9 @@ export default async function ToursPage({ searchParams }: PageProps) {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-12">
       {/* Header */}
       <div className="text-center mb-10">
-        <span className="inline-block text-blue-600 text-sm font-semibold tracking-wide uppercase mb-2">{cms.label}</span>
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{cms.heading}</h1>
-        <p className="text-gray-500 max-w-2xl mx-auto">
+        <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">{cms.label}</span>
+        <h1 className="text-3xl sm:text-4xl font-bold text-ivory mb-4">{cms.heading}</h1>
+        <p className="text-mist-dim max-w-2xl mx-auto">
           {cms.subheading}
         </p>
       </div>
@@ -153,7 +153,7 @@ export default async function ToursPage({ searchParams }: PageProps) {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Filter Sidebar */}
         <aside className="md:col-span-1">
-          <Suspense fallback={<div className="h-10 bg-gray-100 rounded-2xl animate-pulse" />}>
+          <Suspense fallback={<div className="h-10 bg-ink-800 rounded-2xl animate-pulse" />}>
             <TourFilter
               currentDestination={currentDestination}
               currentCategory={currentCategory}
@@ -165,15 +165,15 @@ export default async function ToursPage({ searchParams }: PageProps) {
         {/* Tour Grid */}
         <div className="md:col-span-3">
           {tours.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-xl shadow-card">
+            <div className="text-center py-20 bg-ink-850 rounded-xl shadow-card">
               <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">Tidak ada paket ditemukan</h3>
-              <p className="text-gray-500">Coba ubah filter atau kata kunci pencarian Anda.</p>
+              <h3 className="text-xl font-semibold text-mist mb-2">Tidak ada paket ditemukan</h3>
+              <p className="text-mist-dim">Coba ubah filter atau kata kunci pencarian Anda.</p>
             </div>
           ) : (
             <>
               {/* Result count */}
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-mist-dim mb-4">
                 Menampilkan {tours.length} dari {total} paket wisata
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -181,18 +181,18 @@ export default async function ToursPage({ searchParams }: PageProps) {
                   <Link
                     key={tour.id}
                     href={`/tours/${tour.slug}`}
-                    className="group bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100"
+                    className="group bg-ink-850 rounded-2xl overflow-hidden shadow-card hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-ink-700"
                   >
-                    <div className="h-44 bg-gray-200 relative overflow-hidden">
+                    <div className="h-44 bg-ink-700 relative overflow-hidden">
                       {tour.coverImg ? (
                         <Image src={tour.coverImg} alt={tour.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-teal-400">
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gold-300 to-gold-600">
                           <span className="text-white text-3xl">🏝️</span>
                         </div>
                       )}
                       {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-blue-900/70 via-blue-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-4">
+                      <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-ink-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-4">
                         <span className="text-white text-sm font-semibold flex items-center gap-1 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                           Lihat Detail
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -200,32 +200,32 @@ export default async function ToursPage({ searchParams }: PageProps) {
                           </svg>
                         </span>
                       </div>
-                      <span className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
+                      <span className="absolute top-3 left-3 bg-ink-900/95 backdrop-blur-sm text-mist text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
                         {TourCategoryLabels[tour.category as TourCategory] || tour.category}
                       </span>
                     </div>
                     <div className="p-5">
-                      <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                      <div className="flex items-center gap-2 text-xs text-mist-dim mb-1">
                         <span className="flex items-center gap-1"><span>🕐</span> {tour.duration}</span>
                         <span>•</span>
                         <span className="flex items-center gap-1"><span>📍</span> {tour.destination}</span>
                       </div>
-                      <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">
+                      <h3 className="font-semibold text-ivory mb-1 group-hover:text-gold-300 transition-colors line-clamp-1">
                         {tour.name}
                       </h3>
                       <div className="flex items-center gap-2 mb-2">
                         {tour.avgRating !== undefined && tour.avgRating > 0 ? (
                           <StarRating rating={tour.avgRating} size="sm" />
                         ) : (
-                          <span className="text-xs text-gray-400">Belum ada review</span>
+                          <span className="text-xs text-mist-dim">Belum ada review</span>
                         )}
                       </div>
-                      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                      <div className="flex items-center justify-between pt-3 border-t border-ink-700">
                         <div>
-                          <span className="text-xs text-gray-400">Mulai dari</span>
-                          <p className="text-lg font-bold text-blue-600">{formatCurrency(tour.priceAdult)}</p>
+                          <span className="text-xs text-mist-dim">Mulai dari</span>
+                          <p className="text-lg font-bold text-gold-300">{formatCurrency(tour.priceAdult)}</p>
                         </div>
-                        <span className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 opacity-0 group-hover:opacity-100 translate-x-0 group-hover:translate-x-0 transition-all duration-300">
+                        <span className="inline-flex items-center gap-1 text-sm font-medium text-gold-300 opacity-0 group-hover:opacity-100 translate-x-0 group-hover:translate-x-0 transition-all duration-300">
                           Pesan
                           <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

@@ -56,7 +56,7 @@ export default function Pagination({ currentPage, totalPages, basePath, searchPa
       {currentPage > 1 ? (
         <Link
           href={buildUrl(currentPage - 1)}
-          className={`${btnBase} text-gray-600 hover:text-blue-600 hover:bg-blue-50`}
+          className={`${btnBase} text-mist hover:text-gold-300 hover:bg-gold-400/10`}
         >
           <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -64,7 +64,7 @@ export default function Pagination({ currentPage, totalPages, basePath, searchPa
           <span className="hidden sm:inline">Prev</span>
         </Link>
       ) : (
-        <span className={`${btnBase} text-gray-300 cursor-not-allowed`}>
+        <span className={`${btnBase} text-mist cursor-not-allowed`}>
           <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
@@ -76,15 +76,15 @@ export default function Pagination({ currentPage, totalPages, basePath, searchPa
       <div className="hidden sm:flex items-center gap-1">
         {pages.map((p, i) =>
           p === '...' ? (
-            <span key={`ellipsis-${i}`} className={`${btnBase} text-gray-400 cursor-default`}>...</span>
+            <span key={`ellipsis-${i}`} className={`${btnBase} text-mist-dim cursor-default`}>...</span>
           ) : (
             <Link
               key={p}
               href={buildUrl(p)}
               className={`${btnBase} ${
                 p === currentPage
-                  ? 'bg-blue-600 text-white shadow-sm shadow-blue-200'
-                  : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                  ? 'bg-gold-400 text-ink-950 shadow-sm shadow-gold-700/30'
+                  : 'text-mist hover:text-gold-300 hover:bg-gold-400/10'
               }`}
             >
               {p}
@@ -94,7 +94,7 @@ export default function Pagination({ currentPage, totalPages, basePath, searchPa
       </div>
 
       {/* Mobile: current / total indicator */}
-      <span className="sm:hidden text-sm font-medium text-gray-600 px-3">
+      <span className="sm:hidden text-sm font-medium text-mist px-3">
         {currentPage} / {totalPages}
       </span>
 
@@ -102,7 +102,7 @@ export default function Pagination({ currentPage, totalPages, basePath, searchPa
       {currentPage < totalPages ? (
         <Link
           href={buildUrl(currentPage + 1)}
-          className={`${btnBase} text-gray-600 hover:text-blue-600 hover:bg-blue-50`}
+          className={`${btnBase} text-mist hover:text-gold-300 hover:bg-gold-400/10`}
         >
           <span className="hidden sm:inline">Next</span>
           <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -110,7 +110,7 @@ export default function Pagination({ currentPage, totalPages, basePath, searchPa
           </svg>
         </Link>
       ) : (
-        <span className={`${btnBase} text-gray-300 cursor-not-allowed`}>
+        <span className={`${btnBase} text-mist cursor-not-allowed`}>
           <span className="hidden sm:inline">Next</span>
           <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
