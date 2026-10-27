@@ -83,9 +83,11 @@ export default async function HomePage() {
     <>
       {/* ================= HERO ================= */}
       <section className="relative text-ivory overflow-hidden bg-cover bg-center bg-no-repeat border-b border-gold-500/20"
-        style={{ backgroundImage: "url('/images/haybali/hero-bali.png')" }}
+        style={{ backgroundImage: "url('/images/haybali/hero-banner.jpg')" }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-ink-950/95 via-ink-950/80 to-gold-800/45" />
+        {/* Kiri gelap agar teks terbaca, kanan lebih terang agar banner armada tetap terlihat */}
+        <div className="absolute inset-0 bg-gradient-to-r from-ink-950/95 via-ink-950/70 to-ink-950/25" />
+        <div className="absolute inset-0 bg-gradient-to-b from-ink-950/60 via-transparent to-ink-950/40" />
         <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] blob bg-gold-400/15 animate-float" />
         <div className="absolute bottom-[-15%] left-[-5%] w-[350px] h-[350px] blob bg-gold-200/5 animate-float" style={{ animationDelay: '1s' }} />
 
