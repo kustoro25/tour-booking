@@ -285,25 +285,25 @@ async function main() {
       coverImg: '/images/haybali/innova-reborn.png',
     },
     {
-      name: 'Alphard Vellfire (LUX)',
-      slug: 'sewa-toyota-alphard-bali',
+      name: 'HiAce Commuter',
+      slug: 'sewa-hiace-commuter-bali',
       category: 'CAR_RENTAL',
       destination: 'Bali',
-      duration: '6 / 12 Jam',
-      priceAdult: 2300000,
+      duration: '12 Jam',
+      priceAdult: 1300000,
       priceChild: 0,
       discount: 0,
       maxSlot: 3,
       minPax: 1,
       itinerary: JSON.stringify([
-        { day: 1, title: 'Sewa Alphard Vellfire + Driver', description: 'Direkomendasikan untuk 4 penumpang (maksimum 5 tanpa bagasi). Tarif IDR 1.400.000 / 6 jam dan IDR 2.300.000 / 12 jam. Lembur 10% dari harga per jam. Termasuk pengemudi, bahan bakar, dan air mineral.' },
+        { day: 1, title: 'Sewa HiAce Commuter + Driver', description: 'Direkomendasikan untuk 10 penumpang (maksimum 14 tanpa bagasi). Tarif IDR 1.300.000 / 12 jam. Lembur 10% dari harga per jam. Termasuk pengemudi, bahan bakar, dan air mineral.' },
       ]),
       includes: JSON.stringify(['Pengemudi & Bahan Bakar Termasuk', 'Air Mineral']),
       excludes: JSON.stringify(['Tiket masuk objek wisata', 'Parkir & tol', 'Area di luar standar (biaya tambahan)']),
       terms: '<p>Harga untuk area standar (Area Kota, Bali Selatan, Bali Tengah). Area di luar standar dikenakan biaya tambahan. Lembur dikenakan 10% dari harga per jam. Jam kerja pengemudi 07.00-23.59.</p>',
       isActive: true,
-      sortOrder: 4,
-      coverImg: '/images/haybali/alphard.png',
+      sortOrder: 6,
+      coverImg: '/images/haybali/hiace-commuter.png',
     },
     {
       name: 'Alphard HEV (LUX)',
@@ -323,11 +323,11 @@ async function main() {
       excludes: JSON.stringify(['Tiket masuk objek wisata', 'Parkir & tol', 'Area di luar standar (biaya tambahan)']),
       terms: '<p>Harga untuk area standar (Area Kota, Bali Selatan, Bali Tengah). Area di luar standar dikenakan biaya tambahan. Lembur dikenakan 10% dari harga per jam. Jam kerja pengemudi 07.00-23.59.</p>',
       isActive: true,
-      sortOrder: 5,
+      sortOrder: 4,
       coverImg: '/images/haybali/alphard-hev.png',
     },
     {
-      name: 'Toyota HiAce',
+      name: 'HiAce Premio',
       slug: 'sewa-toyota-hiace-bali',
       category: 'CAR_RENTAL',
       destination: 'Bali',
@@ -338,13 +338,13 @@ async function main() {
       maxSlot: 3,
       minPax: 1,
       itinerary: JSON.stringify([
-        { day: 1, title: 'Sewa HiAce + Driver', description: 'Direkomendasikan untuk 10 penumpang (maksimum 14 tanpa bagasi). Tarif IDR 1.300.000 / 12 jam. Lembur 10% dari harga per jam. Termasuk pengemudi, bahan bakar, dan air mineral.' },
+        { day: 1, title: 'Sewa HiAce Premio + Driver', description: 'Direkomendasikan untuk 10 penumpang (maksimum 14 tanpa bagasi). Tarif IDR 1.300.000 / 12 jam. Lembur 10% dari harga per jam. Termasuk pengemudi, bahan bakar, dan air mineral.' },
       ]),
       includes: JSON.stringify(['Pengemudi & Bahan Bakar Termasuk', 'Air Mineral']),
       excludes: JSON.stringify(['Tiket masuk objek wisata', 'Parkir & tol', 'Area di luar standar (biaya tambahan)']),
       terms: '<p>Harga untuk area standar (Area Kota, Bali Selatan, Bali Tengah). Area di luar standar dikenakan biaya tambahan. Lembur dikenakan 10% dari harga per jam. Jam kerja pengemudi 07.00-23.59.</p>',
       isActive: true,
-      sortOrder: 6,
+      sortOrder: 5,
       coverImg: '/images/haybali/hiace.png',
     },
     // --- Paket Tour Bali (harga per orang, placeholder — edit via admin) ---
@@ -462,7 +462,7 @@ async function main() {
     'sewa-innova-zenix-bali',
     'sewa-innova-zenix-v-bali',
     'sewa-innova-reborn-bali',
-    'sewa-toyota-alphard-bali',
+    'sewa-hiace-commuter-bali',
     'sewa-alphard-hev-bali',
     'sewa-toyota-hiace-bali',
   ]);
@@ -489,6 +489,13 @@ async function main() {
     });
     console.log(fullSync ? 'HAYBALI fleet synced:' : 'HAYBALI product created:', product.name);
   }
+
+  // Armada lama yang tidak lagi tersedia: Alphard Vellfire digantikan HiAce Commuter.
+  const retiredFleet = await prisma.tour.updateMany({
+    where: { slug: 'sewa-toyota-alphard-bali', category: 'CAR_RENTAL' },
+    data: { isActive: false },
+  });
+  if (retiredFleet.count > 0) console.log('Fleet legasi dinonaktifkan:', retiredFleet.count);
 
   // Create sample destinations (mock data with real internet images)
   const destinations = [
