@@ -60,7 +60,7 @@ export function waBookingLink(data: BookingWaMessageData, phoneNumber?: string):
 
 export interface FleetItem {
   slug: string;
-  name: string; // 'Innova Zenix Q (LUX)'
+  name: string; // 'Inova Zenix Q (LUX)'
   tier: 'LUX' | 'CITY';
   recommendedPax: number;
   maxPax: number;
@@ -76,7 +76,7 @@ export interface FleetItem {
 export const FLEET: FleetItem[] = [
   {
     slug: 'sewa-innova-zenix-bali',
-    name: 'Innova Zenix Q (LUX)',
+    name: 'Inova Zenix Q (LUX)',
     tier: 'LUX',
     recommendedPax: 4,
     maxPax: 7,
@@ -90,7 +90,7 @@ export const FLEET: FleetItem[] = [
   },
   {
     slug: 'sewa-innova-zenix-v-bali',
-    name: 'Innova Zenix V (LUX)',
+    name: 'Inova Zenix V (LUX)',
     tier: 'LUX',
     recommendedPax: 4,
     maxPax: 7,
@@ -104,7 +104,7 @@ export const FLEET: FleetItem[] = [
   },
   {
     slug: 'sewa-innova-reborn-bali',
-    name: 'Innova Reborn (CITY)',
+    name: 'Inova Reborn (CITY)',
     tier: 'CITY',
     recommendedPax: 4,
     maxPax: 7,
@@ -132,7 +132,7 @@ export const FLEET: FleetItem[] = [
   },
   {
     slug: 'sewa-toyota-hiace-bali',
-    name: 'HiAce Premio',
+    name: 'Hiace Premio',
     tier: 'CITY',
     recommendedPax: 10,
     maxPax: 14,
@@ -146,7 +146,7 @@ export const FLEET: FleetItem[] = [
   },
   {
     slug: 'sewa-hiace-commuter-bali',
-    name: 'HiAce Commuter',
+    name: 'Hiace Commuter',
     tier: 'CITY',
     recommendedPax: 10,
     maxPax: 14,

@@ -222,7 +222,7 @@ async function main() {
   const haybaliProducts = [
     // --- Sewa Mobil (harga per mobil per durasi, termasuk supir & BBM) ---
     {
-      name: 'Innova Zenix Q (LUX)',
+      name: 'Inova Zenix Q (LUX)',
       slug: 'sewa-innova-zenix-bali',
       category: 'CAR_RENTAL',
       destination: 'Bali',
@@ -233,7 +233,7 @@ async function main() {
       maxSlot: 3,
       minPax: 1,
       itinerary: JSON.stringify([
-        { day: 1, title: 'Sewa Innova Zenix Q + Driver', description: 'Direkomendasikan untuk 4 penumpang (maksimum 7 tanpa bagasi). Tarif IDR 1.400.000 / 6 jam dan IDR 1.800.000 / 12 jam. Lembur 10% dari harga per jam. Termasuk pengemudi, bahan bakar, dan air mineral.' },
+        { day: 1, title: 'Sewa Inova Zenix Q + Driver', description: 'Direkomendasikan untuk 4 penumpang (maksimum 7 tanpa bagasi). Tarif IDR 1.400.000 / 6 jam dan IDR 1.800.000 / 12 jam. Lembur 10% dari harga per jam. Termasuk pengemudi, bahan bakar, dan air mineral.' },
       ]),
       includes: JSON.stringify(['Pengemudi & Bahan Bakar Termasuk', 'Air Mineral']),
       excludes: JSON.stringify(['Tiket masuk objek wisata', 'Parkir & tol', 'Area di luar standar (biaya tambahan)']),
@@ -243,7 +243,7 @@ async function main() {
       coverImg: '/images/haybali/innova-zenix.png',
     },
     {
-      name: 'Innova Zenix V (LUX)',
+      name: 'Inova Zenix V (LUX)',
       slug: 'sewa-innova-zenix-v-bali',
       category: 'CAR_RENTAL',
       destination: 'Bali',
@@ -254,7 +254,7 @@ async function main() {
       maxSlot: 3,
       minPax: 1,
       itinerary: JSON.stringify([
-        { day: 1, title: 'Sewa Innova Zenix V + Driver', description: 'Direkomendasikan untuk 4 penumpang (maksimum 7 tanpa bagasi). Tarif IDR 1.300.000 / 6 jam dan IDR 1.500.000 / 12 jam. Lembur 10% dari harga per jam. Termasuk pengemudi, bahan bakar, dan air mineral.' },
+        { day: 1, title: 'Sewa Inova Zenix V + Driver', description: 'Direkomendasikan untuk 4 penumpang (maksimum 7 tanpa bagasi). Tarif IDR 1.300.000 / 6 jam dan IDR 1.500.000 / 12 jam. Lembur 10% dari harga per jam. Termasuk pengemudi, bahan bakar, dan air mineral.' },
       ]),
       includes: JSON.stringify(['Pengemudi & Bahan Bakar Termasuk', 'Air Mineral']),
       excludes: JSON.stringify(['Tiket masuk objek wisata', 'Parkir & tol', 'Area di luar standar (biaya tambahan)']),
@@ -264,7 +264,7 @@ async function main() {
       coverImg: '/images/haybali/innova-zenix-v.png',
     },
     {
-      name: 'Innova Reborn (CITY)',
+      name: 'Inova Reborn (CITY)',
       slug: 'sewa-innova-reborn-bali',
       category: 'CAR_RENTAL',
       destination: 'Bali',
@@ -275,7 +275,7 @@ async function main() {
       maxSlot: 3,
       minPax: 1,
       itinerary: JSON.stringify([
-        { day: 1, title: 'Sewa Innova Reborn + Driver', description: 'Direkomendasikan untuk 4 penumpang (maksimum 7 tanpa bagasi). Tarif IDR 1.200.000 / 12 jam. Lembur 10% dari harga per jam. Termasuk pengemudi, bahan bakar, dan air mineral.' },
+        { day: 1, title: 'Sewa Inova Reborn + Driver', description: 'Direkomendasikan untuk 4 penumpang (maksimum 7 tanpa bagasi). Tarif IDR 1.200.000 / 12 jam. Lembur 10% dari harga per jam. Termasuk pengemudi, bahan bakar, dan air mineral.' },
       ]),
       includes: JSON.stringify(['Pengemudi & Bahan Bakar Termasuk', 'Air Mineral']),
       excludes: JSON.stringify(['Tiket masuk objek wisata', 'Parkir & tol', 'Area di luar standar (biaya tambahan)']),
@@ -285,7 +285,7 @@ async function main() {
       coverImg: '/images/haybali/innova-reborn.png',
     },
     {
-      name: 'HiAce Commuter',
+      name: 'Hiace Commuter',
       slug: 'sewa-hiace-commuter-bali',
       category: 'CAR_RENTAL',
       destination: 'Bali',
@@ -296,7 +296,7 @@ async function main() {
       maxSlot: 3,
       minPax: 1,
       itinerary: JSON.stringify([
-        { day: 1, title: 'Sewa HiAce Commuter + Driver', description: 'Direkomendasikan untuk 10 penumpang (maksimum 14 tanpa bagasi). Tarif IDR 1.300.000 / 12 jam. Lembur 10% dari harga per jam. Termasuk pengemudi, bahan bakar, dan air mineral.' },
+        { day: 1, title: 'Sewa Hiace Commuter + Driver', description: 'Direkomendasikan untuk 10 penumpang (maksimum 14 tanpa bagasi). Tarif IDR 1.300.000 / 12 jam. Lembur 10% dari harga per jam. Termasuk pengemudi, bahan bakar, dan air mineral.' },
       ]),
       includes: JSON.stringify(['Pengemudi & Bahan Bakar Termasuk', 'Air Mineral']),
       excludes: JSON.stringify(['Tiket masuk objek wisata', 'Parkir & tol', 'Area di luar standar (biaya tambahan)']),
@@ -327,7 +327,7 @@ async function main() {
       coverImg: '/images/haybali/alphard-hev.png',
     },
     {
-      name: 'HiAce Premio',
+      name: 'Hiace Premio',
       slug: 'sewa-toyota-hiace-bali',
       category: 'CAR_RENTAL',
       destination: 'Bali',
@@ -338,7 +338,7 @@ async function main() {
       maxSlot: 3,
       minPax: 1,
       itinerary: JSON.stringify([
-        { day: 1, title: 'Sewa HiAce Premio + Driver', description: 'Direkomendasikan untuk 10 penumpang (maksimum 14 tanpa bagasi). Tarif IDR 1.300.000 / 12 jam. Lembur 10% dari harga per jam. Termasuk pengemudi, bahan bakar, dan air mineral.' },
+        { day: 1, title: 'Sewa Hiace Premio + Driver', description: 'Direkomendasikan untuk 10 penumpang (maksimum 14 tanpa bagasi). Tarif IDR 1.300.000 / 12 jam. Lembur 10% dari harga per jam. Termasuk pengemudi, bahan bakar, dan air mineral.' },
       ]),
       includes: JSON.stringify(['Pengemudi & Bahan Bakar Termasuk', 'Air Mineral']),
       excludes: JSON.stringify(['Tiket masuk objek wisata', 'Parkir & tol', 'Area di luar standar (biaya tambahan)']),
@@ -490,7 +490,7 @@ async function main() {
     console.log(fullSync ? 'HAYBALI fleet synced:' : 'HAYBALI product created:', product.name);
   }
 
-  // Armada lama yang tidak lagi tersedia: Alphard Vellfire digantikan HiAce Commuter.
+  // Armada lama yang tidak lagi tersedia: Alphard Vellfire digantikan Hiace Commuter.
   const retiredFleet = await prisma.tour.updateMany({
     where: { slug: 'sewa-toyota-alphard-bali', category: 'CAR_RENTAL' },
     data: { isActive: false },
