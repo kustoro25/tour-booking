@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     const isInstallment = paymentType === 'INSTALLMENT';
-    const installmentNum = isInstallment ? (parseInt(String(installmentCount)) || 3) : 0;
+    const installmentNum = isInstallment ? (parseInt(String(installmentCount)) || 2) : 0;
 
     if (isInstallment && (installmentNum < 2 || installmentNum > 12)) {
       return NextResponse.json({ success: false, error: 'Jumlah angsuran tidak valid (2-12x)' }, { status: 400 });
@@ -60,6 +60,18 @@ export async function POST(request: NextRequest) {
       const installmentSetting = await prisma.setting.findUnique({ where: { key: 'installment_enabled' } });
       if (!installmentSetting || JSON.parse(installmentSetting.value) !== true) {
         return NextResponse.json({ success: false, error: 'Fitur angsuran sedang tidak tersedia' }, { status: 400 });
+      }
+      // Validasi jumlah angsuran terhadap opsi yang diizinkan admin (default hanya 2x)
+      const optionsSetting = await prisma.setting.findUnique({ where: { key: 'installment_options' } });
+      let allowedOptions: number[] = [2];
+      if (optionsSetting) {
+        try {
+          const parsed = JSON.parse(optionsSetting.value);
+          if (Array.isArray(parsed)) allowedOptions = parsed.map(Number).filter((n) => !isNaN(n));
+        } catch { /* gunakan default [2] */ }
+      }
+      if (!allowedOptions.includes(installmentNum)) {
+        return NextResponse.json({ success: false, error: 'Jumlah angsuran tidak tersedia' }, { status: 400 });
       }
     }
 

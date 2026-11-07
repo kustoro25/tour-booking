@@ -44,7 +44,7 @@ export default function AdminSettingsPage() {
     companyIcon: '',
     invoiceTheme: 'premium' as InvoiceTheme,
     installmentEnabled: false,
-    installmentOptions: '2,3,4,6,12',
+    installmentOptions: '2',
     dpPercentage: 30,
     minAmountForInstallment: 1000000,
     googleReviewsEnabled: false,
@@ -79,7 +79,7 @@ export default function AdminSettingsPage() {
             installmentEnabled: data.data.installment_enabled === true || data.data.installment_enabled === 'true',
             installmentOptions: Array.isArray(data.data.installment_options)
               ? data.data.installment_options.join(',')
-              : (data.data.installment_options as string) || '2,3,4,6,12',
+              : (data.data.installment_options as string) || '2',
             dpPercentage: Number(data.data.dp_percentage) || 30,
             minAmountForInstallment: Number(data.data.min_amount_for_installment) || 1000000,
             googleReviewsEnabled: data.data.google_reviews_enabled === true || data.data.google_reviews_enabled === 'true',
@@ -504,9 +504,9 @@ export default function AdminSettingsPage() {
                       value={form.installmentOptions}
                       onChange={(e) => setForm({ ...form, installmentOptions: e.target.value })}
                       className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="2,3,4,6,12"
+                      placeholder="2"
                     />
-                    <p className="text-xs text-gray-400 mt-1">Contoh: 2,3,4,6,12 (jumlah kali angsuran)</p>
+                    <p className="text-xs text-gray-400 mt-1">Contoh: 2 (jumlah kali angsuran)</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
