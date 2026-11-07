@@ -464,8 +464,8 @@ export default async function HomePage() {
             </Button>
           </div>
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-mist-dim">
-            <span>📍 Denpasar / Kuta, Bali - Indonesia</span>
-            <span>📞 +62 812-3456-7890</span>
+            <span>📍 Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Bali</span>
+            <span>📞 +62 851-1933-4511</span>
             <span>📧 info@haybalitrans.com</span>
           </div>
         </div>

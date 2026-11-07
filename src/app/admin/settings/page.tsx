@@ -250,7 +250,7 @@ export default function AdminSettingsPage() {
                   value={form.companyPhone}
                   onChange={(e) => setForm({ ...form, companyPhone: e.target.value })}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="+62 812-3456-7890"
+                  placeholder="+62 851-1933-4511"
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Dipakai untuk semua tombol &amp; link WhatsApp di website (booking, sewa mobil, antar-jemput).
@@ -264,7 +264,7 @@ export default function AdminSettingsPage() {
                 value={form.companyAddress}
                 onChange={(e) => setForm({ ...form, companyAddress: e.target.value })}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Jl. Pariwisata No. 123, Jakarta Selatan"
+                placeholder="Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361"
               />
             </div>
           </div>

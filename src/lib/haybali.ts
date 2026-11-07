@@ -7,7 +7,7 @@
 
 export const HAYBALI_BRAND = 'HAYBALI TRANS';
 export const HAYBALI_TAGLINE = 'Sewa Mobil & Tour Bali';
-export const WA_NUMBER = '6281234567890'; // +62 812-3456-7890
+export const WA_NUMBER = '6285119334511'; // +62 851-1933-4511
 
 /** Buat link WhatsApp dengan teks prefill. Nomor bisa di-override dari pengaturan admin. */
 export function waLink(text?: string, phoneNumber?: string): string {

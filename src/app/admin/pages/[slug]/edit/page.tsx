@@ -213,10 +213,10 @@ const defaultData: Record<string, PageData> = {
     heading: 'Hubungi Kami',
     subheading: 'Punya pertanyaan atau butuh bantuan memilih paket? Tim kami siap membantu!',
     infoCards: [
-      { icon: '📞', title: 'WhatsApp', detail: '+62 812-3456-7890', color: 'from-green-500 to-green-600' },
-      { icon: '📧', title: 'Email', detail: 'info@jelajahnusantara.com', color: 'from-blue-500 to-blue-600' },
-      { icon: '🕐', title: 'Jam Operasional', detail: 'Senin – Jumat, 09.00 – 18.00 WIB', color: 'from-purple-500 to-purple-600' },
-      { icon: '📍', title: 'Alamat', detail: 'Jl. Pariwisata No. 123, Jakarta Selatan', color: 'from-orange-500 to-orange-600' },
+      { icon: '📞', title: 'WhatsApp', detail: '+62 851-1933-4511', color: 'from-green-500 to-green-600' },
+      { icon: '📧', title: 'Email', detail: 'info@haybalitrans.com', color: 'from-blue-500 to-blue-600' },
+      { icon: '🕐', title: 'Jam Operasional', detail: 'Senin – Minggu, 07.00 – 23.59 WITA', color: 'from-purple-500 to-purple-600' },
+      { icon: '📍', title: 'Alamat', detail: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361', color: 'from-orange-500 to-orange-600' },
     ],
   },
   'destinations': {
@@ -254,9 +254,9 @@ const defaultData: Record<string, PageData> = {
     text: 'Platform booking tour terpercaya untuk menjelajahi destinasi terbaik di Indonesia. Harga transparan, booking instan, dan guide profesional.',
     copyright: `© ${new Date().getFullYear()} Jelajah Nusantara Tour. All rights reserved.`,
     socialLinks: [
-      { platform: 'WhatsApp', url: 'https://wa.me/6281234567890', icon: 'whatsapp' },
-      { platform: 'Instagram', url: 'https://instagram.com/jelajahnusantara', icon: 'instagram' },
-      { platform: 'Email', url: 'mailto:info@jelajahnusantara.com', icon: 'email' },
+      { platform: 'WhatsApp', url: 'https://wa.me/6285119334511', icon: 'whatsapp' },
+      { platform: 'Instagram', url: 'https://instagram.com/haybalitrans', icon: 'instagram' },
+      { platform: 'Email', url: 'mailto:info@haybalitrans.com', icon: 'email' },
     ],
   },
   'invoice-premium': {
@@ -778,7 +778,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
                       }} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="WhatsApp" />
                       <input type="text" value={item.detail} onChange={e => {
                         const arr = [...(data.infoCards as Array<{icon:string;title:string;detail:string;color:string}> || [])]; arr[i] = { ...arr[i], detail: e.target.value }; update('infoCards', arr);
-                      }} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="+62 812-3456-7890" />
+                      }} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="+62 851-1933-4511" />
                     </div>
                   </div>
                 ))}

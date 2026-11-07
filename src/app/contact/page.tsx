@@ -16,10 +16,10 @@ const FALLBACK: ContactData = {
   heading: 'Hubungi Kami',
   subheading: 'Punya pertanyaan atau butuh bantuan memilih paket? Tim kami siap membantu!',
   infoCards: [
-    { icon: '📞', title: 'WhatsApp', detail: '+62 812-3456-7890', color: 'from-gold-300 to-gold-500' },
-    { icon: '📧', title: 'Email', detail: 'info@jelajahnusantara.com', color: 'from-gold-500 to-gold-600' },
-    { icon: '🕐', title: 'Jam Operasional', detail: 'Senin – Jumat, 09.00 – 18.00 WIB', color: 'from-gold-400 to-gold-600' },
-    { icon: '📍', title: 'Alamat', detail: 'Jl. Pariwisata No. 123, Jakarta Selatan', color: 'from-gold-400 to-gold-600' },
+    { icon: '📞', title: 'WhatsApp', detail: '+62 851-1933-4511', color: 'from-gold-300 to-gold-500' },
+    { icon: '📧', title: 'Email', detail: 'info@haybalitrans.com', color: 'from-gold-500 to-gold-600' },
+    { icon: '🕐', title: 'Jam Operasional', detail: 'Senin – Minggu, 07.00 – 23.59 WITA', color: 'from-gold-400 to-gold-600' },
+    { icon: '📍', title: 'Alamat', detail: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361', color: 'from-gold-400 to-gold-600' },
   ],
 };
 

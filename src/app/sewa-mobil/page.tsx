@@ -319,7 +319,7 @@ export default async function SewaMobilPage() {
             </Button>
           </div>
           <p className="text-sm text-mist-dim mt-8">
-            {HAYBALI_BRAND} • Denpasar / Kuta, Bali • +62 812-3456-7890 • Layanan Driver & WhatsApp: 24/7 Online
+            {HAYBALI_BRAND} • Jl. Bypass Ngurah Rai, Kedonganan, Kuta, Bali • +62 851-1933-4511 • Layanan Driver & WhatsApp: 24/7 Online
           </p>
         </div>
       </section>

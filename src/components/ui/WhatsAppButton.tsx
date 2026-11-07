@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 
 export default function WhatsAppButton() {
   const [showTooltip, setShowTooltip] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState('6281234567890');
+  const [phoneNumber, setPhoneNumber] = useState('6285119334511');
 
   useEffect(() => {
     fetch('/api/settings/public')

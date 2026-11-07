@@ -13,7 +13,7 @@ export interface FooterCms {
 }
 
 function useCompanyInfo() {
-  const [info, setInfo] = useState({ email: 'info@haybalitrans.com', phone: '+62 812-3456-7890', address: 'Denpasar / Kuta, Bali - Indonesia', brandName: 'HAYBALI TRANS', brandIcon: 'HB' });
+  const [info, setInfo] = useState({ email: 'info@haybalitrans.com', phone: '+62 851-1933-4511', address: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361', brandName: 'HAYBALI TRANS', brandIcon: 'HB' });
   useEffect(() => {
     fetch('/api/settings/public')
       .then(r => r.json())
@@ -141,7 +141,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
             <div className="space-y-1.5 text-sm text-mist-dim mb-4">
               <p className="flex items-start gap-2">
                 <span className="mt-0.5 flex-shrink-0">📍</span>
-                <span>{info.address || 'Denpasar / Kuta, Bali - Indonesia'}</span>
+                <span>{info.address || 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361'}</span>
               </p>
               <p className="flex items-center gap-2">
                 <span className="flex-shrink-0">📞</span>

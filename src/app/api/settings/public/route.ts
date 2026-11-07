@@ -19,8 +19,8 @@ export async function GET() {
 
     // Map to legacy camelCase fields for backward compatibility
     const email = settingsMap['company_email'] || 'info@jelajahnusantara.com';
-    const phone = settingsMap['company_phone'] || '+62 812-3456-7890';
-    const address = settingsMap['company_address'] || 'Denpasar / Kuta, Bali - Indonesia';
+    const phone = settingsMap['company_phone'] || '+62 851-1933-4511';
+    const address = settingsMap['company_address'] || 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361';
     const brandName = settingsMap['company_name'] || 'HAYBALI TRANS';
     const brandIcon = settingsMap['company_icon'] || 'HB';
     // Nomor WhatsApp bisnis (dari pengaturan admin) untuk link wa.me di komponen client
@@ -47,8 +47,8 @@ export async function GET() {
       data: {
         paymentGateway: 'manual',
         email: 'info@jelajahnusantara.com',
-        phone: '+62 812-3456-7890',
-        address: 'Denpasar / Kuta, Bali - Indonesia',
+        phone: '+62 851-1933-4511',
+        address: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361',
         brandName: 'HAYBALI TRANS',
         brandIcon: 'HB',
         whatsappNumber: WA_NUMBER,

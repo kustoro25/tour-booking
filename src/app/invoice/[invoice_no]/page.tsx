@@ -215,9 +215,9 @@ export default async function InvoicePage({ params }: PageProps) {
         : 'transfer';
 
   // Read company details from settings
-  let companyPhone = '+62 812-3456-7890';
-  let companyEmail = 'info@jelajahnusantara.com';
-  let companyAddress = 'Jl. Pariwisata No. 123, Jakarta Selatan';
+  let companyPhone = '+62 851-1933-4511';
+  let companyEmail = 'info@haybalitrans.com';
+  let companyAddress = 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361';
   try {
     const phoneSetting = await prisma.setting.findUnique({ where: { key: 'company_phone' } });
     if (phoneSetting) {

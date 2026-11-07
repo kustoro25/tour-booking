@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     // Read company info from settings (same source as admin/settings page)
     let companyName = 'HAYBALI TRANS';
     let companyEmail = 'info@haybalitrans.com';
-    let companyPhone = '+6281234567890';
+    let companyPhone = '+6285119334511';
     try {
       const [nameSetting, emailSetting, phoneSetting] = await Promise.all([
         prisma.setting.findUnique({ where: { key: 'company_name' } }),

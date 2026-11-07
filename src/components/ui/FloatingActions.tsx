@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 export default function FloatingActions({ waNumber: initialWaNumber }: { waNumber?: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [showWaTooltip, setShowWaTooltip] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState(initialWaNumber || '6281234567890');
+  const [phoneNumber, setPhoneNumber] = useState(initialWaNumber || '6285119334511');
 
   useEffect(() => {
     fetch('/api/settings/public')
