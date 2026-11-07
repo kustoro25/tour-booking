@@ -8,11 +8,6 @@ const nextConfig: NextConfig = {
         destination: '/sewa-mobil',
         permanent: true,
       },
-      {
-        source: '/tours/:path*',
-        destination: '/sewa-mobil',
-        permanent: true,
-      },
     ];
   },
   images: {
