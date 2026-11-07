@@ -13,7 +13,7 @@ function BrandIcon({ icon, className }: { icon?: string; className?: string }) {
 
 const navLinks = [
   { href: '/', label: 'Beranda' },
-  { href: '/tours', label: 'Paket Wisata' },
+  { href: '/#destinasi', label: 'Destinasi' },
   { href: '/sewa-mobil', label: 'Sewa Mobil' },
   { href: '/antar-jemput', label: 'Antar-Jemput' },
 ];
@@ -83,7 +83,7 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
             <Button href="/contact" variant="outline" size="sm">
               Hubungi Kami
             </Button>
-            <Button href="/tours" variant="primary" size="sm">
+            <Button href="/sewa-mobil" variant="primary" size="sm">
               Booking Sekarang
             </Button>
           </div>
@@ -128,7 +128,7 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
               <Button href="/contact" variant="outline" size="sm" fullWidth>
                 Hubungi Kami
               </Button>
-              <Button href="/tours" variant="primary" size="sm" fullWidth>
+              <Button href="/sewa-mobil" variant="primary" size="sm" fullWidth>
                 Booking
               </Button>
             </div>

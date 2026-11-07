@@ -1,9 +1,6 @@
-import Link from 'next/link';
 import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import { formatCurrency } from '@/lib/utils';
-import { TourCategoryLabels } from '@/types';
-import type { TourCategory } from '@/types';
 import Button from '@/components/ui/Button';
 import StarRating from '@/components/ui/StarRating';
 import {
@@ -18,8 +15,16 @@ export const dynamic = 'force-dynamic';
 
 const HERO_STATS = [
   { num: '10+', label: 'Armada Mewah' },
-  { num: '10+', label: 'Paket Tour Bali' },
+  { num: '10+', label: 'Destinasi Bali' },
   { num: '24/7', label: 'Layanan Driver' },
+];
+
+const DESTINASI_LIST = [
+  { name: 'Ubud', subtitle: 'Pusat Seni & Budaya', description: 'Jelajahi pesona Ubud — sawah terasering Tegalalang, Monkey Forest, dan suasana pedesaan Bali yang autentik.', imageUrl: '/images/haybali/destinasi-ubud.jpg' },
+  { name: 'Bedugul', subtitle: 'Danau & Pegunungan', description: 'Udara sejuk Bedugul dengan Pura Ulun Danu Beratan di tepi danau, kebun raya, dan panorama pegunungan yang memukau.', imageUrl: '/images/haybali/destinasi-bedugul.jpg' },
+  { name: 'Kintamani', subtitle: 'Gunung Batur', description: 'Nikmati pemandangan Gunung Batur dan Danau Batur dari ketinggian, ditemani udara sejuk khas dataran tinggi Kintamani.', imageUrl: '/images/haybali/destinasi-kintamani.jpg' },
+  { name: 'Nusa Penida', subtitle: 'Surga Tersembunyi', description: 'Keindahan alam Nusa Penida — Kelingking Beach, Broken Beach, dan Angel\'s Billabong siap memukau mata Anda.', imageUrl: '/images/haybali/destinasi-nusa-penida.jpg' },
+  { name: 'Uluwatu', subtitle: 'Tebing & Sunset', description: 'Tebing karang megah Uluwatu dengan Pura Luhur di atasnya, ditemani pertunjukan Kecak saat matahari terbenam.', imageUrl: '/images/haybali/destinasi-uluwatu.jpg' },
 ];
 
 const VALUE_ITEMS = [
@@ -30,37 +35,11 @@ const VALUE_ITEMS = [
 ];
 
 const FAQ_ITEMS = [
-  { question: 'Bagaimana cara melakukan booking?', answer: 'Pilih paket tour atau layanan yang Anda inginkan, tentukan tanggal dari kalender, isi data diri, lalu klik "Booking Sekarang". Invoice langsung terbit dan pembayaran diproses aman melalui Midtrans (QRIS, Virtual Account, e-wallet, atau kartu).' },
+  { question: 'Bagaimana cara melakukan booking?', answer: 'Pilih layanan sewa mobil atau antar-jemput yang Anda inginkan, tentukan tanggal dari kalender, isi data diri, lalu klik "Booking Sekarang". Invoice langsung terbit dan pembayaran diproses aman melalui Midtrans (QRIS, Virtual Account, e-wallet, atau kartu).' },
   { question: 'Apakah sewa mobil sudah termasuk supir dan BBM?', answer: 'Ya. Semua harga sewa mobil HAYBALI TRANS sudah termasuk supir berpengalaman dan BBM. Pilih durasi 6 jam atau 12 jam sesuai armada, tanpa batasan jarak tempuh. Area di luar standar dikenakan biaya tambahan sesuai tabel yang tertera.' },
   { question: 'Bagaimana kebijakan jam kerja pengemudi?', answer: 'Jam kerja pengemudi adalah 07.00–23.59 WITA. Penjemputan 07.00–10.30 tanpa biaya tambahan; di luar jam tersebut dikenakan Rp 50.000/mobil. Lewat tengah malam dikenakan Rp 150.000/jam, dan bila menginap di luar kota dikenakan Rp 350.000/malam.' },
   { question: 'Bagaimana kebijakan pembatalan?', answer: 'Pembatalan dilakukan minimal 3 jam sebelum jam pemberangkatan dan dikenakan biaya 50% dari tiket. Mohon informasikan segera bila pesawat Anda mengalami delay agar kami dapat menyesuaikan penjemputan.' },
 ];
-
-async function getBaliTours() {
-  const tours = await prisma.tour.findMany({
-    where: {
-      isActive: true,
-      // Layanan khusus (sewa mobil & antar-jemput) punya halaman sendiri
-      category: { notIn: ['CAR_RENTAL', 'AIRPORT_TRANSFER'] },
-    },
-    orderBy: { sortOrder: 'asc' },
-    include: {
-      _count: { select: { orders: true, reviews: true } },
-      reviews: { select: { rating: true } },
-    },
-  });
-
-  return tours.map((tour) => {
-    const avgRating =
-      tour.reviews.length > 0
-        ? tour.reviews.reduce((sum, r) => sum + r.rating, 0) / tour.reviews.length
-        : 0;
-    return {
-      ...tour,
-      avgRating: Math.round(avgRating * 10) / 10,
-    };
-  });
-}
 
 async function getLatestReviews() {
   return prisma.review.findMany({
@@ -72,8 +51,7 @@ async function getLatestReviews() {
 }
 
 export default async function HomePage() {
-  const [tours, reviews, waNumber] = await Promise.all([
-    getBaliTours(),
+  const [reviews, waNumber] = await Promise.all([
     getLatestReviews(),
     getWhatsAppNumber(),
   ]);
@@ -94,7 +72,7 @@ export default async function HomePage() {
         <div className="border-t border-gold-500/20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-5 flex flex-wrap items-center justify-center sm:justify-between gap-4">
             <div className="flex flex-wrap justify-center gap-3">
-              <Button href="/tours" variant="accent" size="md">
+              <Button href="/sewa-mobil" variant="accent" size="md">
                 Booking Sekarang
               </Button>
               <Button href={waLink('Halo HAYBALI TRANS, saya ingin bertanya tentang layanan Anda', waNumber)} variant="outline" size="md" className="!border-gold-400/60 !text-gold-200 hover:!bg-gold-400/10">
@@ -238,81 +216,58 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ================= PAKET TOUR ================= */}
-      <section className="py-16 sm:py-20 bg-ink-950">
+      {/* ================= DESTINASI ================= */}
+      <section id="destinasi" className="py-16 sm:py-20 bg-ink-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">Paket Tour</span>
-            <h2 className="text-3xl font-bold text-ivory mb-4">Paket Tour Destinasi Pilihan</h2>
+            <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">Destinasi</span>
+            <h2 className="text-3xl font-bold text-ivory mb-4">Destinasi Wisata Bali</h2>
             <p className="text-mist-dim max-w-2xl mx-auto">
-              Nikmati liburan seru di Bali tanpa khawatir rute perjalanan
+              Jelajahi keindahan Bali bersama sopir pribadi HAYBALI TRANS — kami siap mengantar Anda ke destinasi impian
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {tours.map((tour) => (
-              <Link
-                key={tour.id}
-                href={`/tours/${tour.slug}`}
-                className="group bg-ink-850 rounded-xl overflow-hidden shadow-card hover-lift border border-ink-700"
+            {DESTINASI_LIST.map((dest) => (
+              <div
+                key={dest.name}
+                className="group bg-ink-850 rounded-xl overflow-hidden shadow-card hover-lift border border-ink-700 hover:border-gold-500/20 transition-all"
               >
-                <div className="relative h-48 overflow-hidden">
-                  {tour.coverImg ? (
-                    <Image
-                      src={tour.coverImg}
-                      alt={tour.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gold-300 to-gold-600">
-                      <span className="text-white text-4xl">🏝️</span>
-                    </div>
-                  )}
-                  <span className="absolute top-3 left-3 bg-ink-900/95 text-ivory text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
-                    {TourCategoryLabels[tour.category as TourCategory] || tour.category}
-                  </span>
+                <div className="relative h-56 overflow-hidden">
+                  <Image
+                    src={dest.imageUrl}
+                    alt={dest.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <h3 className="text-xl font-bold text-ivory group-hover:text-gold-300 transition-colors">
+                      {dest.name}
+                    </h3>
+                    <p className="text-xs text-mist-dim mt-1">
+                      {dest.subtitle}
+                    </p>
+                  </div>
                 </div>
-                <div className="p-5">
-                  <div className="flex items-center gap-2 text-sm text-mist-dim mb-1">
-                    <span className="flex items-center gap-1"><span>🕐</span> {tour.duration}</span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1"><span>📍</span> {tour.destination}</span>
-                  </div>
-                  <h3 className="text-lg font-semibold text-ivory mb-2 group-hover:text-gold-300 transition-colors line-clamp-2">
-                    {tour.name}
-                  </h3>
-                  <div className="flex items-center gap-2 mb-3">
-                    {tour.avgRating > 0 ? (
-                      <StarRating rating={tour.avgRating} size="sm" />
-                    ) : (
-                      <span className="text-sm text-mist-dim">Belum ada review</span>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between pt-3 border-t border-ink-700">
-                    <div>
-                      <span className="text-xs text-mist-dim">Mulai dari</span>
-                      <p className="text-lg font-bold text-gold-300">{formatCurrency(tour.priceAdult)}</p>
-                    </div>
-                    <span className="inline-flex items-center text-sm font-medium text-gold-300 group-hover:translate-x-1 transition-transform duration-200">
-                      Lihat Detail →
+                <div className="p-4">
+                  <p className="text-sm text-mist leading-relaxed line-clamp-3">
+                    {dest.description}
+                  </p>
+                  <div className="mt-3 pt-3 border-t border-ink-700">
+                    <span className="inline-flex items-center text-xs font-medium text-gold-300">
+                      Sewa mobil + sopir mulai {formatCurrency(1200000)} / 12 jam →
                     </span>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
 
-          {tours.length === 0 && (
-            <div className="text-center py-12 text-mist-dim">
-              Belum ada paket tour tersedia saat ini.
-            </div>
-          )}
-
           <div className="text-center mt-10">
-            <Button href="/tours" variant="primary" size="lg">
-              Lihat Semua Paket Tour
+            <Button href="/sewa-mobil" variant="primary" size="lg">
+              Sewa Mobil ke Destinasi Ini
             </Button>
           </div>
         </div>
@@ -501,8 +456,8 @@ export default async function HomePage() {
             Hubungi kami untuk konsultasi gratis — tim kami siap membantu memilihkan layanan terbaik untuk perjalanan Anda.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-8">
-            <Button href="/tours" variant="accent" size="lg">
-              Booking Sekarang
+            <Button href="/sewa-mobil" variant="accent" size="lg">
+              Sewa Mobil Sekarang
             </Button>
             <Button href={waLink('Halo HAYBALI TRANS, saya ingin konsultasi layanan', waNumber)} variant="outline" size="lg" className="!border-gold-400/60 !text-gold-200 hover:!bg-gold-400/10">
               Chat WhatsApp

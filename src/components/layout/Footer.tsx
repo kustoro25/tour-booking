@@ -61,7 +61,7 @@ const socialIcons: Record<string, React.ReactNode> = {
 const footerLinks = {
   Navigasi: [
     { href: '/', label: 'Beranda' },
-    { href: '/tours', label: 'Paket Wisata' },
+    { href: '/#destinasi', label: 'Destinasi' },
     { href: '/destinations', label: 'Destinasi' },
     { href: '/blog', label: 'Blog & Tips' },
     { href: '/about', label: 'Tentang Kami' },
