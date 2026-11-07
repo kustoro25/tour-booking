@@ -25,7 +25,7 @@ export interface BookingWaMessageData {
   serviceLabel: string;
   dateLabel: string;
   totalLabel: string;
-  paymentLabel?: string; // mis. 'Pembayaran Lunas (Transfer Bank)' / 'Cicilan 3x (DP 50%)'
+  paymentLabel?: string; // mis. 'Pembayaran Lunas (Transfer Bank)' / 'Cicilan 2x (DP 50%)'
   extraLines?: string[]; // rincian tambahan: durasi, jam jemput, area, penumpang, dll.
   invoiceUrl?: string; // link halaman invoice — otomatis bisa diklik di WhatsApp
 }

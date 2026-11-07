@@ -341,7 +341,7 @@ export default async function HomePage() {
               <ul className="space-y-3 text-sm text-mist leading-relaxed">
                 <li>• Booking online aman melalui Midtrans — tersedia QRIS, Virtual Account, e-wallet (GoPay, ShopeePay, DANA), dan kartu kredit/debit.</li>
                 <li>• Pemesanan memerlukan deposit 50% terlebih dahulu untuk mengamankan jadwal &amp; pengemudi Anda. Pelunasan sisa pembayaran dapat dilakukan tunai saat bertemu dengan driver.</li>
-                <li>• Tersedia opsi DP 30% dengan cicilan untuk paket tour tertentu.</li>
+                <li>• Tersedia opsi DP 50% dengan cicilan 2x untuk layanan tertentu.</li>
                 <li>• Batas pembayaran 24 jam sejak invoice terbit; pesanan melewati batas waktu otomatis dibatalkan.</li>
               </ul>
             </div>

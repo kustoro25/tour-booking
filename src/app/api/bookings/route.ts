@@ -261,7 +261,7 @@ export async function POST(request: NextRequest) {
 
       if (isInstallment) {
         // Read DP percentage from settings
-        let dpPct = 30;
+        let dpPct = 50;
         try {
           const dpSetting = await tx.setting.findUnique({ where: { key: 'dp_percentage' } });
           if (dpSetting) {

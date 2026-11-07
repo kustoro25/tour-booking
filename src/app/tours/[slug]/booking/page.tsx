@@ -88,7 +88,7 @@ function BookingPage() {
   const [installmentCount, setInstallmentCount] = useState(2);
   const [installmentEnabled, setInstallmentEnabled] = useState(false);
   const [installmentOptions, setInstallmentOptions] = useState<number[]>([2]);
-  const [dpPercentage, setDpPercentage] = useState(30);
+  const [dpPercentage, setDpPercentage] = useState(50);
   const [minInstallmentAmount, setMinInstallmentAmount] = useState(0);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});

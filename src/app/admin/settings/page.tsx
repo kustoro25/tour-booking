@@ -45,7 +45,7 @@ export default function AdminSettingsPage() {
     invoiceTheme: 'premium' as InvoiceTheme,
     installmentEnabled: false,
     installmentOptions: '2',
-    dpPercentage: 30,
+    dpPercentage: 50,
     minAmountForInstallment: 1000000,
     googleReviewsEnabled: false,
     googlePlaceId: '',
@@ -80,7 +80,7 @@ export default function AdminSettingsPage() {
             installmentOptions: Array.isArray(data.data.installment_options)
               ? data.data.installment_options.join(',')
               : (data.data.installment_options as string) || '2',
-            dpPercentage: Number(data.data.dp_percentage) || 30,
+            dpPercentage: Number(data.data.dp_percentage) || 50,
             minAmountForInstallment: Number(data.data.min_amount_for_installment) || 1000000,
             googleReviewsEnabled: data.data.google_reviews_enabled === true || data.data.google_reviews_enabled === 'true',
             googlePlaceId: (data.data.google_place_id as string) || '',
