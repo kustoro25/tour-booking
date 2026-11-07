@@ -153,7 +153,7 @@ export const FLEET: FleetItem[] = [
     capacityLabel: '10 Penumpang (Maks. 14)',
     paxNote: 'Direkomendasikan untuk 10 penumpang (maksimum 14 tanpa bagasi)',
     price6h: null,
-    price12h: 1300000,
+    price12h: 1700000,
     overtimePct: 10,
     features: ['Pengemudi & Bahan Bakar Termasuk', 'Air Mineral'],
     imageUrl: '/images/haybali/hiace.png',

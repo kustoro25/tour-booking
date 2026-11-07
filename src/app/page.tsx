@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { formatCurrency } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import StarRating from '@/components/ui/StarRating';
+import DestinasiGallery from '@/components/tours/DestinasiGallery';
 import {
   HAYBALI_BRAND,
   FLEET,
@@ -227,43 +228,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {DESTINASI_LIST.map((dest) => (
-              <div
-                key={dest.name}
-                className="group bg-ink-850 rounded-xl overflow-hidden shadow-card hover-lift border border-ink-700 hover:border-gold-500/20 transition-all"
-              >
-                <div className="relative h-56 overflow-hidden">
-                  <Image
-                    src={dest.imageUrl}
-                    alt={dest.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <h3 className="text-xl font-bold text-ivory group-hover:text-gold-300 transition-colors">
-                      {dest.name}
-                    </h3>
-                    <p className="text-xs text-mist-dim mt-1">
-                      {dest.subtitle}
-                    </p>
-                  </div>
-                </div>
-                <div className="p-4">
-                  <p className="text-sm text-mist leading-relaxed line-clamp-3">
-                    {dest.description}
-                  </p>
-                  <div className="mt-3 pt-3 border-t border-ink-700">
-                    <span className="inline-flex items-center text-xs font-medium text-gold-300">
-                      Sewa mobil + sopir mulai {formatCurrency(1200000)} / 12 jam →
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <DestinasiGallery destinations={DESTINASI_LIST} />
 
           <div className="text-center mt-10">
             <Button href="/sewa-mobil" variant="primary" size="lg">
