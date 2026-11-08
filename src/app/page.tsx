@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { formatCurrency } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import StarRating from '@/components/ui/StarRating';
+import DestinasiGallery from '@/components/tours/DestinasiGallery';
 import { HAYBALI_BRAND, FLEET, waLink } from '@/lib/haybali';
 import { getPaymentGateway, getWhatsAppNumber } from '@/lib/settings';
 
@@ -12,6 +13,15 @@ const HERO_STATS = [
   { num: `${FLEET.length}`, label: 'Pilihan Armada' },
   { num: '24/7', label: 'Layanan Driver' },
   { num: '6/12', label: 'Jam Sewa Fleksibel' },
+];
+
+// Galeri foto destinasi (hanya dokumentasi visual, tanpa halaman destinasi).
+const DESTINASI_LIST = [
+  { name: 'Ubud', subtitle: 'Pusat Seni & Budaya', description: 'Sawah terasering Tegalalang, Monkey Forest, dan suasana pedesaan Bali yang autentik.', imageUrl: '/images/haybali/destinasi-ubud.jpg' },
+  { name: 'Bedugul', subtitle: 'Danau & Pegunungan', description: 'Udara sejuk Bedugul dengan Pura Ulun Danu Beratan di tepi danau dan panorama pegunungan.', imageUrl: '/images/haybali/destinasi-bedugul.jpg' },
+  { name: 'Kintamani', subtitle: 'Gunung Batur', description: 'Pemandangan Gunung Batur dan Danau Batur dari ketinggian dengan udara sejuk dataran tinggi.', imageUrl: '/images/haybali/destinasi-kintamani.jpg' },
+  { name: 'Nusa Penida', subtitle: 'Surga Tersembunyi', description: 'Kelingking Beach, Broken Beach, dan Angel\'s Billabong — panorama laut yang memukau.', imageUrl: '/images/haybali/destinasi-nusa-penida.jpg' },
+  { name: 'Uluwatu', subtitle: 'Tebing & Sunset', description: 'Tebing karang megah dengan Pura Luhur di atasnya dan pertunjukan Kecak saat matahari terbenam.', imageUrl: '/images/haybali/destinasi-uluwatu.jpg' },
 ];
 
 const VALUE_ITEMS = [
@@ -204,6 +214,21 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ================= GALERI DESTINASI ================= */}
+      <section id="destinasi" className="py-16 sm:py-20 bg-ink-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+          <div className="text-center mb-12">
+            <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">Galeri</span>
+            <h2 className="text-3xl font-bold text-ivory mb-4">Galeri Destinasi Bali</h2>
+            <p className="text-mist-dim max-w-2xl mx-auto">
+              Beberapa tujuan favorit pelanggan HAYBALI TRANS — armada kami siap mengantar Anda ke mana pun di Bali.
+            </p>
+          </div>
+
+          <DestinasiGallery destinations={DESTINASI_LIST} />
         </div>
       </section>
 
