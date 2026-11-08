@@ -15,7 +15,7 @@ import {
   waLink,
 } from '@/lib/haybali';
 import { getFleetDetail } from '@/lib/fleet-detail';
-import { getWhatsAppNumber } from '@/lib/settings';
+import { getPaymentGateway, getSetting, getWhatsAppNumber } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +64,15 @@ export default async function FleetDetailPage({ params }: PageProps) {
 
   if (!fleet || !detail) notFound();
 
-  const waNumber = await getWhatsAppNumber();
+  const [waNumber, gateway, bankAccounts] = await Promise.all([
+    getWhatsAppNumber(),
+    getPaymentGateway(),
+    getSetting<{ bank: string; number: string; name: string }[]>('bank_accounts', []),
+  ]);
+  const bankLabel = bankAccounts
+    .map((account) => account.bank)
+    .filter(Boolean)
+    .join(' / ');
   const bookingHref = `/tours/${fleet.slug}/booking`;
   const otherFleet = FLEET.filter((f) => f.slug !== fleet.slug).slice(0, 3);
 
@@ -289,7 +297,23 @@ export default async function FleetDetailPage({ params }: PageProps) {
             <ul className="space-y-2 text-sm text-mist leading-relaxed">
               <li>• Deposit 50% saat booking untuk mengunci jadwal &amp; pengemudi.</li>
               <li>• Pelunasan sisa pembayaran tunai saat bertemu driver.</li>
-              <li>• Pembayaran online aman via Midtrans (QRIS, Virtual Account, e-wallet, kartu).</li>
+              {gateway === 'midtrans' ? (
+                <li>
+                  • Pembayaran online via QRIS, Virtual Account, e-wallet, atau kartu kredit/debit —
+                  status terkonfirmasi otomatis.
+                </li>
+              ) : (
+                <>
+                  <li>
+                    • Transfer bank{bankLabel ? ` (${bankLabel})` : ''} ke rekening perusahaan — detail
+                    rekening tercantum di invoice.
+                  </li>
+                  <li>
+                    • Kirim bukti transfer via WhatsApp atau email, status pembayaran diaktifkan
+                    manual oleh admin.
+                  </li>
+                </>
+              )}
               <li>• Tersedia opsi cicilan 2x untuk layanan tertentu.</li>
               <li>• Batas pembayaran 24 jam sejak invoice terbit.</li>
             </ul>

@@ -5,7 +5,7 @@ import Button from '@/components/ui/Button';
 import StarRating from '@/components/ui/StarRating';
 import DestinasiGallery from '@/components/tours/DestinasiGallery';
 import { HAYBALI_BRAND, FLEET, waLink } from '@/lib/haybali';
-import { getWhatsAppNumber } from '@/lib/settings';
+import { getPaymentGateway, getWhatsAppNumber } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,11 +27,11 @@ const VALUE_ITEMS = [
   { icon: '🚙', title: 'Armada Prima', desc: 'Kendaraan bersih, wangi, dan terawat untuk kenyamanan perjalanan Anda.', color: 'from-gold-200 via-gold-400 to-gold-600' },
   { icon: '👨‍✈️', title: 'Supir Profesional', desc: 'Berpengalaman, ramah, dan siap melayani dari jam 07.00 hingga tengah malam.', color: 'from-gold-300 to-gold-700' },
   { icon: '💰', title: 'Harga Transparan', desc: 'Tarif jelas tanpa biaya tersembunyi — apa yang Anda lihat, itulah yang Anda bayar.', color: 'from-ink-600 to-ink-800' },
-  { icon: '⚡', title: 'Booking Instan', desc: 'Pesan online via Midtrans, invoice langsung terbit dan masuk ke email Anda.', color: 'from-gold-400 to-gold-600' },
+  { icon: '⚡', title: 'Booking Instan', desc: 'Pesan online, invoice langsung terbit dan masuk ke email Anda.', color: 'from-gold-400 to-gold-600' },
 ];
 
 const FAQ_ITEMS = [
-  { question: 'Bagaimana cara melakukan booking?', answer: 'Pilih layanan sewa mobil atau antar-jemput yang Anda inginkan, tentukan tanggal dari kalender, isi data diri, lalu klik "Booking Sekarang". Invoice langsung terbit dan pembayaran diproses aman melalui Midtrans (QRIS, Virtual Account, e-wallet, atau kartu).' },
+  { question: 'Bagaimana cara melakukan booking?', answer: 'Pilih layanan sewa mobil yang Anda inginkan, tentukan tanggal dari kalender, isi data diri, lalu klik "Booking Sekarang". Invoice langsung terbit dan pembayaran dilakukan sesuai metode yang tercantum di invoice.' },
   { question: 'Apakah sewa mobil sudah termasuk supir dan BBM?', answer: 'Ya. Semua harga sewa mobil HAYBALI TRANS sudah termasuk supir berpengalaman dan BBM. Pilih durasi 6 jam atau 12 jam sesuai armada, tanpa batasan jarak tempuh. Area di luar standar dikenakan biaya tambahan sesuai tabel yang tertera.' },
   { question: 'Bagaimana kebijakan jam kerja pengemudi?', answer: 'Jam kerja pengemudi adalah 07.00–23.59 WITA. Penjemputan 07.00–10.30 tanpa biaya tambahan; di luar jam tersebut dikenakan Rp 50.000/mobil. Lewat tengah malam dikenakan Rp 150.000/jam, dan bila menginap di luar kota dikenakan Rp 350.000/malam.' },
   { question: 'Bagaimana kebijakan pembatalan?', answer: 'Pembatalan dilakukan minimal 3 jam sebelum jam pemberangkatan dan dikenakan biaya 50% dari tiket. Mohon informasikan segera bila pesawat Anda mengalami delay agar kami dapat menyesuaikan penjemputan.' },
@@ -47,9 +47,10 @@ async function getLatestReviews() {
 }
 
 export default async function HomePage() {
-  const [reviews, waNumber] = await Promise.all([
+  const [reviews, waNumber, gateway] = await Promise.all([
     getLatestReviews(),
     getWhatsAppNumber(),
+    getPaymentGateway(),
   ]);
 
   return (
@@ -248,7 +249,11 @@ export default async function HomePage() {
                 Pembayaran
               </h3>
               <ul className="space-y-3 text-sm text-mist leading-relaxed">
-                <li>• Booking online aman melalui Midtrans — tersedia QRIS, Virtual Account, e-wallet (GoPay, ShopeePay, DANA), dan kartu kredit/debit.</li>
+                {gateway === 'midtrans' ? (
+                  <li>• Booking online aman — tersedia QRIS, Virtual Account, e-wallet (GoPay, ShopeePay, DANA), dan kartu kredit/debit.</li>
+                ) : (
+                  <li>• Pembayaran via transfer bank ke rekening perusahaan yang tercantum di invoice, lalu konfirmasi bukti transfer via WhatsApp.</li>
+                )}
                 <li>• Pemesanan memerlukan deposit 50% terlebih dahulu untuk mengamankan jadwal &amp; pengemudi Anda. Pelunasan sisa pembayaran dapat dilakukan tunai saat bertemu dengan driver.</li>
                 <li>• Tersedia opsi DP 50% dengan cicilan 2x untuk layanan tertentu.</li>
                 <li>• Batas pembayaran 24 jam sejak invoice terbit; pesanan melewati batas waktu otomatis dibatalkan.</li>

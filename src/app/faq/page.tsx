@@ -1,10 +1,21 @@
 import type { Metadata } from 'next';
+import { getPaymentGateway, type PaymentGatewayMode } from '@/lib/settings';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'FAQ',
 };
 
-const faqs = [
+/** Jawaban metode pembayaran menyesuaikan mode aktif: transfer manual atau gateway online. */
+function paymentAnswerFor(mode: PaymentGatewayMode): string {
+  if (mode === 'midtrans') {
+    return 'Pembayaran diproses otomatis melalui gateway pembayaran online — tersedia QRIS, Virtual Account berbagai bank, e-wallet (GoPay, ShopeePay, DANA, dan lainnya), serta kartu kredit/debit. Setelah pembayaran berhasil, pesanan Anda langsung terkonfirmasi otomatis. Untuk pembayaran angsuran (cicilan), tagihan dikirim melalui email dan dapat dibayar langsung dari halaman jadwal angsuran. Detail lengkap tercantum di invoice Anda.';
+  }
+  return 'Pembayaran dilakukan dengan transfer bank ke rekening perusahaan yang tercantum di invoice. Setelah transfer, kirim bukti pembayaran melalui WhatsApp atau email agar admin dapat memverifikasi. Status pesanan diperbarui oleh admin setelah pembayaran diterima. Untuk pembayaran angsuran (cicilan), bukti transfer diunggah pada halaman jadwal angsuran. Detail lengkap tercantum di invoice Anda.';
+}
+
+const buildFaqs = (paymentAnswer: string) => [
   {
     question: 'Bagaimana cara melakukan booking?',
     answer:
@@ -17,8 +28,7 @@ const faqs = [
   },
   {
     question: 'Bagaimana metode pembayaran yang tersedia?',
-    answer:
-      'Pembayaran diproses otomatis melalui gateway Midtrans — tersedia QRIS, Virtual Account berbagai bank, e-wallet (GoPay, ShopeePay, DANA, dan lainnya), serta kartu kredit/debit. Setelah pembayaran berhasil, pesanan Anda langsung terkonfirmasi otomatis. Untuk pembayaran angsuran (cicilan), transfer dilakukan ke rekening bank perusahaan dan bukti transfer dikirim melalui WhatsApp atau email. Detail lengkap tercantum di invoice Anda.',
+    answer: paymentAnswer,
   },
   {
     question: 'Berapa lama batas waktu pembayaran?',
@@ -62,7 +72,8 @@ const faqs = [
   },
 ];
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const faqs = buildFaqs(paymentAnswerFor(await getPaymentGateway()));
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-12">
       <div className="text-center mb-12">
