@@ -12,6 +12,11 @@ export interface FooterCms {
   [key: string]: unknown;
 }
 
+/** Ikon brand berupa gambar (upload admin) vs. inisial teks. */
+function isImageIcon(icon?: string): boolean {
+  return !!icon && (icon.startsWith('http') || icon.startsWith('/'));
+}
+
 function useCompanyInfo() {
   const [info, setInfo] = useState({ email: 'info@haybalitrans.com', phone: '+62 851-1933-4511', address: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361', brandName: 'HAYBALI TRANS', brandIcon: 'HB' });
   useEffect(() => {
@@ -120,17 +125,13 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
           {/* Company Info */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 rounded-xl flex items-center justify-center shadow-md shadow-gold-500/20">
-                {info.brandIcon ? (
-                  (info.brandIcon.startsWith('http') || info.brandIcon.startsWith('/')) ? (
-                    <img src={info.brandIcon} alt="brand" className="w-full h-full object-cover rounded-xl" />
-                  ) : (
-                    <span className="text-ink-950 font-bold text-sm">{info.brandIcon.substring(0, 2).toUpperCase()}</span>
-                  )
-                ) : (
-                  <span className="text-ink-950 font-bold text-sm">HB</span>
-                )}
-              </div>
+              {isImageIcon(info.brandIcon) ? (
+                <img src={info.brandIcon} alt={info.brandName || 'HAYBALI TRANS'} className="w-10 h-10 object-contain" />
+              ) : (
+                <div className="w-9 h-9 bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 rounded-xl flex items-center justify-center shadow-md shadow-gold-500/20">
+                  <span className="text-ink-950 font-bold text-sm">{(info.brandIcon || 'HB').substring(0, 2).toUpperCase()}</span>
+                </div>
+              )}
               <span className="text-xl font-bold text-white">{info.brandName || 'HAYBALI TRANS'}</span>
             </div>
             <p className="text-mist-dim mb-4 max-w-md leading-relaxed">

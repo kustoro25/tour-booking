@@ -6,11 +6,11 @@ import { usePathname, useRouter } from 'next/navigation';
 import { ToastProvider } from '@/components/ui/Toast';
 
 function BrandIcon({ icon, className }: { icon: string; className?: string }) {
-  if (!icon) return <div className={`${className} flex items-center justify-center text-sm font-bold`}>HB</div>;
+  if (!icon) return <div className={`${className} bg-blue-600 flex items-center justify-center text-sm font-bold text-white`}>HB</div>;
   if (icon.startsWith('http') || icon.startsWith('/')) {
-    return <img src={icon} alt="brand" className={`${className} object-cover`} />;
+    return <img src={icon} alt="brand" className={`${className} object-contain`} />;
   }
-  return <div className={`${className} flex items-center justify-center text-sm font-bold`}>{icon.substring(0, 2).toUpperCase()}</div>;
+  return <div className={`${className} bg-blue-600 flex items-center justify-center text-sm font-bold text-white`}>{icon.substring(0, 2).toUpperCase()}</div>;
 }
 
 const sidebarLinks = [
@@ -68,7 +68,7 @@ export default function AdminShell({ brandName, brandIcon, children }: Props) {
       >
         <div className="p-4 border-b border-gray-700 flex-shrink-0">
           <div className="flex items-center gap-2">
-            <BrandIcon icon={brandIcon} className="w-7 h-7 bg-blue-600 rounded" />
+            <BrandIcon icon={brandIcon} className="w-7 h-7 rounded" />
             <div>
               <p className="font-semibold text-xs">{brandName}</p>
               <p className="text-[10px] text-gray-400">Admin Panel</p>

@@ -434,7 +434,7 @@ function CustomInvoice({
               <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold overflow-hidden" style={{ backgroundColor: isIconUrl ? 'transparent' : logoBg }}>
                 {isIconUrl ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
-                  <img src={brandIcon} alt={companyName} className="w-full h-full object-cover" />
+                  <img src={brandIcon} alt={companyName} className="w-full h-full object-contain" />
                 ) : (
                   <span style={{ color: hText }}>{brandIcon}</span>
                 )}

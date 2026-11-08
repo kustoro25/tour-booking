@@ -28,6 +28,8 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  // Logo gambar (upload admin) ditampilkan apa adanya, tanpa tile gradien emas.
+  const isLogoImage = !!brandIcon && (brandIcon.startsWith('http') || brandIcon.startsWith('/'));
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -52,9 +54,17 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 rounded-xl flex items-center justify-center shadow-md shadow-gold-500/30 group-hover:shadow-lg group-hover:shadow-gold-400/50 transition-shadow duration-300">
-              <BrandIcon icon={brandIcon} className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 shadow-md" />
-            </div>
+            {isLogoImage ? (
+              <img
+                src={brandIcon}
+                alt={brandName || 'HAYBALI TRANS'}
+                className="w-10 h-10 object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+            ) : (
+              <div className="w-9 h-9 bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 rounded-xl flex items-center justify-center shadow-md shadow-gold-500/30 group-hover:shadow-lg group-hover:shadow-gold-400/50 transition-shadow duration-300">
+                <BrandIcon icon={brandIcon} className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 shadow-md" />
+              </div>
+            )}
             <span className="text-base sm:text-xl font-bold text-ivory">
               <span className="gradient-text">{brandName || 'HAYBALI TRANS'}</span>
             </span>
