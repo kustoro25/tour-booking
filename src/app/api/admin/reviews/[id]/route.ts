@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
+import { revalidatePublicSite } from '@/lib/revalidate';
 
 const VALID_REVIEW_STATUSES = ['PENDING', 'APPROVED', 'HIDDEN'] as const;
 type ReviewStatus = (typeof VALID_REVIEW_STATUSES)[number];
@@ -32,6 +33,7 @@ export async function PUT(
       data: updateData,
     });
 
+    revalidatePublicSite();
     return NextResponse.json({ success: true, data: review });
   } catch (error: unknown) {
     if (error instanceof Error && error.message === 'Unauthorized') {

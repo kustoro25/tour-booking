@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { unstable_cache } from 'next/cache';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ToastProvider } from '@/components/ui/Toast';
@@ -10,9 +11,22 @@ import { prisma } from '@/lib/prisma';
 
 const inter = Inter({ subsets: ['latin'] });
 
-// Layout membaca brand & footer CMS dari DB — wajib dinamis agar perubahan
-// di admin (mis. link WhatsApp footer) langsung tampil tanpa redeploy.
-export const dynamic = 'force-dynamic';
+// Halaman publik di-cache (ISR) supaya TTFB cepat; perubahan dari admin
+// memanggil revalidatePath/revalidateTag sehingga tetap tampil langsung.
+export const revalidate = 300;
+
+/** Konten CMS footer dipakai di semua halaman → cache 5 menit, tag `cms-pages`. */
+const getFooterCms = unstable_cache(
+  async (): Promise<Record<string, unknown>> => {
+    try {
+      const footerPage = await prisma.page.findUnique({ where: { slug: 'footer' } });
+      if (footerPage?.content) return JSON.parse(footerPage.content);
+    } catch { /* use defaults */ }
+    return {};
+  },
+  ['cms-footer-v1'],
+  { revalidate: 300, tags: ['cms-pages'] }
+);
 
 export async function generateMetadata(): Promise<Metadata> {
   const title = await getSiteTitle();
@@ -39,18 +53,12 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const brandName = await getBrandName();
-  const brandIcon = await getBrandIcon();
-  const waNumber = await getWhatsAppNumber();
-
-  // Fetch footer CMS data server-side for instant rendering
-  let footerCms: Record<string, unknown> = {};
-  try {
-    const footerPage = await prisma.page.findUnique({ where: { slug: 'footer' } });
-    if (footerPage?.content) {
-      footerCms = JSON.parse(footerPage.content);
-    }
-  } catch { /* use defaults */ }
+  const [brandName, brandIcon, waNumber, footerCms] = await Promise.all([
+    getBrandName(),
+    getBrandIcon(),
+    getWhatsAppNumber(),
+    getFooterCms(),
+  ]);
 
   return (
     <html lang="id">

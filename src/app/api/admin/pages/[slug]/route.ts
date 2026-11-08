@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, requireSuperAdmin } from '@/lib/auth';
+import { revalidatePublicSite } from '@/lib/revalidate';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,6 +49,7 @@ export async function PUT(
       },
     });
 
+    revalidatePublicSite();
     return NextResponse.json({ success: true, data: page });
   } catch (error: unknown) {
     if (error instanceof Error && error.message === 'Unauthorized') {

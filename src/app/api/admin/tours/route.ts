@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { slugify } from '@/lib/utils';
+import { revalidatePublicSite } from '@/lib/revalidate';
 
 export async function GET() {
   try {
@@ -53,6 +54,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    revalidatePublicSite();
     return NextResponse.json({ success: true, data: tour }, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof Error && error.message === 'Unauthorized') {

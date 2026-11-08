@@ -1,21 +1,59 @@
 // Helper untuk membaca setting dari DB (tabel Setting) dengan fallback ber-tipe.
 // Nilai setting disimpan sebagai JSON string (mis. true, "teks", ["a","b"]).
 
+import { cache } from 'react';
+import { revalidateTag, unstable_cache } from 'next/cache';
 import { prisma } from './prisma';
 import { WA_NUMBER } from './haybali';
 
-export async function getSetting<T>(key: string, fallback: T): Promise<T> {
-  try {
-    const row = await prisma.setting.findUnique({ where: { key } });
-    if (!row) return fallback;
+/** Tag cache untuk seluruh baris tabel Setting. Dipakai halaman admin agar
+ *  perubahan pengaturan langsung tampil tanpa menunggu masa revalidate. */
+export const SETTINGS_CACHE_TAG = 'site-settings';
+
+/**
+ * Semua setting dibaca sekali (1 query) lalu di-cache:
+ * - `cache()` → dedupe per request, jadi layout + page tidak menembak DB berkali-kali.
+ * - `unstable_cache()` → simpan 5 menit di data cache Next.js (hemat round-trip ke Neon).
+ */
+const loadSettingsMap = unstable_cache(
+  async (): Promise<Record<string, string>> => {
     try {
-      return JSON.parse(row.value) as T;
+      const rows = await prisma.setting.findMany({ select: { key: true, value: true } });
+      const map: Record<string, string> = {};
+      for (const row of rows) map[row.key] = row.value;
+      return map;
     } catch {
-      return row.value as unknown as T;
+      return {};
     }
+  },
+  ['settings-map-v1'],
+  { revalidate: 300, tags: [SETTINGS_CACHE_TAG] }
+);
+
+const settingsMap = cache(() => loadSettingsMap());
+
+function parseRaw<T>(raw: string | undefined, fallback: T): T {
+  if (raw === undefined) return fallback;
+  try {
+    return JSON.parse(raw) as T;
   } catch {
-    return fallback;
+    return raw as unknown as T;
   }
+}
+
+/** Salinan mentah semua setting (sudah di-cache). */
+export async function getAllSettings(): Promise<Record<string, string>> {
+  return settingsMap();
+}
+
+export async function getSetting<T>(key: string, fallback: T): Promise<T> {
+  const map = await settingsMap();
+  return parseRaw(map[key], fallback);
+}
+
+/** Panggil setelah admin menyimpan setting agar cache publik ikut diperbarui. */
+export function invalidateSettingsCache(): void {
+  revalidateTag(SETTINGS_CACHE_TAG, 'max');
 }
 
 /** Normalisasi nomor HP ke format wa.me (tanpa +, diawali 62). Murni & aman untuk client. */

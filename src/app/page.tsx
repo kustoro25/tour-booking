@@ -6,7 +6,7 @@ import StarRating from '@/components/ui/StarRating';
 import { HAYBALI_BRAND, FLEET, waLink } from '@/lib/haybali';
 import { getPaymentGateway, getWhatsAppNumber } from '@/lib/settings';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 const HERO_STATS = [
   { num: `${FLEET.length}`, label: 'Pilihan Armada' },
@@ -50,11 +50,14 @@ export default async function HomePage() {
       <section className="relative overflow-hidden border-b border-gold-500/20 bg-ink-950">
         <h1 className="sr-only">HAYBALI TRANS – Luxury Transport in Bali</h1>
         {/* Banner tampil utuh (tanpa crop) dan responsif mengikuti lebar layar */}
-        <img
+        <Image
           src="/images/haybali/hero-banner.jpg"
           alt="HAYBALI TRANS – Luxury Transport in Bali"
+          width={1280}
+          height={512}
+          priority
+          sizes="100vw"
           className="block w-full h-auto"
-          fetchPriority="high"
         />
         {/* Bar CTA singkat di bawah banner agar tombol booking tetap mudah diakses */}
         <div className="border-t border-gold-500/20">

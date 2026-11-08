@@ -41,6 +41,9 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    // AVIF/WebP jauh lebih kecil dari JPG/PNG asli → LCP lebih cepat.
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 2678400,
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "res.cloudinary.com" },

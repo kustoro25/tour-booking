@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import ContactForm from './ContactForm';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 export interface ContactData {
   label: string;

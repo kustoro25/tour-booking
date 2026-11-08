@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, requireSuperAdmin } from '@/lib/auth';
 import { getPaymentGateway } from '@/lib/settings';
+import { revalidatePublicSite } from '@/lib/revalidate';
 
 export async function GET() {
   try {
@@ -32,15 +33,20 @@ export async function PUT(request: NextRequest) {
     await requireSuperAdmin();
     const body = await request.json();
 
-    // Update each key-value pair
-    for (const [key, value] of Object.entries(body)) {
-      await prisma.setting.upsert({
-        where: { key },
-        update: { value: JSON.stringify(value) },
-        create: { key, value: JSON.stringify(value) },
-      });
-    }
+    // Update semua key sekaligus dalam satu transaksi (1 round-trip, bukan N).
+    const entries = Object.entries(body) as [string, unknown][];
+    await prisma.$transaction(
+      entries.map(([key, value]) => {
+        const serialized = JSON.stringify(value);
+        return prisma.setting.upsert({
+          where: { key },
+          update: { value: serialized },
+          create: { key, value: serialized },
+        });
+      })
+    );
 
+    revalidatePublicSite();
     return NextResponse.json({ success: true, message: 'Pengaturan berhasil disimpan' });
   } catch (error: unknown) {
     if (error instanceof Error && error.message === 'Unauthorized') {

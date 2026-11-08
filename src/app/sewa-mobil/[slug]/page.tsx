@@ -17,10 +17,15 @@ import {
 import { getFleetDetail } from '@/lib/fleet-detail';
 import { getPaymentGateway, getSetting, getWhatsAppNumber } from '@/lib/settings';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+/** Semua armada dirender saat build → kunjungan pertama langsung cepat. */
+export function generateStaticParams() {
+  return FLEET.map((fleet) => ({ slug: fleet.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

@@ -15,7 +15,7 @@ import {
 } from '@/lib/haybali';
 import { getPaymentGateway, getWhatsAppNumber } from '@/lib/settings';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: `${HAYBALI_BRAND} - Sewa Mobil & Tour Bali`,

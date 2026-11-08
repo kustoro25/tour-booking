@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { slugify } from '@/lib/utils';
+import { revalidatePublicSite } from '@/lib/revalidate';
 
 export async function GET(
   request: NextRequest,
@@ -84,6 +85,7 @@ export async function PUT(
       data: updateData,
     });
 
+    revalidatePublicSite();
     return NextResponse.json({ success: true, data: tour });
   } catch (error: unknown) {
     if (error instanceof Error && error.message === 'Unauthorized') {
@@ -101,6 +103,7 @@ export async function DELETE(
     await requireAdmin();
     const { id } = await params;
     await prisma.tour.delete({ where: { id } });
+    revalidatePublicSite();
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
     if (error instanceof Error && error.message === 'Unauthorized') {

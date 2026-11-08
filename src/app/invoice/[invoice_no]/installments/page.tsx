@@ -9,6 +9,9 @@ import CopyButton from '@/components/ui/CopyButton';
 import { InstallmentPaymentStatusLabels, InstallmentPaymentStatusColors, InstallmentPaymentStatusDots } from '@/types';
 import type { InstallmentPaymentStatus } from '@/types';
 
+// Halaman privat per invoice — jangan di-cache, datanya berubah tiap pembayaran.
+export const dynamic = 'force-dynamic';
+
 interface Payment {
   id: string;
   installmentNumber: number; // 0 = DP (uang muka)
