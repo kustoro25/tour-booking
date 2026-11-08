@@ -201,7 +201,7 @@ export default async function FleetDetailPage({ params }: PageProps) {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-14">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-ink-850 rounded-2xl border border-ink-700 shadow-card p-6 sm:p-8">
-            <h2 className="text-2xl font-bold text-ivory mb-4">Ikhtisar {detail.model}</h2>
+            <h2 className="text-2xl font-bold text-ivory mb-4">Gambaran Umum {detail.model}</h2>
             <div className="space-y-4 text-mist leading-relaxed">
               {detail.overview.map((paragraph) => (
                 <p key={paragraph.slice(0, 24)}>{paragraph}</p>
