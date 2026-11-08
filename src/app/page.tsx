@@ -218,7 +218,7 @@ export default async function HomePage() {
       </section>
 
       {/* ================= GALERI DESTINASI ================= */}
-      <section id="destinasi" className="py-16 sm:py-20 bg-ink-950">
+      <section id="destinasi" className="scroll-mt-20 py-16 sm:py-20 bg-ink-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="text-center mb-12">
             <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">Galeri</span>

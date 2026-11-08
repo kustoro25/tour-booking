@@ -14,7 +14,15 @@ function BrandIcon({ icon, className }: { icon?: string; className?: string }) {
 const navLinks = [
   { href: '/', label: 'Beranda' },
   { href: '/sewa-mobil', label: 'Sewa Mobil' },
+  // Anchor ke section galeri foto destinasi di halaman utama.
+  { href: '/#destinasi', label: 'Destinasi' },
 ];
+
+/** Menu anchor (mis. /#destinasi) tidak punya segmen path, jadi tidak pernah "aktif". */
+function isLinkActive(href: string, pathname: string): boolean {
+  if (href.startsWith('/#')) return false;
+  return href === '/' ? pathname === '/' : pathname.startsWith(href);
+}
 
 export default function Header({ brandName, brandIcon }: { brandName?: string; brandIcon?: string }) {
   const pathname = usePathname();
@@ -55,7 +63,7 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-0.5">
             {navLinks.map((link) => {
-              const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+              const isActive = isLinkActive(link.href, pathname);
               return (
                 <Link
                   key={link.href}
@@ -108,7 +116,7 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
         {isMenuOpen && (
           <div className="lg:hidden border-t border-ink-700 pb-4 pt-2 space-y-1 animate-fade-in">
             {navLinks.map((link) => {
-              const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+              const isActive = isLinkActive(link.href, pathname);
               return (
                 <Link
                   key={link.href}
