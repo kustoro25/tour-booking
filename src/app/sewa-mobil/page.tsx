@@ -157,9 +157,14 @@ export default async function SewaMobilPage() {
                       </li>
                     ))}
                   </ul>
-                  <Button href={`/tours/${tour.slug}/booking`} variant="primary" fullWidth>
-                    PESAN MOBIL INI
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Button href={`/tours/${tour.slug}/booking`} variant="primary" className="flex-1">
+                      PESAN MOBIL INI
+                    </Button>
+                    <Button href={`/sewa-mobil/${tour.slug}`} variant="outline" className="flex-1">
+                      Detail
+                    </Button>
+                  </div>
                 </div>
               </div>
             );

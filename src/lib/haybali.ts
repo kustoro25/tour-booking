@@ -132,7 +132,7 @@ export const FLEET: FleetItem[] = [
   },
   {
     slug: 'sewa-alphard-vachelift-bali',
-    name: 'ALPHARD VACHELIFT (LUX)',
+    name: 'ALPHARD FACELIFT (LUX)',
     tier: 'LUX',
     recommendedPax: 4,
     maxPax: 5,

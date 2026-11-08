@@ -201,7 +201,7 @@ export default async function HomePage() {
                     <Button href={`/tours/${car.slug}/booking`} variant="primary" size="sm" className="flex-1">
                       Sewa Sekarang
                     </Button>
-                    <Button href="/sewa-mobil" variant="outline" size="sm" className="flex-1">
+                    <Button href={`/sewa-mobil/${car.slug}`} variant="outline" size="sm" className="flex-1">
                       Detail
                     </Button>
                   </div>
