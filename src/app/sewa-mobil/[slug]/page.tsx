@@ -329,7 +329,7 @@ export default async function FleetDetailPage({ params }: PageProps) {
               </li>
               <li>• Lewat tengah malam +{formatCurrency(DRIVER_POLICY.midnightHourlyFee)}/jam.</li>
               <li>• Menginap di luar kota mulai {formatCurrency(DRIVER_POLICY.driverAccommodation)}/malam.</li>
-              <li>• Pembatalan minimal 3 jam sebelum pemberangkatan, dikenakan biaya 50% dari tiket.</li>
+              <li>• Bila pembatalan dilakukan kurang dari 3 jam sebelum pemberangkatan, mohon dimaklumi bahwa DP yang telah dibayarkan tidak dapat dikembalikan karena jadwal &amp; pengemudi telah kami kunci untuk Anda.</li>
             </ul>
           </div>
         </div>

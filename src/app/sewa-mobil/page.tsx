@@ -13,7 +13,7 @@ import {
   DRIVER_POLICY,
   waLink,
 } from '@/lib/haybali';
-import { getWhatsAppNumber } from '@/lib/settings';
+import { getPaymentGateway, getWhatsAppNumber } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,7 +41,11 @@ const REGION_COLORS: Record<string, string> = {
 };
 
 export default async function SewaMobilPage() {
-  const [fleetTours, waNumber] = await Promise.all([getFleetTours(), getWhatsAppNumber()]);
+  const [fleetTours, waNumber, gateway] = await Promise.all([
+    getFleetTours(),
+    getWhatsAppNumber(),
+    getPaymentGateway(),
+  ]);
   const regionGroups = REMOTE_AREA_FEES.reduce<Record<string, typeof REMOTE_AREA_FEES>>((acc, area) => {
     (acc[area.region] ||= []).push(area);
     return acc;
@@ -288,14 +292,18 @@ export default async function SewaMobilPage() {
             <ul className="space-y-2 text-sm text-gold-200/80">
               <li>• Pemesanan memerlukan deposit 50% terlebih dahulu untuk mengamankan jadwal &amp; pengemudi Anda.</li>
               <li>• Pelunasan sisa pembayaran dapat dilakukan tunai saat bertemu dengan driver.</li>
-              <li>• Pembayaran online saat booking tersedia melalui QRIS, Virtual Account, e-wallet, atau kartu.</li>
+              {gateway === 'midtrans' ? (
+                <li>• Pembayaran online saat booking tersedia melalui QRIS, Virtual Account, e-wallet, atau kartu.</li>
+              ) : (
+                <li>• Pembayaran dilakukan via transfer bank ke rekening perusahaan yang tercantum di invoice, lalu konfirmasi bukti transfer via WhatsApp.</li>
+              )}
             </ul>
           </div>
           <div className="bg-gold-400/10 border border-gold-500/20 rounded-2xl p-6">
             <h3 className="text-lg font-bold text-gold-200 mb-3">📄 Syarat & Ketentuan</h3>
             <ul className="space-y-2 text-sm text-gold-200/80">
               <li>• Mohon memberikan data yang konkret (jelas) untuk mempermudah penjemputan.</li>
-              <li>• Pembatalan tiket harus dilakukan 3 jam sebelum jam pemberangkatan dan akan dikenakan biaya 50% dari tiket.</li>
+              <li>• Bila pembatalan dilakukan kurang dari 3 jam sebelum jam pemberangkatan, mohon dimaklumi bahwa DP yang telah dibayarkan tidak dapat dikembalikan karena jadwal &amp; pengemudi telah kami kunci untuk Anda.</li>
               <li>• Silakan informasikan bila pesawat mengalami delay agar semua proses berjalan lancar.</li>
             </ul>
           </div>
