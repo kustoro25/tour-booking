@@ -192,7 +192,7 @@ export default function AdminBookingsPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
-                      <span className="text-xs text-gray-400">Paket</span>
+                      <span className="text-xs text-gray-400">Layanan</span>
                       <p className="text-gray-700 flex items-center gap-1.5 flex-wrap">{b.tour.name}{categoryBadge(b)}</p>
                     </div>
                     <div>
@@ -232,7 +232,7 @@ export default function AdminBookingsPage() {
                 <tr>
                   <th className="px-4 py-3 text-left font-medium">Invoice</th>
                   <th className="px-4 py-3 text-left font-medium">Tamu</th>
-                  <th className="px-4 py-3 text-left font-medium">Paket</th>
+                  <th className="px-4 py-3 text-left font-medium">Layanan</th>
                   <th className="px-4 py-3 text-left font-medium">Tgl Tour</th>
                   <th className="px-4 py-3 text-right font-medium">Total</th>
                   <th className="px-4 py-3 text-center font-medium">Status</th>

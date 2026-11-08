@@ -66,7 +66,7 @@ const defaultData: Record<string, PageData> = {
     headingAfter: 'Anda Tanpa Ribet!',
     subheading: 'Paket tour terbaik dengan pelayanan premium, harga transparan, dan sistem booking instan. Pilih jadwalmu, amankan kursimu, dan bersiaplah untuk petualangan tak terlupakan.',
     ctaText: '🚀 Lihat Paket Wisata',
-    ctaLink: '/tours',
+    ctaLink: '/sewa-mobil',
     cta2Text: 'Booking Sekarang',
     cta2Link: '/contact',
     stats: [
@@ -231,7 +231,7 @@ const defaultData: Record<string, PageData> = {
     heading: 'Siap Berpetualang?',
     subheading: 'Pilih paket tour terbaik ke {{name}} dan wujudkan liburan impian Anda!',
     ctaText: 'Lihat Paket Tour',
-    ctaLink: '/tours',
+    ctaLink: '/sewa-mobil',
   },
   'tours': {
     label: 'Koleksi Kami',
@@ -354,7 +354,7 @@ const defaultData: Record<string, PageData> = {
     heading: 'Siap untuk Petualangan Berikutnya?',
     subheading: 'Pilih paket tour favorit Anda dan booking dalam hitungan menit. Mudah, cepat, dan transparan.',
     ctaText: 'Jelajahi Paket Tour',
-    ctaLink: '/tours',
+    ctaLink: '/sewa-mobil',
     cta2Text: 'Hubungi Kami',
     cta2Link: '/contact',
   },
@@ -368,7 +368,7 @@ const defaultData: Record<string, PageData> = {
     heading: 'Paket Wisata Unggulan',
     subheading: 'Temukan paket tour terbaik kami ke destinasi paling menakjubkan di Indonesia',
     ctaText: 'Lihat Semua Paket Wisata',
-    ctaLink: '/tours',
+    ctaLink: '/sewa-mobil',
   },
   'home-destinations': {
     label: 'Eksplorasi',

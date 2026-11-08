@@ -317,8 +317,8 @@ function BookingPage() {
   if (!tour) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-20 text-center">
-        <h2 className="text-2xl font-bold text-mist mb-2">Paket tidak ditemukan</h2>
-        <Button href="/tours" variant="primary">Lihat Paket Lain</Button>
+        <h2 className="text-2xl font-bold text-mist mb-2">Armada tidak ditemukan</h2>
+        <Button href="/sewa-mobil" variant="primary">Lihat Armada Lain</Button>
       </div>
     );
   }
@@ -1099,7 +1099,7 @@ function BookingPage() {
 
           <div className="border border-ink-700 rounded-lg p-4 space-y-3 bg-ink-900 mb-6">
             <div>
-              <span className="text-sm text-mist-dim">Paket Tour</span>
+              <span className="text-sm text-mist-dim">Layanan</span>
               <p className="font-semibold text-ivory">{tour.name}</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -1318,8 +1318,8 @@ function BookingPage() {
             <Button href={`/invoice/${bookingResult.invoiceNo}`} variant="primary">
               Lihat Invoice
             </Button>
-            <Button href="/tours" variant="outline">
-              Lihat Paket Lain
+            <Button href="/sewa-mobil" variant="outline">
+              Lihat Armada Lain
             </Button>
           </div>
         </div>

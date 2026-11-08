@@ -77,7 +77,7 @@ export default function AdminInstallmentsPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
-                      <span className="text-xs text-gray-400">Paket</span>
+                      <span className="text-xs text-gray-400">Layanan</span>
                       <p className="text-gray-700">{order.tour.name}</p>
                     </div>
                     <div>
@@ -111,7 +111,7 @@ export default function AdminInstallmentsPage() {
                   <tr>
                     <th className="px-4 py-3 text-left font-medium">Invoice</th>
                     <th className="px-4 py-3 text-left font-medium">Tamu</th>
-                    <th className="px-4 py-3 text-left font-medium">Paket</th>
+                    <th className="px-4 py-3 text-left font-medium">Layanan</th>
                     <th className="px-4 py-3 text-right font-medium">Total</th>
                     <th className="px-4 py-3 text-center font-medium">Angsuran</th>
                     <th className="px-4 py-3 text-center font-medium">Terbayar</th>

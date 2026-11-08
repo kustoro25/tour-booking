@@ -115,7 +115,7 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
         </p>
         <div className="flex justify-center gap-3">
           <Button href="/" variant="outline">Kembali ke Beranda</Button>
-          <Button href="/tours" variant="primary">Lihat Paket Tour</Button>
+          <Button href="/sewa-mobil" variant="primary">Lihat Armada Kami</Button>
         </div>
       </div>
     );

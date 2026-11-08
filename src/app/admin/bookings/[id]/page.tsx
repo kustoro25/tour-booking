@@ -142,7 +142,7 @@ export default function BookingDetailPage() {
             <p className="font-medium">{booking.customerPhone as string}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-500">Paket Tour</p>
+            <p className="text-sm text-gray-500">Layanan</p>
             <p className="font-medium">{(booking.tour as { name: string })?.name}</p>
           </div>
           <div>

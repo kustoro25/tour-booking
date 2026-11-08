@@ -16,8 +16,6 @@ const pageSlugs = [
   // ── Landing page sections (in order of appearance) ──
   { slug: 'home-hero', title: 'Home - Hero Section' },
   { slug: 'home-value', title: 'Home - Value Proposition' },
-  { slug: 'home-destinations', title: 'Home - Destinasi Impian' },
-  { slug: 'home-tours', title: 'Home - Paket Wisata Unggulan' },
   { slug: 'home-gallery', title: 'Home - Galeri' },
   { slug: 'testimonials', title: 'Home - Testimoni' },
   { slug: 'home-faq', title: 'Home - FAQ Section' },
@@ -25,10 +23,6 @@ const pageSlugs = [
   // ── Standalone pages ──
   { slug: 'about', title: 'About Us' },
   { slug: 'contact', title: 'Contact Us' },
-  { slug: 'destinations', title: 'Destinations Page' },
-  { slug: 'destinations-cta', title: 'Destinations Detail - CTA' },
-  { slug: 'tours', title: 'Tours Page' },
-  { slug: 'blog', title: 'Blog Page' },
   { slug: 'privacy', title: 'Privacy Policy' },
   { slug: 'terms', title: 'Terms & Conditions' },
   { slug: 'footer', title: 'Footer' },

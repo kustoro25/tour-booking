@@ -226,7 +226,7 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
           <div className="text-center py-12">
             <div className="text-4xl mb-3">🖼️</div>
             <p className="text-gray-500">Belum ada foto di galeri</p>
-            <p className="text-xs text-gray-400 mt-1">Tambahkan foto untuk mempercantik tampilan paket tour</p>
+            <p className="text-xs text-gray-400 mt-1">Tambahkan foto untuk mempercantik tampilan armada</p>
           </div>
         ) : (
           <>
@@ -235,7 +235,7 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
               <div className="mb-6 p-3 bg-blue-50 rounded-xl border border-blue-100">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">Cover</span>
-                  <span className="text-xs text-gray-500">Foto sampul paket tour</span>
+                  <span className="text-xs text-gray-500">Foto sampul armada</span>
                 </div>
                 <div className="w-full h-48 rounded-lg overflow-hidden bg-gray-200 relative">
                   <Image src={coverImg} alt="Cover" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw"

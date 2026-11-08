@@ -33,7 +33,7 @@ export default function FloatingActions({ waNumber: initialWaNumber }: { waNumbe
   };
 
   const waMessage = encodeURIComponent(
-    'Halo HAYBALI TRANS, saya ingin bertanya tentang paket tour.'
+    'Halo HAYBALI TRANS, saya ingin bertanya tentang sewa mobil.'
   );
 
   return (

@@ -95,7 +95,7 @@ export default function AdminDashboardPage() {
           { label: 'Total Booking', value: stats?.totalBookings || 0, color: 'bg-blue-500', icon: '📋' },
           { label: 'Revenue', value: formatCurrency(stats?.totalRevenue || 0), color: 'bg-green-500', icon: '💰' },
           { label: 'Menunggu Bayar', value: stats?.pendingBookings || 0, color: 'bg-orange-500', icon: '⏳' },
-          { label: 'Paket Tour', value: stats?.totalTours || 0, color: 'bg-purple-500', icon: '🏝️' },
+          { label: 'Total Armada', value: stats?.totalTours || 0, color: 'bg-purple-500', icon: '🚙' },
           { label: 'Subscriber', value: stats?.totalSubscribers || 0, color: 'bg-pink-500', icon: '📧' },
         ].map((stat) => (
           <div key={stat.label} className="bg-white rounded-xl shadow-sm p-5">
@@ -112,10 +112,10 @@ export default function AdminDashboardPage() {
       {/* Quick Actions */}
       <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 mb-8">
         <Link href="/admin/tours/create" className="bg-blue-600 text-white px-3 sm:px-4 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 text-center">
-          + Tambah Paket Tour
+          + Tambah Armada
         </Link>
-        <Link href="/admin/blog/create" className="bg-indigo-600 text-white px-3 sm:px-4 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-indigo-700 text-center">
-          + Tulis Artikel
+        <Link href="/admin/settings" className="bg-indigo-600 text-white px-3 sm:px-4 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-indigo-700 text-center">
+          Pengaturan Situs
         </Link>
         <Link href="/admin/bookings" className="bg-white border border-gray-300 text-gray-700 px-3 sm:px-4 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-gray-50 text-center">
           Lihat Semua Booking

@@ -8,6 +8,36 @@ const nextConfig: NextConfig = {
         destination: '/sewa-mobil',
         permanent: true,
       },
+      {
+        source: '/tours/:slug/booking',
+        destination: '/sewa-mobil/:slug/booking',
+        permanent: true,
+      },
+      {
+        source: '/tours/:slug',
+        destination: '/sewa-mobil/:slug',
+        permanent: true,
+      },
+      {
+        source: '/destinations',
+        destination: '/sewa-mobil',
+        permanent: true,
+      },
+      {
+        source: '/destinations/:slug',
+        destination: '/sewa-mobil',
+        permanent: true,
+      },
+      {
+        source: '/blog',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/blog/:slug',
+        destination: '/',
+        permanent: true,
+      },
     ];
   },
   images: {

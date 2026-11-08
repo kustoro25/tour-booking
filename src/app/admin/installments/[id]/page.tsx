@@ -256,7 +256,7 @@ export default function AdminInstallmentDetailPage() {
               <p className="font-medium">{order.customerPhone as string}</p>
             </div>
             <div>
-              <p className="text-gray-500">Paket Tour</p>
+              <p className="text-gray-500">Layanan</p>
               <p className="font-medium">{(order.tour as Record<string, unknown>)?.name as string}</p>
             </div>
             <div>

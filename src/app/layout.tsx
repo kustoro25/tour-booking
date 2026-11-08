@@ -22,8 +22,8 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${title.split(' - ')[0] || title}`,
     },
     description:
-      'Sewa mobil mewah & paket tur privat di Bali. Supir berpengalaman, kendaraan prima, antar-jemput bandara 24/7.',
-    keywords: ['sewa mobil bali', 'tour bali', 'antar jemput bandara', 'haybali trans', 'paket wisata bali', 'supir pribadi bali'],
+      'Sewa mobil mewah dengan supir di Bali. Armada prima, supir berpengalaman, harga transparan, dan booking online cepat.',
+    keywords: ['sewa mobil bali', 'rental mobil bali', 'sewa mobil dengan supir', 'haybali trans', 'supir pribadi bali', 'sewa alphard bali'],
     icons: {
       icon: [
         { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },

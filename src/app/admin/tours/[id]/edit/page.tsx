@@ -9,21 +9,14 @@ import { useToast } from '@/components/ui/Toast';
 import { Skeleton } from '@/components/ui/Skeleton';
 import ImageUpload from '@/components/ui/ImageUpload';
 
-interface DestinationOption {
-  id: string;
-  name: string;
-  location: string;
-}
-
 export default function EditTourPage() {
   const params = useParams();
   const router = useRouter();
   const { showToast } = useToast();
   const id = params.id as string;
 
-  const [destinations, setDestinations] = useState<DestinationOption[]>([]);
   const [form, setForm] = useState({
-    name: '', category: 'OPEN_TRIP', destination: '', destinationId: '', duration: '',
+    name: '', category: 'CAR_RENTAL', destination: '', destinationId: '', duration: '',
     priceAdult: '', priceChild: '0', discount: '0', maxSlot: '15', minPax: '2',
     coverImg: '', terms: '', isActive: true,
   });
@@ -37,13 +30,6 @@ export default function EditTourPage() {
   const [showCustomCategory, setShowCustomCategory] = useState(false);
 
   useEffect(() => {
-    fetch('/api/admin/destinations')
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) setDestinations(data.data.filter((d: DestinationOption & { isActive: boolean }) => d.isActive));
-      })
-      .catch(() => {});
-
     fetch(`/api/admin/tours/${id}`)
       .then(r => r.json())
       .then(data => {
@@ -95,8 +81,7 @@ export default function EditTourPage() {
       setForm({ ...form, destinationId: '', destination: '' });
       return;
     }
-    const selected = destinations.find(d => d.id === destId);
-    if (selected) setForm({ ...form, destinationId: selected.id, destination: selected.name });
+    setForm({ ...form, destinationId: '' });
   };
 
   // Itinerary helpers
@@ -150,7 +135,7 @@ export default function EditTourPage() {
       });
       const data = await res.json();
       if (data.success) {
-        showToast('Paket tour berhasil diperbarui!', 'success');
+        showToast('Armada berhasil diperbarui!', 'success');
         setTimeout(() => router.push('/admin/tours'), 500);
       } else setError(data.error || 'Gagal menyimpan');
     } catch { setError('Terjadi kesalahan'); }
@@ -187,7 +172,7 @@ export default function EditTourPage() {
     <div className="max-w-4xl">
       <div className="flex items-center gap-3 mb-6">
         <Link href="/admin/tours" className="text-gray-500 hover:text-gray-700 transition-colors">← Kembali</Link>
-        <h1 className="text-2xl font-bold text-gray-900">Edit Paket Tour</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Edit Armada</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -223,21 +208,11 @@ export default function EditTourPage() {
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Destinasi</label>
-              <select value={form.destinationId} onChange={handleDestinationSelect}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-                <option value="">-- Pilih Destinasi --</option>
-                {destinations.map(d => (
-                  <option key={d.id} value={d.id}>{d.name} — {d.location}</option>
-                ))}
-                <option value="__custom__">➕ Custom (manual)</option>
-              </select>
-              {!form.destinationId && (
-                <input type="text" value={form.destination}
-                  onChange={e => updateField('destination', e.target.value)}
-                  placeholder="Nama destinasi custom..."
-                  className="w-full mt-2 px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm" />
-              )}
+              <label className="block text-sm font-medium text-gray-700 mb-1">Area Layanan</label>
+              <input type="text" value={form.destination}
+                onChange={e => updateField('destination', e.target.value)}
+                placeholder="Contoh: Bali Selatan"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Durasi</label>
@@ -398,7 +373,7 @@ export default function EditTourPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1">Syarat & Ketentuan</label>
             <textarea value={form.terms} onChange={e => updateField('terms', e.target.value)} rows={4}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-              placeholder="Tulis syarat dan ketentuan paket tour..." />
+              placeholder="Tulis syarat dan ketentuan sewa mobil..." />
           </div>
         </div>
 

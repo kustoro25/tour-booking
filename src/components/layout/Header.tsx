@@ -13,7 +13,6 @@ function BrandIcon({ icon, className }: { icon?: string; className?: string }) {
 
 const navLinks = [
   { href: '/', label: 'Beranda' },
-  { href: '/#destinasi', label: 'Destinasi' },
   { href: '/sewa-mobil', label: 'Sewa Mobil' },
 ];
 

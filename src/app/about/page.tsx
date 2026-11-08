@@ -18,8 +18,8 @@ const FALLBACK: AboutData = {
   label: 'Tentang',
   heading: 'Tentang Kami',
   storyTitle: 'Cerita Kami',
-  story: 'HAYBALI TRANS adalah mitra transportasi dan privat tur tepercaya di Bali yang berkomitmen memberikan pengalaman liburan tak terlupakan dengan pelayanan VIP, harga transparan, dan armada yang prima.\n\nKami melayani sewa mobil mewah dengan supir berpengalaman, paket tur privat ke destinasi terbaik Bali, serta antar-jemput bandara Ngurah Rai 24/7. Dari Kintamani hingga Uluwatu, dari Lovina hingga Nusa Penida — kami siap mengantar Anda menjelajahi setiap sudut Pulau Dewata.\n\nKami percaya bahwa setiap perjalanan adalah cerita yang berharga. Itulah mengapa kami merancang setiap layanan dengan detail dan penuh perhatian, memastikan setiap momen perjalanan Anda menjadi kenangan yang tak terlupakan.',
-  vision: 'Menjadi mitra transportasi dan privat tur paling tepercaya di Bali dengan pelayanan VIP yang konsisten.',
+  story: 'HAYBALI TRANS adalah mitra sewa mobil dengan supir tepercaya di Bali yang berkomitmen memberikan pengalaman perjalanan yang nyaman, aman, dan berkelas melalui pelayanan VIP, harga transparan, serta armada yang prima.\n\nKami menyediakan beragam pilihan armada — dari MPV keluarga hingga luxury MPV — lengkap dengan supir berpengalaman yang siap mengantar Anda ke seluruh penjuru Bali. Semua tarif sudah termasuk supir dan BBM tanpa batasan jarak tempuh.\n\nKami percaya bahwa setiap perjalanan adalah cerita yang berharga. Itulah mengapa kami merawat setiap unit dan melatih setiap pengemudi dengan detail dan penuh perhatian, memastikan setiap momen perjalanan Anda menjadi kenangan yang tak terlupakan.',
+  vision: 'Menjadi penyedia jasa sewa mobil dengan supir paling tepercaya di Bali dengan pelayanan VIP yang konsisten.',
   mission: [
     'Menyediakan armada bersih, wangi, dan terawat',
     'Memberikan pelayanan supir profesional dan ramah',
@@ -29,7 +29,7 @@ const FALLBACK: AboutData = {
   ],
   whyUs: [
     { icon: '🚙', title: 'Armada Prima', desc: 'Kendaraan bersih, wangi, dan terawat untuk kenyamanan Anda.', color: 'bg-gold-400/10 text-gold-300' },
-    { icon: '👨‍✈️', title: 'Supir Profesional', desc: 'Berpengalaman, ramah, dan siap melayani 24/7.', color: 'bg-gold-400/10 text-gold-300' },
+    { icon: '👨‍✈️', title: 'Supir Profesional', desc: 'Berpengalaman, ramah, dan siap melayani sesuai jam layanan kami.', color: 'bg-gold-400/10 text-gold-300' },
     { icon: '💰', title: 'Harga Transparan', desc: 'Tidak ada biaya tersembunyi. Semua jelas di awal.', color: 'bg-gold-400/10 text-gold-200' },
     { icon: '⚡', title: 'Booking Instan', desc: 'Sistem booking modern, invoice langsung terbit.', color: 'bg-gold-400/10 text-gold-300' },
     { icon: '🛡️', title: 'Terpercaya', desc: 'Ribuan tamu puas telah menggunakan layanan kami.', color: 'bg-gold-400/10 text-gold-300' },

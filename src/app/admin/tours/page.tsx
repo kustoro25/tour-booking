@@ -43,8 +43,8 @@ export default function AdminToursPage() {
   };
 
   const blockedMessage = role === 'CONTENT_MANAGER'
-    ? '🚫 Hanya Super Admin & Admin Operasional yang bisa menambah/menghapus paket tour.'
-    : '🚫 Hanya Super Admin yang bisa menambah/menghapus paket tour.';
+    ? '🚫 Hanya Super Admin & Admin Operasional yang bisa menambah/menghapus armada.'
+    : '🚫 Hanya Super Admin yang bisa menambah/menghapus armada.';
 
   useEffect(() => { fetchTours(); }, []);
 
@@ -123,7 +123,7 @@ export default function AdminToursPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 text-center mb-1">Hapus Paket?</h3>
+            <h3 className="text-lg font-semibold text-gray-900 text-center mb-1">Hapus Armada?</h3>
             <p className="text-sm text-gray-500 text-center mb-6">
               &quot;{deleteTarget.name}&quot; akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.
             </p>
@@ -138,14 +138,14 @@ export default function AdminToursPage() {
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Paket Tour</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Armada Mobil</h1>
         {canManageTours ? (
           <Link href="/admin/tours/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 whitespace-nowrap transition-colors">
-            + Tambah Paket
+            + Tambah Armada
           </Link>
         ) : (
           <button onClick={handleBlocked} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 whitespace-nowrap transition-colors">
-            + Tambah Paket
+            + Tambah Armada
           </button>
         )}
       </div>
@@ -166,7 +166,7 @@ export default function AdminToursPage() {
             type="text"
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1); }}
-            placeholder="Cari nama paket atau destinasi..."
+            placeholder="Cari nama armada atau tipe..."
             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"
           />
         </div>
@@ -186,9 +186,9 @@ export default function AdminToursPage() {
       {paginatedTours.length === 0 ? (
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
           <div className="text-4xl mb-3">🏝️</div>
-          <p className="text-gray-500">Belum ada paket tour{search || filterCategory ? ' yang cocok dengan filter' : ''}</p>
+          <p className="text-gray-500">Belum ada armada{search || filterCategory ? ' yang cocok dengan filter' : ''}</p>
           {!search && !filterCategory && (
-            <Link href="/admin/tours/create" className="inline-block mt-4 text-blue-600 text-sm font-medium hover:text-blue-700">+ Tambah paket pertama</Link>
+            <Link href="/admin/tours/create" className="inline-block mt-4 text-blue-600 text-sm font-medium hover:text-blue-700">+ Tambah Armada pertama</Link>
           )}
         </div>
       ) : (

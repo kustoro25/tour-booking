@@ -17,14 +17,14 @@ function paymentAnswerFor(mode: PaymentGatewayMode): string {
 
 const buildFaqs = (paymentAnswer: string) => [
   {
-    question: 'Bagaimana cara melakukan booking?',
+    question: 'Bagaimana cara melakukan booking sewa mobil?',
     answer:
-      'Caranya sangat mudah! Cukup pilih paket tour yang Anda inginkan di halaman Paket Wisata, pilih tanggal keberangkatan dari kalender interaktif, isi data diri dan jumlah peserta, lalu klik "Booking Sekarang". Invoice akan langsung terbit dan dikirim ke email Anda.',
+      'Pilih armada yang Anda inginkan di halaman Sewa Mobil, tentukan tanggal serta durasi sewa (6 atau 12 jam) dari kalender, isi data diri dan jam penjemputan, lalu klik "Pesan Mobil Ini". Invoice akan langsung terbit dan dikirim ke email Anda.',
   },
   {
-    question: 'Apakah saya bisa mengganti tanggal keberangkatan?',
+    question: 'Apakah saya bisa mengganti tanggal atau jam penjemputan?',
     answer:
-      'Ya, Anda bisa mengajukan perubahan tanggal keberangkatan maksimal H-7 sebelum keberangkatan. Silakan hubungi tim kami melalui WhatsApp atau email untuk proses perubahan. Perubahan tanggal bergantung pada ketersediaan slot di tanggal yang baru.',
+      'Bisa. Silakan hubungi tim kami melalui WhatsApp atau email untuk mengajukan perubahan. Perubahan mengikuti ketersediaan armada dan sebaiknya dikonfirmasi minimal 3 jam sebelum jadwal penjemputan.',
   },
   {
     question: 'Bagaimana metode pembayaran yang tersedia?',
@@ -33,42 +33,37 @@ const buildFaqs = (paymentAnswer: string) => [
   {
     question: 'Berapa lama batas waktu pembayaran?',
     answer:
-      'Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan. Jika pembayaran tidak dilakukan dalam batas waktu tersebut, pesanan akan otomatis dibatalkan oleh sistem dan slot akan dilepas kembali. Anda akan menerima email pengingat sebelum batas waktu berakhir.',
+      'Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan. Jika pembayaran tidak dilakukan dalam batas waktu tersebut, pesanan akan otomatis dibatalkan oleh sistem dan jadwal armada dilepas kembali. Anda akan menerima email pengingat sebelum batas waktu berakhir.',
   },
   {
     question: 'Apakah saya akan menerima e-ticket?',
     answer:
-      'Ya, setelah pembayaran Anda terkonfirmasi, sistem akan mengirimkan E-Ticket ke email Anda. E-Ticket berisi detail lengkap perjalanan Anda: nama paket, tanggal, itinerary, dan kontak guide yang akan mendampingi.',
+      'Ya, setelah pembayaran Anda terkonfirmasi, sistem akan mengirimkan E-Ticket ke email Anda. E-Ticket berisi detail lengkap pemesanan: jenis armada, tanggal, jam penjemputan, area tujuan, dan kontak pengemudi.',
   },
   {
-    question: 'Apakah ada minimal peserta untuk setiap tour?',
+    question: 'Apakah harga sewa sudah termasuk supir dan BBM?',
     answer:
-      'Ya, setiap paket tour memiliki minimal peserta yang berbeda-beda (umumnya 2 orang). Informasi ini tercantum di halaman detail masing-masing paket tour. Jika kuota minimal tidak terpenuhi, tim kami akan menghubungi Anda untuk opsi alternatif.',
+      'Ya. Semua harga sewa mobil HAYBALI TRANS sudah termasuk supir berpengalaman dan BBM tanpa batasan jarak tempuh. Tiket masuk objek wisata, biaya parkir, dan biaya tol tidak termasuk dan menjadi tanggungan tamu.',
   },
   {
-    question: 'Bagaimana jika tour dibatalkan oleh pihak penyelenggara?',
+    question: 'Apakah ada biaya tambahan untuk area tertentu?',
     answer:
-      'Jika tour terpaksa dibatalkan oleh kami karena force majeure atau kuota minimal tidak terpenuhi, Anda akan mendapatkan refund 100% dari jumlah yang telah dibayarkan. Tim kami akan menghubungi Anda untuk proses pengembalian dana.',
+      'Ada. Setiap armada memiliki area standar layanan, sedangkan area di luar standar dikenakan biaya tambahan sesuai tabel remote area yang tercantum di halaman Sewa Mobil dan halaman detail armada.',
   },
   {
-    question: 'Apakah bisa melakukan refund jika saya membatalkan?',
+    question: 'Bagaimana kebijakan jam kerja pengemudi?',
     answer:
-      'Kebijakan refund kami: Pembatalan H-14 sebelum keberangkatan: refund 80%. Pembatalan H-7 sebelum keberangkatan: refund 50%. Pembatalan H-3 sebelum keberangkatan: refund 25%. Pembatalan kurang dari H-3: tidak ada refund. Silakan baca Syarat & Ketentuan untuk detail lengkap.',
+      'Jam kerja pengemudi adalah 07.00–23.59 WITA. Penjemputan 07.00–10.30 tanpa biaya tambahan; di luar jam tersebut dikenakan Rp 50.000/mobil. Lewat tengah malam dikenakan Rp 150.000/jam, dan bila menginap di luar kota dikenakan Rp 350.000/malam.',
   },
   {
-    question: 'Apakah harga sudah termasuk tiket pesawat?',
+    question: 'Bagaimana kebijakan pembatalan?',
     answer:
-      'Umumnya harga paket tour tidak termasuk tiket pesawat, kecuali disebutkan secara eksplisit di deskripsi paket. Fasilitas yang termasuk dan tidak termasuk tercantum dengan jelas di halaman detail setiap paket tour.',
+      'Pembatalan sebaiknya dikonfirmasi minimal 3 jam sebelum jadwal penjemputan. Bila pembatalan dilakukan kurang dari waktu tersebut, mohon dimaklumi bahwa DP yang telah dibayarkan tidak dapat dikembalikan karena jadwal & pengemudi telah kami kunci untuk Anda.',
   },
   {
-    question: 'Apakah anak-anak dikenakan biaya?',
+    question: 'Bagaimana cara memberikan review setelah sewa selesai?',
     answer:
-      'Ya, tersedia harga khusus untuk anak-anak (biasanya usia 3-10 tahun) yang lebih terjangkau. Detail harga dewasa dan anak tercantum di setiap halaman paket tour. Untuk anak di bawah 3 tahun umumnya gratis (tanpa fasilitas tambahan).',
-  },
-  {
-    question: 'Bagaimana cara memberikan review setelah tour selesai?',
-    answer:
-      'Setelah tour selesai, Anda akan menerima email berisi link khusus untuk menulis review dan memberikan rating. Link ini berlaku satu kali dan hanya untuk tamu yang telah menyelesaikan tour. Review Anda sangat berarti bagi kami dan calon wisatawan lainnya!',
+      'Setelah perjalanan selesai, Anda akan menerima email berisi link khusus untuk menulis review dan memberikan rating. Link ini berlaku satu kali dan hanya untuk tamu yang telah menyelesaikan perjalanan. Review Anda sangat berarti bagi kami dan calon pelanggan lainnya!',
   },
 ];
 
@@ -83,7 +78,7 @@ export default async function FaqPage() {
         </h1>
         <p className="text-mist-dim max-w-2xl mx-auto">
           Temukan jawaban untuk pertanyaan-pertanyaan umum seputar pemesanan, pembayaran, dan
-          perjalanan tour bersama HAYBALI TRANS.
+          sewa mobil bersama HAYBALI TRANS.
         </p>
       </div>
 

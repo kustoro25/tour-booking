@@ -21,8 +21,6 @@ const ROLE_PATH_RULES: { prefix: string; allowedRoles: AdminRole[] }[] = [
   { prefix: '/admin/reviews',       allowedRoles: ['SUPER_ADMIN', 'ADMIN'] },
   { prefix: '/admin/dashboard',     allowedRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_MANAGER'] },
   { prefix: '/admin/tours',         allowedRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_MANAGER'] },
-  { prefix: '/admin/destinations',  allowedRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_MANAGER'] },
-  { prefix: '/admin/blog',          allowedRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_MANAGER'] },
   { prefix: '/admin/pages',         allowedRoles: ['SUPER_ADMIN', 'ADMIN', 'CONTENT_MANAGER'] },
 ];
 

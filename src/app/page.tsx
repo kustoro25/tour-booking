@@ -3,24 +3,15 @@ import { prisma } from '@/lib/prisma';
 import { formatCurrency } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import StarRating from '@/components/ui/StarRating';
-import DestinasiGallery from '@/components/tours/DestinasiGallery';
 import { HAYBALI_BRAND, FLEET, waLink } from '@/lib/haybali';
 import { getPaymentGateway, getWhatsAppNumber } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
 const HERO_STATS = [
-  { num: '10+', label: 'Armada Mewah' },
-  { num: '10+', label: 'Destinasi Bali' },
+  { num: `${FLEET.length}`, label: 'Pilihan Armada' },
   { num: '24/7', label: 'Layanan Driver' },
-];
-
-const DESTINASI_LIST = [
-  { name: 'Ubud', subtitle: 'Pusat Seni & Budaya', description: 'Jelajahi pesona Ubud — sawah terasering Tegalalang, Monkey Forest, dan suasana pedesaan Bali yang autentik.', imageUrl: '/images/haybali/destinasi-ubud.jpg' },
-  { name: 'Bedugul', subtitle: 'Danau & Pegunungan', description: 'Udara sejuk Bedugul dengan Pura Ulun Danu Beratan di tepi danau, kebun raya, dan panorama pegunungan yang memukau.', imageUrl: '/images/haybali/destinasi-bedugul.jpg' },
-  { name: 'Kintamani', subtitle: 'Gunung Batur', description: 'Nikmati pemandangan Gunung Batur dan Danau Batur dari ketinggian, ditemani udara sejuk khas dataran tinggi Kintamani.', imageUrl: '/images/haybali/destinasi-kintamani.jpg' },
-  { name: 'Nusa Penida', subtitle: 'Surga Tersembunyi', description: 'Keindahan alam Nusa Penida — Kelingking Beach, Broken Beach, dan Angel\'s Billabong siap memukau mata Anda.', imageUrl: '/images/haybali/destinasi-nusa-penida.jpg' },
-  { name: 'Uluwatu', subtitle: 'Tebing & Sunset', description: 'Tebing karang megah Uluwatu dengan Pura Luhur di atasnya, ditemani pertunjukan Kecak saat matahari terbenam.', imageUrl: '/images/haybali/destinasi-uluwatu.jpg' },
+  { num: '6/12', label: 'Jam Sewa Fleksibel' },
 ];
 
 const VALUE_ITEMS = [
@@ -199,7 +190,7 @@ export default async function HomePage() {
                     ))}
                   </ul>
                   <div className="flex flex-wrap gap-2">
-                    <Button href={`/tours/${car.slug}/booking`} variant="primary" size="sm" className="flex-1">
+                    <Button href={`/sewa-mobil/${car.slug}/booking`} variant="primary" size="sm" className="flex-1">
                       Sewa Sekarang
                     </Button>
                     <Button href={`/sewa-mobil/${car.slug}`} variant="outline" size="sm" className="flex-1">
@@ -209,27 +200,6 @@ export default async function HomePage() {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ================= DESTINASI ================= */}
-      <section id="destinasi" className="py-16 sm:py-20 bg-ink-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          <div className="text-center mb-12">
-            <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">Destinasi</span>
-            <h2 className="text-3xl font-bold text-ivory mb-4">Destinasi Wisata Bali</h2>
-            <p className="text-mist-dim max-w-2xl mx-auto">
-              Jelajahi keindahan Bali bersama sopir pribadi HAYBALI TRANS — kami siap mengantar Anda ke destinasi impian
-            </p>
-          </div>
-
-          <DestinasiGallery destinations={DESTINASI_LIST} />
-
-          <div className="text-center mt-10">
-            <Button href="/sewa-mobil" variant="primary" size="lg">
-              Sewa Mobil ke Destinasi Ini
-            </Button>
           </div>
         </div>
       </section>

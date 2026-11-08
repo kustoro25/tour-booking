@@ -162,8 +162,8 @@ export default async function TestimonialsPage({ searchParams }: PageProps) {
       )}
 
       <div className="text-center mt-12">
-        <Button href="/tours" variant="primary" size="lg">
-          Lihat Semua Paket Wisata
+        <Button href="/sewa-mobil" variant="primary" size="lg">
+          Lihat Semua Armada
         </Button>
       </div>
     </div>

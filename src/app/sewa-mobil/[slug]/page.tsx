@@ -73,7 +73,7 @@ export default async function FleetDetailPage({ params }: PageProps) {
     .map((account) => account.bank)
     .filter(Boolean)
     .join(' / ');
-  const bookingHref = `/tours/${fleet.slug}/booking`;
+  const bookingHref = `/sewa-mobil/${fleet.slug}/booking`;
   const otherFleet = FLEET.filter((f) => f.slug !== fleet.slug).slice(0, 3);
 
   const regionGroups = REMOTE_AREA_FEES.reduce<Record<string, typeof REMOTE_AREA_FEES>>((acc, area) => {

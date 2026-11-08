@@ -15,12 +15,10 @@ function BrandIcon({ icon, className }: { icon: string; className?: string }) {
 
 const sidebarLinks = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: '📊' },
-  { href: '/admin/tours', label: 'Paket Tour', icon: '🏝️' },
-  { href: '/admin/destinations', label: 'Destinasi', icon: '🗺️' },
+  { href: '/admin/tours', label: 'Armada Mobil', icon: '🚙' },
   { href: '/admin/bookings', label: 'Booking', icon: '📋' },
   { href: '/admin/payments', label: 'Pembayaran', icon: '💰' },
   { href: '/admin/installments', label: 'Angsuran', icon: '💳' },
-  { href: '/admin/blog', label: 'Blog', icon: '📝' },
   { href: '/admin/pages', label: 'Halaman CMS', icon: '📄' },
   { href: '/admin/reviews', label: 'Review', icon: '⭐' },
   { href: '/admin/newsletter', label: 'Newsletter', icon: '📧' },

@@ -61,9 +61,7 @@ const socialIcons: Record<string, React.ReactNode> = {
 const footerLinks = {
   Navigasi: [
     { href: '/', label: 'Beranda' },
-    { href: '/#destinasi', label: 'Destinasi' },
-    { href: '/destinations', label: 'Destinasi' },
-    { href: '/blog', label: 'Blog & Tips' },
+    { href: '/sewa-mobil', label: 'Sewa Mobil' },
     { href: '/about', label: 'Tentang Kami' },
     { href: '/testimonials', label: 'Testimoni' },
     { href: '/contact', label: 'Hubungi Kami' },
@@ -136,7 +134,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
               <span className="text-xl font-bold text-white">{info.brandName || 'HAYBALI TRANS'}</span>
             </div>
             <p className="text-mist-dim mb-4 max-w-md leading-relaxed">
-              {cms.text || 'Mitra transportasi dan privat tur tepercaya di Bali. Mengutamakan keselamatan, kenyamanan, dan pelayanan VIP bagi seluruh pelanggan.'}
+              {cms.text || 'Mitra sewa mobil dan transportasi privat tepercaya di Bali. Mengutamakan keselamatan, kenyamanan, dan pelayanan VIP bagi seluruh pelanggan.'}
             </p>
             <div className="space-y-1.5 text-sm text-mist-dim mb-4">
               <p className="flex items-start gap-2">
@@ -177,7 +175,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
                 Dapatkan Info Terbaru ✉️
               </h4>
               <p className="text-mist-dim text-xs mb-3">
-                Berlangganan newsletter untuk info promo & paket terbaru.
+                Berlangganan newsletter untuk info promo & armada terbaru.
               </p>
               <form onSubmit={handleSubscribe} className="flex gap-2">
                 <input
@@ -221,7 +219,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
 
         {/* Bottom Bar */}
         <div className="border-t border-ink-700 mt-10 pt-6 text-center text-sm text-mist-dim">
-          {cms.copyright || `© ${new Date().getFullYear()} ${info.brandName || 'HAYBALI TRANS'} Tour. All rights reserved.`}
+          {cms.copyright || `© ${new Date().getFullYear()} ${info.brandName || 'HAYBALI TRANS'}. All rights reserved.`}
         </div>
       </div>
     </footer>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { TourCategoryLabels } from '@/types';
@@ -8,18 +8,11 @@ import type { TourCategory, ItineraryDay } from '@/types';
 import { useToast } from '@/components/ui/Toast';
 import ImageUpload from '@/components/ui/ImageUpload';
 
-interface DestinationOption {
-  id: string;
-  name: string;
-  location: string;
-}
-
 export default function CreateTourPage() {
   const router = useRouter();
   const { showToast } = useToast();
-  const [destinations, setDestinations] = useState<DestinationOption[]>([]);
   const [form, setForm] = useState({
-    name: '', category: 'OPEN_TRIP', destination: '', destinationId: '', duration: '',
+    name: '', category: 'CAR_RENTAL', destination: '', destinationId: '', duration: '',
     priceAdult: '', priceChild: '0', discount: '0', maxSlot: '15', minPax: '2',
     coverImg: '', terms: '',
   });
@@ -30,17 +23,6 @@ export default function CreateTourPage() {
   const [error, setError] = useState('');
   const [customCategory, setCustomCategory] = useState('');
   const [showCustomCategory, setShowCustomCategory] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/admin/destinations')
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) {
-          setDestinations(data.data.filter((d: DestinationOption & { isActive: boolean }) => d.isActive));
-        }
-      })
-      .catch(() => {});
-  }, []);
 
   const updateField = (field: string, value: string) => {
     setForm({ ...form, [field]: value });
@@ -55,18 +37,6 @@ export default function CreateTourPage() {
     } else {
       setShowCustomCategory(false);
       updateField('category', val);
-    }
-  };
-
-  const handleDestinationSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const destId = e.target.value;
-    if (destId === '__custom__') {
-      setForm({ ...form, destinationId: '', destination: '' });
-      return;
-    }
-    const selected = destinations.find(d => d.id === destId);
-    if (selected) {
-      setForm({ ...form, destinationId: selected.id, destination: selected.name });
     }
   };
 
@@ -133,7 +103,7 @@ export default function CreateTourPage() {
       });
       const data = await res.json();
       if (data.success) {
-        showToast('Paket tour berhasil dibuat!', 'success');
+        showToast('Armada berhasil dibuat!', 'success');
         setTimeout(() => router.push('/admin/tours'), 500);
       } else {
         setError(data.error || 'Gagal menyimpan');
@@ -149,22 +119,22 @@ export default function CreateTourPage() {
     <div className="max-w-4xl">
       <div className="flex items-center gap-3 mb-6">
         <Link href="/admin/tours" className="text-gray-500 hover:text-gray-700 transition-colors">← Kembali</Link>
-        <h1 className="text-2xl font-bold text-gray-900">Tambah Paket Tour</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Tambah Armada</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Card 1: Informasi Paket */}
+        {/* Card 1: Informasi Armada */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="flex items-center gap-2 mb-4">
             <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-sm">📋</span>
-            <h2 className="text-lg font-semibold text-gray-900">Informasi Paket</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Informasi Armada</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nama Paket</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nama Armada</label>
               <input type="text" required value={form.name} onChange={e => updateField('name', e.target.value)}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"
-                placeholder="Contoh: Eksplorasi Raja Ampat 4 Hari" />
+                placeholder="Contoh: Toyota Alphard HEV" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
@@ -186,21 +156,11 @@ export default function CreateTourPage() {
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Destinasi</label>
-              <select value={form.destinationId} onChange={handleDestinationSelect} required
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-                <option value="">-- Pilih Destinasi --</option>
-                {destinations.map(d => (
-                  <option key={d.id} value={d.id}>{d.name} — {d.location}</option>
-                ))}
-                <option value="__custom__">➕ Custom (manual)</option>
-              </select>
-              {!form.destinationId && (
-                <input type="text" required={!form.destinationId} value={form.destination}
-                  onChange={e => updateField('destination', e.target.value)}
-                  placeholder="Nama destinasi custom..."
-                  className="w-full mt-2 px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow text-sm" />
-              )}
+              <label className="block text-sm font-medium text-gray-700 mb-1">Area Layanan</label>
+              <input type="text" required value={form.destination}
+                onChange={e => updateField('destination', e.target.value)}
+                placeholder="Contoh: Bali Selatan"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Durasi</label>
@@ -356,7 +316,7 @@ export default function CreateTourPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1">Syarat & Ketentuan</label>
             <textarea value={form.terms} onChange={e => updateField('terms', e.target.value)} rows={4}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-              placeholder="Tulis syarat dan ketentuan paket tour..." />
+              placeholder="Tulis syarat dan ketentuan sewa mobil..." />
           </div>
         </div>
 
@@ -377,7 +337,7 @@ export default function CreateTourPage() {
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
                 Menyimpan...
               </>
-            ) : 'Simpan Paket'}
+            ) : 'Simpan Armada'}
           </button>
           <Link href="/admin/tours"
             className="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium">

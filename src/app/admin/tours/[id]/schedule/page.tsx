@@ -240,7 +240,7 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
           {tourName && <p className="text-sm text-gray-500 mt-1">{tourName}</p>}
         </div>
         <Link href="/admin/tours" className="text-sm text-blue-600 hover:text-blue-700">
-          ← Kembali ke Daftar Paket
+          ← Kembali ke Daftar Armada
         </Link>
       </div>
 

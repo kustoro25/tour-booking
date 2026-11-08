@@ -20,7 +20,7 @@ export default function WhatsAppButton() {
   }, []);
 
   const message = encodeURIComponent(
-    'Halo Jelajah Nusantara, saya ingin bertanya tentang paket tour.'
+    'Halo HAYBALI TRANS, saya ingin bertanya tentang sewa mobil.'
   );
 
   return (

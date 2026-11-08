@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: `${HAYBALI_BRAND} - Sewa Mobil & Tour Bali`,
   description:
-    'Sewa mobil mewah & paket tur privat di Bali. Supir berpengalaman, kendaraan prima, antar-jemput bandara 24/7.',
+    'Sewa mobil mewah dengan supir di Bali. Supir berpengalaman, kendaraan prima, harga transparan, dan booking online cepat.',
 };
 
 async function getFleetTours() {
@@ -162,7 +162,7 @@ export default async function SewaMobilPage() {
                     ))}
                   </ul>
                   <div className="flex flex-wrap gap-2">
-                    <Button href={`/tours/${tour.slug}/booking`} variant="primary" className="flex-1">
+                    <Button href={`/sewa-mobil/${tour.slug}/booking`} variant="primary" className="flex-1">
                       PESAN MOBIL INI
                     </Button>
                     <Button href={`/sewa-mobil/${tour.slug}`} variant="outline" className="flex-1">
