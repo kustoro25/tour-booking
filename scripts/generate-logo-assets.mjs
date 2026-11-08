@@ -140,8 +140,8 @@ const fullBuf = await full.png({ compressionLevel: 9 }).toBuffer();
 // Logo lengkap
 fs.mkdirSync(OUT_DIR, { recursive: true });
 await sharp(fullBuf)
-  .resize({ height: 900, fit: 'inside', withoutEnlargement: true })
-  .png({ compressionLevel: 9 })
+  .resize({ height: 720, fit: 'inside', withoutEnlargement: true })
+  .png({ compressionLevel: 9, palette: true, colours: 200 })
   .toFile(path.join(OUT_DIR, 'logo-haybali.png'));
 
 // Emblem (bagian atas: lingkaran H + mobil). Batas bawah dicari dari baris
@@ -176,9 +176,10 @@ const mark = await sharp(markRaw.data, {
   .extract({ left: markBox.left, top: markBox.top, width: markBox.width, height: markBox.height })
   .png()
   .toBuffer();
+// Ikon brand: 256px cukup untuk tampilan 40px (retina 2x) dan jauh lebih ringan.
 const markBuf = await sharp(mark)
-  .resize({ width: 512, height: 512, fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-  .png({ compressionLevel: 9 })
+  .resize({ width: 256, height: 256, fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+  .png({ compressionLevel: 9, palette: true, colours: 128 })
   .toBuffer();
 fs.writeFileSync(path.join(OUT_DIR, 'logo-mark.png'), markBuf);
 
@@ -192,9 +193,10 @@ const targets = [
 ];
 const icoSizes = {};
 for (const t of targets) {
-  const buf = await sharp(markBuf)
+  // Selalu dari emblem resolusi penuh agar ikon 512 tidak ikut ter-upscale.
+  const buf = await sharp(mark)
     .resize(t.size, t.size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-    .png({ compressionLevel: 9 })
+    .png({ compressionLevel: 9, palette: true, colours: 128 })
     .toBuffer();
   fs.writeFileSync(t.file, buf);
   if (t.size === 16 || t.size === 32) icoSizes[t.size] = buf;
