@@ -4,12 +4,7 @@ import { formatCurrency } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import StarRating from '@/components/ui/StarRating';
 import DestinasiGallery from '@/components/tours/DestinasiGallery';
-import {
-  HAYBALI_BRAND,
-  FLEET,
-  AIRPORT_TRANSFER_RATES,
-  waLink,
-} from '@/lib/haybali';
+import { HAYBALI_BRAND, FLEET, waLink } from '@/lib/haybali';
 import { getWhatsAppNumber } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
@@ -233,57 +228,6 @@ export default async function HomePage() {
           <div className="text-center mt-10">
             <Button href="/sewa-mobil" variant="primary" size="lg">
               Sewa Mobil ke Destinasi Ini
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= ANTAR-JEMPUT ================= */}
-      <section className="py-16 sm:py-20 bg-ink-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          <div className="text-center mb-12">
-            <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-2">Layanan 24/7</span>
-            <h2 className="text-3xl font-bold text-ivory mb-4">Antar-Jemput Bandara Ngurah Rai</h2>
-            <p className="text-mist-dim max-w-2xl mx-auto">
-              Layanan penjemputan dan pengantaran tepat waktu. Harga per sekali antar/jemput, sesuai jumlah penumpang.
-            </p>
-          </div>
-
-          <div className="bg-ink-850 rounded-xl shadow-card border border-ink-700 overflow-hidden max-w-3xl mx-auto">
-            <div className="max-h-[420px] overflow-y-auto">
-              <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-gold-400 text-ink-950">
-                  <tr>
-                    <th className="text-left px-4 py-3 font-semibold">Area / Tujuan</th>
-                    <th className="text-right px-4 py-3 font-semibold">1 - 5 Orang</th>
-                    <th className="text-right px-4 py-3 font-semibold">6 - 10 Orang</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {AIRPORT_TRANSFER_RATES.map((r) => (
-                    <tr key={r.area} className="border-t border-ink-700 hover:bg-gold-400/5 transition-colors">
-                      <td className="px-4 py-2.5 text-mist">{r.area}</td>
-                      <td className="px-4 py-2.5 text-right font-medium text-ivory">{formatCurrency(r.priceSmall)}</td>
-                      <td className="px-4 py-2.5 text-right text-mist">
-                        {r.priceBig !== null ? formatCurrency(r.priceBig) : '—'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <p className="text-center text-xs text-mist-dim mt-4">
-            Harga dapat berubah sewaktu-waktu. Konfirmasi harga akhir via WhatsApp.
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-4 mt-8">
-            <Button href="/antar-jemput" variant="primary" size="lg">
-              Booking Antar-Jemput
-            </Button>
-            <Button href={waLink('Halo HAYBALI TRANS, saya ingin bertanya harga antar-jemput bandara', waNumber)} variant="outline" size="lg">
-              Tanya Harga via WhatsApp
             </Button>
           </div>
         </div>

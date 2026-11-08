@@ -314,9 +314,6 @@ export default async function SewaMobilPage() {
             >
               💬 Chat WhatsApp {HAYBALI_BRAND}
             </Button>
-            <Button href="/antar-jemput" variant="outline" size="lg" className="!border-gold-400/60 !text-gold-200 hover:!bg-gold-400/10">
-              Lihat Tarif Antar-Jemput
-            </Button>
           </div>
           <p className="text-sm text-mist-dim mt-8">
             {HAYBALI_BRAND} • Jl. Bypass Ngurah Rai, Kedonganan, Kuta, Bali • +62 851-1933-4511 • Layanan Driver & WhatsApp: 24/7 Online

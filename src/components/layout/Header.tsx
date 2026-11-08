@@ -15,7 +15,6 @@ const navLinks = [
   { href: '/', label: 'Beranda' },
   { href: '/#destinasi', label: 'Destinasi' },
   { href: '/sewa-mobil', label: 'Sewa Mobil' },
-  { href: '/antar-jemput', label: 'Antar-Jemput' },
 ];
 
 export default function Header({ brandName, brandIcon }: { brandName?: string; brandIcon?: string }) {
