@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import StarRating from '@/components/ui/StarRating';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAdminRole } from '@/lib/useAdminRole';
@@ -33,27 +33,41 @@ export default function AdminReviewsPage() {
     ? '🚫 Hanya Super Admin & Admin Operasional yang bisa mengelola review.'
     : '🚫 Hanya Super Admin yang bisa mengelola review.';
 
-  useEffect(() => { fetchReviews(); }, [statusFilter]);
-
-  const fetchReviews = async () => {
-    setLoading(true);
+  const loadReviews = useCallback(async (): Promise<Review[] | null> => {
     try {
       const url = statusFilter ? `/api/admin/reviews?status=${statusFilter}` : '/api/admin/reviews';
       const res = await fetch(url);
       const data = await res.json();
-      if (data.success) setReviews(data.data || []);
+      if (data.success) return data.data || [];
     } catch (err) { console.error(err); }
-    finally { setLoading(false); }
+    return null;
+  }, [statusFilter]);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadReviews().then((result) => {
+      if (cancelled) return;
+      if (result) setReviews(result);
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [loadReviews]);
+
+  const refreshReviews = async () => {
+    setLoading(true);
+    const result = await loadReviews();
+    if (result) setReviews(result);
+    setLoading(false);
   };
 
   const handleApprove = async (id: string) => {
     await fetch(`/api/admin/reviews/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'APPROVED' }) });
-    fetchReviews();
+    refreshReviews();
   };
 
   const handleHide = async (id: string) => {
     await fetch(`/api/admin/reviews/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'HIDDEN' }) });
-    fetchReviews();
+    refreshReviews();
   };
 
   return (
@@ -68,7 +82,7 @@ export default function AdminReviewsPage() {
 
       <div className="flex flex-wrap gap-2 mb-4">
         {['', 'PENDING', 'APPROVED', 'HIDDEN'].map(s => (
-          <button key={s} onClick={() => setStatusFilter(s)} className={`px-3 py-1.5 rounded-full text-xs font-medium ${statusFilter === s ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-300'}`}>
+          <button key={s} onClick={() => { setStatusFilter(s); setLoading(true); }} className={`px-3 py-1.5 rounded-full text-xs font-medium ${statusFilter === s ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-300'}`}>
             {s || 'Semua'}
           </button>
         ))}

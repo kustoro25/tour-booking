@@ -84,13 +84,9 @@ export async function POST(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(request: NextRequest) {
   try {
     await requireAdmin();
-    const { id: tourId } = await params;
     const body = await request.json();
     const { slotId } = body;
 

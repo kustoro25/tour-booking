@@ -46,16 +46,24 @@ export default function AdminToursPage() {
     ? '🚫 Hanya Super Admin & Admin Operasional yang bisa menambah/menghapus armada.'
     : '🚫 Hanya Super Admin yang bisa menambah/menghapus armada.';
 
-  useEffect(() => { fetchTours(); }, []);
-
-  const fetchTours = async () => {
+  const fetchTours = async (): Promise<Tour[] | null> => {
     try {
       const res = await fetch('/api/admin/tours');
       const data = await res.json();
-      if (data.success) setTours(data.data || []);
+      if (data.success) return data.data || [];
     } catch (err) { console.error(err); }
-    finally { setLoading(false); }
+    return null;
   };
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchTours().then((result) => {
+      if (cancelled) return;
+      if (result) setTours(result);
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;

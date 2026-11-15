@@ -18,7 +18,7 @@ export async function GET() {
     }
 
     // Map to legacy camelCase fields for backward compatibility
-    const email = settingsMap['company_email'] || 'info@jelajahnusantara.com';
+    const email = settingsMap['company_email'] || 'info@haybalitrans.com';
     const phone = settingsMap['company_phone'] || '+62 851-1933-4511';
     const address = settingsMap['company_address'] || 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361';
     const brandName = settingsMap['company_name'] || 'HAYBALI TRANS';
@@ -46,7 +46,7 @@ export async function GET() {
       success: true,
       data: {
         paymentGateway: 'manual',
-        email: 'info@jelajahnusantara.com',
+        email: 'info@haybalitrans.com',
         phone: '+62 851-1933-4511',
         address: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361',
         brandName: 'HAYBALI TRANS',

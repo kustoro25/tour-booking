@@ -17,7 +17,7 @@ interface TestimonialsPageData {
 const FALLBACK: TestimonialsPageData = {
   label: 'Testimoni',
   heading: 'Cerita dari Mereka yang Telah Berpetualang',
-  subheading: 'Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka yang sudah merasakan serunya liburan tanpa beban bersama Jelajah Nusantara.',
+  subheading: 'Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka yang sudah merasakan serunya liburan tanpa beban bersama HAYBALI TRANS.',
 };
 
 async function getTestimonialsPageData(): Promise<TestimonialsPageData> {

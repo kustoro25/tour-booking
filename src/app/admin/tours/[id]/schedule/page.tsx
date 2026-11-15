@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useCallback } from 'react';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useToast } from '@/components/ui/Toast';
@@ -41,18 +41,30 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
       .then(d => { if (d.success) setTourName(d.data.name); });
   }, [tourId]);
 
-  const fetchSlots = async () => {
-    setLoading(true);
+  const fetchSlots = useCallback(async (): Promise<TourSlot[] | null> => {
     const m = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`;
     const res = await fetch(`/api/admin/tours/${tourId}/slots?month=${m}`);
     const data = await res.json();
-    if (data.success) setSlots(data.data || []);
-    setLoading(false);
-  };
+    if (data.success) return data.data || [];
+    return null;
+  }, [viewYear, viewMonth, tourId]);
 
   useEffect(() => {
-    fetchSlots();
-  }, [viewYear, viewMonth]);
+    let cancelled = false;
+    fetchSlots().then((result) => {
+      if (cancelled) return;
+      if (result) setSlots(result);
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [fetchSlots]);
+
+  const refreshSlots = async () => {
+    setLoading(true);
+    const result = await fetchSlots();
+    if (result) setSlots(result);
+    setLoading(false);
+  };
 
   const openAdd = (date?: string) => {
     setEditingSlot(null);
@@ -115,7 +127,7 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
       }
       setBatchDates('');
       setBatchMode(false);
-      fetchSlots();
+      refreshSlots();
       setMessage(`${ok} dari ${dates.length} slot berhasil disimpan`);
     } else {
       if (!formDate) return;
@@ -136,7 +148,7 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
         setFormPrice('');
         setFormBlackout(false);
         setEditingSlot(null);
-        fetchSlots();
+        refreshSlots();
         setMessage('Slot berhasil disimpan');
       } else {
         setMessage(data.error || 'Gagal menyimpan');
@@ -152,7 +164,7 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ slotId: deleteTarget }),
     });
-    fetchSlots();
+    refreshSlots();
     showToast('Slot berhasil dihapus', 'success');
     setDeleting(false);
     setDeleteTarget(null);

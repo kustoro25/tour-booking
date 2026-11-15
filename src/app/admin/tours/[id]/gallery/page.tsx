@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useToast } from '@/components/ui/Toast';
@@ -30,27 +30,36 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
   const [deleting, setDeleting] = useState(false);
   const { showToast } = useToast();
 
-  useEffect(() => {
-    fetchTour();
-    fetchImages();
-  }, []);
-
-  const fetchTour = async () => {
+  const fetchTour = useCallback(async (): Promise<{ name: string; coverImg: string } | null> => {
     const res = await fetch(`/api/admin/tours/${tourId}`);
     const data = await res.json();
     if (data.success) {
-      setTourName(data.data.name);
-      setCoverImg(data.data.coverImg || '');
+      return { name: data.data.name, coverImg: data.data.coverImg || '' };
     }
-  };
+    return null;
+  }, [tourId]);
 
-  const fetchImages = async () => {
-    setLoading(true);
+  const fetchImages = useCallback(async (): Promise<GalleryImage[] | null> => {
     const res = await fetch(`/api/admin/tours/${tourId}/gallery`);
     const data = await res.json();
-    if (data.success) setImages(data.data || []);
-    setLoading(false);
-  };
+    if (data.success) return data.data || [];
+    return null;
+  }, [tourId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchTour().then((result) => {
+      if (cancelled || !result) return;
+      setTourName(result.name);
+      setCoverImg(result.coverImg);
+    });
+    fetchImages().then((result) => {
+      if (cancelled) return;
+      if (result) setImages(result);
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [fetchTour, fetchImages]);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +75,10 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
     if (data.success) {
       setNewUrl('');
       setNewAlt('');
-      fetchImages();
+      setLoading(true);
+      const result = await fetchImages();
+      if (result) setImages(result);
+      setLoading(false);
       showToast('Foto berhasil ditambahkan', 'success');
     } else {
       setMessage(data.error || 'Gagal menambahkan foto');
@@ -82,7 +94,10 @@ export default function AdminGalleryPage({ params }: { params: Promise<{ id: str
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ imageId: deleteTarget }),
     });
-    fetchImages();
+    setLoading(true);
+    const result = await fetchImages();
+    if (result) setImages(result);
+    setLoading(false);
     showToast('Foto berhasil dihapus', 'success');
     setDeleting(false);
     setDeleteTarget(null);

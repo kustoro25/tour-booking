@@ -43,28 +43,32 @@ export default function AdminUsersPage() {
     ? '🚫 Hanya Super Admin yang bisa menambah, mengganti password, atau menghapus admin. Hubungi Admin Operasional untuk bantuan.'
     : '🚫 Hanya Super Admin yang bisa menambah, mengganti password, atau menghapus admin.';
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
-    setLoading(true);
-    setError('');
+  const fetchUsers = async (): Promise<{ users: AdminUser[]; error: string } | null> => {
     try {
       const res = await fetch('/api/admin/users');
       const data = await res.json();
       if (data.success) {
-        setUsers(data.data || []);
-      } else {
-        setError(data.error || 'Gagal memuat data');
+        return { users: data.data || [], error: '' };
       }
+      return { users: [], error: data.error || 'Gagal memuat data' };
     } catch (err) {
       console.error(err);
-      setError('Gagal memuat data');
-    } finally {
-      setLoading(false);
+      return { users: [], error: 'Gagal memuat data' };
     }
   };
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchUsers().then((result) => {
+      if (cancelled) return;
+      if (result) {
+        setUsers(result.users);
+        setError(result.error);
+      }
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -77,7 +81,13 @@ export default function AdminUsersPage() {
       });
       const data = await res.json();
       if (data.success) {
-        fetchUsers();
+        setLoading(true);
+        const result = await fetchUsers();
+        if (result) {
+          setUsers(result.users);
+          setError(result.error);
+        }
+        setLoading(false);
         showToast(`Admin "${deleteTarget.name}" berhasil dihapus`, 'success');
       } else {
         showToast(data.error || 'Gagal menghapus', 'error');

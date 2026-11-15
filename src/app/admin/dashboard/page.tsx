@@ -26,11 +26,7 @@ export default function AdminDashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (): Promise<DashboardStats | null> => {
     try {
       const [bookingsRes, toursRes, reviewsRes, newsletterRes] = await Promise.all([
         fetch('/api/admin/bookings?limit=5'),
@@ -49,7 +45,7 @@ export default function AdminDashboardPage() {
         .filter((b: { status: string }) => b.status === 'CONFIRMED' || b.status === 'COMPLETED')
         .reduce((sum: number, b: { total: number }) => sum + b.total, 0);
 
-      setStats({
+      return {
         totalBookings: bookings.total || allBookings.length,
         totalRevenue,
         pendingBookings: allBookings.filter((b: { status: string }) => b.status === 'PENDING').length,
@@ -57,13 +53,22 @@ export default function AdminDashboardPage() {
         totalReviews: reviews.total || reviews.data?.length || 0,
         totalSubscribers: newsletter.total || 0,
         recentBookings: allBookings.slice(0, 5),
-      });
+      };
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
-    } finally {
-      setLoading(false);
+      return null;
     }
   };
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchDashboardData().then((data) => {
+      if (cancelled) return;
+      if (data) setStats(data);
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   const formatCurrency = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 

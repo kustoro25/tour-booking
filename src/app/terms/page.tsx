@@ -27,7 +27,7 @@ export default async function TermsPage() {
       </div>
     );
   }
-  const defaultHtml = `<h2>1. Umum</h2><p>Dengan menggunakan layanan Kami, Anda menyetujui seluruh syarat dan ketentuan.</p><h2>2. Pemesanan</h2><p>Booking sah setelah menerima nomor invoice. Data diri wajib diisi lengkap.</p><h2>3. Pembayaran</h2><p>Pembayaran dalam 24 jam sejak invoice. Jika tidak, pesanan otomatis dibatalkan.</p><h2>4. Pembatalan & Refund</h2><table><tr><th>Waktu</th><th>Refund</th></tr><tr><td>H-14+</td><td>80%</td></tr><tr><td>H-7~13</td><td>50%</td></tr><tr><td>H-3~6</td><td>25%</td></tr><tr><td>&lt;H-3</td><td>0%</td></tr></table><p>Refund diproses 7-14 hari kerja.</p><h2>5. Hubungi Kami</h2><p>Email: support@jelajahnusantara.com</p>`;
+  const defaultHtml = `<h2>1. Umum</h2><p>Dengan menggunakan layanan Kami, Anda menyetujui seluruh syarat dan ketentuan.</p><h2>2. Pemesanan</h2><p>Booking sah setelah menerima nomor invoice. Data diri wajib diisi lengkap.</p><h2>3. Pembayaran</h2><p>Pembayaran dalam 24 jam sejak invoice. Jika tidak, pesanan otomatis dibatalkan.</p><h2>4. Pembatalan & Refund</h2><table><tr><th>Waktu</th><th>Refund</th></tr><tr><td>H-14+</td><td>80%</td></tr><tr><td>H-7~13</td><td>50%</td></tr><tr><td>H-3~6</td><td>25%</td></tr><tr><td>&lt;H-3</td><td>0%</td></tr></table><p>Refund diproses 7-14 hari kerja.</p><h2>5. Hubungi Kami</h2><p>Email: support@haybalitrans.com</p>`;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-12">

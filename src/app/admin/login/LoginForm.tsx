@@ -46,6 +46,7 @@ export default function LoginForm({ brandName, brandIcon }: Props) {
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
         <div className="text-center mb-8">
           {(brandIcon.startsWith('http') || brandIcon.startsWith('/')) ? (
+            // eslint-disable-next-line @next/next/no-img-element -- ikon brand bisa berupa URL eksternal/path dinamis dari pengaturan
             <img src={brandIcon} alt={brandName} className="w-16 h-16 object-contain mx-auto mb-4" />
           ) : (
             <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">

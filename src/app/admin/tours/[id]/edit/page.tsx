@@ -75,15 +75,6 @@ export default function EditTourPage() {
     }
   };
 
-  const handleDestinationSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const destId = e.target.value;
-    if (destId === '__custom__') {
-      setForm({ ...form, destinationId: '', destination: '' });
-      return;
-    }
-    setForm({ ...form, destinationId: '' });
-  };
-
   // Itinerary helpers
   const addItineraryDay = () => setItinerary([...itinerary, { day: itinerary.length + 1, title: '', description: '' }]);
   const removeItineraryDay = (index: number) => {

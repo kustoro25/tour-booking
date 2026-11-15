@@ -89,7 +89,7 @@ const defaultData: Record<string, PageData> = {
   'home-faq': {
     label: 'Bantuan',
     heading: 'Pertanyaan yang Sering Diajukan',
-    subheading: 'Temukan jawaban untuk pertanyaan-pertanyaan umum seputar pemesanan, pembayaran, dan perjalanan tour bersama Jelajah Nusantara.',
+    subheading: 'Temukan jawaban untuk pertanyaan-pertanyaan umum seputar pemesanan, pembayaran, dan perjalanan Anda bersama HAYBALI TRANS.',
     faqs: [
       { question: 'Bagaimana cara melakukan booking?', answer: 'Caranya sangat mudah! Pilih paket tour yang Anda inginkan, tentukan tanggal keberangkatan dari kalender interaktif, isi data diri dan jumlah peserta, lalu klik "Booking Sekarang". Invoice akan langsung terbit dan dikirim ke email Anda.' },
       { question: 'Metode pembayaran apa saja yang tersedia?', answer: 'Kami menerima transfer bank (BCA, Mandiri, BRI, BNI) dan e-wallet (OVO, Dana, GoPay, ShopeePay). Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan. Jika melebihi batas waktu, pesanan akan otomatis dibatalkan.' },
@@ -99,7 +99,7 @@ const defaultData: Record<string, PageData> = {
   },
   'privacy': {
     html: `<h2>1. Informasi yang Kami Kumpulkan</h2>
-<p>Saat Anda menggunakan layanan Jelajah Nusantara Tour, kami dapat mengumpulkan informasi berikut:</p>
+<p>Saat Anda menggunakan layanan HAYBALI TRANS, kami dapat mengumpulkan informasi berikut:</p>
 <ul><li><strong>Data Pribadi:</strong> Nama lengkap, alamat email, nomor telepon, dan informasi kontak lainnya yang Anda berikan saat booking.</li>
 <li><strong>Data Pemesanan:</strong> Detail paket tour yang dipesan, tanggal perjalanan, jumlah peserta, dan preferensi khusus.</li>
 <li><strong>Data Pembayaran:</strong> Informasi pembayaran diproses melalui payment gateway pihak ketiga. Kami tidak menyimpan data kartu kredit atau kredensial perbankan Anda.</li>
@@ -140,11 +140,11 @@ const defaultData: Record<string, PageData> = {
 <p>Kami dapat memperbarui Kebijakan Privasi ini sewaktu-waktu. Perubahan akan diumumkan melalui website dan, untuk perubahan signifikan, kami akan mengirimkan pemberitahuan melalui email.</p>
 
 <h2>9. Hubungi Kami</h2>
-<p>Jika Anda memiliki pertanyaan terkait Kebijakan Privasi ini, silakan hubungi kami melalui halaman Hubungi Kami atau kirim email ke privacy@jelajahnusantara.com.</p>`
+<p>Jika Anda memiliki pertanyaan terkait Kebijakan Privasi ini, silakan hubungi kami melalui halaman Hubungi Kami atau kirim email ke privacy@haybalitrans.com.</p>`
   },
   'terms': {
     html: `<h2>1. Umum</h2>
-<p>Dengan menggunakan layanan Jelajah Nusantara Tour ("Kami"), Anda ("Tamu" atau "Pelanggan") dianggap telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan yang berlaku.</p>
+<p>Dengan menggunakan layanan HAYBALI TRANS ("Kami"), Anda ("Tamu" atau "Pelanggan") dianggap telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan yang berlaku.</p>
 
 <h2>2. Pemesanan (Booking)</h2>
 <ul><li>Booking dianggap sah apabila tamu telah menyelesaikan form pemesanan dan menerima nomor invoice.</li>
@@ -185,13 +185,13 @@ const defaultData: Record<string, PageData> = {
 <p>Kami berhak mengubah syarat dan ketentuan ini sewaktu-waktu. Perubahan berlaku efektif sejak publikasi.</p>
 
 <h2>9. Hubungi Kami</h2>
-<p>Jika ada pertanyaan, hubungi kami melalui halaman Hubungi Kami atau email support@jelajahnusantara.com.</p>`
+<p>Jika ada pertanyaan, hubungi kami melalui halaman Hubungi Kami atau email support@haybalitrans.com.</p>`
   },
   'about': {
     label: 'Tentang',
     heading: 'Tentang Kami',
     storyTitle: 'Cerita Kami',
-    story: 'Jelajah Nusantara Tour adalah perusahaan jasa perjalanan wisata yang berkomitmen memberikan pengalaman liburan tak terlupakan dengan pelayanan personal dan harga transparan.\n\nBerdiri sejak 2018, kami telah melayani ribuan wisatawan domestik dan mancanegara dengan paket-paket tour pilihan ke destinasi terbaik di Indonesia. Dari Bali hingga Raja Ampat, dari Bromo hingga Danau Toba — kami ada untuk mewujudkan liburan impian Anda.\n\nKami percaya bahwa setiap perjalanan adalah cerita yang berharga. Itulah mengapa kami merancang setiap paket tour dengan detail dan penuh perhatian, memastikan setiap momen perjalanan Anda menjadi kenangan yang tak terlupakan.',
+    story: 'HAYBALI TRANS adalah penyedia jasa sewa mobil dan transportasi privat di Bali yang berkomitmen memberikan pengalaman perjalanan terbaik dengan armada bersih, nyaman, dan terawat, serta sopir profesional yang ramah.\n\nKami melayani wisatawan domestik dan mancanegara dengan pilihan kendaraan premium — mulai dari MPV keluarga hingga Alphard mewah — untuk perjalanan wisata, antar-jemput bandara, liburan keluarga, maupun perjalanan bisnis.\n\nKami percaya bahwa setiap perjalanan adalah cerita yang berharga. Itulah mengapa kami merawat setiap kendaraan dengan detail dan penuh perhatian, memastikan setiap momen perjalanan Anda menjadi kenangan yang tak terlupakan.',
     vision: 'Menjadi platform booking tour yang paling mudah, transparan, dan terpercaya bagi wisatawan domestik maupun mancanegara.',
     mission: [
       'Menyediakan paket tour berkualitas dengan harga transparan',
@@ -246,13 +246,13 @@ const defaultData: Record<string, PageData> = {
   'testimonials': {
     label: 'Testimoni',
     heading: 'Cerita dari Mereka yang Telah Berpetualang',
-    subheading: 'Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka yang sudah merasakan serunya liburan tanpa beban bersama Jelajah Nusantara.',
+    subheading: 'Kepuasan Anda adalah kebahagiaan kami. Lihat apa kata mereka yang sudah merasakan serunya liburan tanpa beban bersama HAYBALI TRANS.',
     ctaText: 'Lihat Semua Testimoni',
     ctaLink: '/testimonials',
   },
   'footer': {
     text: 'Platform booking tour terpercaya untuk menjelajahi destinasi terbaik di Indonesia. Harga transparan, booking instan, dan guide profesional.',
-    copyright: `© ${new Date().getFullYear()} Jelajah Nusantara Tour. All rights reserved.`,
+    copyright: `© ${new Date().getFullYear()} HAYBALI TRANS. All rights reserved.`,
     socialLinks: [
       { platform: 'WhatsApp', url: 'https://wa.me/6285119334511', icon: 'whatsapp' },
       { platform: 'Instagram', url: 'https://instagram.com/haybalitrans', icon: 'instagram' },
@@ -838,7 +838,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             <SectionCard icon="©️" title="Copyright">
               <input type="text" value={data.copyright || ''} onChange={e => update('copyright', e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="© 2026 Jelajah Nusantara Tour. All rights reserved." />
+                placeholder="© 2026 HAYBALI TRANS. All rights reserved." />
             </SectionCard>
             <SectionCard icon="🔗" title="Social Media Links" addLabel="+ Tambah Medsos" onAdd={() => update('socialLinks', [...(data.socialLinks as Array<{platform:string;url:string;icon:string}> || []), { platform: '', url: '', icon: 'whatsapp' }])}>
               <div className="space-y-3">

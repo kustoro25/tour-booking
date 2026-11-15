@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useToast } from '@/components/ui/Toast';
 
@@ -27,23 +27,36 @@ export default function AdminNewsletterPage() {
 
   const { showToast } = useToast();
 
-  useEffect(() => { fetchSubscribers(); }, [page, search]);
-
-  const fetchSubscribers = async () => {
-    setLoading(true);
+  const loadSubscribers = useCallback(async () => {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '20' });
       if (search) params.set('search', search);
       const res = await fetch(`/api/admin/newsletter?${params}`);
       const data = await res.json();
       if (data.success) {
-        setSubscribers(data.data || []);
-        setTotal(data.total);
-        setTotalPages(data.totalPages);
+        return {
+          subscribers: data.data || [],
+          total: data.total,
+          totalPages: data.totalPages,
+        } as { subscribers: Subscriber[]; total: number; totalPages: number };
       }
     } catch (err) { console.error(err); }
-    finally { setLoading(false); }
-  };
+    return null;
+  }, [page, search]);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadSubscribers().then((result) => {
+      if (cancelled) return;
+      if (result) {
+        setSubscribers(result.subscribers);
+        setTotal(result.total);
+        setTotalPages(result.totalPages);
+      }
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [loadSubscribers]);
 
   const handleDelete = async (sub: Subscriber) => {
     if (!confirm(`Hapus subscriber "${sub.email}"?`)) return;
@@ -56,7 +69,14 @@ export default function AdminNewsletterPage() {
       const data = await res.json();
       if (data.success) {
         showToast('Subscriber berhasil dihapus', 'success');
-        fetchSubscribers();
+        setLoading(true);
+        const result = await loadSubscribers();
+        if (result) {
+          setSubscribers(result.subscribers);
+          setTotal(result.total);
+          setTotalPages(result.totalPages);
+        }
+        setLoading(false);
       } else {
         showToast(data.error || 'Gagal menghapus', 'error');
       }
@@ -216,7 +236,7 @@ export default function AdminNewsletterPage() {
         <input
           type="text"
           value={search}
-          onChange={e => { setSearch(e.target.value); setPage(1); }}
+          onChange={e => { setSearch(e.target.value); setPage(1); setLoading(true); }}
           placeholder="Cari email subscriber..."
           className="w-full max-w-sm border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
         />
@@ -267,7 +287,7 @@ export default function AdminNewsletterPage() {
             {totalPages > 1 && (
               <div className="p-4 border-t border-gray-100 flex items-center justify-center gap-3">
                 <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  onClick={() => { setPage(p => Math.max(1, p - 1)); setLoading(true); }}
                   disabled={page === 1}
                   className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
                 >
@@ -275,7 +295,7 @@ export default function AdminNewsletterPage() {
                 </button>
                 <span className="text-sm text-gray-500">{page} / {totalPages}</span>
                 <button
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  onClick={() => { setPage(p => Math.min(totalPages, p + 1)); setLoading(true); }}
                   disabled={page === totalPages}
                   className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
                 >
