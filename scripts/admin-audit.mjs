@@ -1,6 +1,7 @@
 // Audit runtime halaman & API admin — READ-ONLY (hanya GET + login).
-// Jalankan: node scripts/admin-audit.mjs
-const BASE = 'http://localhost:3000';
+// Jalankan: node scripts/admin-audit.mjs            (lokal http://localhost:3000)
+//           AUDIT_BASE=https://www.example.com node scripts/admin-audit.mjs
+const BASE = process.env.AUDIT_BASE || 'http://localhost:3000';
 
 const results = [];
 function record(name, ok, detail) {
