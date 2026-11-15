@@ -59,26 +59,34 @@ export default function InvoiceActions({
         : '💬 Hubungi Kami';
 
   return (
-    <div className="screen-only flex flex-wrap justify-center gap-3 sm:gap-4 mt-6">
-      {payUrl && (
-        <Button href={payUrl} variant="accent" size="lg">
-          {payLabel}
+    <div className="screen-only mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
+        {/* Aksi utama: bayar online (tampil penuh di atas bila tersedia) */}
+        {payUrl && (
+          <Button href={payUrl} variant="accent" size="lg" className="sm:col-span-2 w-full">
+            {payLabel}
+          </Button>
+        )}
+        <Button onClick={() => window.print()} variant="secondary" className="w-full">
+          🖨️ Cetak / Simpan PDF
         </Button>
-      )}
-      <Button onClick={() => window.print()} variant="primary">
-        🖨️ Cetak / Simpan PDF
-      </Button>
-      <Button
-        href={`https://wa.me/${waNumber}?text=${waMessage}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        variant="accent"
-      >
-        {waLabel}
-      </Button>
-      <Button href={helpLink || '/contact'} variant="outline">
-        Butuh Bantuan?
-      </Button>
+        <Button
+          href={`https://wa.me/${waNumber}?text=${waMessage}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="accent"
+          className="w-full"
+        >
+          {waLabel}
+        </Button>
+        <Button
+          href={helpLink || '/contact'}
+          variant="outline"
+          className="w-full sm:col-span-2 sm:w-auto sm:justify-self-center sm:px-10"
+        >
+          ❓ Butuh Bantuan?
+        </Button>
+      </div>
     </div>
   );
 }

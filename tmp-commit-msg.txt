@@ -1,6 +1,6 @@
-fix(pembayaran): pelunasan bisa tunai ke sopir atau transfer bank
+style(invoice): rapikan tombol aksi invoice
 
-Kalimat pelunasan diubah agar tidak wajib tunai ke sopir:
-"bisa tunai ke sopir saat bertemu atau transfer bank" — diterapkan
-di halaman booking, simulasi, syarat & ketentuan, invoice, jadwal
-pembayaran, label WhatsApp, dan email penagihan.
+- Grid 2 kolom rapi, ukuran tombol seragam (md), lebar konsisten
+- Tombol bayar online tampil penuh di atas sebagai aksi utama
+- Cetak / Simpan PDF jadi varian secondary (gelap), WhatsApp tetap emas
+- Butuh Bantuan? di tengah bawah dengan lebar wajar + ikon
