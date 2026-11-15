@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense, type SyntheticEvent } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import {
-  PICKUP_ZONES,
   STANDARD_AREAS,
   REMOTE_AREA_FEES,
   FLEET,
@@ -969,17 +968,11 @@ function BookingPage() {
                     <label className="block text-sm font-medium text-mist mb-1">Zona Penjemputan</label>
                     <input
                       type="text"
-                      list="pickup-zone-options"
                       value={pickupZone}
                       onChange={(e) => { setPickupZone(e.target.value); clearError('pickupZone'); }}
                       placeholder="Contoh: Kuta, Seminyak, Bandara Ngurah Rai"
                       className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
                     />
-                    <datalist id="pickup-zone-options">
-                      {PICKUP_ZONES.map((zone) => (
-                        <option key={zone} value={zone} />
-                      ))}
-                    </datalist>
                     {errors.pickupZone && <p className="text-red-500 text-sm mt-1">{errors.pickupZone}</p>}
                   </div>
                   <div>
