@@ -61,7 +61,7 @@ export default async function HomePage() {
         <h1 className="sr-only">HAYBALI TRANS – Luxury Transport in Bali</h1>
         {/* Banner tampil utuh (tanpa crop) dan responsif mengikuti lebar layar */}
         <Image
-          src="/images/haybali/hero-banner.jpg"
+          src="/images/haybali/hero-banner-v2.jpg"
           alt="HAYBALI TRANS – Luxury Transport in Bali"
           width={1280}
           height={512}
