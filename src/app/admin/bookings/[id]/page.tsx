@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { OrderStatusLabels } from '@/types';
 import type { OrderStatus } from '@/types';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { formatTime12h } from '@/lib/haybali';
 
 export default function BookingDetailPage() {
   const params = useParams();
@@ -199,7 +200,7 @@ export default function BookingDetailPage() {
                 <p className="text-gray-700"><span className="text-gray-400">Durasi Sewa: </span>{extrasDurationLabel}</p>
               ) : null}
               {booking.pickupTime ? (
-                <p className="text-gray-700"><span className="text-gray-400">Jam Penjemputan: </span>{String(booking.pickupTime)} WITA</p>
+                <p className="text-gray-700"><span className="text-gray-400">Jam Penjemputan: </span>{formatTime12h(String(booking.pickupTime))} WITA</p>
               ) : null}
               {booking.pickupArea ? (
                 <p className="text-gray-700"><span className="text-gray-400">Zona Penjemputan: </span>{String(booking.pickupArea)}</p>

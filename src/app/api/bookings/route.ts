@@ -11,6 +11,7 @@ import {
   getFleetBySlug,
   getTransferPrice,
   getPickupTimeOptions,
+  formatTime12h,
   getCarRentalBasePrice,
   calcCarRentalTotal,
   TRANSFER_MAX_PAX,
@@ -348,7 +349,7 @@ export async function POST(request: NextRequest) {
     const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
     const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
     const dateLabel = new Date(tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-    const tourDateLabel = pickupTime ? `${dateLabel}, pukul ${pickupTime}` : dateLabel;
+    const tourDateLabel = pickupTime ? `${dateLabel}, pukul ${formatTime12h(String(pickupTime))} WITA` : dateLabel;
     const expiryDate = getExpiryDate(24);
 
     // 1. Buat transaksi Midtrans Snap (FULL) atau Snap DP (INSTALLMENT) jika gateway midtrans aktif

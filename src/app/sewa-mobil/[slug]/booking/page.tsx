@@ -17,6 +17,8 @@ import {
   calcCarRentalTotal,
   calcLatePickupFee,
   normalizePickupTime,
+  formatTime12h,
+  formatPickupWindow12h,
   waBookingLink,
 } from '@/lib/haybali';
 import Button from '@/components/ui/Button';
@@ -100,7 +102,8 @@ function BookingPage() {
   const [waNumber, setWaNumber] = useState<string>(WA_NUMBER); // nomor WA bisnis dari pengaturan admin
 
   // --- State layanan khusus HAYBALI TRANS ---
-  const [pickupTime, setPickupTime] = useState('');
+  const [pickupTime, setPickupTime] = useState(''); // nilai kanonik "HH:MM" (24 jam) untuk harga & API
+  const [pickupTimeText, setPickupTimeText] = useState(''); // tampilan 12 jam, mis. "7:30 AM"
   const [pickupZone, setPickupZone] = useState('');
   const [destinationArea, setDestinationArea] = useState(''); // area tujuan (diketik manual, biaya info saja)
   const [rentalDuration, setRentalDuration] = useState<'6' | '12'>('12'); // durasi sewa mobil
@@ -193,6 +196,7 @@ function BookingPage() {
     // Saat masih kosong, tombol panah memulai dari awal jam normal (07:00)
     if (!isValidPickupTime(pickupTime)) {
       setPickupTime(DRIVER_POLICY.normalPickupStart);
+      setPickupTimeText(formatTime12h(DRIVER_POLICY.normalPickupStart));
       clearError('pickupTime');
       return;
     }
@@ -200,6 +204,7 @@ function BookingPage() {
     const total = (hour * 60 + minute + deltaMinutes + 24 * 60) % (24 * 60);
     const next = `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
     setPickupTime(next);
+    setPickupTimeText(formatTime12h(next));
     clearError('pickupTime');
   };
 
@@ -228,7 +233,7 @@ function BookingPage() {
   const validateStep1 = () => {
     const errs: Record<string, string> = {};
     if (!selectedDate) errs.date = 'Silakan pilih tanggal keberangkatan';
-    if (isCarRental && !isValidPickupTime(pickupTime)) errs.pickupTime = 'Jam penjemputan wajib diisi (kelipatan 30 menit)';
+    if (isCarRental && !isValidPickupTime(pickupTime)) errs.pickupTime = 'Silakan tentukan jam penjemputan (kelipatan 30 menit)';
     if (isTransfer && !transferArea) errs.transferArea = 'Pilih area / tujuan';
     return errs;
   };
@@ -373,7 +378,7 @@ function BookingPage() {
     const extraLines: string[] = [];
     if (isCarRental) {
       extraLines.push(`• Durasi: ${rentalDuration} Jam`);
-      if (pickupTime) extraLines.push(`• Jam Penjemputan: ${pickupTime}`);
+      if (pickupTime) extraLines.push(`• Jam Penjemputan: ${formatTime12h(pickupTime)} WITA`);
       if (pickupZone) extraLines.push(`• Zona Penjemputan: ${pickupZone}`);
       if (destinationArea) extraLines.push(`• Area Tujuan: ${destinationArea}`);
     }
@@ -601,17 +606,17 @@ function BookingPage() {
                 <div className="relative">
                   <input
                     type="text"
-                    inputMode="numeric"
-                    value={pickupTime}
+                    value={pickupTimeText}
                     onChange={(e) => {
-                      setPickupTime(e.target.value);
+                      const raw = e.target.value;
+                      setPickupTimeText(raw);
+                      setPickupTime(normalizePickupTime(raw) ?? '');
                       clearError('pickupTime');
                     }}
                     onBlur={() => {
-                      const normalized = normalizePickupTime(pickupTime);
-                      if (normalized) setPickupTime(normalized);
+                      if (isValidPickupTime(pickupTime)) setPickupTimeText(formatTime12h(pickupTime));
                     }}
-                    placeholder="07:00"
+                    placeholder="7:00 AM"
                     aria-label="Jam penjemputan"
                     className="w-full h-11 pl-4 pr-14 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
                   />
@@ -636,17 +641,18 @@ function BookingPage() {
                   </div>
                 </div>
                 <p className="text-xs text-mist-dim mt-1">
-                  Ketik jam (mis. 0730) atau pakai tombol ▲▼ — kelipatan {DRIVER_POLICY.pickupTimeStepMinutes} menit.
+                  Pilih waktu penjemputan. Sesuaikan dengan tombol panah setiap {DRIVER_POLICY.pickupTimeStepMinutes} menit,
+                  atau ketik langsung (contoh: 7:30 AM).
                 </p>
                 {isValidPickupTime(pickupTime) &&
                   (calcLatePickupFee(pickupTime) > 0 ? (
                     <p className="text-xs text-gold-300 mt-1">
-                      Di luar {DRIVER_POLICY.normalPickupStart}–{DRIVER_POLICY.normalPickupEnd} WITA: +
-                      {formatCurrency(DRIVER_POLICY.latePickupFee)} (sekali per mobil).
+                      Penjemputan di luar pukul {formatPickupWindow12h()} WITA dikenakan biaya tambahan{' '}
+                      {formatCurrency(DRIVER_POLICY.latePickupFee)} per mobil, dibayarkan sekali.
                     </p>
                   ) : (
                     <p className="text-xs text-green-300 mt-1">
-                      Tanpa biaya tambahan ({DRIVER_POLICY.normalPickupStart}–{DRIVER_POLICY.normalPickupEnd} WITA).
+                      Penjemputan pukul {formatPickupWindow12h()} WITA tidak dikenakan biaya tambahan.
                     </p>
                   ))}
                 {errors.pickupTime && <p className="text-red-500 text-sm mt-1">{errors.pickupTime}</p>}
@@ -661,7 +667,7 @@ function BookingPage() {
                   </div>
                   {(carQuote?.latePickupFee ?? 0) > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-mist">Biaya Jam di Luar Tarif Normal</span>
+                      <span className="text-mist">Biaya Penjemputan di Luar Jam Normal</span>
                       <span className="font-medium text-gold-300">+{formatCurrency(carQuote?.latePickupFee ?? 0)}</span>
                     </div>
                   )}
@@ -1202,7 +1208,7 @@ function BookingPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <span className="text-sm text-mist-dim">Jam Penjemputan</span>
-                  <p className="font-medium">{pickupTime}</p>
+                  <p className="font-medium">{formatTime12h(pickupTime)} WITA</p>
                 </div>
                 <div>
                   <span className="text-sm text-mist-dim">Zona Penjemputan</span>
@@ -1278,7 +1284,7 @@ function BookingPage() {
                 </div>
                 {(carQuote?.latePickupFee ?? 0) > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-mist-dim">Biaya Jam Penjemputan</span>
+                    <span className="text-mist-dim">Biaya Penjemputan di Luar Jam Normal</span>
                     <span className="text-gold-300">+{formatCurrency(carQuote?.latePickupFee ?? 0)}</span>
                   </div>
                 )}

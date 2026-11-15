@@ -26,7 +26,7 @@ const DESTINASI_LIST = [
 
 const VALUE_ITEMS = [
   { icon: '🚙', title: 'Armada Prima', desc: 'Kendaraan bersih, wangi, dan terawat untuk kenyamanan perjalanan Anda.', color: 'from-gold-200 via-gold-400 to-gold-600' },
-  { icon: '👨‍✈️', title: 'Supir Profesional', desc: 'Berpengalaman, ramah, dan siap melayani dari jam 07.00 hingga tengah malam.', color: 'from-gold-300 to-gold-700' },
+  { icon: '👨‍✈️', title: 'Supir Profesional', desc: 'Berpengalaman, ramah, dan siap melayani pukul 7:00 AM–11:00 PM WITA.', color: 'from-gold-300 to-gold-700' },
   { icon: '💰', title: 'Harga Transparan', desc: 'Tarif jelas tanpa biaya tersembunyi — apa yang Anda lihat, itulah yang Anda bayar.', color: 'from-ink-600 to-ink-800' },
   { icon: '⚡', title: 'Booking Instan', desc: 'Pesan online, invoice langsung terbit dan masuk ke email Anda.', color: 'from-gold-400 to-gold-600' },
 ];
@@ -34,7 +34,7 @@ const VALUE_ITEMS = [
 const FAQ_ITEMS = [
   { question: 'Bagaimana cara melakukan booking?', answer: 'Pilih layanan sewa mobil yang Anda inginkan, tentukan tanggal dari kalender, isi data diri, lalu klik "Booking Sekarang". Invoice langsung terbit dan pembayaran dilakukan sesuai metode yang tercantum di invoice.' },
   { question: 'Apakah sewa mobil sudah termasuk supir dan BBM?', answer: 'Ya. Semua harga sewa mobil HAYBALI TRANS sudah termasuk supir berpengalaman dan BBM. Pilih durasi 6 jam atau 12 jam sesuai armada, tanpa batasan jarak tempuh. Area di luar standar dikenakan biaya tambahan sesuai tabel yang tertera dan dikonfirmasi admin via WhatsApp — tidak dihitung otomatis saat booking.' },
-  { question: 'Bagaimana kebijakan jam kerja pengemudi?', answer: 'Jam kerja pengemudi adalah 07.00–23.00 WITA. Penjemputan pukul 07.00–23.00 tanpa biaya tambahan. Di luar jam tersebut — termasuk dini hari 00.00–04.00 — dikenakan biaya tambahan Rp 50.000/mobil sekali per penjemputan, bukan per jam. Bila menginap di luar kota dikenakan Rp 350.000/malam.' },
+  { question: 'Bagaimana kebijakan jam kerja pengemudi?', answer: 'Jam kerja pengemudi adalah 7:00 AM–11:00 PM WITA. Penjemputan dalam rentang tersebut tidak dikenakan biaya tambahan. Di luar rentang itu — termasuk dini hari 12:00 AM–4:00 AM — dikenakan biaya tambahan Rp 50.000 per mobil, dibayarkan sekali per penjemputan (bukan per jam). Bila menginap di luar kota dikenakan Rp 350.000/malam.' },
   { question: 'Bagaimana kebijakan pembatalan?', answer: 'Pembatalan sebaiknya dikonfirmasi minimal 3 jam sebelum jam pemberangkatan. Bila pembatalan dilakukan kurang dari waktu tersebut, mohon dimaklumi bahwa DP yang telah dibayarkan tidak dapat dikembalikan karena jadwal & pengemudi telah kami kunci untuk Anda. Mohon informasikan segera bila pesawat Anda mengalami delay agar kami dapat menyesuaikan penjemputan.' },
 ];
 
@@ -277,7 +277,7 @@ export default async function HomePage() {
                 <li>• Mohon memberikan data yang jelas untuk mempermudah penjemputan.</li>
                 <li>• Bila pembatalan dilakukan kurang dari 3 jam sebelum pemberangkatan, mohon dimaklumi bahwa DP yang telah dibayarkan tidak dapat dikembalikan karena jadwal &amp; pengemudi telah kami kunci untuk Anda.</li>
                 <li>• Informasikan bila pesawat Anda delay agar kami dapat menyesuaikan jadwal.</li>
-                <li>• Jam kerja pengemudi 07.00–23.00 WITA. Penjemputan pukul 07.00–23.00 tanpa biaya tambahan; di luar jam tersebut (termasuk 00.00–04.00) +Rp 50.000/mobil sekali.</li>
+                <li>• Jam kerja pengemudi 7:00 AM–11:00 PM WITA. Penjemputan dalam rentang tersebut tanpa biaya tambahan; di luar rentang itu (termasuk 12:00 AM–4:00 AM) +Rp 50.000 per mobil, dibayarkan sekali.</li>
               </ul>
             </div>
           </div>

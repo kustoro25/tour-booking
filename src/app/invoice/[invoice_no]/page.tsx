@@ -8,6 +8,7 @@ import CopyButton from '@/components/ui/CopyButton';
 import InvoiceActions from '@/components/booking/InvoiceActions';
 import { getBrandName, getBrandIcon } from '@/lib/brand';
 import { getPaymentGateway } from '@/lib/settings';
+import { formatTime12h } from '@/lib/haybali';
 
 export const dynamic = 'force-dynamic';
 
@@ -532,7 +533,7 @@ function CustomInvoice({
                 { label: T.L.children, value: !isSpecialService && order.children > 0 ? `${order.children} orang` : '-' },
                 // Rincian tambahan layanan sewa mobil
                 ...(isCarRental && extrasDuration ? [{ label: 'Durasi Sewa', value: extrasDuration }] : []),
-                ...(isCarRental && order.pickupTime ? [{ label: 'Jam Penjemputan', value: `${order.pickupTime} WITA` }] : []),
+                ...(isCarRental && order.pickupTime ? [{ label: 'Jam Penjemputan', value: `${formatTime12h(order.pickupTime)} WITA` }] : []),
                 ...(isCarRental && order.pickupArea ? [{ label: 'Zona Penjemputan', value: order.pickupArea }] : []),
                 ...(isCarRental && (extrasDestinationArea || extrasRemoteLabel) ? [{ label: 'Area Tujuan', value: extrasDestinationArea || extrasRemoteLabel }] : []),
                 // Rincian tambahan antar-jemput bandara
@@ -693,7 +694,7 @@ function CustomInvoice({
                 {/* Biaya jam penjemputan di luar tarif normal */}
                 {extrasLateFee > 0 && (
                   <div className="flex justify-between items-center py-2 text-sm">
-                    <span className="text-gray-600">Biaya Jam Penjemputan (di luar 07.00–23.00)</span>
+                    <span className="text-gray-600">Biaya Penjemputan di Luar Jam Normal (7:00 AM–11:00 PM)</span>
                     <span className="font-medium text-gray-800">{formatCurrency(extrasLateFee)}</span>
                   </div>
                 )}

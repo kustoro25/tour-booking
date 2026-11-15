@@ -11,6 +11,8 @@ import {
   PICKUP_ZONES,
   REMOTE_AREA_FEES,
   STANDARD_AREAS,
+  formatPickupWindow12h,
+  formatTime12h,
   getFleetBySlug,
   waLink,
 } from '@/lib/haybali';
@@ -326,11 +328,11 @@ export default async function FleetDetailPage({ params }: PageProps) {
           <div className="bg-ink-850 rounded-2xl border border-ink-700 shadow-card p-6">
             <h3 className="font-bold text-ivory mb-3">Jam Kerja Pengemudi</h3>
             <ul className="space-y-2 text-sm text-mist leading-relaxed">
-              <li>• Jam kerja {DRIVER_POLICY.workStart}–{DRIVER_POLICY.workEnd} WITA.</li>
+              <li>• Jam kerja {formatTime12h(DRIVER_POLICY.workStart)}–{formatTime12h(DRIVER_POLICY.workEnd)} WITA.</li>
               <li>
-                • Penjemputan {DRIVER_POLICY.normalPickupStart}–{DRIVER_POLICY.normalPickupEnd} tanpa biaya tambahan. Di
-                luar jam tersebut (termasuk dini hari 00.00–04.00) +{formatCurrency(DRIVER_POLICY.latePickupFee)}/mobil,
-                sekali per penjemputan — bukan per jam.
+                • Penjemputan pukul {formatPickupWindow12h()} WITA tidak dikenakan biaya tambahan. Di luar rentang tersebut —
+                termasuk dini hari 12:00 AM–4:00 AM — dikenakan biaya tambahan
+                {formatCurrency(DRIVER_POLICY.latePickupFee)}/mobil, dibayarkan sekali per penjemputan (bukan per jam).
               </li>
               <li>• Menginap di luar kota mulai {formatCurrency(DRIVER_POLICY.driverAccommodation)}/malam.</li>
               <li>• Bila pembatalan dilakukan kurang dari 3 jam sebelum pemberangkatan, mohon dimaklumi bahwa DP yang telah dibayarkan tidak dapat dikembalikan karena jadwal &amp; pengemudi telah kami kunci untuk Anda.</li>

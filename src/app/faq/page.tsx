@@ -53,7 +53,7 @@ const buildFaqs = (paymentAnswer: string) => [
   {
     question: 'Bagaimana kebijakan jam kerja pengemudi?',
     answer:
-      'Jam kerja pengemudi adalah 07.00–23.00 WITA. Penjemputan pukul 07.00–23.00 tanpa biaya tambahan. Di luar jam tersebut — termasuk dini hari 00.00–04.00 — dikenakan biaya tambahan Rp 50.000/mobil sekali per penjemputan, bukan per jam. Bila menginap di luar kota dikenakan Rp 350.000/malam.',
+      'Jam kerja pengemudi adalah 7:00 AM–11:00 PM WITA. Penjemputan dalam rentang tersebut tidak dikenakan biaya tambahan. Di luar rentang itu — termasuk dini hari 12:00 AM–4:00 AM — dikenakan biaya tambahan Rp 50.000 per mobil, dibayarkan sekali per penjemputan (bukan per jam). Bila menginap di luar kota dikenakan Rp 350.000/malam.',
   },
   {
     question: 'Bagaimana kebijakan pembatalan?',

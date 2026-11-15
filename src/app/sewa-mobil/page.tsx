@@ -11,6 +11,8 @@ import {
   STANDARD_AREAS,
   PICKUP_ZONES,
   DRIVER_POLICY,
+  formatPickupWindow12h,
+  formatTime12h,
   waLink,
 } from '@/lib/haybali';
 import { getPaymentGateway, getWhatsAppNumber } from '@/lib/settings';
@@ -259,15 +261,15 @@ export default async function SewaMobilPage() {
             <ul className="space-y-3 text-mist">
               <li className="flex items-start gap-2">
                 <span className="text-gold-400 mt-0.5">•</span>
-                Pukul <strong>{DRIVER_POLICY.workStart}</strong> hingga{' '}
-                <strong>{DRIVER_POLICY.workEnd}</strong> WITA.
+                Pukul <strong>{formatTime12h(DRIVER_POLICY.workStart)}</strong> hingga{' '}
+                <strong>{formatTime12h(DRIVER_POLICY.workEnd)}</strong> WITA.
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-gold-400 mt-0.5">•</span>
-                Penjemputan pukul {DRIVER_POLICY.normalPickupStart}–{DRIVER_POLICY.normalPickupEnd} tanpa biaya tambahan. Di
-                luar jam tersebut (termasuk dini hari 00.00–04.00), dikenakan biaya tambahan sebesar{' '}
-                <strong>{formatCurrency(DRIVER_POLICY.latePickupFee)}</strong> / mobil — sekali per penjemputan, bukan per
-                jam.
+                Penjemputan pukul {formatPickupWindow12h()} WITA tidak dikenakan biaya tambahan. Di luar rentang tersebut
+                (termasuk dini hari 12:00 AM–4:00 AM), dikenakan biaya tambahan sebesar{' '}
+                <strong>{formatCurrency(DRIVER_POLICY.latePickupFee)}</strong> / mobil, dibayarkan sekali per penjemputan
+                (bukan per jam).
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-gold-400 mt-0.5">•</span>

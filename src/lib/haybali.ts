@@ -360,14 +360,32 @@ export function calcLatePickupFee(pickupTime: string): number {
   return isLatePickup(pickupTime) ? DRIVER_POLICY.latePickupFee : 0;
 }
 
+/** Format "HH:MM" (24 jam) menjadi tampilan 12 jam, mis. "6:30 AM". */
+export function formatTime12h(time: string): string {
+  const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(time);
+  if (!match) return time;
+  const hour24 = Number(match[1]);
+  const period = hour24 < 12 ? 'AM' : 'PM';
+  const hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12;
+  return `${hour12}:${match[2]} ${period}`;
+}
+
+/** Rentang jam tarif normal dalam format 12 jam, mis. "7:00 AM–11:00 PM". */
+export function formatPickupWindow12h(): string {
+  return `${formatTime12h(DRIVER_POLICY.normalPickupStart)}–${formatTime12h(DRIVER_POLICY.normalPickupEnd)}`;
+}
+
 /**
- * Normalisasi ketikan jam menjadi "HH:MM" kelipatan 30 menit.
- * Menerima "7", "730", "07:30", "0730". Null bila tidak valid (jam > 23 / menit > 59).
+ * Normalisasi ketikan jam menjadi "HH:MM" 24 jam kelipatan 30 menit.
+ * Menerima "7:30 AM", "6.30 pm", "0730", "18:00". Null bila tidak valid.
  */
 export function normalizePickupTime(raw: string): string | null {
   const trimmed = raw.trim();
-  const withSeparator = trimmed.match(/^(\d{1,2})[:.](\d{1,2})$/);
-  const digits = trimmed.replace(/\D/g, '');
+  const periodMatch = trimmed.match(/(a\.?m\.?|p\.?m\.?)/i);
+  const isPm = periodMatch ? /^p/i.test(periodMatch[1]) : false;
+  const timePart = trimmed.replace(/[ap]\.?m\.?/gi, '').trim();
+  const withSeparator = timePart.match(/^(\d{1,2})[:.](\d{1,2})$/);
+  const digits = timePart.replace(/\D/g, '');
   if (!withSeparator && !digits) return null;
   let hour: number;
   let minute: number;
@@ -385,7 +403,14 @@ export function normalizePickupTime(raw: string): string | null {
     minute = Number(digits.slice(2, 4));
   }
   if (!Number.isFinite(hour) || !Number.isFinite(minute)) return null;
-  if (hour > 23 || minute > 59) return null;
+  if (minute > 59) return null;
+  if (periodMatch) {
+    // Format 12 jam: hanya 1–12, lalu konversi ke 24 jam
+    if (hour < 1 || hour > 12) return null;
+    hour = (hour % 12) + (isPm ? 12 : 0);
+  } else if (hour > 23) {
+    return null;
+  }
   const roundedMinute = minute >= 30 ? 30 : 0;
   return `${String(hour).padStart(2, '0')}:${String(roundedMinute).padStart(2, '0')}`;
 }
