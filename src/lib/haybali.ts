@@ -192,32 +192,36 @@ export function getCarRentalBasePrice(slug: string, durationHours: number): numb
 
 // ----------------------------------------------------------------------------
 // 2. Biaya Tambahan Daerah (di luar harga sewa 12 jam yang disepakati)
-//    Revisi spesifikasi: tarif per destinasi — Ubud/Klungkung/Kintamani/
-//    Bedugul +Rp 100.000, Singaraja/Karangasem +Rp 200.000, Negara +Rp 300.000.
+//    Struktur mengikuti materi referensi: 4 kartu wilayah (North Bali,
+//    Mid-North Bali, East Bali, West Bali), tiap baris menggabungkan
+//    beberapa area dengan satu tarif.
 // ----------------------------------------------------------------------------
 
 export interface RemoteAreaFee {
   id: string; // key stabil untuk API booking
-  region: string; // Bali Utara / Bali Tengah / Bali Tengah-Utara / Bali Barat / Bali Timur
+  region: string; // North Bali / Mid-North Bali / East Bali / West Bali
   label: string; // nama area tujuan
   fee: number; // biaya tambahan (Rp)
 }
 
 export const REMOTE_AREA_FEES: RemoteAreaFee[] = [
-  { id: 'ubud', region: 'Bali Tengah', label: 'Ubud', fee: 100000 },
-  { id: 'klungkung', region: 'Bali Timur', label: 'Klungkung', fee: 100000 },
-  { id: 'kintamani', region: 'Bali Tengah-Utara', label: 'Kintamani', fee: 100000 },
-  { id: 'bedugul', region: 'Bali Tengah-Utara', label: 'Bedugul', fee: 100000 },
-  { id: 'singaraja', region: 'Bali Utara', label: 'Singaraja', fee: 200000 },
-  { id: 'karangasem', region: 'Bali Timur', label: 'Karangasem', fee: 200000 },
-  { id: 'negara', region: 'Bali Barat', label: 'Negara', fee: 300000 },
+  { id: 'north-bedugul', region: 'North Bali', label: 'Bedugul, Jatiluwih, Batukaru, Baturiti', fee: 200000 },
+  { id: 'north-munduk', region: 'North Bali', label: 'Munduk, Gitgit, Sekumpul, Banyumala', fee: 300000 },
+  { id: 'north-lovina', region: 'North Bali', label: 'Lovina, Singaraja, Aling-Aling, Tejakula', fee: 350000 },
+  { id: 'north-banjar', region: 'North Bali', label: 'Banjar, Temukus, Gerokgak', fee: 400000 },
+  { id: 'midnorth-penelokan', region: 'Mid-North Bali', label: 'Penelokan, Kintamani, Puhu, Bangli', fee: 150000 },
+  { id: 'midnorth-besakih', region: 'Mid-North Bali', label: 'Besakih, Sidemen, Selat, Tembuku', fee: 250000 },
+  { id: 'east-lempuyang', region: 'East Bali', label: 'Lempuyang, Tirta Gangga, Candidasa', fee: 250000 },
+  { id: 'east-amed', region: 'East Bali', label: 'Amed, Culik, Lahangan Sweet', fee: 300000 },
+  { id: 'east-tulamben', region: 'East Bali', label: 'Tulamben, Tejakula, Tianyar, Kubu, Gretek', fee: 350000 },
+  { id: 'west-gilimanuk', region: 'West Bali', label: 'Gilimanuk, Menjangan, Pemuteran, Banyuwedang', fee: 450000 },
 ];
 
 /** Area standar (tanpa biaya tambahan) — satu wilayah per hari. */
 export const STANDARD_AREAS = [
   { id: 'area-kota', label: 'AREA KOTA — Jimbaran, Nusa Dua, Kuta, Seminyak, Denpasar, Sanur' },
   { id: 'bali-selatan', label: 'BALI SELATAN — Jimbaran, Nusa Dua, Uluwatu, Pecatu, Bukit' },
-  { id: 'bali-tengah', label: 'BALI TENGAH — Gianyar & sekitarnya' },
+  { id: 'bali-tengah', label: 'BALI TENGAH — Gianyar , Batubulan, singapadu, & sukawati area' },
 ] as const;
 
 export function getRemoteAreaFee(id: string): RemoteAreaFee | undefined {
