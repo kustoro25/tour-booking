@@ -102,7 +102,7 @@ function BookingPage() {
   // --- State layanan khusus HAYBALI TRANS ---
   const [pickupTime, setPickupTime] = useState('');
   const [pickupZone, setPickupZone] = useState('');
-  const [destinationArea, setDestinationArea] = useState(''); // area tujuan sewa mobil (id konstanta)
+  const [destinationArea, setDestinationArea] = useState(''); // area tujuan (diketik manual, biaya info saja)
   const [rentalDuration, setRentalDuration] = useState<'6' | '12'>('12'); // durasi sewa mobil
   const [direction, setDirection] = useState<Direction>(queryDir === 'DROP' ? 'DROP' : 'PICKUP');
   const [transferArea, setTransferArea] = useState(validQueryArea);
@@ -115,7 +115,7 @@ function BookingPage() {
   // Data armada untuk produk sewa mobil (harga 6/12 jam sesuai konstanta resmi)
   const fleetCar = isCarRental && tour ? FLEET.find((f) => f.slug === tour.slug) : undefined;
 
-  // Grup area terpencil per wilayah (untuk select area tujuan sewa mobil)
+  // Grup area terpencil per wilayah (hanya info biaya, tidak dihitung otomatis)
   const remoteRegions = REMOTE_AREA_FEES.reduce<Record<string, typeof REMOTE_AREA_FEES>>((acc, a) => {
     (acc[a.region] ||= []).push(a);
     return acc;
@@ -177,6 +177,15 @@ function BookingPage() {
     }
   };
 
+  const clearError = (field: string) => {
+    if (!errors[field]) return;
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
   const handleDateSelect = async (date: string) => {
     setSelectedDate(date);
     setErrors({});
@@ -202,11 +211,7 @@ function BookingPage() {
   const validateStep1 = () => {
     const errs: Record<string, string> = {};
     if (!selectedDate) errs.date = 'Silakan pilih tanggal keberangkatan';
-    if (isCarRental) {
-      if (!pickupTime) errs.pickupTime = 'Pilih jam penjemputan';
-      if (!pickupZone) errs.pickupZone = 'Pilih zona penjemputan';
-      if (!destinationArea) errs.destinationArea = 'Pilih area tujuan';
-    }
+    if (isCarRental && !pickupTime) errs.pickupTime = 'Pilih jam penjemputan';
     if (isTransfer && !transferArea) errs.transferArea = 'Pilih area / tujuan';
     return errs;
   };
@@ -219,6 +224,10 @@ function BookingPage() {
     if (formData.adults < 1) errs.adults = 'Minimal 1 peserta dewasa';
     if (formData.children < 0) errs.children = 'Jumlah anak tidak valid';
     if (tour && formData.adults + formData.children < tour.minPax) errs.adults = `Minimal ${tour.minPax} peserta total`;
+    if (isCarRental) {
+      if (pickupZone.trim().length < 3) errs.pickupZone = 'Zona penjemputan wajib diisi (min. 3 karakter)';
+      if (destinationArea.trim().length < 3) errs.destinationArea = 'Area tujuan wajib diisi (min. 3 karakter)';
+    }
     return errs;
   };
 
@@ -327,7 +336,7 @@ function BookingPage() {
     ? getCarRentalBasePrice(slug, rentalDuration === '6' ? 6 : 12)
     : 0;
   const carQuote = isCarRental
-    ? calcCarRentalTotal(carBasePrice, destinationArea, pickupTime)
+    ? calcCarRentalTotal(carBasePrice, pickupTime)
     : null;
   const transferPrice = isTransfer ? getTransferPrice(transferArea, formData.adults) ?? 0 : null;
   const total = isSpecialService
@@ -349,12 +358,7 @@ function BookingPage() {
       extraLines.push(`• Durasi: ${rentalDuration} Jam`);
       if (pickupTime) extraLines.push(`• Jam Penjemputan: ${pickupTime}`);
       if (pickupZone) extraLines.push(`• Zona Penjemputan: ${pickupZone}`);
-      const areaLabel = destinationArea
-        ? (REMOTE_AREA_FEES.find((a) => a.id === destinationArea)?.label ||
-            STANDARD_AREAS.find((a) => a.id === destinationArea)?.label ||
-            '')
-        : '';
-      if (areaLabel) extraLines.push(`• Area Tujuan: ${areaLabel}`);
+      if (destinationArea) extraLines.push(`• Area Tujuan: ${destinationArea}`);
     }
     if (isTransfer) {
       extraLines.push(
@@ -596,63 +600,13 @@ function BookingPage() {
                 {errors.pickupTime && <p className="text-red-500 text-sm mt-1">{errors.pickupTime}</p>}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-mist mb-1">Zona Penjemputan</label>
-                <select
-                  value={pickupZone}
-                  onChange={(e) => setPickupZone(e.target.value)}
-                  className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
-                >
-                  <option value="">— Pilih zona —</option>
-                  {PICKUP_ZONES.map((zone) => (
-                    <option key={zone} value={zone}>{zone}</option>
-                  ))}
-                </select>
-                <p className="text-xs text-mist-dim mt-1">
-                  Area lain silakan hubungi kami untuk informasi harga & ketersediaan.
-                </p>
-                {errors.pickupZone && <p className="text-red-500 text-sm mt-1">{errors.pickupZone}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-mist mb-1">Area Tujuan</label>
-                <select
-                  value={destinationArea}
-                  onChange={(e) => setDestinationArea(e.target.value)}
-                  className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
-                >
-                  <option value="">— Pilih area tujuan —</option>
-                  <optgroup label="Area Standar (Tanpa Biaya Tambahan)">
-                    {STANDARD_AREAS.map((a) => (
-                      <option key={a.id} value={a.id}>{a.label}</option>
-                    ))}
-                  </optgroup>
-                  {Object.entries(remoteRegions).map(([region, areas]) => (
-                    <optgroup key={region} label={`${region} (Biaya Tambahan)`}>
-                      {areas.map((a) => (
-                        <option key={a.id} value={a.id}>
-                          {a.label} — +{formatCurrency(a.fee)}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
-                {errors.destinationArea && <p className="text-red-500 text-sm mt-1">{errors.destinationArea}</p>}
-              </div>
-
-              {/* Rincian harga sewa mobil */}
-              {pickupTime && destinationArea && (
+              {/* Rincian harga sewa mobil — area tujuan diisi pada langkah "Isi Data" */}
+              {pickupTime && (
                 <div className="bg-gold-400/10 border border-gold-500/20 rounded-xl p-4 space-y-1.5 text-sm">
                   <div className="flex justify-between">
                     <span className="text-mist">Harga Armada ({rentalDuration} Jam)</span>
                     <span className="font-medium">{formatCurrency(carQuote?.base ?? 0)}</span>
                   </div>
-                  {(carQuote?.remoteFee ?? 0) > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-mist">Biaya Area Terpencil</span>
-                      <span className="font-medium text-gold-300">+{formatCurrency(carQuote?.remoteFee ?? 0)}</span>
-                    </div>
-                  )}
                   {(carQuote?.latePickupFee ?? 0) > 0 && (
                     <div className="flex justify-between">
                       <span className="text-mist">Biaya Jam di Luar Tarif Normal</span>
@@ -789,7 +743,9 @@ function BookingPage() {
       {/* Step 2: Fill Data */}
       {step === 2 && (
         <div className="bg-ink-850 rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-bold text-ivory mb-1">Isi Data Diri & Peserta</h2>
+          <h2 className="text-xl font-bold text-ivory mb-1">
+            {isCarRental ? 'Isi Data Diri & Detail Sewa' : 'Isi Data Diri & Peserta'}
+          </h2>
           <p className="text-mist-dim text-sm mb-6">Lengkapi data berikut untuk melanjutkan booking</p>
 
           <div className="space-y-4">
@@ -829,6 +785,78 @@ function BookingPage() {
                 {errors.customerPhone && <p className="text-red-500 text-sm mt-1">{errors.customerPhone}</p>}
               </div>
             </div>
+
+            {/* Sewa mobil: zona penjemputan & area tujuan diketik manual */}
+            {isCarRental && (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-mist mb-1">Zona Penjemputan</label>
+                    <input
+                      type="text"
+                      list="pickup-zone-options"
+                      value={pickupZone}
+                      onChange={(e) => { setPickupZone(e.target.value); clearError('pickupZone'); }}
+                      placeholder="Contoh: Kuta, Seminyak, Bandara Ngurah Rai"
+                      className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
+                    />
+                    <datalist id="pickup-zone-options">
+                      {PICKUP_ZONES.map((zone) => (
+                        <option key={zone} value={zone} />
+                      ))}
+                    </datalist>
+                    <p className="text-xs text-mist-dim mt-1">
+                      Tulis area penjemputan Anda. Di luar zona umum, silakan hubungi kami.
+                    </p>
+                    {errors.pickupZone && <p className="text-red-500 text-sm mt-1">{errors.pickupZone}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-mist mb-1">Area Tujuan</label>
+                    <input
+                      type="text"
+                      value={destinationArea}
+                      onChange={(e) => { setDestinationArea(e.target.value); clearError('destinationArea'); }}
+                      placeholder="Contoh: Ubud, Kintamani, Nusa Dua"
+                      className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
+                    />
+                    <p className="text-xs text-mist-dim mt-1">
+                      Satu wilayah tujuan utama per hari, diketik bebas.
+                    </p>
+                    {errors.destinationArea && <p className="text-red-500 text-sm mt-1">{errors.destinationArea}</p>}
+                  </div>
+                </div>
+
+                {/* Info biaya area tambahan — tidak dihitung otomatis ke total */}
+                <details className="rounded-xl border border-ink-700 bg-ink-900">
+                  <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium text-mist">
+                    Info biaya area tambahan (tidak dihitung otomatis)
+                  </summary>
+                  <div className="px-4 pb-4 space-y-3 text-xs">
+                    <p className="text-mist-dim leading-relaxed">
+                      Harga sewa berlaku untuk area standar:{' '}
+                      {STANDARD_AREAS.map((a) => a.label.split('—')[0].trim()).join(', ')}. Bila area
+                      tujuan Anda di luar daftar, biaya di bawah ini hanya informasi — admin akan
+                      mengonfirmasi nominalnya via WhatsApp setelah booking.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {Object.entries(remoteRegions).map(([region, areas]) => (
+                        <div key={region} className="rounded-lg border border-ink-700 p-3">
+                          <p className="font-semibold text-mist mb-1.5">{region}</p>
+                          <ul className="space-y-1">
+                            {areas.map((area) => (
+                              <li key={area.id} className="flex items-start justify-between gap-2">
+                                <span className="text-mist-dim">{area.label}</span>
+                                <span className="text-gold-300 whitespace-nowrap">+{formatCurrency(area.fee)}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </details>
+              </>
+            )}
 
             {!isSpecialService && (
             <div className="grid grid-cols-2 gap-4">
@@ -1111,7 +1139,7 @@ function BookingPage() {
                 <span className="text-sm text-mist-dim">{isCarRental ? 'Unit' : isTransfer ? 'Penumpang' : 'Peserta'}</span>
                 <p className="font-medium">
                   {isCarRental
-                    ? '1 Mobil (12 Jam)'
+                    ? `1 Mobil (${rentalDuration} Jam)`
                     : isTransfer
                       ? `${formData.adults} Orang (${formData.adults <= 5 ? '1-5' : '6-10'})`
                       : `${formData.adults} Dewasa${formData.children > 0 ? `, ${formData.children} Anak` : ''}`}
@@ -1133,10 +1161,7 @@ function BookingPage() {
             {isCarRental && destinationArea && (
               <div>
                 <span className="text-sm text-mist-dim">Area Tujuan</span>
-                <p className="font-medium">
-                  {REMOTE_AREA_FEES.find((a) => a.id === destinationArea)?.label ||
-                    STANDARD_AREAS.find((a) => a.id === destinationArea)?.label}
-                </p>
+                <p className="font-medium">{destinationArea}</p>
               </div>
             )}
             {isTransfer && (
@@ -1199,12 +1224,6 @@ function BookingPage() {
                   <span className="text-mist-dim">Harga Armada ({rentalDuration} Jam)</span>
                   <span>{formatCurrency(carQuote?.base ?? 0)}</span>
                 </div>
-                {(carQuote?.remoteFee ?? 0) > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-mist-dim">Biaya Area Terpencil</span>
-                    <span className="text-gold-300">+{formatCurrency(carQuote?.remoteFee ?? 0)}</span>
-                  </div>
-                )}
                 {(carQuote?.latePickupFee ?? 0) > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-mist-dim">Biaya Jam Penjemputan</span>

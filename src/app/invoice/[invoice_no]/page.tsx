@@ -359,6 +359,7 @@ function CustomInvoice({
 
   // Parse rincian layanan dari kolom extras (JSON)
   let extrasRemoteLabel: string | null = null;
+  let extrasDestinationArea: string | null = null;
   let extrasRemoteFee = 0;
   let extrasLateFee = 0;
   let extrasDuration: string | null = null;
@@ -370,6 +371,7 @@ function CustomInvoice({
     try {
       const extras = JSON.parse(order.extras);
       extrasRemoteLabel = typeof extras.remoteAreaLabel === 'string' ? extras.remoteAreaLabel : null;
+      extrasDestinationArea = typeof extras.destinationArea === 'string' ? extras.destinationArea : null;
       extrasRemoteFee = typeof extras.remoteAreaFee === 'number' ? extras.remoteAreaFee : 0;
       extrasLateFee = typeof extras.latePickupFee === 'number' ? extras.latePickupFee : 0;
       extrasBasePrice = typeof extras.basePrice === 'number' ? extras.basePrice : 0;
@@ -532,7 +534,7 @@ function CustomInvoice({
                 ...(isCarRental && extrasDuration ? [{ label: 'Durasi Sewa', value: extrasDuration }] : []),
                 ...(isCarRental && order.pickupTime ? [{ label: 'Jam Penjemputan', value: `${order.pickupTime} WITA` }] : []),
                 ...(isCarRental && order.pickupArea ? [{ label: 'Zona Penjemputan', value: order.pickupArea }] : []),
-                ...(isCarRental && extrasRemoteLabel ? [{ label: 'Area Tujuan', value: extrasRemoteLabel }] : []),
+                ...(isCarRental && (extrasDestinationArea || extrasRemoteLabel) ? [{ label: 'Area Tujuan', value: extrasDestinationArea || extrasRemoteLabel }] : []),
                 // Rincian tambahan antar-jemput bandara
                 ...(isTransfer && extrasDirection ? [{ label: 'Arah', value: extrasDirection }] : []),
                 ...(isTransfer && (extrasTransferArea || order.dropoffArea) ? [{ label: 'Area', value: extrasTransferArea || order.dropoffArea }] : []),
@@ -700,6 +702,10 @@ function CustomInvoice({
                   <span className="text-gray-600">{T.L.subTotal}</span>
                   <span className="font-semibold text-gray-800">{formatCurrency(subTotal)}</span>
                 </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  Biaya area tujuan di luar area standar tidak termasuk total di atas — admin akan
+                  mengonfirmasi nominalnya terpisah.
+                </p>
               </>
             ) : isTransfer ? (
               <>

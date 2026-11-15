@@ -360,26 +360,20 @@ export function calcLatePickupFee(pickupTime: string): number {
 
 export interface CarRentalQuote {
   base: number;
-  remoteFee: number;
   latePickupFee: number;
   total: number;
 }
 
 /**
- * Total sewa mobil = harga armada + biaya area terpencil (bila ada)
- * + biaya jam penjemputan di luar tarif normal.
+ * Total sewa mobil = harga armada + biaya jam penjemputan di luar tarif normal.
+ * Biaya area tujuan (REMOTE_AREA_FEES) hanya informasi — tidak dihitung otomatis,
+ * nominalnya dikonfirmasi admin karena area diisi manual oleh tamu.
  */
-export function calcCarRentalTotal(
-  base: number,
-  remoteAreaId: string,
-  pickupTime: string
-): CarRentalQuote {
-  const remoteFee = getRemoteAreaFee(remoteAreaId)?.fee ?? 0;
+export function calcCarRentalTotal(base: number, pickupTime: string): CarRentalQuote {
   const latePickupFee = calcLatePickupFee(pickupTime);
   return {
     base,
-    remoteFee,
     latePickupFee,
-    total: base + remoteFee + latePickupFee,
+    total: base + latePickupFee,
   };
 }

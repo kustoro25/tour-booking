@@ -428,6 +428,12 @@ export default async function FleetDetailPage({ params }: PageProps) {
             </div>
           ))}
         </div>
+
+        <p className="text-xs text-mist-dim text-center mt-6 max-w-3xl mx-auto leading-relaxed">
+          Biaya area terpencil di atas bersifat informasi dan tidak dihitung otomatis saat booking —
+          cukup tuliskan area tujuan Anda pada langkah isi data, lalu admin akan mengonfirmasi
+          nominalnya via WhatsApp.
+        </p>
       </section>
 
       {/* ================= ARMADA LAIN ================= */}

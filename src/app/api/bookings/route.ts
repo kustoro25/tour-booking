@@ -8,13 +8,10 @@ import { getOwnerEmail, getPaymentGateway } from '@/lib/settings';
 import { createSnapTransaction, isMidtransConfigured } from '@/lib/midtrans';
 import { notifyCustomerNewBooking, notifyAdminNewOrder } from '@/lib/whatsapp';
 import {
-  PICKUP_ZONES,
-  getRemoteAreaFee,
   getFleetBySlug,
   getTransferPrice,
   getCarRentalBasePrice,
   calcCarRentalTotal,
-  STANDARD_AREAS,
   TRANSFER_MAX_PAX,
 } from '@/lib/haybali';
 
@@ -97,28 +94,17 @@ export async function POST(request: NextRequest) {
     // HAYBALI TRANS — perhitungan harga khusus layanan sewa mobil & transfer
     // ========================================================================
     let serviceTotal: number | null = null; // total hasil perhitungan khusus (menggantikan hitung pax)
-    let serviceSurcharge = 0; // biaya tambahan (area terpencil + jam penjemputan)
+    let serviceSurcharge = 0; // biaya tambahan (jam penjemputan)
     let orderExtras: Record<string, unknown> | null = null; // rincian yang disimpan di kolom extras
     let forcedAdults: number | null = null; // jumlah peserta final untuk kategori khusus
 
     if (tour.category === 'CAR_RENTAL') {
-      if (!pickupArea || !dropoffArea || !pickupTime) {
+      // Zona penjemputan & area tujuan diketik manual oleh tamu.
+      const pickupZoneText = String(pickupArea || '').trim();
+      const destinationText = String(dropoffArea || '').trim();
+      if (pickupZoneText.length < 3 || destinationText.length < 3 || !pickupTime) {
         return NextResponse.json(
           { success: false, error: 'Zona penjemputan, jam penjemputan, dan area tujuan wajib diisi' },
-          { status: 400 }
-        );
-      }
-      if (!(PICKUP_ZONES as readonly string[]).includes(String(pickupArea))) {
-        return NextResponse.json(
-          { success: false, error: 'Zona penjemputan tidak valid. Area lain silakan hubungi kami via WhatsApp.' },
-          { status: 400 }
-        );
-      }
-      const remoteFee = getRemoteAreaFee(String(dropoffArea));
-      const standardArea = STANDARD_AREAS.find((a) => a.id === dropoffArea);
-      if (!remoteFee && !standardArea) {
-        return NextResponse.json(
-          { success: false, error: 'Area tujuan tidak valid' },
           { status: 400 }
         );
       }
@@ -133,18 +119,17 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Biaya area tujuan tidak ikut dihitung — hanya informasi untuk admin.
       const quote = calcCarRentalTotal(
         getCarRentalBasePrice(tour.slug, rentalDuration),
-        String(dropoffArea),
         String(pickupTime)
       );
       serviceTotal = quote.total;
-      serviceSurcharge = quote.remoteFee + quote.latePickupFee;
+      serviceSurcharge = quote.latePickupFee;
       orderExtras = {
         durationLabel: `${rentalDuration} Jam`,
         basePrice: quote.base,
-        remoteAreaLabel: remoteFee?.label || standardArea?.label || null,
-        remoteAreaFee: quote.remoteFee,
+        destinationArea: destinationText,
         latePickupFee: quote.latePickupFee,
       };
       forcedAdults = 1;

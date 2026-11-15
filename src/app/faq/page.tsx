@@ -48,7 +48,7 @@ const buildFaqs = (paymentAnswer: string) => [
   {
     question: 'Apakah ada biaya tambahan untuk area tertentu?',
     answer:
-      'Ada. Setiap armada memiliki area standar layanan, sedangkan area di luar standar dikenakan biaya tambahan sesuai tabel remote area yang tercantum di halaman Sewa Mobil dan halaman detail armada.',
+      'Ada. Setiap armada memiliki area standar layanan, sedangkan area di luar standar dikenakan biaya tambahan sesuai tabel remote area yang tercantum di halaman Sewa Mobil dan halaman detail armada. Biaya tersebut tidak dihitung otomatis saat booking — tuliskan area tujuan Anda pada langkah isi data, lalu admin mengonfirmasi nominalnya via WhatsApp.',
   },
   {
     question: 'Bagaimana kebijakan jam kerja pengemudi?',

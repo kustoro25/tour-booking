@@ -81,6 +81,11 @@ export default function BookingDetailPage() {
   const extrasFlightNo = typeof extras?.flightNo === 'string' && extras.flightNo ? extras.flightNo : null;
   const extrasTransferArea = typeof extras?.transferArea === 'string' ? extras.transferArea : null;
   const extrasRemoteLabel = typeof extras?.remoteAreaLabel === 'string' ? extras.remoteAreaLabel : null;
+  // Area tujuan kini diketik manual (order baru) — fallback ke label lama
+  const extrasDestinationArea =
+    typeof extras?.destinationArea === 'string' && extras.destinationArea
+      ? extras.destinationArea
+      : extrasRemoteLabel;
   const extrasDurationLabel = typeof extras?.durationLabel === 'string' ? extras.durationLabel : null;
   const hasServiceDetails = Boolean(
     booking.pickupTime || booking.pickupArea || booking.dropoffArea || extrasDirection || extrasTransferArea || extrasFlightNo || extrasDurationLabel
@@ -199,8 +204,8 @@ export default function BookingDetailPage() {
               {booking.pickupArea ? (
                 <p className="text-gray-700"><span className="text-gray-400">Zona Penjemputan: </span>{String(booking.pickupArea)}</p>
               ) : null}
-              {booking.dropoffArea || extrasRemoteLabel ? (
-                <p className="text-gray-700"><span className="text-gray-400">Area Tujuan: </span>{extrasRemoteLabel || String(booking.dropoffArea)}</p>
+              {booking.dropoffArea || extrasDestinationArea ? (
+                <p className="text-gray-700"><span className="text-gray-400">Area Tujuan: </span>{extrasDestinationArea || String(booking.dropoffArea)}</p>
               ) : null}
               {extrasDirection ? (
                 <p className="text-gray-700"><span className="text-gray-400">Arah: </span>{extrasDirection}</p>
