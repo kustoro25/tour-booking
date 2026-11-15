@@ -8,8 +8,8 @@
 export interface FleetDetail {
   slug: string;
   brand: string; // 'Toyota'
-  model: string; // 'Alphard 2.5 HEV'
-  fullName: string; // 'Toyota Alphard 2.5 HEV'
+  model: string; // 'Alphard Hybrid New'
+  fullName: string; // 'Toyota Alphard Hybrid New'
   bodyType: string; // 'MPV Luxury'
   year: string; // '2024'
   color: string;
@@ -121,8 +121,8 @@ export const FLEET_DETAILS: FleetDetail[] = [
   {
     slug: 'sewa-alphard-hev-bali',
     brand: 'Toyota',
-    model: 'Alphard 2.5 HEV',
-    fullName: 'Toyota Alphard 2.5 HEV',
+    model: 'Alphard Hybrid New',
+    fullName: 'Toyota Alphard Hybrid New',
     bodyType: 'MPV Luxury (7 Penumpang)',
     year: '2024 – sekarang',
     color: 'Hitam / Putih (sesuai ketersediaan)',
@@ -132,7 +132,7 @@ export const FLEET_DETAILS: FleetDetail[] = [
     seatConfig: 'Executive lounge seat baris kedua (2 + 2 + 3)',
     tagline: 'Standar VIP eksekutif — Alphard hybrid terbaru dengan executive lounge seat.',
     overview: [
-      'Toyota Alphard 2.5 HEV generasi terbaru adalah ikon transportasi eksekutif di Bali. Baris kedua memakai executive lounge seat dengan ottoman dan sandaran elektrik, sehingga penumpang bisa beristirahat penuh selama perjalanan dari bandara menuju hotel atau selama city tour.',
+      'Toyota Alphard Hybrid New generasi terbaru adalah ikon transportasi eksekutif di Bali. Baris kedua memakai executive lounge seat dengan ottoman dan sandaran elektrik, sehingga penumpang bisa beristirahat penuh selama perjalanan dari bandara menuju hotel atau selama city tour.',
       'Armada ini paling sering dipakai untuk penjemputan VIP, kunjungan bisnis, hingga pernikahan. Kabin kedap suara dengan suspensi halus membuat perjalanan panjang terasa ringan, sementara supir HAYBALI TRANS sudah terbiasa menangani tamu korporat dan diplomatik.',
     ],
     highlights: [
