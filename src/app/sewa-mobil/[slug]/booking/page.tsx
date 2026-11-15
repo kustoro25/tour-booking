@@ -16,6 +16,7 @@ import {
   getCarRentalBasePrice,
   calcCarRentalTotal,
   calcLatePickupFee,
+  isValidPickupTime,
   normalizePickupTime,
   formatTime12h,
   formatPickupWindow12h,
@@ -189,8 +190,7 @@ function BookingPage() {
     });
   };
 
-  // Jam penjemputan valid: "HH:MM" kelipatan 30 menit (00:00–23:30)
-  const isValidPickupTime = (value: string) => /^([01]\d|2[0-3]):(00|30)$/.test(value);
+  // Jam penjemputan valid: "HH:MM" 24 jam, menit bebas (00:00–23:59)
 
   const stepPickupTime = (deltaMinutes: number) => {
     // Saat masih kosong, tombol panah memulai dari awal jam normal (07:00)
@@ -233,7 +233,7 @@ function BookingPage() {
   const validateStep1 = () => {
     const errs: Record<string, string> = {};
     if (!selectedDate) errs.date = 'Silakan pilih tanggal keberangkatan';
-    if (isCarRental && !isValidPickupTime(pickupTime)) errs.pickupTime = 'Silakan tentukan jam penjemputan (kelipatan 30 menit)';
+    if (isCarRental && !isValidPickupTime(pickupTime)) errs.pickupTime = 'Silakan tentukan jam penjemputan';
     if (isTransfer && !transferArea) errs.transferArea = 'Pilih area / tujuan';
     return errs;
   };
@@ -642,7 +642,7 @@ function BookingPage() {
                 </div>
                 <p className="text-xs text-mist-dim mt-1">
                   Pilih waktu penjemputan. Sesuaikan dengan tombol panah setiap {DRIVER_POLICY.pickupTimeStepMinutes} menit,
-                  atau ketik langsung (contoh: 7:30 AM).
+                  atau ketik langsung (contoh: 7:15 AM).
                 </p>
                 {isValidPickupTime(pickupTime) &&
                   (calcLatePickupFee(pickupTime) > 0 ? (

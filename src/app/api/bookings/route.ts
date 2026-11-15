@@ -10,7 +10,7 @@ import { notifyCustomerNewBooking, notifyAdminNewOrder } from '@/lib/whatsapp';
 import {
   getFleetBySlug,
   getTransferPrice,
-  getPickupTimeOptions,
+  isValidPickupTime,
   formatTime12h,
   getCarRentalBasePrice,
   calcCarRentalTotal,
@@ -111,10 +111,10 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
-      // Jam penjemputan harus kelipatan 30 menit (00:00–23:30) — sumber kebenaran biaya surcharge
-      if (!getPickupTimeOptions().includes(pickupTimeText)) {
+      // Jam penjemputan bebas menit, cukup valid 00:00–23:59 — sumber kebenaran biaya surcharge
+      if (!isValidPickupTime(pickupTimeText)) {
         return NextResponse.json(
-          { success: false, error: 'Jam penjemputan tidak valid. Gunakan kelipatan 30 menit (00:00–23:30).' },
+          { success: false, error: 'Jam penjemputan tidak valid. Gunakan format 12 jam, misalnya 7:15 AM.' },
           { status: 400 }
         );
       }

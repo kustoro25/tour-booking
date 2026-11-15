@@ -336,15 +336,9 @@ export const DRIVER_POLICY = {
   driverAccommodation: 350000, // minimal Rp 350.000 / malam jika menginap di luar kota
 } as const;
 
-/** Semua opsi jam penjemputan: 00:00–23:30, per 30 menit. */
-export function getPickupTimeOptions(): string[] {
-  const options: string[] = [];
-  for (let h = 0; h <= 23; h++) {
-    for (const m of [0, 30]) {
-      options.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
-    }
-  }
-  return options;
+/** Benar bila jam berformat "HH:MM" 24 jam (00:00–23:59). */
+export function isValidPickupTime(value: string): boolean {
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 }
 
 /** Benar bila jam penjemputan di luar jendela tarif normal (07.00–23.00). */
@@ -356,7 +350,7 @@ export function isLatePickup(pickupTime: string): boolean {
 /** Biaya tambahan jam penjemputan di luar 07.00–23.00 (flat per mobil). */
 export function calcLatePickupFee(pickupTime: string): number {
   // Abaikan ketikan yang belum lengkap/invalid agar biaya tidak muncul saat mengetik
-  if (!/^([01]\d|2[0-3]):(00|30)$/.test(pickupTime)) return 0;
+  if (!isValidPickupTime(pickupTime)) return 0;
   return isLatePickup(pickupTime) ? DRIVER_POLICY.latePickupFee : 0;
 }
 
@@ -376,8 +370,8 @@ export function formatPickupWindow12h(): string {
 }
 
 /**
- * Normalisasi ketikan jam menjadi "HH:MM" 24 jam kelipatan 30 menit.
- * Menerima "7:30 AM", "6.30 pm", "0730", "18:00". Null bila tidak valid.
+ * Normalisasi ketikan jam menjadi "HH:MM" 24 jam (menit bebas, tidak dibulatkan).
+ * Menerima "7:15 AM", "6.30 pm", "0715", "18:45". Null bila tidak valid.
  */
 export function normalizePickupTime(raw: string): string | null {
   const trimmed = raw.trim();
@@ -411,8 +405,7 @@ export function normalizePickupTime(raw: string): string | null {
   } else if (hour > 23) {
     return null;
   }
-  const roundedMinute = minute >= 30 ? 30 : 0;
-  return `${String(hour).padStart(2, '0')}:${String(roundedMinute).padStart(2, '0')}`;
+  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 }
 
 // ----------------------------------------------------------------------------
