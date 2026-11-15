@@ -19,7 +19,13 @@ export async function GET(request: NextRequest) {
       include: { tour: { select: { name: true, category: true } } },
     });
 
-    return NextResponse.json({ success: true, data: bookings, total: bookings.length });
+    // Total sesungguhnya (bukan panjang hasil terbatas) — dipakai statistik dashboard
+    const [total, pendingTotal] = await Promise.all([
+      prisma.order.count({ where }),
+      prisma.order.count({ where: { ...where, status: 'PENDING' } }),
+    ]);
+
+    return NextResponse.json({ success: true, data: bookings, total, pendingTotal });
   } catch (error: unknown) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });

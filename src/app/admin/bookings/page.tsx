@@ -83,13 +83,18 @@ export default function AdminBookingsPage() {
 
   const handleStatusUpdate = async (id: string, newStatus: string) => {
     try {
-      await fetch(`/api/admin/bookings/${id}`, {
+      const res = await fetch(`/api/admin/bookings/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
-      fetchBookings();
-      showToast('Status booking diperbarui', 'success');
+      const data = await res.json();
+      if (data.success) {
+        fetchBookings();
+        showToast('Status booking diperbarui', 'success');
+      } else {
+        showToast(data.error || 'Gagal memperbarui status', 'error');
+      }
     } catch (err) {
       console.error(err);
       showToast('Gagal memperbarui status', 'error');

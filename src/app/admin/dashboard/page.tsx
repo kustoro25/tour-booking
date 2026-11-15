@@ -25,6 +25,21 @@ interface DashboardStats {
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [forbidden, setForbidden] = useState(false);
+
+  useEffect(() => {
+    // Middleware mengarahkan akses terlarang ke /admin/dashboard?error=forbidden
+    // Defer via setTimeout agar setState tidak dipanggil sinkron di body effect
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('error') === 'forbidden') {
+        setForbidden(true);
+        // Bersihkan query param tanpa reload penuh
+        window.history.replaceState(null, '', '/admin/dashboard');
+      }
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const fetchDashboardData = async (): Promise<DashboardStats | null> => {
     try {
@@ -48,7 +63,7 @@ export default function AdminDashboardPage() {
       return {
         totalBookings: bookings.total || allBookings.length,
         totalRevenue,
-        pendingBookings: allBookings.filter((b: { status: string }) => b.status === 'PENDING').length,
+        pendingBookings: typeof bookings.pendingTotal === 'number' ? bookings.pendingTotal : allBookings.filter((b: { status: string }) => b.status === 'PENDING').length,
         totalTours: tours.total || tours.data?.length || 0,
         totalReviews: reviews.total || reviews.data?.length || 0,
         totalSubscribers: newsletter.total || 0,
@@ -93,6 +108,13 @@ export default function AdminDashboardPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
+
+      {forbidden && (
+        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-start gap-2">
+          <span>🚫</span>
+          <p>Anda tidak memiliki izin untuk mengakses halaman tersebut.</p>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
