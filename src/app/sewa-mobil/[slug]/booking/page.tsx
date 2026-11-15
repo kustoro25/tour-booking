@@ -640,10 +640,7 @@ function BookingPage() {
                     </button>
                   </div>
                 </div>
-                <p className="text-xs text-mist-dim mt-1">
-                  Pilih waktu penjemputan. Sesuaikan dengan tombol panah setiap {DRIVER_POLICY.pickupTimeStepMinutes} menit,
-                  atau ketik langsung (contoh: 7:15 AM).
-                </p>
+                <p className="text-xs text-mist-dim mt-1">Pilih waktu penjemputan.</p>
                 {isValidPickupTime(pickupTime) &&
                   (calcLatePickupFee(pickupTime) > 0 ? (
                     <p className="text-xs text-gold-300 mt-1">
