@@ -31,9 +31,7 @@ const INCLUDED_COMMON = [
   'Supir profesional berbahasa Indonesia & Inggris',
   'Bahan bakar (BBM) tanpa batasan jarak tempuh',
   'Air mineral dingin selama perjalanan',
-  'Penjemputan gratis di area standar',
   'Kendaraan bersih, wangi, dan rutin diservis',
-  'Pajak & asuransi kendaraan',
 ];
 
 const EXCLUDED_COMMON = [
