@@ -260,18 +260,14 @@ export default async function SewaMobilPage() {
               <li className="flex items-start gap-2">
                 <span className="text-gold-400 mt-0.5">•</span>
                 Pukul <strong>{DRIVER_POLICY.workStart}</strong> hingga{' '}
-                <strong>{DRIVER_POLICY.workEnd}</strong> (maksimum).
+                <strong>{DRIVER_POLICY.workEnd}</strong> WITA.
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-gold-400 mt-0.5">•</span>
-                Tarif berlaku jika Anda dijemput selama jam kerja kami ({DRIVER_POLICY.normalPickupStart} hingga{' '}
-                {DRIVER_POLICY.normalPickupEnd}). Di luar jam kerja tersebut, dikenakan biaya tambahan sebesar{' '}
-                <strong>{formatCurrency(DRIVER_POLICY.latePickupFee)}</strong> / mobil, tanpa memandang modelnya.
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-gold-400 mt-0.5">•</span>
-                Biaya tambahan jam kerja setelah pukul {DRIVER_POLICY.workEnd} (tengah malam) adalah{' '}
-                <strong>{formatCurrency(DRIVER_POLICY.midnightHourlyFee)}</strong> / jam.
+                Penjemputan pukul {DRIVER_POLICY.normalPickupStart}–{DRIVER_POLICY.normalPickupEnd} tanpa biaya tambahan. Di
+                luar jam tersebut (termasuk dini hari 00.00–04.00), dikenakan biaya tambahan sebesar{' '}
+                <strong>{formatCurrency(DRIVER_POLICY.latePickupFee)}</strong> / mobil — sekali per penjemputan, bukan per
+                jam.
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-gold-400 mt-0.5">•</span>

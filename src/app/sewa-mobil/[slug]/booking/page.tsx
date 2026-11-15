@@ -12,11 +12,11 @@ import {
   TRANSFER_MAX_PAX,
   DRIVER_POLICY,
   WA_NUMBER,
-  getPickupTimeOptions,
   getTransferPrice,
   getCarRentalBasePrice,
   calcCarRentalTotal,
   calcLatePickupFee,
+  normalizePickupTime,
   waBookingLink,
 } from '@/lib/haybali';
 import Button from '@/components/ui/Button';
@@ -186,6 +186,23 @@ function BookingPage() {
     });
   };
 
+  // Jam penjemputan valid: "HH:MM" kelipatan 30 menit (00:00–23:30)
+  const isValidPickupTime = (value: string) => /^([01]\d|2[0-3]):(00|30)$/.test(value);
+
+  const stepPickupTime = (deltaMinutes: number) => {
+    // Saat masih kosong, tombol panah memulai dari awal jam normal (07:00)
+    if (!isValidPickupTime(pickupTime)) {
+      setPickupTime(DRIVER_POLICY.normalPickupStart);
+      clearError('pickupTime');
+      return;
+    }
+    const [hour, minute] = pickupTime.split(':').map(Number);
+    const total = (hour * 60 + minute + deltaMinutes + 24 * 60) % (24 * 60);
+    const next = `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+    setPickupTime(next);
+    clearError('pickupTime');
+  };
+
   const handleDateSelect = async (date: string) => {
     setSelectedDate(date);
     setErrors({});
@@ -211,7 +228,7 @@ function BookingPage() {
   const validateStep1 = () => {
     const errs: Record<string, string> = {};
     if (!selectedDate) errs.date = 'Silakan pilih tanggal keberangkatan';
-    if (isCarRental && !pickupTime) errs.pickupTime = 'Pilih jam penjemputan';
+    if (isCarRental && !isValidPickupTime(pickupTime)) errs.pickupTime = 'Jam penjemputan wajib diisi (kelipatan 30 menit)';
     if (isTransfer && !transferArea) errs.transferArea = 'Pilih area / tujuan';
     return errs;
   };
@@ -581,27 +598,62 @@ function BookingPage() {
 
               <div>
                 <label className="block text-sm font-medium text-mist mb-1">Jam Penjemputan</label>
-                <select
-                  value={pickupTime}
-                  onChange={(e) => setPickupTime(e.target.value)}
-                  className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
-                >
-                  <option value="">— Pilih jam penjemputan —</option>
-                  {getPickupTimeOptions().map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                      {calcLatePickupFee(t) > 0 ? ` (+${formatCurrency(DRIVER_POLICY.latePickupFee)})` : ''}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={pickupTime}
+                    onChange={(e) => {
+                      setPickupTime(e.target.value);
+                      clearError('pickupTime');
+                    }}
+                    onBlur={() => {
+                      const normalized = normalizePickupTime(pickupTime);
+                      if (normalized) setPickupTime(normalized);
+                    }}
+                    placeholder="07:00"
+                    aria-label="Jam penjemputan"
+                    className="w-full h-11 pl-4 pr-14 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
+                  />
+                  <div className="absolute right-1.5 top-1.5 bottom-1.5 flex w-8 flex-col overflow-hidden rounded-lg border border-ink-600 bg-ink-800">
+                    <button
+                      type="button"
+                      onClick={() => stepPickupTime(DRIVER_POLICY.pickupTimeStepMinutes)}
+                      aria-label={`Tambah ${DRIVER_POLICY.pickupTimeStepMinutes} menit`}
+                      className="flex-1 flex items-center justify-center text-[10px] leading-none text-mist hover:bg-ink-700 active:bg-ink-600"
+                    >
+                      ▲
+                    </button>
+                    <span className="h-px bg-ink-600" />
+                    <button
+                      type="button"
+                      onClick={() => stepPickupTime(-DRIVER_POLICY.pickupTimeStepMinutes)}
+                      aria-label={`Kurangi ${DRIVER_POLICY.pickupTimeStepMinutes} menit`}
+                      className="flex-1 flex items-center justify-center text-[10px] leading-none text-mist hover:bg-ink-700 active:bg-ink-600"
+                    >
+                      ▼
+                    </button>
+                  </div>
+                </div>
                 <p className="text-xs text-mist-dim mt-1">
-                  Tarif normal berlaku untuk penjemputan {DRIVER_POLICY.normalPickupStart}–{DRIVER_POLICY.normalPickupEnd}.
+                  Ketik jam (mis. 0730) atau pakai tombol ▲▼ — kelipatan {DRIVER_POLICY.pickupTimeStepMinutes} menit.
                 </p>
+                {isValidPickupTime(pickupTime) &&
+                  (calcLatePickupFee(pickupTime) > 0 ? (
+                    <p className="text-xs text-gold-300 mt-1">
+                      Di luar {DRIVER_POLICY.normalPickupStart}–{DRIVER_POLICY.normalPickupEnd} WITA: +
+                      {formatCurrency(DRIVER_POLICY.latePickupFee)} (sekali per mobil).
+                    </p>
+                  ) : (
+                    <p className="text-xs text-green-300 mt-1">
+                      Tanpa biaya tambahan ({DRIVER_POLICY.normalPickupStart}–{DRIVER_POLICY.normalPickupEnd} WITA).
+                    </p>
+                  ))}
                 {errors.pickupTime && <p className="text-red-500 text-sm mt-1">{errors.pickupTime}</p>}
               </div>
 
               {/* Rincian harga sewa mobil — area tujuan diisi pada langkah "Isi Data" */}
-              {pickupTime && (
+              {isValidPickupTime(pickupTime) && (
                 <div className="bg-gold-400/10 border border-gold-500/20 rounded-xl p-4 space-y-1.5 text-sm">
                   <div className="flex justify-between">
                     <span className="text-mist">Harga Armada ({rentalDuration} Jam)</span>

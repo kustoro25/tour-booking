@@ -328,10 +328,10 @@ export default async function FleetDetailPage({ params }: PageProps) {
             <ul className="space-y-2 text-sm text-mist leading-relaxed">
               <li>• Jam kerja {DRIVER_POLICY.workStart}–{DRIVER_POLICY.workEnd} WITA.</li>
               <li>
-                • Penjemputan normal {DRIVER_POLICY.normalPickupStart}–{DRIVER_POLICY.normalPickupEnd}; di luar jam
-                tersebut +{formatCurrency(DRIVER_POLICY.latePickupFee)}/mobil.
+                • Penjemputan {DRIVER_POLICY.normalPickupStart}–{DRIVER_POLICY.normalPickupEnd} tanpa biaya tambahan. Di
+                luar jam tersebut (termasuk dini hari 00.00–04.00) +{formatCurrency(DRIVER_POLICY.latePickupFee)}/mobil,
+                sekali per penjemputan — bukan per jam.
               </li>
-              <li>• Lewat tengah malam +{formatCurrency(DRIVER_POLICY.midnightHourlyFee)}/jam.</li>
               <li>• Menginap di luar kota mulai {formatCurrency(DRIVER_POLICY.driverAccommodation)}/malam.</li>
               <li>• Bila pembatalan dilakukan kurang dari 3 jam sebelum pemberangkatan, mohon dimaklumi bahwa DP yang telah dibayarkan tidak dapat dikembalikan karena jadwal &amp; pengemudi telah kami kunci untuk Anda.</li>
             </ul>

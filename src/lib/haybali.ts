@@ -328,30 +328,66 @@ export const PICKUP_ZONES = [
 
 export const DRIVER_POLICY = {
   workStart: '07:00',
-  workEnd: '23:59', // maksimum
+  workEnd: '23:00', // jam kerja pengemudi WITA
   normalPickupStart: '07:00',
-  normalPickupEnd: '10:30', // tarif normal jika dijemput 07.00–10.30
-  latePickupFee: 50000, // di luar jam tarif normal: +Rp 50.000 / mobil
-  midnightHourlyFee: 150000, // lewat 23.59 (tengah malam): +Rp 150.000 / jam
+  normalPickupEnd: '23:00', // tarif normal bila dijemput 07.00–23.00
+  latePickupFee: 50000, // penjemputan di luar 07.00–23.00: +Rp 50.000 / mobil (sekali)
+  pickupTimeStepMinutes: 30, // jam penjemputan dipilih per 30 menit
   driverAccommodation: 350000, // minimal Rp 350.000 / malam jika menginap di luar kota
 } as const;
 
-/** Opsi jam penjemputan (setiap 30 menit, 07:00–23:30). */
+/** Semua opsi jam penjemputan: 00:00–23:30, per 30 menit. */
 export function getPickupTimeOptions(): string[] {
   const options: string[] = [];
-  for (let h = 7; h <= 23; h++) {
+  for (let h = 0; h <= 23; h++) {
     for (const m of [0, 30]) {
-      if (h === 23 && m === 30) break; // maksimal 23:30
       options.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
     }
   }
   return options;
 }
 
-/** Biaya tambahan jam penjemputan di luar tarif normal (07.00–10.30). */
+/** Benar bila jam penjemputan di luar jendela tarif normal (07.00–23.00). */
+export function isLatePickup(pickupTime: string): boolean {
+  if (!pickupTime) return false;
+  return pickupTime < DRIVER_POLICY.normalPickupStart || pickupTime > DRIVER_POLICY.normalPickupEnd;
+}
+
+/** Biaya tambahan jam penjemputan di luar 07.00–23.00 (flat per mobil). */
 export function calcLatePickupFee(pickupTime: string): number {
-  if (!pickupTime) return 0;
-  return pickupTime > DRIVER_POLICY.normalPickupEnd ? DRIVER_POLICY.latePickupFee : 0;
+  // Abaikan ketikan yang belum lengkap/invalid agar biaya tidak muncul saat mengetik
+  if (!/^([01]\d|2[0-3]):(00|30)$/.test(pickupTime)) return 0;
+  return isLatePickup(pickupTime) ? DRIVER_POLICY.latePickupFee : 0;
+}
+
+/**
+ * Normalisasi ketikan jam menjadi "HH:MM" kelipatan 30 menit.
+ * Menerima "7", "730", "07:30", "0730". Null bila tidak valid (jam > 23 / menit > 59).
+ */
+export function normalizePickupTime(raw: string): string | null {
+  const trimmed = raw.trim();
+  const withSeparator = trimmed.match(/^(\d{1,2})[:.](\d{1,2})$/);
+  const digits = trimmed.replace(/\D/g, '');
+  if (!withSeparator && !digits) return null;
+  let hour: number;
+  let minute: number;
+  if (withSeparator) {
+    hour = Number(withSeparator[1]);
+    minute = Number(withSeparator[2]);
+  } else if (digits.length <= 2) {
+    hour = Number(digits);
+    minute = 0;
+  } else if (digits.length === 3) {
+    hour = Number(digits.slice(0, 1));
+    minute = Number(digits.slice(1));
+  } else {
+    hour = Number(digits.slice(0, 2));
+    minute = Number(digits.slice(2, 4));
+  }
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return null;
+  if (hour > 23 || minute > 59) return null;
+  const roundedMinute = minute >= 30 ? 30 : 0;
+  return `${String(hour).padStart(2, '0')}:${String(roundedMinute).padStart(2, '0')}`;
 }
 
 // ----------------------------------------------------------------------------

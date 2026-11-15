@@ -10,6 +10,7 @@ import { notifyCustomerNewBooking, notifyAdminNewOrder } from '@/lib/whatsapp';
 import {
   getFleetBySlug,
   getTransferPrice,
+  getPickupTimeOptions,
   getCarRentalBasePrice,
   calcCarRentalTotal,
   TRANSFER_MAX_PAX,
@@ -102,9 +103,17 @@ export async function POST(request: NextRequest) {
       // Zona penjemputan & area tujuan diketik manual oleh tamu.
       const pickupZoneText = String(pickupArea || '').trim();
       const destinationText = String(dropoffArea || '').trim();
-      if (pickupZoneText.length < 3 || destinationText.length < 3 || !pickupTime) {
+      const pickupTimeText = String(pickupTime || '').trim();
+      if (pickupZoneText.length < 3 || destinationText.length < 3 || !pickupTimeText) {
         return NextResponse.json(
           { success: false, error: 'Zona penjemputan, jam penjemputan, dan area tujuan wajib diisi' },
+          { status: 400 }
+        );
+      }
+      // Jam penjemputan harus kelipatan 30 menit (00:00–23:30) — sumber kebenaran biaya surcharge
+      if (!getPickupTimeOptions().includes(pickupTimeText)) {
+        return NextResponse.json(
+          { success: false, error: 'Jam penjemputan tidak valid. Gunakan kelipatan 30 menit (00:00–23:30).' },
           { status: 400 }
         );
       }
@@ -122,7 +131,7 @@ export async function POST(request: NextRequest) {
       // Biaya area tujuan tidak ikut dihitung — hanya informasi untuk admin.
       const quote = calcCarRentalTotal(
         getCarRentalBasePrice(tour.slug, rentalDuration),
-        String(pickupTime)
+        pickupTimeText
       );
       serviceTotal = quote.total;
       serviceSurcharge = quote.latePickupFee;

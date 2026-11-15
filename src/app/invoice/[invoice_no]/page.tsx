@@ -693,7 +693,7 @@ function CustomInvoice({
                 {/* Biaya jam penjemputan di luar tarif normal */}
                 {extrasLateFee > 0 && (
                   <div className="flex justify-between items-center py-2 text-sm">
-                    <span className="text-gray-600">Biaya Jam Penjemputan (setelah 10:30)</span>
+                    <span className="text-gray-600">Biaya Jam Penjemputan (di luar 07.00–23.00)</span>
                     <span className="font-medium text-gray-800">{formatCurrency(extrasLateFee)}</span>
                   </div>
                 )}
