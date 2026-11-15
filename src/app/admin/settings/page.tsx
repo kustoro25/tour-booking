@@ -229,7 +229,7 @@ export default function AdminSettingsPage() {
                 onChange={(url) => setForm({ ...form, companyIcon: url })}
                 label=""
                 folder="tour-booking/brand"
-                placeholder="JN (teks) atau upload logo"
+                placeholder="HB (teks) atau upload logo"
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

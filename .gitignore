@@ -49,5 +49,8 @@ test-step*.png
 snap-test-*.png
 walkthrough-step*.png
 
+# input sementara untuk scripts/generate-logo-assets.mjs
+/tmp-logo/
+
 .vercel
 .env*

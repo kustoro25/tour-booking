@@ -2,13 +2,15 @@
 // - public/images/haybali/logo-haybali.png  (logo lengkap, background transparan)
 // - public/images/haybali/logo-mark.png     (emblem H + mobil, untuk ikon brand)
 // - favicon & apple-touch-icon turunan emblem
-// Jalankan: node scripts/generate-logo-assets.mjs
-// Prasyarat: simpan file logo sumber (JPG/PNG background putih) di tmp-logo/logo-src.jpg
+// Jalankan: node scripts/generate-logo-assets.mjs [logo-sumber] [--brand-only]
+// Tanpa argumen: logo sumber dibaca dari tmp-logo/logo-src.jpg (JPG/PNG background putih).
+// --brand-only: hanya logo-haybali.png & logo-mark.png (favicon set dibiarkan apa adanya).
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
-const SRC = 'tmp-logo/logo-src.jpg';
+const BRAND_ONLY = process.argv.includes('--brand-only');
+const SRC = process.argv.slice(2).find((arg) => !arg.startsWith('--')) || 'tmp-logo/logo-src.jpg';
 const OUT_DIR = 'public/images/haybali';
 const WHITE_MIN = 232; // ambang "putih" yang dianggap background
 
@@ -183,7 +185,7 @@ const markBuf = await sharp(mark)
   .toBuffer();
 fs.writeFileSync(path.join(OUT_DIR, 'logo-mark.png'), markBuf);
 
-// Turunan ikon situs
+// Turunan ikon situs (dilewati saat --brand-only supaya favicon set dari desainer tetap utuh)
 const targets = [
   { file: 'public/favicon-32x32.png', size: 32 },
   { file: 'public/favicon-16x16.png', size: 16 },
@@ -192,22 +194,24 @@ const targets = [
   { file: 'public/android-chrome-512x512.png', size: 512 },
 ];
 const icoSizes = {};
-for (const t of targets) {
-  // Selalu dari emblem resolusi penuh agar ikon 512 tidak ikut ter-upscale.
-  const buf = await sharp(mark)
-    .resize(t.size, t.size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-    .png({ compressionLevel: 9, palette: true, colours: 128 })
-    .toBuffer();
-  fs.writeFileSync(t.file, buf);
-  if (t.size === 16 || t.size === 32) icoSizes[t.size] = buf;
+if (!BRAND_ONLY) {
+  for (const t of targets) {
+    // Selalu dari emblem resolusi penuh agar ikon 512 tidak ikut ter-upscale.
+    const buf = await sharp(mark)
+      .resize(t.size, t.size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png({ compressionLevel: 9, palette: true, colours: 128 })
+      .toBuffer();
+    fs.writeFileSync(t.file, buf);
+    if (t.size === 16 || t.size === 32) icoSizes[t.size] = buf;
+  }
+  fs.writeFileSync(
+    'src/app/favicon.ico',
+    buildIco([
+      { size: 16, png: icoSizes[16] },
+      { size: 32, png: icoSizes[32] },
+    ])
+  );
 }
-fs.writeFileSync(
-  'src/app/favicon.ico',
-  buildIco([
-    { size: 16, png: icoSizes[16] },
-    { size: 32, png: icoSizes[32] },
-  ])
-);
 
 // Pratinjau untuk pemeriksaan visual (logo di atas latar gelap situs)
 const previewTile = 64;
