@@ -17,7 +17,6 @@ import {
   calcCarRentalTotal,
   calcLatePickupFee,
   isValidPickupTime,
-  normalizePickupTime,
   formatTime12h,
   formatPickupWindow12h,
   waBookingLink,
@@ -51,6 +50,16 @@ type PaymentType = 'FULL' | 'INSTALLMENT';
 
 // Layanan khusus HAYBALI TRANS (sewa mobil & antar-jemput bandara)
 type Direction = 'PICKUP' | 'DROP';
+
+// Slot jam penjemputan per 30 menit (00:00–23:30) dalam format kanonik "HH:MM".
+// Ditampilkan sebagai dropdown 12 jam agar tidak ada input bebas yang salah ketik.
+const PICKUP_TIME_SLOTS = Array.from(
+  { length: (24 * 60) / DRIVER_POLICY.pickupTimeStepMinutes },
+  (_, i) => {
+    const total = i * DRIVER_POLICY.pickupTimeStepMinutes;
+    return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+  }
+);
 
 export default function BookingPageWrapper() {
   return (
@@ -104,7 +113,6 @@ function BookingPage() {
 
   // --- State layanan khusus HAYBALI TRANS ---
   const [pickupTime, setPickupTime] = useState(''); // nilai kanonik "HH:MM" (24 jam) untuk harga & API
-  const [pickupTimeText, setPickupTimeText] = useState(''); // tampilan 12 jam, mis. "7:30 AM"
   const [pickupZone, setPickupZone] = useState('');
   const [destinationArea, setDestinationArea] = useState(''); // area tujuan (diketik manual, biaya info saja)
   const [rentalDuration, setRentalDuration] = useState<'6' | '12'>('12'); // durasi sewa mobil
@@ -188,24 +196,6 @@ function BookingPage() {
       delete next[field];
       return next;
     });
-  };
-
-  // Jam penjemputan valid: "HH:MM" 24 jam, menit bebas (00:00–23:59)
-
-  const stepPickupTime = (deltaMinutes: number) => {
-    // Saat masih kosong, tombol panah memulai dari awal jam normal (07:00)
-    if (!isValidPickupTime(pickupTime)) {
-      setPickupTime(DRIVER_POLICY.normalPickupStart);
-      setPickupTimeText(formatTime12h(DRIVER_POLICY.normalPickupStart));
-      clearError('pickupTime');
-      return;
-    }
-    const [hour, minute] = pickupTime.split(':').map(Number);
-    const total = (hour * 60 + minute + deltaMinutes + 24 * 60) % (24 * 60);
-    const next = `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
-    setPickupTime(next);
-    setPickupTimeText(formatTime12h(next));
-    clearError('pickupTime');
   };
 
   const handleDateSelect = async (date: string) => {
@@ -603,43 +593,20 @@ function BookingPage() {
 
               <div>
                 <label className="block text-sm font-medium text-mist mb-1">Jam Penjemputan</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={pickupTimeText}
-                    onChange={(e) => {
-                      const raw = e.target.value;
-                      setPickupTimeText(raw);
-                      setPickupTime(normalizePickupTime(raw) ?? '');
-                      clearError('pickupTime');
-                    }}
-                    onBlur={() => {
-                      if (isValidPickupTime(pickupTime)) setPickupTimeText(formatTime12h(pickupTime));
-                    }}
-                    placeholder="7:00 AM"
-                    aria-label="Jam penjemputan"
-                    className="w-full h-11 pl-4 pr-14 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
-                  />
-                  <div className="absolute right-1.5 top-1.5 bottom-1.5 flex w-8 flex-col overflow-hidden rounded-lg border border-ink-600 bg-ink-800">
-                    <button
-                      type="button"
-                      onClick={() => stepPickupTime(DRIVER_POLICY.pickupTimeStepMinutes)}
-                      aria-label={`Tambah ${DRIVER_POLICY.pickupTimeStepMinutes} menit`}
-                      className="flex-1 flex items-center justify-center text-[10px] leading-none text-mist hover:bg-ink-700 active:bg-ink-600"
-                    >
-                      ▲
-                    </button>
-                    <span className="h-px bg-ink-600" />
-                    <button
-                      type="button"
-                      onClick={() => stepPickupTime(-DRIVER_POLICY.pickupTimeStepMinutes)}
-                      aria-label={`Kurangi ${DRIVER_POLICY.pickupTimeStepMinutes} menit`}
-                      className="flex-1 flex items-center justify-center text-[10px] leading-none text-mist hover:bg-ink-700 active:bg-ink-600"
-                    >
-                      ▼
-                    </button>
-                  </div>
-                </div>
+                <select
+                  value={pickupTime}
+                  onChange={(e) => {
+                    setPickupTime(e.target.value);
+                    clearError('pickupTime');
+                  }}
+                  aria-label="Jam penjemputan"
+                  className="w-full h-11 pl-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
+                >
+                  <option value="" disabled>— Pilih jam penjemputan —</option>
+                  {PICKUP_TIME_SLOTS.map((t) => (
+                    <option key={t} value={t}>{formatTime12h(t)} WITA</option>
+                  ))}
+                </select>
                 <p className="text-xs text-mist-dim mt-1">Pilih waktu penjemputan.</p>
                 {isValidPickupTime(pickupTime) &&
                   (calcLatePickupFee(pickupTime) > 0 ? (
