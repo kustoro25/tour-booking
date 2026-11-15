@@ -95,29 +95,40 @@ export default async function HomePage() {
       {/* ================= KEUNGGULAN ================= */}
       <section className="py-16 sm:py-20 bg-ink-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          {/* Sambutan HAYBALI TRANS — di atas tulisan "Mengapa Memilih Kami?" */}
+          {/* ABOUT HAYBALI TRANS — di atas tulisan "Mengapa Memilih Kami?" */}
           <div className="max-w-3xl mx-auto text-center mb-12">
+            <span className="inline-block text-gold-300 text-sm font-semibold tracking-wide uppercase mb-3">
+              About HAYBALI TRANS
+            </span>
             <h2 className="text-2xl sm:text-3xl font-bold text-ivory mb-3">
-              Selamat datang di {HAYBALI_BRAND}
+              Your Trusted Travel Partner in Bali
             </h2>
-            <p className="text-mist leading-relaxed mb-4">
-              Nikmati perjalanan bebas khawatir ke mana saja di Bali selama{' '}
-              <strong>12 jam full</strong>, sudah include bahan bakar dan mineral water{' '}
-              <strong>tanpa batasan jarak tempuh</strong>!
+            <p className="text-gold-200/90 mb-6">
+              Explore Bali with Comfort, Safety &amp; Exceptional Service.
             </p>
-            <div className="bg-gold-400/10 border border-gold-500/30 rounded-xl p-4 text-sm text-gold-200 text-left">
-              <p className="font-semibold mb-1">Catatan:</p>
+            <div className="text-mist leading-relaxed space-y-4">
               <p>
-                Pemesanan memerlukan <strong>deposit 50%</strong> terlebih dahulu untuk mengamankan
-                jadwal &amp; pengemudi Anda. Pelunasan sisa pembayaran dapat dilakukan tunai saat
-                bertemu dengan driver.
+                HAYBALI TRANS hadir untuk memberikan pengalaman perjalanan terbaik selama Anda
+                berada di Bali.
+              </p>
+              <p>
+                Kami menyediakan layanan transportasi pribadi dengan pilihan kendaraan yang
+                bersih, nyaman, dan terawat, didukung oleh pengemudi profesional, ramah,
+                berpengalaman, serta memahami berbagai destinasi wisata di Bali.
+              </p>
+              <p>
+                Baik untuk perjalanan wisata, liburan keluarga, antar-jemput bandara, maupun
+                perjalanan bisnis, kami berkomitmen memberikan pelayanan yang aman, tepat waktu,
+                dan menyenangkan.
+              </p>
+              <p>
+                Bagi kami, setiap perjalanan bukan sekadar menuju destinasi, tetapi menciptakan
+                pengalaman dan kenangan yang tak terlupakan.
+              </p>
+              <p className="text-gold-200 font-semibold">
+                HAYBALI TRANS — Your Comfort, Our Priority.
               </p>
             </div>
-            <p className="text-mist mt-4 leading-relaxed">
-              Jelajahi Bali dengan sopir pribadi berbahasa Inggris, kondisi mobil bagus dan bersih.
-              Dapatkan harga dan layanan terbaik dengan jarak tempuh tak terbatas untuk pergi ke
-              mana pun Anda mau.
-            </p>
           </div>
 
           <div className="text-center mb-12">
