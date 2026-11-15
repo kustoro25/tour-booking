@@ -126,13 +126,16 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
               {isImageIcon(info.brandIcon) ? (
-                <img src={info.brandIcon} alt={info.brandName || 'HAYBALI TRANS'} className="w-10 h-10 object-contain" />
+                // Logo gambar memuat tulisan brand di dalamnya, jadi teks di samping disembunyikan.
+                <img src={info.brandIcon} alt={info.brandName || 'HAYBALI TRANS'} className="h-12 w-auto object-contain" />
               ) : (
-                <div className="w-9 h-9 bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 rounded-xl flex items-center justify-center shadow-md shadow-gold-500/20">
-                  <span className="text-ink-950 font-bold text-sm">{(info.brandIcon || 'HB').substring(0, 2).toUpperCase()}</span>
-                </div>
+                <>
+                  <div className="w-9 h-9 bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 rounded-xl flex items-center justify-center shadow-md shadow-gold-500/20">
+                    <span className="text-ink-950 font-bold text-sm">{(info.brandIcon || 'HB').substring(0, 2).toUpperCase()}</span>
+                  </div>
+                  <span className="text-xl font-bold text-white">{info.brandName || 'HAYBALI TRANS'}</span>
+                </>
               )}
-              <span className="text-xl font-bold text-white">{info.brandName || 'HAYBALI TRANS'}</span>
             </div>
             <p className="text-mist-dim mb-4 max-w-md leading-relaxed">
               {cms.text || 'Mitra sewa mobil dan transportasi privat tepercaya di Bali. Mengutamakan keselamatan, kenyamanan, dan pelayanan VIP bagi seluruh pelanggan.'}

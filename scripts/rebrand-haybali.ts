@@ -15,7 +15,7 @@ async function updateSettings() {
   const settings: Record<string, string> = {
     company_name: JSON.stringify('HAYBALI TRANS'),
     site_title: JSON.stringify('HAYBALI TRANS — Sewa Mobil & Tour Bali'),
-    company_icon: JSON.stringify('/images/haybali/logo-mark-v2.png'),
+    company_icon: JSON.stringify('/images/haybali/logo-lockup.png'),
     company_email: JSON.stringify('info@haybalitrans.com'),
     company_phone: JSON.stringify('+6281234567890'),
     company_address: JSON.stringify('Denpasar / Kuta, Bali - Indonesia'),

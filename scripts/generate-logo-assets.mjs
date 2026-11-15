@@ -1,10 +1,10 @@
 // Script sekali pakai: ubah logo sumber (background putih) menjadi aset web:
-// - public/images/haybali/logo-haybali.png  (logo lengkap, background transparan)
-// - public/images/haybali/logo-mark.png     (emblem H + mobil, untuk ikon brand)
+// - public/images/haybali/logo-lockup.png (logo lengkap, background transparan)
+// - public/images/haybali/logo-emblem.png (emblem H + mobil, untuk ikon brand)
 // - favicon & apple-touch-icon turunan emblem
 // Jalankan: node scripts/generate-logo-assets.mjs [logo-sumber] [--brand-only]
 // Tanpa argumen: logo sumber dibaca dari tmp-logo/logo-src.jpg (JPG/PNG background putih).
-// --brand-only: hanya logo-haybali.png & logo-mark.png (favicon set dibiarkan apa adanya).
+// --brand-only: hanya logo-lockup.png & logo-emblem.png (favicon set dibiarkan apa adanya).
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
@@ -144,7 +144,7 @@ fs.mkdirSync(OUT_DIR, { recursive: true });
 await sharp(fullBuf)
   .resize({ height: 720, fit: 'inside', withoutEnlargement: true })
   .png({ compressionLevel: 9, palette: true, colours: 200 })
-  .toFile(path.join(OUT_DIR, 'logo-haybali.png'));
+  .toFile(path.join(OUT_DIR, 'logo-lockup.png'));
 
 // Emblem (bagian atas: lingkaran H + mobil). Batas bawah dicari dari baris
 // yang sepenuhnya transparan di bawah gambar mobil (celah sebelum teks).
@@ -183,7 +183,7 @@ const markBuf = await sharp(mark)
   .resize({ width: 256, height: 256, fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
   .png({ compressionLevel: 9, palette: true, colours: 128 })
   .toBuffer();
-fs.writeFileSync(path.join(OUT_DIR, 'logo-mark.png'), markBuf);
+fs.writeFileSync(path.join(OUT_DIR, 'logo-emblem.png'), markBuf);
 
 // Turunan ikon situs (dilewati saat --brand-only supaya favicon set dari desainer tetap utuh)
 const targets = [
@@ -226,5 +226,5 @@ await sharp({ create: { width: 360, height: 260, channels: 4, background: '#0b0b
   .png()
   .toFile('tmp-logo/preview.png');
 
-console.log('logo-haybali.png, logo-mark.png, favicon set, favicon.ico dibuat');
+console.log('logo-lockup.png, logo-emblem.png, favicon set, favicon.ico dibuat');
 console.log('emblem crop:', markBox.width + 'x' + markBox.height);

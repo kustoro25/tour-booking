@@ -55,19 +55,22 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
             {isLogoImage ? (
+              // Logo gambar memuat tulisan brand di dalamnya, jadi teks di samping disembunyikan.
               <img
                 src={brandIcon}
                 alt={brandName || 'HAYBALI TRANS'}
-                className="w-10 h-10 object-contain group-hover:scale-105 transition-transform duration-300"
+                className="h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
               />
             ) : (
-              <div className="w-9 h-9 bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 rounded-xl flex items-center justify-center shadow-md shadow-gold-500/30 group-hover:shadow-lg group-hover:shadow-gold-400/50 transition-shadow duration-300">
-                <BrandIcon icon={brandIcon} className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 shadow-md" />
-              </div>
+              <>
+                <div className="w-9 h-9 bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 rounded-xl flex items-center justify-center shadow-md shadow-gold-500/30 group-hover:shadow-lg group-hover:shadow-gold-400/50 transition-shadow duration-300">
+                  <BrandIcon icon={brandIcon} className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 shadow-md" />
+                </div>
+                <span className="text-base sm:text-xl font-bold text-ivory">
+                  <span className="gradient-text">{brandName || 'HAYBALI TRANS'}</span>
+                </span>
+              </>
             )}
-            <span className="text-base sm:text-xl font-bold text-ivory">
-              <span className="gradient-text">{brandName || 'HAYBALI TRANS'}</span>
-            </span>
           </Link>
 
           {/* Desktop Nav */}
