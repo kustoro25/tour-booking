@@ -37,7 +37,7 @@ export default function FloatingActions({ waNumber: initialWaNumber }: { waNumbe
   );
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="no-print fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
       {/* Scroll to Top Button */}
       <button
         type="button"

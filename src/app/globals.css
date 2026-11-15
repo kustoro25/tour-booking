@@ -320,10 +320,22 @@ img { image-rendering: auto; }
     color-adjust: exact !important;
   }
 
-  /* Hide site chrome — only show invoice */
-  body > *:not(.invoice-document),
+  /* Hide site chrome — only show invoice.
+     Catatan: konten halaman berada di dalam <main> (layout Next.js),
+     jadi yang disembunyikan hanya chrome situs, bukan seluruh anak <body>. */
   header, footer, nav, .no-print, .screen-only {
     display: none !important;
+  }
+
+  /* Netralkan wrapper layout agar invoice mulai dari atas kertas */
+  main {
+    display: block !important;
+    padding: 0 !important;
+  }
+  .invoice-page {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   /* Ensure invoice fills the page */

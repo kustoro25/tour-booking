@@ -253,7 +253,7 @@ export default async function InvoicePage({ params }: PageProps) {
 
   return (
     <>
-      <div className="max-w-[210mm] mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
+      <div className="invoice-page max-w-[210mm] mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
         <CustomInvoice
           order={order}
           companyName={companyName}

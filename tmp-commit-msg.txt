@@ -1,6 +1,10 @@
-style(invoice): rapikan tombol aksi invoice
+fix(invoice): perbaiki cetak invoice yang kosong
 
-- Grid 2 kolom rapi, ukuran tombol seragam (md), lebar konsisten
-- Tombol bayar online tampil penuh di atas sebagai aksi utama
-- Cetak / Simpan PDF jadi varian secondary (gelap), WhatsApp tetap emas
-- Butuh Bantuan? di tengah bawah dengan lebar wajar + ikon
+Penyebab: CSS print menyembunyikan semua anak <body> kecuali
+.invoice-document, padahal konten halaman berada di dalam <main>
+(layout Next.js) sehingga ikut tersembunyi dan hasil cetak kosong.
+
+- Print CSS kini hanya menyembunyikan chrome situs (header/footer/
+  nav/.no-print/.screen-only) dan menetralkan wrapper halaman
+- Tambah class invoice-page pada wrapper invoice & no-print pada
+  tombol mengambang agar tidak ikut tercetak
