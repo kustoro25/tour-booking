@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, type SyntheticEvent } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import {
@@ -127,6 +127,7 @@ function BookingPage() {
   const [pickupTime, setPickupTime] = useState(''); // nilai kanonik "HH:MM" (24 jam) untuk harga & API
   const [pickupTimeText, setPickupTimeText] = useState(''); // ketikan "H:MM"/"HH:MM" 12 jam (dibatasi)
   const [pickupPeriod, setPickupPeriod] = useState<'AM' | 'PM'>('AM'); // dropdown AM/PM
+  const [pickupSegment, setPickupSegment] = useState<'hour' | 'minute'>('hour'); // bagian yang disorot kursor
   const [pickupZone, setPickupZone] = useState('');
   const [destinationArea, setDestinationArea] = useState(''); // area tujuan (diketik manual, biaya info saja)
   const [rentalDuration, setRentalDuration] = useState<'6' | '12'>('12'); // durasi sewa mobil
@@ -232,6 +233,16 @@ function BookingPage() {
     const next = formatPickupDigits(digits);
     setPickupTimeText(next);
     applyPickupTime(next, pickupPeriod);
+    // Saat mengetik, kursor berada di akhir: ikuti bagian yang sedang diisi.
+    const colonIdx = next.indexOf(':');
+    setPickupSegment(colonIdx === -1 || next.length <= colonIdx ? 'hour' : 'minute');
+  };
+
+  // Ikuti posisi kursor: sebelum titik dua = jam, sesudahnya = menit.
+  const handlePickupCaret = (e: SyntheticEvent<HTMLInputElement>) => {
+    const pos = (e.target as HTMLInputElement).selectionStart ?? 0;
+    const colonIdx = pickupTimeText.indexOf(':');
+    setPickupSegment(colonIdx === -1 || pos <= colonIdx ? 'hour' : 'minute');
   };
 
   // Rapi-rapi saat fokus pindah: "7" → "07:00", "7:3" → "07:03"; kosongkan bila tak valid.
@@ -249,9 +260,10 @@ function BookingPage() {
     }
   };
 
-  // Tombol ▲▼ menaikkan/menurunkan jam; AM/PM ikut berganti saat melewati 12.
-  // Saat masih kosong, dimulai dari 07:00 AM (awal jam normal pengemudi).
-  const stepPickupHour = (delta: 1 | -1) => {
+  // Tombol ▲▼ mengubah bagian sesuai posisi kursor: jam naik/turun bila kursor
+  // di jam, menit naik/turun bila kursor di menit. AM/PM ikut berganti saat
+  // jam melewati 11↔12. Saat masih kosong, dimulai dari 07:00 AM.
+  const stepPickupSegment = (delta: 1 | -1) => {
     const m = /^(0?[1-9]|1[0-2])(?::([0-5]?\d))?$/.exec(pickupTimeText);
     if (!m) {
       setPickupTimeText('07:00');
@@ -259,18 +271,42 @@ function BookingPage() {
       applyPickupTime('07:00', 'AM');
       return;
     }
-    const hour = parseInt(m[1], 10);
-    const minute = m[2] ? parseInt(m[2], 10) : 0;
-    let next = hour + delta;
+    let hour = parseInt(m[1], 10);
+    let minute = m[2] ? parseInt(m[2], 10) : 0;
     let nextPeriod = pickupPeriod;
-    if (next > 12) {
-      next = 1;
-      nextPeriod = nextPeriod === 'AM' ? 'PM' : 'AM';
-    } else if (next < 1) {
-      next = 12;
-      nextPeriod = nextPeriod === 'AM' ? 'PM' : 'AM';
+
+    const stepHour = (dir: 1 | -1) => {
+      if (hour === 11 && dir === 1) {
+        hour = 12;
+        nextPeriod = nextPeriod === 'AM' ? 'PM' : 'AM';
+      } else if (hour === 12 && dir === -1) {
+        hour = 11;
+        nextPeriod = nextPeriod === 'AM' ? 'PM' : 'AM';
+      } else if (hour === 12 && dir === 1) {
+        hour = 1;
+      } else if (hour === 1 && dir === -1) {
+        hour = 12;
+      } else {
+        hour += dir;
+      }
+    };
+
+    if (pickupSegment === 'minute') {
+      // Menit melingkar 00–59; saat melingkar, jam ikut naik/turun.
+      if (minute === 59 && delta === 1) {
+        minute = 0;
+        stepHour(1);
+      } else if (minute === 0 && delta === -1) {
+        minute = 59;
+        stepHour(-1);
+      } else {
+        minute += delta;
+      }
+    } else {
+      stepHour(delta);
     }
-    const text = `${String(next).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+
+    const text = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
     setPickupTimeText(text);
     setPickupPeriod(nextPeriod);
     applyPickupTime(text, nextPeriod);
@@ -686,6 +722,10 @@ function BookingPage() {
                       value={pickupTimeText}
                       onChange={(e) => handlePickupTimeChange(e.target.value)}
                       onBlur={normalizePickupTimeOnBlur}
+                      onClick={handlePickupCaret}
+                      onFocus={handlePickupCaret}
+                      onKeyUp={handlePickupCaret}
+                      onSelect={handlePickupCaret}
                       placeholder="07:00"
                       aria-label="Jam penjemputan"
                       className="w-full h-11 px-4 pr-12 text-center border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
@@ -693,8 +733,8 @@ function BookingPage() {
                     <div className="absolute right-1.5 top-1.5 bottom-1.5 flex w-8 flex-col overflow-hidden rounded-lg border border-ink-600 bg-ink-800">
                       <button
                         type="button"
-                        onClick={() => stepPickupHour(1)}
-                        aria-label="Tambah 1 jam"
+                        onClick={() => stepPickupSegment(1)}
+                        aria-label={pickupSegment === 'minute' ? 'Tambah 1 menit' : 'Tambah 1 jam'}
                         className="flex-1 flex items-center justify-center text-[10px] leading-none text-mist hover:bg-ink-700 active:bg-ink-600"
                       >
                         ▲
@@ -702,8 +742,8 @@ function BookingPage() {
                       <span className="h-px bg-ink-600" />
                       <button
                         type="button"
-                        onClick={() => stepPickupHour(-1)}
-                        aria-label="Kurangi 1 jam"
+                        onClick={() => stepPickupSegment(-1)}
+                        aria-label={pickupSegment === 'minute' ? 'Kurangi 1 menit' : 'Kurangi 1 jam'}
                         className="flex-1 flex items-center justify-center text-[10px] leading-none text-mist hover:bg-ink-700 active:bg-ink-600"
                       >
                         ▼
