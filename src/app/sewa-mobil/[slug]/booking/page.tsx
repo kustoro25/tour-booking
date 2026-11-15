@@ -51,6 +51,28 @@ type PaymentType = 'FULL' | 'INSTALLMENT';
 // Layanan khusus HAYBALI TRANS (sewa mobil & antar-jemput bandara)
 type Direction = 'PICKUP' | 'DROP';
 
+// Format digit ketikan jam penjemputan: "730" → "7:30", "1230" → "12:30", "9" → "9".
+// Hanya digit valid yang dipertahankan; jam 01–12, menit diawali 0–5.
+function formatPickupDigits(digits: string): string {
+  if (!digits) return '';
+  const first = digits[0];
+  const minutePart = (from: number) => digits.slice(from, from + 2).replace(/^[6-9]/, '');
+  if (first === '0') {
+    if (digits.length === 1) return '0';
+    const second = digits[1];
+    if (second < '1' || second > '9') return '0'; // "00" ditolak
+    const mm = minutePart(2);
+    return `0${second}${mm ? `:${mm}` : ''}`;
+  }
+  if (first === '1' && digits.length > 1 && digits[1] <= '2') {
+    const mm = minutePart(2);
+    return `1${digits[1]}${mm ? `:${mm}` : ''}`;
+  }
+  // Jam satu digit (1–9): menit mengikuti setelah titik dua
+  const mm = minutePart(1);
+  return `${first}${mm ? `:${mm}` : ''}`;
+}
+
 export default function BookingPageWrapper() {
   return (
     <Suspense fallback={<div className="max-w-3xl mx-auto px-4 py-12"><Skeleton className="h-64 w-full rounded-xl" /></div>}>
@@ -103,8 +125,7 @@ function BookingPage() {
 
   // --- State layanan khusus HAYBALI TRANS ---
   const [pickupTime, setPickupTime] = useState(''); // nilai kanonik "HH:MM" (24 jam) untuk harga & API
-  const [pickupHour, setPickupHour] = useState(''); // ketikan manual jam 1–12 (dibatasi digit valid)
-  const [pickupMinute, setPickupMinute] = useState(''); // ketikan manual menit 00–59 (dibatasi digit valid)
+  const [pickupTimeText, setPickupTimeText] = useState(''); // ketikan "H:MM"/"HH:MM" 12 jam (dibatasi)
   const [pickupPeriod, setPickupPeriod] = useState<'AM' | 'PM'>('AM'); // dropdown AM/PM
   const [pickupZone, setPickupZone] = useState('');
   const [destinationArea, setDestinationArea] = useState(''); // area tujuan (diketik manual, biaya info saja)
@@ -191,73 +212,56 @@ function BookingPage() {
     });
   };
 
-  // Gabungkan bagian jam/menit/AM-PM menjadi "HH:MM" 24 jam; kosong bila belum lengkap.
-  const applyPickupParts = (h: string, m: string, p: 'AM' | 'PM') => {
+  // Gabungkan ketikan "H:MM"/"HH:MM" + periode menjadi "HH:MM" 24 jam; kosong bila belum lengkap.
+  const applyPickupTime = (display: string, period: 'AM' | 'PM') => {
     clearError('pickupTime');
-    const hourValid = /^(0?[1-9]|1[0-2])$/.test(h);
-    const minValid = /^([0-5]?\d)$/.test(m);
-    if (!hourValid || !minValid) {
+    const m = /^(0?[1-9]|1[0-2]):([0-5]\d)$/.exec(display);
+    if (!m) {
       setPickupTime('');
       return;
     }
-    const hNum = parseInt(h, 10);
-    const mNum = parseInt(m, 10);
-    const h24 = hNum === 12 ? (p === 'AM' ? 0 : 12) : (hNum % 12) + (p === 'PM' ? 12 : 0);
-    setPickupTime(`${String(h24).padStart(2, '0')}:${String(mNum).padStart(2, '0')}`);
+    const hour = parseInt(m[1], 10);
+    const minute = parseInt(m[2], 10);
+    const h24 = hour === 12 ? (period === 'AM' ? 0 : 12) : (hour % 12) + (period === 'PM' ? 12 : 0);
+    setPickupTime(`${String(h24).padStart(2, '0')}:${String(minute).padStart(2, '0')}`);
   };
 
-  // Ketikan jam dibatasi: hanya digit, maks 2 angka, hanya kombinasi 01–12.
-  const handlePickupHourChange = (raw: string) => {
-    let digits = raw.replace(/\D/g, '').slice(0, 2);
-    if (digits.length === 2) {
-      const [a, b] = digits;
-      const validPair = (a === '0' && b >= '1' && b <= '9') || (a === '1' && b >= '0' && b <= '2');
-      if (!validPair) digits = a; // kombinasi tak valid: hanya digit pertama yang dipertahankan
+  // Ketikan dibatasi: hanya digit; titik dua disisipkan otomatis ("730" → "7:30").
+  const handlePickupTimeChange = (raw: string) => {
+    const digits = raw.replace(/\D/g, '').slice(0, 4);
+    const next = formatPickupDigits(digits);
+    setPickupTimeText(next);
+    applyPickupTime(next, pickupPeriod);
+  };
+
+  // Rapi-rapi saat fokus pindah: "7" → "07:00", "7:3" → "07:03"; kosongkan bila tak valid.
+  const normalizePickupTimeOnBlur = () => {
+    const m = /^(0?[1-9]|1[0-2])(?::([0-5]?\d))?$/.exec(pickupTimeText);
+    let next = '';
+    if (m) {
+      const hour = String(parseInt(m[1], 10)).padStart(2, '0');
+      const minute = String(m[2] ? parseInt(m[2], 10) : 0).padStart(2, '0');
+      next = `${hour}:${minute}`;
     }
-    setPickupHour(digits);
-    applyPickupParts(digits, pickupMinute, pickupPeriod);
-  };
-
-  // Ketikan menit dibatasi: hanya digit, maks 2 angka, puluhan maks 5 (00–59).
-  const handlePickupMinuteChange = (raw: string) => {
-    let digits = raw.replace(/\D/g, '').slice(0, 2);
-    if (digits.length === 2 && digits[0] > '5') digits = digits[0]; // "75" → "7"
-    setPickupMinute(digits);
-    applyPickupParts(pickupHour, digits, pickupPeriod);
-  };
-
-  // Rapi-rapi saat fokus pindah: "7" → "07"; nilai di luar rentang dikosongkan.
-  const normalizeHourOnBlur = () => {
-    const num = parseInt(pickupHour, 10);
-    const next = Number.isInteger(num) && num >= 1 && num <= 12 ? String(num).padStart(2, '0') : '';
-    if (next !== pickupHour) {
-      setPickupHour(next);
-      applyPickupParts(next, pickupMinute, pickupPeriod);
-    }
-  };
-
-  const normalizeMinuteOnBlur = () => {
-    const num = parseInt(pickupMinute, 10);
-    const next = Number.isInteger(num) && num >= 0 && num <= 59 ? String(num).padStart(2, '0') : '';
-    if (next !== pickupMinute) {
-      setPickupMinute(next);
-      applyPickupParts(pickupHour, next, pickupPeriod);
+    if (next !== pickupTimeText) {
+      setPickupTimeText(next);
+      applyPickupTime(next, pickupPeriod);
     }
   };
 
   // Tombol ▲▼ menaikkan/menurunkan jam; AM/PM ikut berganti saat melewati 12.
   // Saat masih kosong, dimulai dari 07:00 AM (awal jam normal pengemudi).
   const stepPickupHour = (delta: 1 | -1) => {
-    const num = parseInt(pickupHour, 10);
-    if (!Number.isInteger(num) || num < 1 || num > 12) {
-      const m = pickupMinute || '00';
-      setPickupHour('07');
-      setPickupMinute(m);
+    const m = /^(0?[1-9]|1[0-2])(?::([0-5]?\d))?$/.exec(pickupTimeText);
+    if (!m) {
+      setPickupTimeText('07:00');
       setPickupPeriod('AM');
-      applyPickupParts('07', m, 'AM');
+      applyPickupTime('07:00', 'AM');
       return;
     }
-    let next = num + delta;
+    const hour = parseInt(m[1], 10);
+    const minute = m[2] ? parseInt(m[2], 10) : 0;
+    let next = hour + delta;
     let nextPeriod = pickupPeriod;
     if (next > 12) {
       next = 1;
@@ -266,15 +270,15 @@ function BookingPage() {
       next = 12;
       nextPeriod = nextPeriod === 'AM' ? 'PM' : 'AM';
     }
-    const h = String(next).padStart(2, '0');
-    setPickupHour(h);
+    const text = `${String(next).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+    setPickupTimeText(text);
     setPickupPeriod(nextPeriod);
-    applyPickupParts(h, pickupMinute, nextPeriod);
+    applyPickupTime(text, nextPeriod);
   };
 
   const handlePickupPeriodChange = (p: 'AM' | 'PM') => {
     setPickupPeriod(p);
-    applyPickupParts(pickupHour, pickupMinute, p);
+    applyPickupTime(pickupTimeText, p);
   };
 
   const handleDateSelect = async (date: string) => {
@@ -673,18 +677,18 @@ function BookingPage() {
               <div>
                 <label className="block text-sm font-medium text-mist mb-1">Jam Penjemputan</label>
                 <div className="flex items-center gap-2">
-                  {/* Jam — ketik manual 1–12 + tombol naik/turun */}
+                  {/* Jam & menit dalam satu kolom — ketik manual "H:MM"/"HH:MM" */}
                   <div className="relative flex-1">
                     <input
                       type="text"
                       inputMode="numeric"
-                      maxLength={2}
-                      value={pickupHour}
-                      onChange={(e) => handlePickupHourChange(e.target.value)}
-                      onBlur={normalizeHourOnBlur}
-                      placeholder="07"
-                      aria-label="Jam penjemputan (jam)"
-                      className="w-full h-11 px-3 pr-12 text-center border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
+                      maxLength={5}
+                      value={pickupTimeText}
+                      onChange={(e) => handlePickupTimeChange(e.target.value)}
+                      onBlur={normalizePickupTimeOnBlur}
+                      placeholder="07:00"
+                      aria-label="Jam penjemputan"
+                      className="w-full h-11 px-4 pr-12 text-center border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
                     />
                     <div className="absolute right-1.5 top-1.5 bottom-1.5 flex w-8 flex-col overflow-hidden rounded-lg border border-ink-600 bg-ink-800">
                       <button
@@ -706,25 +710,12 @@ function BookingPage() {
                       </button>
                     </div>
                   </div>
-                  <span className="text-mist-dim font-medium" aria-hidden="true">:</span>
-                  {/* Menit — ketik manual 00–59 */}
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={2}
-                    value={pickupMinute}
-                    onChange={(e) => handlePickupMinuteChange(e.target.value)}
-                    onBlur={normalizeMinuteOnBlur}
-                    placeholder="00"
-                    aria-label="Jam penjemputan (menit)"
-                    className="flex-1 h-11 px-3 text-center border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
-                  />
-                  {/* Periode AM/PM */}
+                  {/* Periode AM/PM — ruang chevron dijaga agar tidak menumpuk teks */}
                   <select
                     value={pickupPeriod}
                     onChange={(e) => handlePickupPeriodChange(e.target.value as 'AM' | 'PM')}
                     aria-label="Periode AM/PM"
-                    className="h-11 w-[4.5rem] px-2 text-center border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
+                    className="h-11 w-20 pl-3 pr-9 text-sm border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
                   >
                     <option value="AM">AM</option>
                     <option value="PM">PM</option>
