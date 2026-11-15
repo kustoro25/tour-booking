@@ -721,7 +721,6 @@ function BookingPage() {
                     <option value="PM">PM</option>
                   </select>
                 </div>
-                <p className="text-xs text-mist-dim mt-1">Ketik jam 1–12 dan menit 00–59, lalu pilih AM/PM.</p>
                 {isValidPickupTime(pickupTime) &&
                   (calcLatePickupFee(pickupTime) > 0 ? (
                     <p className="text-xs text-gold-300 mt-1">
