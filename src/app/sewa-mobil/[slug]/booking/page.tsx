@@ -51,16 +51,6 @@ type PaymentType = 'FULL' | 'INSTALLMENT';
 // Layanan khusus HAYBALI TRANS (sewa mobil & antar-jemput bandara)
 type Direction = 'PICKUP' | 'DROP';
 
-// Slot jam penjemputan per 30 menit (00:00–23:30) dalam format kanonik "HH:MM".
-// Ditampilkan sebagai dropdown 12 jam agar tidak ada input bebas yang salah ketik.
-const PICKUP_TIME_SLOTS = Array.from(
-  { length: (24 * 60) / DRIVER_POLICY.pickupTimeStepMinutes },
-  (_, i) => {
-    const total = i * DRIVER_POLICY.pickupTimeStepMinutes;
-    return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
-  }
-);
-
 export default function BookingPageWrapper() {
   return (
     <Suspense fallback={<div className="max-w-3xl mx-auto px-4 py-12"><Skeleton className="h-64 w-full rounded-xl" /></div>}>
@@ -113,6 +103,9 @@ function BookingPage() {
 
   // --- State layanan khusus HAYBALI TRANS ---
   const [pickupTime, setPickupTime] = useState(''); // nilai kanonik "HH:MM" (24 jam) untuk harga & API
+  const [pickupHour, setPickupHour] = useState(''); // ketikan manual jam 1–12 (dibatasi digit valid)
+  const [pickupMinute, setPickupMinute] = useState(''); // ketikan manual menit 00–59 (dibatasi digit valid)
+  const [pickupPeriod, setPickupPeriod] = useState<'AM' | 'PM'>('AM'); // dropdown AM/PM
   const [pickupZone, setPickupZone] = useState('');
   const [destinationArea, setDestinationArea] = useState(''); // area tujuan (diketik manual, biaya info saja)
   const [rentalDuration, setRentalDuration] = useState<'6' | '12'>('12'); // durasi sewa mobil
@@ -196,6 +189,92 @@ function BookingPage() {
       delete next[field];
       return next;
     });
+  };
+
+  // Gabungkan bagian jam/menit/AM-PM menjadi "HH:MM" 24 jam; kosong bila belum lengkap.
+  const applyPickupParts = (h: string, m: string, p: 'AM' | 'PM') => {
+    clearError('pickupTime');
+    const hourValid = /^(0?[1-9]|1[0-2])$/.test(h);
+    const minValid = /^([0-5]?\d)$/.test(m);
+    if (!hourValid || !minValid) {
+      setPickupTime('');
+      return;
+    }
+    const hNum = parseInt(h, 10);
+    const mNum = parseInt(m, 10);
+    const h24 = hNum === 12 ? (p === 'AM' ? 0 : 12) : (hNum % 12) + (p === 'PM' ? 12 : 0);
+    setPickupTime(`${String(h24).padStart(2, '0')}:${String(mNum).padStart(2, '0')}`);
+  };
+
+  // Ketikan jam dibatasi: hanya digit, maks 2 angka, hanya kombinasi 01–12.
+  const handlePickupHourChange = (raw: string) => {
+    let digits = raw.replace(/\D/g, '').slice(0, 2);
+    if (digits.length === 2) {
+      const [a, b] = digits;
+      const validPair = (a === '0' && b >= '1' && b <= '9') || (a === '1' && b >= '0' && b <= '2');
+      if (!validPair) digits = a; // kombinasi tak valid: hanya digit pertama yang dipertahankan
+    }
+    setPickupHour(digits);
+    applyPickupParts(digits, pickupMinute, pickupPeriod);
+  };
+
+  // Ketikan menit dibatasi: hanya digit, maks 2 angka, puluhan maks 5 (00–59).
+  const handlePickupMinuteChange = (raw: string) => {
+    let digits = raw.replace(/\D/g, '').slice(0, 2);
+    if (digits.length === 2 && digits[0] > '5') digits = digits[0]; // "75" → "7"
+    setPickupMinute(digits);
+    applyPickupParts(pickupHour, digits, pickupPeriod);
+  };
+
+  // Rapi-rapi saat fokus pindah: "7" → "07"; nilai di luar rentang dikosongkan.
+  const normalizeHourOnBlur = () => {
+    const num = parseInt(pickupHour, 10);
+    const next = Number.isInteger(num) && num >= 1 && num <= 12 ? String(num).padStart(2, '0') : '';
+    if (next !== pickupHour) {
+      setPickupHour(next);
+      applyPickupParts(next, pickupMinute, pickupPeriod);
+    }
+  };
+
+  const normalizeMinuteOnBlur = () => {
+    const num = parseInt(pickupMinute, 10);
+    const next = Number.isInteger(num) && num >= 0 && num <= 59 ? String(num).padStart(2, '0') : '';
+    if (next !== pickupMinute) {
+      setPickupMinute(next);
+      applyPickupParts(pickupHour, next, pickupPeriod);
+    }
+  };
+
+  // Tombol ▲▼ menaikkan/menurunkan jam; AM/PM ikut berganti saat melewati 12.
+  // Saat masih kosong, dimulai dari 07:00 AM (awal jam normal pengemudi).
+  const stepPickupHour = (delta: 1 | -1) => {
+    const num = parseInt(pickupHour, 10);
+    if (!Number.isInteger(num) || num < 1 || num > 12) {
+      const m = pickupMinute || '00';
+      setPickupHour('07');
+      setPickupMinute(m);
+      setPickupPeriod('AM');
+      applyPickupParts('07', m, 'AM');
+      return;
+    }
+    let next = num + delta;
+    let nextPeriod = pickupPeriod;
+    if (next > 12) {
+      next = 1;
+      nextPeriod = nextPeriod === 'AM' ? 'PM' : 'AM';
+    } else if (next < 1) {
+      next = 12;
+      nextPeriod = nextPeriod === 'AM' ? 'PM' : 'AM';
+    }
+    const h = String(next).padStart(2, '0');
+    setPickupHour(h);
+    setPickupPeriod(nextPeriod);
+    applyPickupParts(h, pickupMinute, nextPeriod);
+  };
+
+  const handlePickupPeriodChange = (p: 'AM' | 'PM') => {
+    setPickupPeriod(p);
+    applyPickupParts(pickupHour, pickupMinute, p);
   };
 
   const handleDateSelect = async (date: string) => {
@@ -593,21 +672,65 @@ function BookingPage() {
 
               <div>
                 <label className="block text-sm font-medium text-mist mb-1">Jam Penjemputan</label>
-                <select
-                  value={pickupTime}
-                  onChange={(e) => {
-                    setPickupTime(e.target.value);
-                    clearError('pickupTime');
-                  }}
-                  aria-label="Jam penjemputan"
-                  className="w-full h-11 pl-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
-                >
-                  <option value="" disabled>— Pilih jam penjemputan —</option>
-                  {PICKUP_TIME_SLOTS.map((t) => (
-                    <option key={t} value={t}>{formatTime12h(t)} WITA</option>
-                  ))}
-                </select>
-                <p className="text-xs text-mist-dim mt-1">Pilih waktu penjemputan.</p>
+                <div className="flex items-center gap-2">
+                  {/* Jam — ketik manual 1–12 + tombol naik/turun */}
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={2}
+                      value={pickupHour}
+                      onChange={(e) => handlePickupHourChange(e.target.value)}
+                      onBlur={normalizeHourOnBlur}
+                      placeholder="07"
+                      aria-label="Jam penjemputan (jam)"
+                      className="w-full h-11 px-3 pr-12 text-center border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
+                    />
+                    <div className="absolute right-1.5 top-1.5 bottom-1.5 flex w-8 flex-col overflow-hidden rounded-lg border border-ink-600 bg-ink-800">
+                      <button
+                        type="button"
+                        onClick={() => stepPickupHour(1)}
+                        aria-label="Tambah 1 jam"
+                        className="flex-1 flex items-center justify-center text-[10px] leading-none text-mist hover:bg-ink-700 active:bg-ink-600"
+                      >
+                        ▲
+                      </button>
+                      <span className="h-px bg-ink-600" />
+                      <button
+                        type="button"
+                        onClick={() => stepPickupHour(-1)}
+                        aria-label="Kurangi 1 jam"
+                        className="flex-1 flex items-center justify-center text-[10px] leading-none text-mist hover:bg-ink-700 active:bg-ink-600"
+                      >
+                        ▼
+                      </button>
+                    </div>
+                  </div>
+                  <span className="text-mist-dim font-medium" aria-hidden="true">:</span>
+                  {/* Menit — ketik manual 00–59 */}
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={2}
+                    value={pickupMinute}
+                    onChange={(e) => handlePickupMinuteChange(e.target.value)}
+                    onBlur={normalizeMinuteOnBlur}
+                    placeholder="00"
+                    aria-label="Jam penjemputan (menit)"
+                    className="flex-1 h-11 px-3 text-center border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
+                  />
+                  {/* Periode AM/PM */}
+                  <select
+                    value={pickupPeriod}
+                    onChange={(e) => handlePickupPeriodChange(e.target.value as 'AM' | 'PM')}
+                    aria-label="Periode AM/PM"
+                    className="h-11 w-[4.5rem] px-2 text-center border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
+                  >
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
+                <p className="text-xs text-mist-dim mt-1">Ketik jam 1–12 dan menit 00–59, lalu pilih AM/PM.</p>
                 {isValidPickupTime(pickupTime) &&
                   (calcLatePickupFee(pickupTime) > 0 ? (
                     <p className="text-xs text-gold-300 mt-1">
