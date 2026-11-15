@@ -980,9 +980,6 @@ function BookingPage() {
                         <option key={zone} value={zone} />
                       ))}
                     </datalist>
-                    <p className="text-xs text-mist-dim mt-1">
-                      Tulis area penjemputan Anda. Di luar zona umum, silakan hubungi kami.
-                    </p>
                     {errors.pickupZone && <p className="text-red-500 text-sm mt-1">{errors.pickupZone}</p>}
                   </div>
                   <div>
@@ -994,9 +991,6 @@ function BookingPage() {
                       placeholder="Contoh: Ubud, Kintamani, Nusa Dua"
                       className="w-full h-11 px-4 border border-ink-600 rounded-xl focus:ring-2 focus:ring-gold-400 focus:border-gold-400 bg-ink-900"
                     />
-                    <p className="text-xs text-mist-dim mt-1">
-                      Satu wilayah tujuan utama per hari, diketik bebas.
-                    </p>
                     {errors.destinationArea && <p className="text-red-500 text-sm mt-1">{errors.destinationArea}</p>}
                   </div>
                 </div>
@@ -1004,7 +998,7 @@ function BookingPage() {
                 {/* Info biaya area tambahan — tidak dihitung otomatis ke total */}
                 <details className="rounded-xl border border-ink-700 bg-ink-900">
                   <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium text-mist">
-                    Info biaya area tambahan (tidak dihitung otomatis)
+                    Info biaya area tambahan
                   </summary>
                   <div className="px-4 pb-4 space-y-3 text-xs">
                     <p className="text-mist-dim leading-relaxed">
