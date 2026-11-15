@@ -118,7 +118,7 @@ export const FLEET: FleetItem[] = [
   },
   {
     slug: 'sewa-alphard-hev-bali',
-    name: 'ALPHARD HEV (LUX)',
+    name: 'ALPHARD HYBRID NEW ( LUX )',
     tier: 'LUX',
     recommendedPax: 4,
     maxPax: 5,
