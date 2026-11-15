@@ -142,6 +142,7 @@ export async function POST(request: NextRequest) {
       serviceSurcharge = quote.remoteFee + quote.latePickupFee;
       orderExtras = {
         durationLabel: `${rentalDuration} Jam`,
+        basePrice: quote.base,
         remoteAreaLabel: remoteFee?.label || standardArea?.label || null,
         remoteAreaFee: quote.remoteFee,
         latePickupFee: quote.latePickupFee,

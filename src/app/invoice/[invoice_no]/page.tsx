@@ -362,6 +362,7 @@ function CustomInvoice({
   let extrasRemoteFee = 0;
   let extrasLateFee = 0;
   let extrasDuration: string | null = null;
+  let extrasBasePrice = 0;
   let extrasDirection: string | null = null;
   let extrasTransferArea: string | null = null;
   let extrasFlightNo: string | null = null;
@@ -371,12 +372,17 @@ function CustomInvoice({
       extrasRemoteLabel = typeof extras.remoteAreaLabel === 'string' ? extras.remoteAreaLabel : null;
       extrasRemoteFee = typeof extras.remoteAreaFee === 'number' ? extras.remoteAreaFee : 0;
       extrasLateFee = typeof extras.latePickupFee === 'number' ? extras.latePickupFee : 0;
+      extrasBasePrice = typeof extras.basePrice === 'number' ? extras.basePrice : 0;
       extrasDuration = typeof extras.durationLabel === 'string' ? extras.durationLabel : null;
       extrasDirection = extras.direction === 'DROP' ? 'Antar ke Bandara' : extras.direction === 'PICKUP' ? 'Jemput di Bandara' : null;
       extrasTransferArea = typeof extras.transferArea === 'string' ? extras.transferArea : null;
       extrasFlightNo = typeof extras.flightNo === 'string' && extras.flightNo ? extras.flightNo : null;
     } catch { /* extras bukan JSON valid — abaikan */ }
   }
+
+  // Harga sewa dasar: pakai snapshot durasi yang dipilih saat booking;
+  // order lama tanpa snapshot memakai harga dewasa tour.
+  const carRentalBasePrice = extrasBasePrice > 0 ? extrasBasePrice : priceAdult;
 
   const adultTotal = isSpecialService ? priceAdult : priceAdult * order.adults;
   const childTotal = isSpecialService ? 0 : order.children > 0 ? priceChild * order.children : 0;
@@ -673,7 +679,7 @@ function CustomInvoice({
                 {/* Harga sewa mobil (flat per mobil) */}
                 <div className="flex justify-between items-center py-2 text-sm">
                   <span className="text-gray-600">Harga Sewa Mobil ({extrasDuration || '12 Jam'}, Termasuk Supir & BBM)</span>
-                  <span className="font-medium text-gray-800">{formatCurrency(priceAdult)}</span>
+                  <span className="font-medium text-gray-800">{formatCurrency(carRentalBasePrice)}</span>
                 </div>
                 {/* Biaya area terpencil */}
                 {extrasRemoteFee > 0 && (

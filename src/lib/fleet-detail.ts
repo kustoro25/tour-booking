@@ -281,14 +281,14 @@ export const FLEET_DETAILS: FleetDetail[] = [
     tagline: 'Van rombongan paling ekonomis — pilihan hemat untuk grup besar.',
     overview: [
       'Toyota HiAce Commuter 3.0 adalah pilihan paling ekonomis untuk memindahkan banyak orang dalam satu kendaraan. Cocok untuk rombongan wisata, keluarga besar, atau tamu acara yang perlu berpindah lokasi bersama-sama.',
-      'Meski lebih sederhana dibanding Premio, unit Commuter HAYBALI TRANS tetap dirawat rutin, dibersihkan setiap selesai trip, dan dikemudikan supir berpengalaman. Tersedia khusus paket 12 jam.',
+      'Meski lebih sederhana dibanding Premio, unit Commuter HAYBALI TRANS tetap dirawat rutin, dibersihkan setiap selesai trip, dan dikemudikan supir berpengalaman. Tersedia paket 6 jam atau 12 jam.',
     ],
     highlights: [
       'Biaya per orang paling efisien untuk rombongan besar',
       'Kapasitas hingga 14 penumpang tanpa bagasi',
       'Mesin diesel 3.0 bertenaga untuk rute berbukit',
       'Cocok untuk grup wisata dan acara keluarga besar',
-      'Tersedia khusus paket 12 jam',
+      'Tersedia paket 6 jam atau 12 jam',
     ],
     interiorFeatures: [
       'Jok berbaris dengan headrest',
