@@ -127,6 +127,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
             <div className="flex items-center gap-2.5 mb-4">
               {isImageIcon(info.brandIcon) ? (
                 // Logo gambar memuat tulisan brand di dalamnya, jadi teks di samping disembunyikan.
+                // eslint-disable-next-line @next/next/no-img-element -- logo bisa berupa URL eksternal/path dinamis dari pengaturan
                 <img src={info.brandIcon} alt={info.brandName || 'HAYBALI TRANS'} className="h-12 w-auto object-contain" />
               ) : (
                 <>

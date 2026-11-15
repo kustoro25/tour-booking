@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 /** Format tanggal lokal sebagai YYYY-MM-DD. Gunakan ini, bukan toISOString(),
@@ -29,29 +29,33 @@ interface BookingCalendarProps {
 export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: BookingCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [slots, setSlots] = useState<Slot[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
 
-  const fetchSlots = async () => {
-    setLoading(true);
+  const fetchSlots = useCallback(async (): Promise<Slot[] | null> => {
     try {
       const res = await fetch(`/api/tours/${tourId}/slots?month=${year}-${String(month + 1).padStart(2, '0')}`);
       const data = await res.json();
       if (data.success) {
-        setSlots(data.data || []);
+        return data.data || [];
       }
     } catch (err) {
       console.error('Failed to fetch slots:', err);
-    } finally {
-      setLoading(false);
     }
-  };
+    return null;
+  }, [tourId, year, month]);
 
   useEffect(() => {
-    fetchSlots();
-  }, [year, month, tourId]);
+    let cancelled = false;
+    fetchSlots().then((result) => {
+      if (cancelled) return;
+      if (result) setSlots(result);
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [fetchSlots]);
 
   const getSlotForDate = (date: Date): Slot | undefined => {
     const dateStr = toLocalDateStr(date);
@@ -105,7 +109,7 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
     <div className="bg-ink-850 rounded-xl shadow-sm p-4">
       <div className="flex items-center justify-between mb-4">
         <button
-          onClick={() => setCurrentMonth(new Date(year, month - 1))}
+          onClick={() => { setCurrentMonth(new Date(year, month - 1)); setLoading(true); }}
           className="w-9 h-9 flex items-center justify-center hover:bg-ink-800 rounded-lg text-mist hover:text-gold-300 transition-colors"
           disabled={loading}
           aria-label="Bulan sebelumnya"
@@ -116,7 +120,7 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
           {monthNames[month]} {year}
         </h4>
         <button
-          onClick={() => setCurrentMonth(new Date(year, month + 1))}
+          onClick={() => { setCurrentMonth(new Date(year, month + 1)); setLoading(true); }}
           className="w-9 h-9 flex items-center justify-center hover:bg-ink-800 rounded-lg text-mist hover:text-gold-300 transition-colors"
           disabled={loading}
           aria-label="Bulan berikutnya"

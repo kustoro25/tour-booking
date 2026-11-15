@@ -7,7 +7,10 @@ import Button from '../ui/Button';
 
 function BrandIcon({ icon, className }: { icon?: string; className?: string }) {
   if (!icon) return <span className="text-ink-950 font-bold text-sm">HB</span>;
-  if (icon.startsWith('http') || icon.startsWith('/')) return <img src={icon} alt="brand" className={`${className} object-cover`} />;
+  if (icon.startsWith('http') || icon.startsWith('/')) {
+    // eslint-disable-next-line @next/next/no-img-element -- ikon brand bisa berupa URL eksternal/path dinamis dari pengaturan
+    return <img src={icon} alt="brand" className={`${className} object-cover`} />;
+  }
   return <span className="text-ink-950 font-bold text-sm">{icon.substring(0, 2).toUpperCase()}</span>;
 }
 
@@ -37,10 +40,13 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Tutup menu mobile otomatis saat pindah halaman
-  useEffect(() => {
+  // Tutup menu mobile otomatis saat pindah halaman (pola penyesuaian state saat render,
+  // pengganti useEffect yang direkomendasikan React agar tidak ada setState sinkron di effect)
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setIsMenuOpen(false);
-  }, [pathname]);
+  }
 
   return (
     <header
@@ -56,6 +62,7 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
           <Link href="/" className="flex items-center gap-2.5 group">
             {isLogoImage ? (
               // Logo gambar memuat tulisan brand di dalamnya, jadi teks di samping disembunyikan.
+              // eslint-disable-next-line @next/next/no-img-element -- logo bisa berupa URL eksternal/path dinamis dari pengaturan
               <img
                 src={brandIcon}
                 alt={brandName || 'HAYBALI TRANS'}

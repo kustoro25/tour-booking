@@ -21,18 +21,26 @@ export default function GalleryLightbox({
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
-  useEffect(() => {
+  // Reset index & status loading saat lightbox dibuka atau gambar awal berubah
+  // (pola penyesuaian state saat render, bukan di effect)
+  const [prevOpen, setPrevOpen] = useState({ isOpen, initialIndex });
+  if (prevOpen.isOpen !== isOpen || prevOpen.initialIndex !== initialIndex) {
+    setPrevOpen({ isOpen, initialIndex });
     if (isOpen) {
       setCurrentIndex(initialIndex);
       setLoaded(false);
+    }
+  }
+
+  // Kunci scroll halaman saat lightbox terbuka (sinkronisasi dengan DOM eksternal)
+  useEffect(() => {
+    if (isOpen) {
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
     }
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isOpen, initialIndex]);
+  }, [isOpen]);
 
   const goTo = useCallback(
     (index: number) => {

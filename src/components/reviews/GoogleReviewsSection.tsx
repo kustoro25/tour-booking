@@ -101,6 +101,7 @@ export default function GoogleReviewsSection() {
               {/* Header: avatar + name */}
               <div className="flex items-center gap-3 mb-3">
                 {review.profilePhoto ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- foto profil berasal dari URL eksternal Google Places API
                   <img
                     src={review.profilePhoto}
                     alt={review.authorName}

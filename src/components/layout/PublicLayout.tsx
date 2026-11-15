@@ -10,7 +10,9 @@ export default function PublicLayout({ children, brandName, brandIcon, footerCms
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    // setMounted dibungkus setTimeout agar tidak memicu setState sinkron di dalam effect
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   // During SSR, always render public layout to avoid hydration mismatch.
