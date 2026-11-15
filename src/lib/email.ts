@@ -344,7 +344,7 @@ export function installmentBillingTemplate(data: {
   onlineMode?: boolean; // true = bayar online (Midtrans), false = transfer manual
 }): string {
   const isDp = data.installmentNumber === 0;
-  // Skema DP: totalInstallments = 1 berarti DP + pelunasan (tunai ke sopir)
+  // Skema DP: totalInstallments = 1 berarti DP + pelunasan (tunai ke sopir / transfer)
   const isPelunasan = !isDp && data.totalInstallments === 1;
   const paymentLabel = isDp ? 'DP (Uang Muka)' : isPelunasan ? 'Pelunasan' : `Angsuran ke-${data.installmentNumber}`;
   const dueDateLabel = isDp ? 'Batas Pembayaran' : 'Jatuh Tempo';
@@ -383,9 +383,9 @@ export function installmentBillingTemplate(data: {
       <h2 style="color: #E59800;">${isDp ? 'Pembayaran DP (Uang Muka)' : isPelunasan ? 'Pelunasan' : `Penagihan Angsuran ke-${data.installmentNumber}`}</h2>
       <p>Halo <strong>${data.customerName}</strong>,</p>
       <p>${isDp
-        ? `Untuk mengaktifkan pesanan tour <strong>${data.tourName}</strong>, silakan lakukan pembayaran <strong>DP (Uang Muka)</strong>. Pelunasan dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.`
+        ? `Untuk mengaktifkan pesanan tour <strong>${data.tourName}</strong>, silakan lakukan pembayaran <strong>DP (Uang Muka)</strong>. Pelunasan dapat dibayar tunai kepada sopir saat bertemu di lokasi penjemputan, atau transfer bank.`
         : isPelunasan
-          ? `Berikut adalah penagihan <strong>pelunasan</strong> untuk pemesanan tour <strong>${data.tourName}</strong>. Pelunasan dapat dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.`
+          ? `Berikut adalah penagihan <strong>pelunasan</strong> untuk pemesanan tour <strong>${data.tourName}</strong>. Pelunasan dapat dibayar tunai kepada sopir saat bertemu di lokasi penjemputan, atau transfer bank.`
           : `Berikut adalah penagihan angsuran ke-<strong>${data.installmentNumber}</strong> dari <strong>${data.totalInstallments}</strong> untuk pemesanan tour <strong>${data.tourName}</strong>.`}</p>
       
       <div style="background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 8px; padding: 16px; margin: 16px 0;">

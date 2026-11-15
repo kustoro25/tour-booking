@@ -1,8 +1,6 @@
-feat(pembayaran): skema DP + pelunasan tunai ke sopir
+fix(pembayaran): pelunasan bisa tunai ke sopir atau transfer bank
 
-- Metode "Pembayaran Angsuran (Cicilan)" diganti "Pembayaran DP"
-- Hapus pemilih jumlah angsuran (2x): tamu bayar DP di muka, pelunasan tunai ke sopir saat bertemu
-- Booking selalu kirim installmentCount=1 (API menerima nilai 1 sebagai skema DP)
-- Simulasi, syarat & ketentuan, dan layar sukses disesuaikan
-- Invoice & halaman jadwal: label DP/Pelunasan + catatan tunai ke sopir
-- Email penagihan DP: teks pelunasan tunai ke sopir
+Kalimat pelunasan diubah agar tidak wajib tunai ke sopir:
+"bisa tunai ke sopir saat bertemu atau transfer bank" — diterapkan
+di halaman booking, simulasi, syarat & ketentuan, invoice, jadwal
+pembayaran, label WhatsApp, dan email penagihan.

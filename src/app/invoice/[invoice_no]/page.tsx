@@ -631,9 +631,9 @@ function CustomInvoice({
                       </table>
                     </div>
 
-                    {/* Catatan pelunasan tunai ke sopir */}
+                    {/* Catatan pelunasan: tunai ke sopir atau transfer bank */}
                     <p className="mt-3 text-[11px] text-gray-500 leading-relaxed">
-                      Pelunasan dapat dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.
+                      Pelunasan dapat dibayar tunai kepada sopir saat bertemu di lokasi penjemputan, atau transfer bank.
                     </p>
 
                     {/* Link ke halaman jadwal & pembayaran DP/pelunasan */}
@@ -786,7 +786,7 @@ function CustomInvoice({
                     Klik tombol <strong>Bayar DP</strong> di bawah invoice ini untuk membayar DP melalui
                     halaman pembayaran aman <strong>Midtrans</strong> — mendukung QRIS, Virtual Account
                     berbagai bank, e-wallet (GoPay, ShopeePay, DANA), dan kartu kredit/debit. Pelunasan
-                    dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.
+                    dapat dibayar tunai kepada sopir saat bertemu di lokasi penjemputan, atau transfer bank.
                   </>
                 ) : (
                   <>
@@ -800,8 +800,8 @@ function CustomInvoice({
                 {order.paymentType === 'INSTALLMENT' ? (
                   <>
                     Pembayaran DP <strong>terkonfirmasi otomatis</strong> setelah berhasil — tanpa upload
-                    bukti atau konfirmasi manual. Pelunasan dibayar tunai langsung kepada sopir saat
-                    bertemu di lokasi penjemputan.
+                    bukti atau konfirmasi manual. Pelunasan dapat dibayar tunai kepada sopir saat
+                    bertemu di lokasi penjemputan, atau transfer bank.
                   </>
                 ) : (
                   <>
@@ -858,8 +858,9 @@ function CustomInvoice({
               <p className="text-[10px] text-gray-500 mt-3 leading-relaxed">
                 {order.paymentType === 'INSTALLMENT' ? (
                   <>
-                    Pelunasan dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.
-                    E-Ticket dikirim setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {companyPhone}.
+                    Pelunasan dapat dibayar tunai kepada sopir saat bertemu di lokasi penjemputan, atau
+                    transfer bank. E-Ticket dikirim setelah pembayaran terkonfirmasi. Untuk bantuan,
+                    hubungi {companyPhone}.
                   </>
                 ) : (
                   <>

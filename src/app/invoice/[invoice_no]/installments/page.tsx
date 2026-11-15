@@ -235,7 +235,7 @@ export default function InstallmentTrackingPage() {
           </div>
           <div>
             <span className="text-mist-dim text-xs">Pelunasan</span>
-            <p className="font-semibold">{plan.installmentCount === 1 ? `${formatCurrency(plan.amountPerInstallment)} (tunai ke sopir)` : `${plan.installmentCount}x @ ${formatCurrency(plan.amountPerInstallment)}`}</p>
+            <p className="font-semibold">{plan.installmentCount === 1 ? `${formatCurrency(plan.amountPerInstallment)} (tunai ke sopir / transfer)` : `${plan.installmentCount}x @ ${formatCurrency(plan.amountPerInstallment)}`}</p>
           </div>
           <div>
             <span className="text-mist-dim text-xs">Status</span>
@@ -409,7 +409,7 @@ export default function InstallmentTrackingPage() {
               <li>Status pembayaran <strong>terkonfirmasi otomatis</strong> — tidak perlu upload bukti atau konfirmasi ke admin.</li>
             </ol>
             <p className="mt-3 text-xs text-gold-300">
-              Pelunasan dapat dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.
+              Pelunasan dapat dibayar tunai kepada sopir saat bertemu di lokasi penjemputan, atau transfer bank.
             </p>
             <p className="mt-3 text-xs text-gold-300">
               Link pembayaran berlaku 24 jam dan dapat dibuat ulang kapan saja. Ada kendala? Hubungi WhatsApp{' '}
@@ -425,7 +425,7 @@ export default function InstallmentTrackingPage() {
               <li>Admin akan memverifikasi dalam 1×24 jam — status berubah menjadi <strong>Terkonfirmasi</strong>.</li>
             </ol>
             <p className="mt-3 text-xs text-gold-300">
-              Pelunasan dapat dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.
+              Pelunasan dapat dibayar tunai kepada sopir saat bertemu di lokasi penjemputan, atau transfer bank.
             </p>
             <p className="mt-3 text-xs text-gold-300">
               Alternatif: kirim bukti melalui WhatsApp {companyPhone || 'admin'} atau email {companyEmail || 'yang tertera pada invoice'}.

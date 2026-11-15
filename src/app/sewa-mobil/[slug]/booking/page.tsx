@@ -395,7 +395,7 @@ function BookingPage() {
           tourDate: selectedDate,
           ...formData,
           paymentType,
-          // Skema pembayaran DP: DP di muka + 1 pelunasan (dibayar tunai ke sopir)
+          // Skema pembayaran DP: DP di muka + 1 pelunasan (tunai ke sopir atau transfer bank)
           installmentCount: paymentType === 'INSTALLMENT' ? 1 : undefined,
           // Layanan khusus HAYBALI TRANS
           pickupTime: isCarRental ? pickupTime : undefined,
@@ -497,7 +497,7 @@ function BookingPage() {
     }
     const paymentLabel =
       paymentType === 'INSTALLMENT'
-        ? `DP ${dpPercentage}% (Transfer) + Pelunasan Tunai ke Sopir`
+        ? `DP ${dpPercentage}% (Transfer) + Pelunasan (Tunai ke Sopir / Transfer)`
         : 'Pembayaran Lunas (Transfer Bank)';
     return waBookingLink(
       {
@@ -1168,11 +1168,11 @@ function BookingPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-ivory">Pembayaran DP</h3>
-                  <p className="text-sm text-mist-dim mt-0.5">Bayar DP {dpPercentage}% sekarang, sisa {100 - dpPercentage}% dibayar tunai ke sopir saat bertemu</p>
+                  <p className="text-sm text-mist-dim mt-0.5">Bayar DP {dpPercentage}% sekarang, sisa {100 - dpPercentage}% dibayar tunai ke sopir atau transfer bank</p>
                   {paymentGateway === 'midtrans' ? (
-                    <p className="text-xs text-green-300 mt-1">💳 DP dibayar online via Midtrans — terkonfirmasi otomatis. Pelunasan dibayar tunai ke sopir saat penjemputan.</p>
+                    <p className="text-xs text-green-300 mt-1">💳 DP dibayar online via Midtrans — terkonfirmasi otomatis. Pelunasan bisa tunai ke sopir saat penjemputan atau transfer bank.</p>
                   ) : (
-                    <p className="text-xs text-mist-dim mt-1">🏦 DP dibayar via transfer bank — unggah bukti transfer di invoice, konfirmasi oleh admin. Pelunasan dibayar tunai ke sopir saat penjemputan.</p>
+                    <p className="text-xs text-mist-dim mt-1">🏦 DP dibayar via transfer bank — unggah bukti transfer di invoice, konfirmasi oleh admin. Pelunasan bisa tunai ke sopir saat penjemputan atau transfer bank.</p>
                   )}
                   {!installmentEnabled && (
                     <p className="text-xs text-mist-dim mt-1">Belum tersedia saat ini.</p>
@@ -1185,7 +1185,7 @@ function BookingPage() {
 
                 {paymentType === 'INSTALLMENT' && (
                   <div className="mt-4 ml-9">
-                    {/* Simulasi pembayaran DP: DP di muka + pelunasan tunai ke sopir */}
+                    {/* Simulasi pembayaran DP: DP di muka + pelunasan (tunai ke sopir / transfer) */}
                     {(() => {
                       const dp = Math.round(grandTotal * (dpPercentage / 100));
                       const remaining = grandTotal - dp;
@@ -1197,7 +1197,7 @@ function BookingPage() {
                             <span className="text-right font-medium">{formatCurrency(grandTotal)}</span>
                             <span className="text-mist-dim">DP ({dpPercentage}%) — dibayar sekarang</span>
                             <span className="text-right font-medium text-gold-300">{formatCurrency(dp)}</span>
-                            <span className="text-mist-dim pt-2 border-t">Pelunasan — tunai ke sopir</span>
+                            <span className="text-mist-dim pt-2 border-t">Pelunasan — tunai ke sopir atau transfer</span>
                             <span className="text-right font-bold text-gold-300 pt-2 border-t">{formatCurrency(remaining)}</span>
                           </div>
                         </div>
@@ -1212,9 +1212,9 @@ function BookingPage() {
             <div className="mt-4 p-4 bg-gold-400/10 border border-gold-500/30 rounded-lg">
               <h4 className="text-sm font-semibold text-gold-200 mb-2">Syarat & Ketentuan Pembayaran DP</h4>
               <ol className="text-xs text-gold-300 space-y-1.5 list-decimal list-inside leading-relaxed">
-                <li>DP sebesar {dpPercentage}% dibayar saat pemesanan. Sisa {100 - dpPercentage}% dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.</li>
+                <li>DP sebesar {dpPercentage}% dibayar saat pemesanan. Sisa {100 - dpPercentage}% dibayar tunai kepada sopir saat bertemu di lokasi penjemputan, atau transfer bank.</li>
                 <li>DP yang telah dibayarkan <strong>tidak dapat dikembalikan</strong> jika pemesanan dibatalkan.</li>
-                <li>Pelunasan wajib dibayarkan kepada sopir sebelum perjalanan dimulai.</li>
+                <li>Pelunasan wajib dibayarkan sebelum perjalanan dimulai.</li>
                 <li>
                   {paymentGateway === 'midtrans'
                     ? <>DP dibayar <strong>online</strong> (QRIS / Virtual Account / e-wallet / kartu) melalui halaman <strong>Jadwal &amp; Bayar DP / Pelunasan</strong> pada invoice Anda. Status pembayaran <strong>terkonfirmasi otomatis</strong>.</>
@@ -1334,14 +1334,14 @@ function BookingPage() {
                   ? paymentGateway === 'midtrans'
                     ? 'Pembayaran Lunas (Online — QRIS / VA / E-Wallet / Kartu)'
                     : 'Pembayaran Lunas (Transfer Bank)'
-                  : `Pembayaran DP ${dpPercentage}%${paymentGateway === 'midtrans' ? ' (Online)' : ' (Transfer Bank)'} + pelunasan tunai ke sopir`}
+                  : `Pembayaran DP ${dpPercentage}%${paymentGateway === 'midtrans' ? ' (Online)' : ' (Transfer Bank)'} + pelunasan (tunai ke sopir / transfer)`}
               </p>
             </div>
             {paymentType === 'INSTALLMENT' && (
               <div className="bg-gold-400/10 rounded-lg p-3 border border-gold-500/20">
                 <p className="text-sm font-medium text-gold-200">Rincian Pembayaran DP:</p>
                 <p className="text-xs text-gold-300 mt-1">
-                  DP {dpPercentage}% (dibayar sekarang): {formatCurrency(Math.round(grandTotal * (dpPercentage / 100)))} &bull; Pelunasan (tunai ke sopir): {formatCurrency(grandTotal - Math.round(grandTotal * (dpPercentage / 100)))}
+                  DP {dpPercentage}% (dibayar sekarang): {formatCurrency(Math.round(grandTotal * (dpPercentage / 100)))} &bull; Pelunasan (tunai ke sopir / transfer): {formatCurrency(grandTotal - Math.round(grandTotal * (dpPercentage / 100)))}
                 </p>
               </div>
             )}
@@ -1420,8 +1420,8 @@ function BookingPage() {
               {paymentType === 'INSTALLMENT' ? (
                 <>
                   Langkah terakhir: bayar <strong>DP (uang muka)</strong> melalui halaman pembayaran aman
-                  (QRIS, Virtual Account, e-wallet, atau kartu). Pelunasan dibayar tunai langsung kepada{' '}
-                  <strong>sopir saat bertemu</strong> di lokasi penjemputan.
+                  (QRIS, Virtual Account, e-wallet, atau kartu). Pelunasan dibayar tunai kepada{' '}
+                  <strong>sopir saat bertemu</strong> di lokasi penjemputan, atau transfer bank.
                 </>
               ) : (
                 <>
