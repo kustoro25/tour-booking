@@ -131,7 +131,7 @@ export default function InstallmentTrackingPage() {
       const result = await res.json();
       if (!res.ok || !result.success) throw new Error(result.error || 'Gagal menyimpan bukti transfer');
 
-      setUploadMsg({ type: 'success', text: `Bukti angsuran ke-${installmentNumber} berhasil diunggah. Menunggu konfirmasi admin.` });
+      setUploadMsg({ type: 'success', text: `Bukti pembayaran ${installmentNumber === 0 ? 'DP' : 'pelunasan'} berhasil diunggah. Menunggu konfirmasi admin.` });
       await fetchData();
     } catch (e) {
       setUploadMsg({ type: 'error', text: e instanceof Error ? e.message : 'Gagal mengunggah bukti transfer' });
@@ -166,7 +166,11 @@ export default function InstallmentTrackingPage() {
   const dpPayment = payments.find((p) => p.installmentNumber === 0);
   const nextUnpaid = payments.find((p) => p.status === 'PENDING' || p.status === 'OVERDUE');
   const labelFor = (p: Payment) =>
-    p.installmentNumber === 0 ? `DP ${plan.dpPercentage}% (Uang Muka)` : `Angsuran ke-${p.installmentNumber}`;
+    p.installmentNumber === 0
+      ? `DP ${plan.dpPercentage}% (Uang Muka)`
+      : plan.installmentCount === 1
+        ? 'Pelunasan'
+        : `Angsuran ke-${p.installmentNumber}`;
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
@@ -174,7 +178,7 @@ export default function InstallmentTrackingPage() {
         ← Kembali ke Invoice
       </Link>
 
-      <h1 className="text-2xl font-bold text-ivory mb-1">Pembayaran Angsuran</h1>
+      <h1 className="text-2xl font-bold text-ivory mb-1">Pembayaran DP & Pelunasan</h1>
       <p className="text-mist-dim text-sm mb-6">
         {order.tour.name} &bull; Invoice: {invoiceNo}
       </p>
@@ -230,8 +234,8 @@ export default function InstallmentTrackingPage() {
             )}
           </div>
           <div>
-            <span className="text-mist-dim text-xs">Angsuran</span>
-            <p className="font-semibold">{plan.installmentCount}x @ {formatCurrency(plan.amountPerInstallment)}</p>
+            <span className="text-mist-dim text-xs">Pelunasan</span>
+            <p className="font-semibold">{plan.installmentCount === 1 ? `${formatCurrency(plan.amountPerInstallment)} (tunai ke sopir)` : `${plan.installmentCount}x @ ${formatCurrency(plan.amountPerInstallment)}`}</p>
           </div>
           <div>
             <span className="text-mist-dim text-xs">Status</span>
@@ -298,13 +302,13 @@ export default function InstallmentTrackingPage() {
       {/* Payments Table */}
       <div className="bg-ink-850 rounded-xl shadow-sm overflow-hidden mb-6">
         <div className="px-5 py-3 bg-gold-400/10 border-b border-orange-100">
-          <h3 className="text-sm font-semibold text-orange-800">Jadwal Angsuran</h3>
+          <h3 className="text-sm font-semibold text-orange-800">Jadwal Pembayaran</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-ink-900 text-mist-dim text-xs">
               <tr>
-                <th className="py-2.5 px-4 text-left font-medium">Angsuran</th>
+                <th className="py-2.5 px-4 text-left font-medium">Tahapan</th>
                 <th className="py-2.5 px-4 text-right font-medium">Jumlah</th>
                 <th className="py-2.5 px-4 text-right font-medium">Jatuh Tempo</th>
                 <th className="py-2.5 px-4 text-center font-medium">Status</th>
@@ -400,10 +404,13 @@ export default function InstallmentTrackingPage() {
           <>
             <h3 className="font-semibold mb-2">💳 Cara Membayar (Online &amp; Otomatis)</h3>
             <ol className="list-decimal list-inside space-y-1.5 ml-1">
-              <li>Klik tombol <strong>Bayar Online</strong> pada baris DP / angsuran yang ingin dibayar.</li>
+              <li>Klik tombol <strong>Bayar Online</strong> pada baris DP yang ingin dibayar.</li>
               <li>Pilih metode pembayaran di halaman aman <strong>Midtrans</strong> — QRIS, Virtual Account, e-wallet, atau kartu.</li>
               <li>Status pembayaran <strong>terkonfirmasi otomatis</strong> — tidak perlu upload bukti atau konfirmasi ke admin.</li>
             </ol>
+            <p className="mt-3 text-xs text-gold-300">
+              Pelunasan dapat dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.
+            </p>
             <p className="mt-3 text-xs text-gold-300">
               Link pembayaran berlaku 24 jam dan dapat dibuat ulang kapan saja. Ada kendala? Hubungi WhatsApp{' '}
               {companyPhone || 'admin'} atau email {companyEmail || 'yang tertera pada invoice'}.
@@ -413,10 +420,13 @@ export default function InstallmentTrackingPage() {
           <>
             <h3 className="font-semibold mb-2">📤 Cara Membayar &amp; Mengirim Bukti</h3>
             <ol className="list-decimal list-inside space-y-1.5 ml-1">
-              <li>Transfer sesuai nominal angsuran ke salah satu <strong>rekening perusahaan</strong> di atas.</li>
-              <li>Unggah bukti transfer melalui tombol <strong>Unggah Bukti</strong> pada baris angsuran di tabel.</li>
+              <li>Transfer sesuai nominal DP ke salah satu <strong>rekening perusahaan</strong> di atas.</li>
+              <li>Unggah bukti transfer melalui tombol <strong>Unggah Bukti</strong> pada baris DP di tabel.</li>
               <li>Admin akan memverifikasi dalam 1×24 jam — status berubah menjadi <strong>Terkonfirmasi</strong>.</li>
             </ol>
+            <p className="mt-3 text-xs text-gold-300">
+              Pelunasan dapat dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.
+            </p>
             <p className="mt-3 text-xs text-gold-300">
               Alternatif: kirim bukti melalui WhatsApp {companyPhone || 'admin'} atau email {companyEmail || 'yang tertera pada invoice'}.
             </p>

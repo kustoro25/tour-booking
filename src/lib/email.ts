@@ -344,7 +344,9 @@ export function installmentBillingTemplate(data: {
   onlineMode?: boolean; // true = bayar online (Midtrans), false = transfer manual
 }): string {
   const isDp = data.installmentNumber === 0;
-  const paymentLabel = isDp ? 'DP (Uang Muka)' : `Angsuran ke-${data.installmentNumber}`;
+  // Skema DP: totalInstallments = 1 berarti DP + pelunasan (tunai ke sopir)
+  const isPelunasan = !isDp && data.totalInstallments === 1;
+  const paymentLabel = isDp ? 'DP (Uang Muka)' : isPelunasan ? 'Pelunasan' : `Angsuran ke-${data.installmentNumber}`;
   const dueDateLabel = isDp ? 'Batas Pembayaran' : 'Jatuh Tempo';
 
   const bankRows = data.bankAccounts
@@ -369,7 +371,7 @@ export function installmentBillingTemplate(data: {
       </table>`;
 
   const buttonLabel = data.onlineMode
-    ? `💳 Bayar ${isDp ? 'DP' : 'Angsuran'} Online`
+    ? `💳 Bayar ${isDp ? 'DP' : isPelunasan ? 'Pelunasan' : 'Angsuran'} Online`
     : '💳 Upload Bukti Transfer';
 
   const footerNote = data.onlineMode
@@ -378,11 +380,13 @@ export function installmentBillingTemplate(data: {
 
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #E59800;">${isDp ? 'Pembayaran DP (Uang Muka)' : `Penagihan Angsuran ke-${data.installmentNumber}`}</h2>
+      <h2 style="color: #E59800;">${isDp ? 'Pembayaran DP (Uang Muka)' : isPelunasan ? 'Pelunasan' : `Penagihan Angsuran ke-${data.installmentNumber}`}</h2>
       <p>Halo <strong>${data.customerName}</strong>,</p>
       <p>${isDp
-        ? `Untuk mengaktifkan pesanan tour <strong>${data.tourName}</strong>, silakan lakukan pembayaran <strong>DP (Uang Muka)</strong>. Sisa pembayaran dicicil sebanyak <strong>${data.totalInstallments}x</strong> sesuai jadwal.`
-        : `Berikut adalah penagihan angsuran ke-<strong>${data.installmentNumber}</strong> dari <strong>${data.totalInstallments}</strong> untuk pemesanan tour <strong>${data.tourName}</strong>.`}</p>
+        ? `Untuk mengaktifkan pesanan tour <strong>${data.tourName}</strong>, silakan lakukan pembayaran <strong>DP (Uang Muka)</strong>. Pelunasan dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.`
+        : isPelunasan
+          ? `Berikut adalah penagihan <strong>pelunasan</strong> untuk pemesanan tour <strong>${data.tourName}</strong>. Pelunasan dapat dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.`
+          : `Berikut adalah penagihan angsuran ke-<strong>${data.installmentNumber}</strong> dari <strong>${data.totalInstallments}</strong> untuk pemesanan tour <strong>${data.tourName}</strong>.`}</p>
       
       <div style="background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 8px; padding: 16px; margin: 16px 0;">
         <table style="width: 100%; border-collapse: collapse;">

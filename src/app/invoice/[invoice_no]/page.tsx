@@ -120,7 +120,7 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     headingTerms: 'Syarat & Ketentuan',
     deadlineText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan.',
     termsText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
-    paymentInstructionsText: 'Silakan lakukan transfer ke salah satu rekening bank di bawah ini. Pastikan jumlah yang ditransfer sesuai dengan total invoice. Setelah transfer, mohon unggah bukti transfer melalui halaman Jadwal & Bayar Angsuran (khusus cicilan) atau kirim melalui WhatsApp/email agar pembayaran dapat segera kami verifikasi.',
+    paymentInstructionsText: 'Silakan lakukan transfer ke salah satu rekening bank di bawah ini. Pastikan jumlah yang ditransfer sesuai dengan total invoice. Setelah transfer, mohon unggah bukti transfer melalui halaman Jadwal & Bayar DP / Pelunasan (khusus pembayaran DP) atau kirim melalui WhatsApp/email agar pembayaran dapat segera kami verifikasi.',
     labelInvoiceNo: 'No. Invoice',
     labelInvoiceDate: 'Tanggal',
     labelPaymentDeadline: 'Batas Pembayaran',
@@ -278,7 +278,7 @@ export default async function InvoicePage({ params }: PageProps) {
           companyPhone={companyPhone}
           helpLink={config.helpLink}
           payUrl={payUrl}
-          payLabel={order.paymentType === 'INSTALLMENT' ? '💳 Bayar DP / Angsuran' : undefined}
+          payLabel={order.paymentType === 'INSTALLMENT' ? '💳 Bayar DP' : undefined}
           tourDate={tourDate}
           invoiceUrl={invoiceUrl}
           paymentMode={paymentMode}
@@ -554,7 +554,7 @@ function CustomInvoice({
         {order.paymentType === 'INSTALLMENT' && order.installmentPlan && (
           <div className="overflow-hidden mb-6 relative" style={{ border: `1px solid ${border}`, borderRadius: '12px' }}>
             <div className="px-5 py-3" style={{ backgroundColor: '#FFF7ED' }}>
-              <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#E59800' }}>Pembayaran Angsuran (Cicilan)</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#E59800' }}>Pembayaran DP</h3>
             </div>
             <div className="p-5">
               {/* Plan summary */}
@@ -569,8 +569,8 @@ function CustomInvoice({
                   <>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-4">
                       <div className="rounded-lg px-3 py-2" style={{ backgroundColor: stripeBg }}>
-                        <p className="text-gray-400 mb-0.5">Jumlah Angsuran</p>
-                        <p className="font-medium text-gray-800">{plan.installmentCount}x</p>
+                        <p className="text-gray-400 mb-0.5">Skema</p>
+                        <p className="font-medium text-gray-800">DP + Pelunasan</p>
                       </div>
                       <div className="rounded-lg px-3 py-2" style={{ backgroundColor: stripeBg }}>
                         <p className="text-gray-400 mb-0.5">DP ({plan.dpPercentage}%)</p>
@@ -582,7 +582,7 @@ function CustomInvoice({
                         )}
                       </div>
                       <div className="rounded-lg px-3 py-2" style={{ backgroundColor: stripeBg }}>
-                        <p className="text-gray-400 mb-0.5">Per Angsuran</p>
+                        <p className="text-gray-400 mb-0.5">Pelunasan</p>
                         <p className="font-medium text-gray-800">{formatCurrency(plan.amountPerInstallment)}</p>
                       </div>
                       <div className="rounded-lg px-3 py-2" style={{ backgroundColor: paidCount === plan.installmentCount ? '#ECFDF5' : stripeBg }}>
@@ -596,7 +596,7 @@ function CustomInvoice({
                       <table className="w-full text-xs">
                         <thead>
                           <tr className="border-b" style={{ borderColor: border }}>
-                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Angsuran</th>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Tahapan</th>
                             <th className="text-right py-2 px-2 text-gray-400 font-medium">Jumlah</th>
                             <th className="text-right py-2 px-2 text-gray-400 font-medium">Jatuh Tempo</th>
                             <th className="text-center py-2 px-2 text-gray-400 font-medium">Status</th>
@@ -610,7 +610,11 @@ function CustomInvoice({
                             return (
                               <tr key={p.id} className="border-b" style={{ borderColor: border }}>
                                 <td className="py-2 px-2 font-medium text-gray-700">
-                                  {p.installmentNumber === 0 ? `DP (${plan.dpPercentage}%)` : `Angsuran ke-${p.installmentNumber}`}
+                                  {p.installmentNumber === 0
+                                    ? `DP (${plan.dpPercentage}%)`
+                                    : plan.installmentCount === 1
+                                      ? 'Pelunasan'
+                                      : `Angsuran ke-${p.installmentNumber}`}
                                 </td>
                                 <td className="py-2 px-2 text-right text-gray-700">{formatCurrency(p.amount)}</td>
                                 <td className="py-2 px-2 text-right text-gray-600">{new Date(p.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</td>
@@ -627,7 +631,12 @@ function CustomInvoice({
                       </table>
                     </div>
 
-                    {/* Link ke halaman jadwal & pembayaran angsuran */}
+                    {/* Catatan pelunasan tunai ke sopir */}
+                    <p className="mt-3 text-[11px] text-gray-500 leading-relaxed">
+                      Pelunasan dapat dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.
+                    </p>
+
+                    {/* Link ke halaman jadwal & pembayaran DP/pelunasan */}
                     {hasUnpaid && (
                       <div className="mt-4 text-center">
                         <a
@@ -635,7 +644,7 @@ function CustomInvoice({
                           className="inline-flex items-center gap-1 text-xs font-medium px-4 py-2 rounded-lg transition-colors"
                           style={{ backgroundColor: '#E59800', color: '#fff' }}
                         >
-                          💳 Lihat Jadwal & Bayar Angsuran
+                          💳 Lihat Jadwal & Bayar DP / Pelunasan
                         </a>
                       </div>
                     )}
@@ -774,9 +783,10 @@ function CustomInvoice({
                 <span className="font-semibold" style={{ color: accent }}>Pembayaran online otomatis.</span>{' '}
                 {order.paymentType === 'INSTALLMENT' ? (
                   <>
-                    Klik tombol <strong>Bayar DP / Angsuran</strong> di bawah invoice ini untuk membayar DP dan setiap
-                    angsuran melalui halaman pembayaran aman <strong>Midtrans</strong> — mendukung QRIS, Virtual Account
-                    berbagai bank, e-wallet (GoPay, ShopeePay, DANA), dan kartu kredit/debit.
+                    Klik tombol <strong>Bayar DP</strong> di bawah invoice ini untuk membayar DP melalui
+                    halaman pembayaran aman <strong>Midtrans</strong> — mendukung QRIS, Virtual Account
+                    berbagai bank, e-wallet (GoPay, ShopeePay, DANA), dan kartu kredit/debit. Pelunasan
+                    dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.
                   </>
                 ) : (
                   <>
@@ -789,9 +799,9 @@ function CustomInvoice({
               <p className="text-[10px] text-gray-500 mt-2 leading-relaxed">
                 {order.paymentType === 'INSTALLMENT' ? (
                   <>
-                    Setiap pembayaran (DP &amp; angsuran) <strong>terkonfirmasi otomatis</strong> setelah berhasil —
-                    tanpa upload bukti atau konfirmasi manual. Jadwal lengkap tersedia di halaman
-                    <strong> Jadwal &amp; Bayar Angsuran</strong>.
+                    Pembayaran DP <strong>terkonfirmasi otomatis</strong> setelah berhasil — tanpa upload
+                    bukti atau konfirmasi manual. Pelunasan dibayar tunai langsung kepada sopir saat
+                    bertemu di lokasi penjemputan.
                   </>
                 ) : (
                   <>
@@ -827,7 +837,7 @@ function CustomInvoice({
                 <span className="text-base">✅</span>
                 <span className="text-xs font-semibold text-green-700">
                   {order.paymentType === 'INSTALLMENT'
-                    ? 'Pembayaran DP / angsuran Anda telah kami terima — terima kasih!'
+                    ? 'Pembayaran DP Anda telah kami terima — terima kasih!'
                     : 'Pembayaran Anda telah kami terima — terima kasih!'}
                 </span>
               </div>
@@ -848,8 +858,8 @@ function CustomInvoice({
               <p className="text-[10px] text-gray-500 mt-3 leading-relaxed">
                 {order.paymentType === 'INSTALLMENT' ? (
                   <>
-                    Sisa angsuran dapat dibayar kapan saja melalui halaman <strong>Jadwal &amp; Bayar Angsuran</strong>.
-                    E-Ticket dikirim setelah seluruh angsuran lunas. Untuk bantuan, hubungi {companyPhone}.
+                    Pelunasan dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.
+                    E-Ticket dikirim setelah pembayaran terkonfirmasi. Untuk bantuan, hubungi {companyPhone}.
                   </>
                 ) : (
                   <>

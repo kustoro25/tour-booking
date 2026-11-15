@@ -108,9 +108,7 @@ function BookingPage() {
     notes: '',
   });
   const [paymentType, setPaymentType] = useState<PaymentType>('FULL');
-  const [installmentCount, setInstallmentCount] = useState(2);
   const [installmentEnabled, setInstallmentEnabled] = useState(false);
-  const [installmentOptions, setInstallmentOptions] = useState<number[]>([2]);
   const [dpPercentage, setDpPercentage] = useState(50);
   const [minInstallmentAmount, setMinInstallmentAmount] = useState(0);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -167,12 +165,6 @@ function BookingPage() {
           }
           if (typeof data.data.whatsappNumber === 'string' && data.data.whatsappNumber) {
             setWaNumber(data.data.whatsappNumber);
-          }
-          if (data.data.installment_options && Array.isArray(data.data.installment_options)) {
-            setInstallmentOptions(data.data.installment_options);
-            if (data.data.installment_options.length > 0) {
-              setInstallmentCount(data.data.installment_options[0]);
-            }
           }
           if (typeof data.data.dp_percentage === 'number') {
             setDpPercentage(data.data.dp_percentage);
@@ -403,7 +395,8 @@ function BookingPage() {
           tourDate: selectedDate,
           ...formData,
           paymentType,
-          installmentCount: paymentType === 'INSTALLMENT' ? installmentCount : undefined,
+          // Skema pembayaran DP: DP di muka + 1 pelunasan (dibayar tunai ke sopir)
+          installmentCount: paymentType === 'INSTALLMENT' ? 1 : undefined,
           // Layanan khusus HAYBALI TRANS
           pickupTime: isCarRental ? pickupTime : undefined,
           pickupArea: isCarRental ? pickupZone : undefined,
@@ -504,7 +497,7 @@ function BookingPage() {
     }
     const paymentLabel =
       paymentType === 'INSTALLMENT'
-        ? `Cicilan ${installmentCount}x (DP ${dpPercentage}%)`
+        ? `DP ${dpPercentage}% (Transfer) + Pelunasan Tunai ke Sopir`
         : 'Pembayaran Lunas (Transfer Bank)';
     return waBookingLink(
       {
@@ -1174,61 +1167,38 @@ function BookingPage() {
                   {paymentType === 'INSTALLMENT' && <div className="w-2.5 h-2.5 rounded-full bg-gold-500" />}
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-ivory">Pembayaran Angsuran (Cicilan)</h3>
-                  <p className="text-sm text-mist-dim mt-0.5">Bayar dengan DP {dpPercentage}% dan sisanya dicicil sesuai pilihan Anda</p>
+                  <h3 className="font-semibold text-ivory">Pembayaran DP</h3>
+                  <p className="text-sm text-mist-dim mt-0.5">Bayar DP {dpPercentage}% sekarang, sisa {100 - dpPercentage}% dibayar tunai ke sopir saat bertemu</p>
                   {paymentGateway === 'midtrans' ? (
-                    <p className="text-xs text-green-300 mt-1">💳 DP &amp; angsuran dibayar online via Midtrans — terkonfirmasi otomatis, tanpa transfer manual.</p>
+                    <p className="text-xs text-green-300 mt-1">💳 DP dibayar online via Midtrans — terkonfirmasi otomatis. Pelunasan dibayar tunai ke sopir saat penjemputan.</p>
                   ) : (
-                    <p className="text-xs text-mist-dim mt-1">🏦 DP &amp; angsuran dibayar via transfer bank — unggah bukti transfer di halaman jadwal angsuran, konfirmasi oleh admin.</p>
+                    <p className="text-xs text-mist-dim mt-1">🏦 DP dibayar via transfer bank — unggah bukti transfer di invoice, konfirmasi oleh admin. Pelunasan dibayar tunai ke sopir saat penjemputan.</p>
                   )}
                   {!installmentEnabled && (
                     <p className="text-xs text-mist-dim mt-1">Belum tersedia saat ini.</p>
                   )}
                   {installmentEnabled && !installmentThresholdMet && (
-                    <p className="text-xs text-gold-300 mt-1">Minimal total transaksi {formatCurrency(minInstallmentAmount)} untuk pembayaran angsuran.</p>
+                    <p className="text-xs text-gold-300 mt-1">Minimal total transaksi {formatCurrency(minInstallmentAmount)} untuk pembayaran DP.</p>
                   )}
                 </div>
               </div>
 
                 {paymentType === 'INSTALLMENT' && (
-                  <div className="mt-4 ml-9 space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-mist mb-2">Jumlah Angsuran</label>
-                      <div className="flex flex-wrap gap-2">
-                        {installmentOptions.map((opt) => (
-                          <button
-                            key={opt}
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); setInstallmentCount(opt); }}
-                            className={`h-9 px-4 rounded-lg text-sm font-medium transition-colors ${
-                              installmentCount === opt
-                                ? 'bg-gold-400 text-ink-950'
-                                : 'bg-ink-850 border border-ink-600 text-mist hover:bg-ink-800'
-                            }`}
-                          >
-                            {opt}x
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Installment simulation */}
+                  <div className="mt-4 ml-9">
+                    {/* Simulasi pembayaran DP: DP di muka + pelunasan tunai ke sopir */}
                     {(() => {
                       const dp = Math.round(grandTotal * (dpPercentage / 100));
                       const remaining = grandTotal - dp;
-                      const perInstallment = Math.round(remaining / installmentCount);
                       return (
                         <div className="bg-ink-850 border border-ink-700 rounded-lg p-4 space-y-2">
-                          <h4 className="text-sm font-semibold text-mist">Simulasi Angsuran</h4>
+                          <h4 className="text-sm font-semibold text-mist">Simulasi Pembayaran DP</h4>
                           <div className="grid grid-cols-2 gap-y-1.5 text-sm">
                             <span className="text-mist-dim">Total Harga</span>
                             <span className="text-right font-medium">{formatCurrency(grandTotal)}</span>
-                            <span className="text-mist-dim">DP ({dpPercentage}%)</span>
+                            <span className="text-mist-dim">DP ({dpPercentage}%) — dibayar sekarang</span>
                             <span className="text-right font-medium text-gold-300">{formatCurrency(dp)}</span>
-                            <span className="text-mist-dim">Sisa</span>
-                            <span className="text-right font-medium">{formatCurrency(remaining)}</span>
-                            <span className="text-mist-dim pt-2 border-t">Angsuran / Bulan</span>
-                            <span className="text-right font-bold text-gold-300 pt-2 border-t">{installmentCount}x {formatCurrency(perInstallment)}</span>
+                            <span className="text-mist-dim pt-2 border-t">Pelunasan — tunai ke sopir</span>
+                            <span className="text-right font-bold text-gold-300 pt-2 border-t">{formatCurrency(remaining)}</span>
                           </div>
                         </div>
                       );
@@ -1240,16 +1210,15 @@ function BookingPage() {
 
           {paymentType === 'INSTALLMENT' && (
             <div className="mt-4 p-4 bg-gold-400/10 border border-gold-500/30 rounded-lg">
-              <h4 className="text-sm font-semibold text-gold-200 mb-2">Syarat & Ketentuan Angsuran</h4>
+              <h4 className="text-sm font-semibold text-gold-200 mb-2">Syarat & Ketentuan Pembayaran DP</h4>
               <ol className="text-xs text-gold-300 space-y-1.5 list-decimal list-inside leading-relaxed">
-                <li>Pembayaran angsuran wajib dilakukan sesuai jadwal jatuh tempo yang telah disepakati.</li>
-                <li>Setiap angsuran harus dibayar paling lambat pada tanggal jatuh tempo. Keterlambatan lebih dari 7 hari setelah jatuh tempo dapat mengakibatkan pembatalan pesanan.</li>
-                <li>Uang muka (DP) dan angsuran yang telah dibayarkan <strong>tidak dapat dikembalikan</strong>.</li>
-                <li>Seluruh angsuran harus <strong>lunas H-7</strong> sebelum tanggal keberangkatan. Jika belum lunas, pihak tour berhak menunda atau membatalkan keberangkatan.</li>
+                <li>DP sebesar {dpPercentage}% dibayar saat pemesanan. Sisa {100 - dpPercentage}% dibayar tunai langsung kepada sopir saat bertemu di lokasi penjemputan.</li>
+                <li>DP yang telah dibayarkan <strong>tidak dapat dikembalikan</strong> jika pemesanan dibatalkan.</li>
+                <li>Pelunasan wajib dibayarkan kepada sopir sebelum perjalanan dimulai.</li>
                 <li>
                   {paymentGateway === 'midtrans'
-                    ? <>DP dan angsuran dibayar <strong>online</strong> (QRIS / Virtual Account / e-wallet / kartu) melalui halaman <strong>Jadwal &amp; Bayar Angsuran</strong> pada invoice Anda. Status pembayaran <strong>terkonfirmasi otomatis</strong>.</>
-                    : <>Bukti transfer diunggah melalui halaman <strong>Jadwal &amp; Bayar Angsuran</strong> pada invoice Anda (atau dikirim via WhatsApp/email). Admin akan memverifikasi dan mengkonfirmasi pembayaran.</>}
+                    ? <>DP dibayar <strong>online</strong> (QRIS / Virtual Account / e-wallet / kartu) melalui halaman <strong>Jadwal &amp; Bayar DP / Pelunasan</strong> pada invoice Anda. Status pembayaran <strong>terkonfirmasi otomatis</strong>.</>
+                    : <>Bukti transfer DP diunggah melalui halaman <strong>Jadwal &amp; Bayar DP / Pelunasan</strong> pada invoice Anda (atau dikirim via WhatsApp/email). Admin akan memverifikasi dan mengkonfirmasi pembayaran.</>}
                 </li>
               </ol>
               <label className="flex items-start gap-2 mt-3 cursor-pointer">
@@ -1260,7 +1229,7 @@ function BookingPage() {
                   className="mt-0.5 w-4 h-4 text-gold-300 border-ink-600 rounded focus:ring-gold-400"
                 />
                 <span className="text-sm text-gold-200">
-                  Saya telah membaca dan menyetujui syarat & ketentuan pembayaran angsuran di atas
+                  Saya telah membaca dan menyetujui syarat & ketentuan pembayaran DP di atas
                 </span>
               </label>
             </div>
@@ -1277,7 +1246,7 @@ function BookingPage() {
             </Button>
           </div>
           {paymentType === 'INSTALLMENT' && !agreedToTerms && (
-            <p className="text-xs text-gold-300 text-right mt-2">Centang persetujuan Syarat & Ketentuan angsuran di atas untuk melanjutkan.</p>
+            <p className="text-xs text-gold-300 text-right mt-2">Centang persetujuan Syarat & Ketentuan pembayaran DP di atas untuk melanjutkan.</p>
           )}
         </div>
       )}
@@ -1365,14 +1334,14 @@ function BookingPage() {
                   ? paymentGateway === 'midtrans'
                     ? 'Pembayaran Lunas (Online — QRIS / VA / E-Wallet / Kartu)'
                     : 'Pembayaran Lunas (Transfer Bank)'
-                  : `Angsuran ${installmentCount}x${paymentGateway === 'midtrans' ? ' (Online — DP + cicilan otomatis)' : ''}`}
+                  : `Pembayaran DP ${dpPercentage}%${paymentGateway === 'midtrans' ? ' (Online)' : ' (Transfer Bank)'} + pelunasan tunai ke sopir`}
               </p>
             </div>
             {paymentType === 'INSTALLMENT' && (
               <div className="bg-gold-400/10 rounded-lg p-3 border border-gold-500/20">
-                <p className="text-sm font-medium text-gold-200">Detail Angsuran:</p>
+                <p className="text-sm font-medium text-gold-200">Rincian Pembayaran DP:</p>
                 <p className="text-xs text-gold-300 mt-1">
-                  DP {dpPercentage}%: {formatCurrency(Math.round(grandTotal * (dpPercentage / 100)))} &bull; Sisa {installmentCount}x @ {formatCurrency(Math.round((grandTotal - Math.round(grandTotal * (dpPercentage / 100))) / installmentCount))}/bulan
+                  DP {dpPercentage}% (dibayar sekarang): {formatCurrency(Math.round(grandTotal * (dpPercentage / 100)))} &bull; Pelunasan (tunai ke sopir): {formatCurrency(grandTotal - Math.round(grandTotal * (dpPercentage / 100)))}
                 </p>
               </div>
             )}
@@ -1451,8 +1420,8 @@ function BookingPage() {
               {paymentType === 'INSTALLMENT' ? (
                 <>
                   Langkah terakhir: bayar <strong>DP (uang muka)</strong> melalui halaman pembayaran aman
-                  (QRIS, Virtual Account, e-wallet, atau kartu). Angsuran berikutnya dibayar melalui halaman{' '}
-                  <strong>Jadwal &amp; Bayar Angsuran</strong> — setiap pembayaran terkonfirmasi otomatis.
+                  (QRIS, Virtual Account, e-wallet, atau kartu). Pelunasan dibayar tunai langsung kepada{' '}
+                  <strong>sopir saat bertemu</strong> di lokasi penjemputan.
                 </>
               ) : (
                 <>

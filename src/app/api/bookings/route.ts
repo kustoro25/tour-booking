@@ -48,10 +48,11 @@ export async function POST(request: NextRequest) {
     }
 
     const isInstallment = paymentType === 'INSTALLMENT';
-    const installmentNum = isInstallment ? (parseInt(String(installmentCount)) || 2) : 0;
+    // Skema DP: nilai 1 berarti DP di muka + 1 pelunasan (tunai ke sopir).
+    const installmentNum = isInstallment ? (parseInt(String(installmentCount)) || 1) : 0;
 
-    if (isInstallment && (installmentNum < 2 || installmentNum > 12)) {
-      return NextResponse.json({ success: false, error: 'Jumlah angsuran tidak valid (2-12x)' }, { status: 400 });
+    if (isInstallment && (installmentNum < 1 || installmentNum > 12)) {
+      return NextResponse.json({ success: false, error: 'Jumlah angsuran tidak valid (1-12x)' }, { status: 400 });
     }
 
     // Check if installment is enabled from settings
@@ -60,7 +61,8 @@ export async function POST(request: NextRequest) {
       if (!installmentSetting || JSON.parse(installmentSetting.value) !== true) {
         return NextResponse.json({ success: false, error: 'Fitur angsuran sedang tidak tersedia' }, { status: 400 });
       }
-      // Validasi jumlah angsuran terhadap opsi yang diizinkan admin (default hanya 2x)
+      // Validasi jumlah angsuran terhadap opsi yang diizinkan admin (default hanya 2x).
+      // Nilai 1 selalu diizinkan: skema standar DP + pelunasan tunai ke sopir.
       const optionsSetting = await prisma.setting.findUnique({ where: { key: 'installment_options' } });
       let allowedOptions: number[] = [2];
       if (optionsSetting) {
@@ -69,7 +71,7 @@ export async function POST(request: NextRequest) {
           if (Array.isArray(parsed)) allowedOptions = parsed.map(Number).filter((n) => !isNaN(n));
         } catch { /* gunakan default [2] */ }
       }
-      if (!allowedOptions.includes(installmentNum)) {
+      if (installmentNum !== 1 && !allowedOptions.includes(installmentNum)) {
         return NextResponse.json({ success: false, error: 'Jumlah angsuran tidak tersedia' }, { status: 400 });
       }
     }
