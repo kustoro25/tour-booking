@@ -55,10 +55,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const REGION_COLORS: Record<string, string> = {
-  'North Bali': 'bg-sky-500/15 text-sky-200 border border-sky-500/30',
-  'Mid-North Bali': 'bg-emerald-500/15 text-emerald-200 border border-emerald-500/30',
-  'East Bali': 'bg-gold-400/15 text-gold-200 border border-gold-500/30',
-  'West Bali': 'bg-rose-500/15 text-rose-200 border border-rose-500/30',
+  'Bali Utara': 'bg-sky-500/15 text-sky-200 border border-sky-500/30',
+  'Bali Tengah-Utara': 'bg-emerald-500/15 text-emerald-200 border border-emerald-500/30',
+  'Bali Timur': 'bg-gold-400/15 text-gold-200 border border-gold-500/30',
+  'Bali Barat': 'bg-rose-500/15 text-rose-200 border border-rose-500/30',
 };
 
 export default async function FleetDetailPage({ params }: PageProps) {

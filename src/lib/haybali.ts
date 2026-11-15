@@ -192,29 +192,29 @@ export function getCarRentalBasePrice(slug: string, durationHours: number): numb
 
 // ----------------------------------------------------------------------------
 // 2. Biaya Tambahan Daerah (di luar harga sewa 12 jam yang disepakati)
-//    Struktur mengikuti materi referensi: 4 kartu wilayah (North Bali,
-//    Mid-North Bali, East Bali, West Bali), tiap baris menggabungkan
+//    Struktur mengikuti materi referensi: 4 kartu wilayah (Bali Utara,
+//    Bali Tengah-Utara, Bali Timur, Bali Barat), tiap baris menggabungkan
 //    beberapa area dengan satu tarif.
 // ----------------------------------------------------------------------------
 
 export interface RemoteAreaFee {
   id: string; // key stabil untuk API booking
-  region: string; // North Bali / Mid-North Bali / East Bali / West Bali
+  region: string; // Bali Utara / Bali Tengah-Utara / Bali Timur / Bali Barat
   label: string; // nama area tujuan
   fee: number; // biaya tambahan (Rp)
 }
 
 export const REMOTE_AREA_FEES: RemoteAreaFee[] = [
-  { id: 'north-bedugul', region: 'North Bali', label: 'Bedugul, Jatiluwih, Batukaru, Baturiti', fee: 200000 },
-  { id: 'north-munduk', region: 'North Bali', label: 'Munduk, Gitgit, Sekumpul, Banyumala', fee: 300000 },
-  { id: 'north-lovina', region: 'North Bali', label: 'Lovina, Singaraja, Aling-Aling, Tejakula', fee: 350000 },
-  { id: 'north-banjar', region: 'North Bali', label: 'Banjar, Temukus, Gerokgak', fee: 400000 },
-  { id: 'midnorth-penelokan', region: 'Mid-North Bali', label: 'Penelokan, Kintamani, Puhu, Bangli', fee: 150000 },
-  { id: 'midnorth-besakih', region: 'Mid-North Bali', label: 'Besakih, Sidemen, Selat, Tembuku', fee: 250000 },
-  { id: 'east-lempuyang', region: 'East Bali', label: 'Lempuyang, Tirta Gangga, Candidasa', fee: 250000 },
-  { id: 'east-amed', region: 'East Bali', label: 'Amed, Culik, Lahangan Sweet', fee: 300000 },
-  { id: 'east-tulamben', region: 'East Bali', label: 'Tulamben, Tejakula, Tianyar, Kubu, Gretek', fee: 350000 },
-  { id: 'west-gilimanuk', region: 'West Bali', label: 'Gilimanuk, Menjangan, Pemuteran, Banyuwedang', fee: 450000 },
+  { id: 'north-bedugul', region: 'Bali Utara', label: 'Bedugul, Jatiluwih, Batukaru, Baturiti', fee: 200000 },
+  { id: 'north-munduk', region: 'Bali Utara', label: 'Munduk, Gitgit, Sekumpul, Banyumala', fee: 300000 },
+  { id: 'north-lovina', region: 'Bali Utara', label: 'Lovina, Singaraja, Aling-Aling, Tejakula', fee: 350000 },
+  { id: 'north-banjar', region: 'Bali Utara', label: 'Banjar, Temukus, Gerokgak', fee: 400000 },
+  { id: 'midnorth-penelokan', region: 'Bali Tengah-Utara', label: 'Penelokan, Kintamani, Puhu, Bangli', fee: 150000 },
+  { id: 'midnorth-besakih', region: 'Bali Tengah-Utara', label: 'Besakih, Sidemen, Selat, Tembuku', fee: 250000 },
+  { id: 'east-lempuyang', region: 'Bali Timur', label: 'Lempuyang, Tirta Gangga, Candidasa', fee: 250000 },
+  { id: 'east-amed', region: 'Bali Timur', label: 'Amed, Culik, Lahangan Sweet', fee: 300000 },
+  { id: 'east-tulamben', region: 'Bali Timur', label: 'Tulamben, Tejakula, Tianyar, Kubu, Gretek', fee: 350000 },
+  { id: 'west-gilimanuk', region: 'Bali Barat', label: 'Gilimanuk, Menjangan, Pemuteran, Banyuwedang', fee: 450000 },
 ];
 
 /** Area standar (tanpa biaya tambahan) — satu wilayah per hari. */

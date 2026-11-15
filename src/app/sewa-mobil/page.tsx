@@ -33,10 +33,10 @@ async function getFleetTours() {
 }
 
 const REGION_COLORS: Record<string, string> = {
-  'North Bali': 'bg-sky-500/15 text-sky-200',
-  'Mid-North Bali': 'bg-emerald-500/15 text-emerald-300',
-  'East Bali': 'bg-purple-500/15 text-purple-300',
-  'West Bali': 'bg-gold-400/15 text-gold-300',
+  'Bali Utara': 'bg-sky-500/15 text-sky-200',
+  'Bali Tengah-Utara': 'bg-emerald-500/15 text-emerald-300',
+  'Bali Timur': 'bg-purple-500/15 text-purple-300',
+  'Bali Barat': 'bg-gold-400/15 text-gold-300',
 };
 
 export default async function SewaMobilPage() {
