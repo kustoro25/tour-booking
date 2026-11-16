@@ -6,10 +6,12 @@
 // lalu klien memakai preferensi tersimpan (pola mount-swap).
 // ============================================================================
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import id from './id';
 import en from './en';
 import type { Dictionary } from './id';
+import { DEFAULT_USD_RATE, formatUsdFromIdr } from '@/lib/currency';
+import { formatCurrency } from '@/lib/utils';
 
 export type Locale = 'id' | 'en';
 
@@ -80,6 +82,10 @@ export interface I18nValue {
   list: (path: string) => unknown[];
   /** Ambil daftar dari kamus dengan fallback bila kunci tidak ada. */
   listOr: (path: string, fallback: string[]) => string[];
+  /** Kurs USD→IDR aktif (estimasi harga bahasa English). */
+  usdRate: number;
+  /** Format nominal IDR sesuai bahasa aktif: id → Rupiah, en → estimasi USD. */
+  formatPrice: (amountIdr: number) => string;
 }
 
 function interpolate(raw: string, vars?: Record<string, string | number>): string {
@@ -121,6 +127,8 @@ const fallbackValue: I18nValue = {
   tOr: (path, fallback, vars) => lookupOr(path, 'id', fallback, vars),
   list: (path) => lookupList(path, 'id'),
   listOr: (path, fallback) => lookupListOr(path, 'id', fallback),
+  usdRate: DEFAULT_USD_RATE,
+  formatPrice: (amount) => formatCurrency(amount),
 };
 
 const I18nContext = createContext<I18nValue>(fallbackValue);
@@ -129,6 +137,25 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   // Snapshot server selalu 'id'; klien membaca preferensi tersimpan dari
   // localStorage. React me-render ulang setelah hidrasi bila berbeda.
   const locale = useSyncExternalStore(subscribeLocale, getStoredLocale, () => 'id' as Locale);
+
+  // Kurs USD→IDR diambil sekali per mount dari API publik (sudah di-cache server).
+  // Hanya perlu saat bahasa English aktif — hemat satu request untuk pengunjung ID.
+  const [usdRate, setUsdRate] = useState(DEFAULT_USD_RATE);
+
+  useEffect(() => {
+    if (locale !== 'en') return;
+    let active = true;
+    fetch('/api/settings/public')
+      .then((r) => r.json())
+      .then((data) => {
+        const rate = Number(data?.data?.usdRate);
+        if (active && Number.isFinite(rate) && rate > 1000) setUsdRate(rate);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [locale]);
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -147,10 +174,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     (path: string, fallback: string[]) => lookupListOr(path, locale, fallback),
     [locale]
   );
+  // Harga mengikuti bahasa: Rupiah untuk id, estimasi USD untuk en.
+  const formatPrice = useCallback(
+    (amountIdr: number) =>
+      locale === 'en' ? formatUsdFromIdr(amountIdr, usdRate) : formatCurrency(amountIdr),
+    [locale, usdRate]
+  );
 
   const value = useMemo<I18nValue>(
-    () => ({ locale, setLocale: setStoredLocale, t, tOr, list, listOr }),
-    [locale, t, tOr, list, listOr]
+    () => ({ locale, setLocale: setStoredLocale, t, tOr, list, listOr, usdRate, formatPrice }),
+    [locale, t, tOr, list, listOr, usdRate, formatPrice]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
@@ -180,23 +213,44 @@ export function useTranslatedMeta(titleEn: string, descriptionEn?: string) {
     }
     const original = originalRef.current;
     const desiredTitle = locale === 'en' ? titleEn : original.title;
+    const desiredDescription =
+      descriptionEn === undefined
+        ? null
+        : locale === 'en'
+          ? descriptionEn
+          : (original.description ?? '');
 
-    const applyTitle = () => {
+    const apply = () => {
       if (document.title !== desiredTitle) document.title = desiredTitle;
+      if (desiredDescription !== null) {
+        // Next.js kadang menambah tag deskripsi baru saat hidrasi/navigasi —
+        // samakan semua tag (termasuk og/twitter) agar tidak ada versi lama tertinggal.
+        const descSelector = [
+          'meta[name="description"]',
+          'meta[property="og:description"]',
+          'meta[name="og:description"]',
+          'meta[property="twitter:description"]',
+          'meta[name="twitter:description"]',
+        ].join(', ');
+        document.head.querySelectorAll(descSelector).forEach((el) => {
+          if (el.getAttribute('content') !== desiredDescription) {
+            el.setAttribute('content', desiredDescription);
+          }
+        });
+      }
     };
-    applyTitle();
+    apply();
 
     // Next.js menulis ulang <title> dari metadata server saat hidrasi/navigasi;
-    // observer memastikan judul sesuai bahasa aktif tetap menang.
-    const observer = new MutationObserver(applyTitle);
-    observer.observe(document.head, { childList: true, subtree: true, characterData: true });
-
-    if (descriptionEn !== undefined) {
-      const descEl = document.querySelector('meta[name="description"]');
-      if (descEl) {
-        descEl.setAttribute('content', locale === 'en' ? descriptionEn : (original.description ?? ''));
-      }
-    }
+    // observer memastikan judul & deskripsi sesuai bahasa aktif tetap menang.
+    const observer = new MutationObserver(apply);
+    observer.observe(document.head, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ['content'],
+    });
 
     return () => observer.disconnect();
   }, [locale, titleEn, descriptionEn]);

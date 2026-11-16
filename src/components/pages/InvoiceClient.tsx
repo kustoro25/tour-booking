@@ -7,9 +7,10 @@
 // ============================================================================
 
 import { formatCurrency } from '@/lib/utils';
+import { formatUsdFromIdr } from '@/lib/currency';
 import { formatTime12h } from '@/lib/haybali';
 import CopyButton from '@/components/ui/CopyButton';
-import { useI18n } from '@/lib/i18n/client';
+import { useI18n, useTranslatedMeta } from '@/lib/i18n/client';
 import {
   OrderStatusColors,
   OrderStatusIcons,
@@ -114,7 +115,8 @@ export default function InvoiceClient({
   config,
   paymentMode,
 }: InvoiceClientProps) {
-  const { t, tOr, locale } = useI18n();
+  const { t, tOr, locale, usdRate } = useI18n();
+  useTranslatedMeta(t('meta.invoice'));
   const c = config;
   const H = c.headerBg || '#1e3a5f';
   const He = c.headerBgEnd || H;
@@ -189,6 +191,8 @@ export default function InvoiceClient({
   }
 
   // Durasi sewa tersimpan dalam bahasa Indonesia — petakan untuk locale en.
+  const tourDurationText =
+    locale === 'en' ? String(order.tour.duration || '').replace(/Jam/g, 'Hours') : order.tour.duration;
   const durationText =
     locale === 'en'
       ? extrasDuration === '6 Jam'
@@ -348,13 +352,13 @@ export default function InvoiceClient({
               </div>
               <div className="flex-1">
                 <h4 className="font-semibold text-gray-900 text-sm">{order.tour.name}</h4>
-                <p className="text-xs text-gray-500 mt-0.5">{order.tour.duration} · {order.tour.destination}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{tourDurationText} · {order.tour.destination}</p>
               </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               {[
                 { label: T.L.tourDate, value: fmtDate(order.tourDate) },
-                { label: T.L.duration, value: order.tour.duration },
+                { label: T.L.duration, value: tourDurationText },
                 {
                   label: isCarRental ? t('invoice.unit') : T.L.adults,
                   value: isCarRental ? t('invoice.unitCar') : t('invoice.people', { count: order.adults }),
@@ -613,6 +617,17 @@ export default function InvoiceClient({
               <span className="text-base font-bold text-gray-900">{T.L.total}</span>
               <span className="text-xl font-extrabold" style={{ color: accent }}>{formatCurrency(grandTotal)}</span>
             </div>
+            {locale === 'en' && (
+              <div className="pt-2 text-right space-y-0.5">
+                <p className="text-sm font-semibold text-gray-700">
+                  {t('currency.usdEstimate', {
+                    usd: formatUsdFromIdr(grandTotal, usdRate),
+                    rate: usdRate.toLocaleString('en-US'),
+                  })}
+                </p>
+                <p className="text-[11px] text-gray-500">{t('currency.idrNote')}</p>
+              </div>
+            )}
           </div>
         </div>
 

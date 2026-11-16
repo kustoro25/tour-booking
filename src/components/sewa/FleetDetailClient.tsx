@@ -7,7 +7,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { formatCurrency } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import type { FleetItem } from '@/lib/haybali';
 import type { FleetDetail } from '@/lib/fleet-detail';
@@ -40,8 +39,8 @@ const REGION_COLORS: Record<string, string> = {
 };
 
 export default function FleetDetailClient({ fleet, detail, waNumber, gateway, bankLabel }: FleetDetailClientProps) {
-  const { t, tOr, listOr } = useI18n();
-  useTranslatedMeta(t('meta.fleetDetail', { name: detail.fullName }));
+  const { t, tOr, listOr, formatPrice } = useI18n();
+  useTranslatedMeta(t('meta.fleetDetail', { name: detail.fullName }), t('meta.fleetDetailDesc', { name: detail.fullName }));
 
   const carKey = `fleetDetail.cars.${fleet.slug}`;
   const tagline = tOr(`${carKey}.tagline`, detail.tagline);
@@ -139,11 +138,11 @@ export default function FleetDetailClient({ fleet, detail, waNumber, gateway, ba
                   <div>
                     {fleet.price6h !== null && (
                       <p className="text-sm text-mist-dim mb-1">
-                        {formatCurrency(fleet.price6h)} <span className="text-xs">{t('fleetDetail.common.per6h')}</span>
+                        {formatPrice(fleet.price6h)} <span className="text-xs">{t('fleetDetail.common.per6h')}</span>
                       </p>
                     )}
                     <p className="text-3xl font-bold text-gold-300">
-                      {formatCurrency(fleet.price12h)}
+                      {formatPrice(fleet.price12h)}
                       <span className="text-sm font-medium text-mist-dim"> {t('fleetDetail.common.per12h')}</span>
                     </p>
                     <p className="text-xs text-mist-dim mt-1">
@@ -260,12 +259,12 @@ export default function FleetDetailClient({ fleet, detail, waNumber, gateway, ba
               {fleet.price6h !== null && (
                 <li className="flex justify-between gap-3">
                   <span>{t('fleetDetail.common.pkg6')}</span>
-                  <span className="font-semibold text-gold-300 whitespace-nowrap">{formatCurrency(fleet.price6h)}</span>
+                  <span className="font-semibold text-gold-300 whitespace-nowrap">{formatPrice(fleet.price6h)}</span>
                 </li>
               )}
               <li className="flex justify-between gap-3">
                 <span>{t('fleetDetail.common.pkg12')}</span>
-                <span className="font-semibold text-gold-300 whitespace-nowrap">{formatCurrency(fleet.price12h)}</span>
+                <span className="font-semibold text-gold-300 whitespace-nowrap">{formatPrice(fleet.price12h)}</span>
               </li>
               <li className="flex justify-between gap-3">
                 <span>{t('fleetDetail.common.overtime')}</span>
@@ -309,12 +308,12 @@ export default function FleetDetailClient({ fleet, detail, waNumber, gateway, ba
               <li>
                 {t('fleetDetail.common.driverWindow', {
                   window: formatPickupWindow12h(),
-                  fee: formatCurrency(DRIVER_POLICY.latePickupFee),
+                  fee: formatPrice(DRIVER_POLICY.latePickupFee),
                 })}
               </li>
               <li>
                 {t('fleetDetail.common.driverOvernight', {
-                  fee: formatCurrency(DRIVER_POLICY.driverAccommodation),
+                  fee: formatPrice(DRIVER_POLICY.driverAccommodation),
                 })}
               </li>
               <li>{t('fleetDetail.common.driverCancel')}</li>
@@ -406,7 +405,7 @@ export default function FleetDetailClient({ fleet, detail, waNumber, gateway, ba
                 {areas.map((area) => (
                   <li key={area.id} className="flex items-start justify-between gap-3 text-sm">
                     <span className="text-mist">{area.label}</span>
-                    <span className="font-bold text-gold-300 whitespace-nowrap">+{formatCurrency(area.fee)}</span>
+                    <span className="font-bold text-gold-300 whitespace-nowrap">+{formatPrice(area.fee)}</span>
                   </li>
                 ))}
               </ul>
@@ -449,7 +448,7 @@ export default function FleetDetailClient({ fleet, detail, waNumber, gateway, ba
                 <div className="p-5 flex flex-col flex-1">
                   <h3 className="text-lg font-bold text-ivory mb-1">{car.name}</h3>
                   <p className="text-gold-300 font-bold mb-3">
-                    {formatCurrency(car.price12h)}
+                    {formatPrice(car.price12h)}
                     <span className="text-xs font-medium text-mist-dim"> {t('fleetDetail.common.per12h')}</span>
                   </p>
                   <span className="mt-auto text-sm font-semibold text-gold-300 group-hover:text-gold-200">

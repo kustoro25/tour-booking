@@ -167,7 +167,7 @@ const en: Dictionary = {
         clearData: '• Please provide clear details to make pick-up easier.',
         cancel: '• If a cancellation is made less than 3 hours before departure, please understand that the paid deposit cannot be refunded because we have locked in the schedule & driver for you.',
         delay: '• Let us know if your flight is delayed so we can adjust the schedule.',
-        hours: '• Driver working hours are 7:00 AM–11:00 PM WITA. Pick-ups within that window are free of extra charge; outside it (including 12:00 AM–4:00 AM) +Rp 50,000 per car, charged once.',
+        hours: '• Driver working hours are 7:00 AM–11:00 PM WITA. Pick-ups within that window are free of extra charge; outside it (including 12:00 AM–4:00 AM) an extra $3 (≈ Rp 50,000) per car, charged once.',
       },
     },
     testimonials: {
@@ -183,7 +183,7 @@ const en: Dictionary = {
       items: [
         { question: 'How do I make a booking?', answer: 'Choose the car rental service you want, pick a date from the calendar, fill in your details, then click "Book Now". Your invoice is issued immediately and payment is made according to the method listed on the invoice.' },
         { question: 'Does the car rental include a driver and fuel?', answer: 'Yes. All HAYBALI TRANS rental prices include an experienced driver and fuel. Choose 6-hour or 12-hour durations depending on the fleet, with no mileage limits. Areas outside the standard zones are subject to additional fees per the listed table and confirmed by admin via WhatsApp — not calculated automatically at booking.' },
-        { question: 'What is the driver working-hours policy?', answer: 'Driver working hours are 7:00 AM–11:00 PM WITA. Pick-ups within that window are free of extra charge. Outside it — including the early hours of 12:00 AM–4:00 AM — an additional Rp 50,000 per car applies, charged once per pick-up (not per hour). Overnight stays outside the city are charged Rp 350,000/night.' },
+        { question: 'What is the driver working-hours policy?', answer: 'Driver working hours are 7:00 AM–11:00 PM WITA. Pick-ups within that window are free of extra charge. Outside it — including the early hours of 12:00 AM–4:00 AM — an additional $3 (≈ Rp 50,000) per car applies, charged once per pick-up (not per hour). Overnight stays outside the city are charged $19 (≈ Rp 350,000)/night.' },
         { question: 'What is the cancellation policy?', answer: 'Cancellations should be confirmed at least 3 hours before departure. If a cancellation is made later than that, please understand that the paid deposit cannot be refunded because we have locked in the schedule & driver for you. Please let us know immediately if your flight is delayed so we can adjust the pick-up.' },
       ],
     },
@@ -636,6 +636,8 @@ const en: Dictionary = {
     durationLabel: 'Rental Duration',
     duration6: '6 Hours — {price}',
     duration12: '12 Hours — {price}',
+    durationTag6or12: '6 / 12 Hours',
+    durationTag12: '12 Hours',
     overtimeNote: 'Overtime is charged at {pct}% of the price per hour.',
     pickupTimeLabel: 'Pickup Time',
     pickupAria: 'Pickup time',
@@ -827,7 +829,7 @@ const en: Dictionary = {
     orderName: '- Name: {name}',
     orderPackage: '- Package: {tour}',
     orderDate: '- Date: {date}',
-    orderTotal: '- Total: Rp {total}',
+    orderTotal: '- Total: {total}',
     msgOnline: 'Hello, I would like to ask about the online payment for my order:\n{orderInfo}',
     msgPaid:
       'Hello, I would like to ask about my order:\n{orderInfo}\n\nMy order has been paid. Please send me the E-Ticket information.',
@@ -930,7 +932,7 @@ const en: Dictionary = {
       },
       {
         q: 'What are the driver working hours policy?',
-        a: 'Driver working hours are 7:00 AM–11:00 PM WITA. Pickups within that range are free of extra charges. Outside that range — including early morning 12:00 AM–4:00 AM — an extra fee of Rp 50,000 per car applies, charged once per pickup (not per hour). Overnight stays outside the city are charged Rp 350,000 per night.',
+        a: 'Driver working hours are 7:00 AM–11:00 PM WITA. Pickups within that range are free of extra charges. Outside that range — including early morning 12:00 AM–4:00 AM — an extra fee of $3 (≈ Rp 50,000) per car applies, charged once per pickup (not per hour). Overnight stays outside the city are charged $19 (≈ Rp 350,000) per night.',
       },
       {
         q: 'What is the cancellation policy?',
@@ -1227,6 +1229,8 @@ const en: Dictionary = {
     sewaDesc:
       'Luxury car rental with driver in Bali. Experienced drivers, pristine vehicles, transparent pricing, and fast online booking.',
     fleetDetail: 'Rent {name} in Bali with Driver | HAYBALI TRANS',
+    fleetDetailDesc:
+      'Rent {name} with a private driver in Bali: transparent pricing, a well-maintained fleet, and fast online booking.',
     about: 'About Us | HAYBALI TRANS',
     aboutDesc: 'Get to know HAYBALI TRANS, your trusted car rental and private transport partner in Bali.',
     testimonials: 'Testimonials | HAYBALI TRANS',
@@ -1237,6 +1241,13 @@ const en: Dictionary = {
     faqDesc: 'Frequently asked questions about car rental and booking at HAYBALI TRANS.',
     terms: 'Terms & Conditions | HAYBALI TRANS',
     privacy: 'Privacy Policy | HAYBALI TRANS',
+    booking: 'Booking | HAYBALI TRANS',
+    invoice: 'Invoice | HAYBALI TRANS',
+  },
+  currency: {
+    usdEstimate: '≈ {usd} (rate Rp {rate}/USD)',
+    idrNote: 'All amounts on this page are in Indonesian Rupiah (IDR).',
+    estimateNote: 'USD prices are estimates. Payment is processed in Indonesian Rupiah (IDR).',
   },
 };
 

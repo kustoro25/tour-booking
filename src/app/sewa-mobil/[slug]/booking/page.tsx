@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense, type SyntheticEvent } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { formatCurrency } from '@/lib/utils';
+import { formatUsdFromIdr } from '@/lib/currency';
 import {
   STANDARD_AREAS,
   REMOTE_AREA_FEES,
@@ -23,7 +24,7 @@ import {
 import Button from '@/components/ui/Button';
 import BookingCalendar from '@/components/booking/BookingCalendar';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { useI18n } from '@/lib/i18n/client';
+import { useI18n, useTranslatedMeta } from '@/lib/i18n/client';
 
 interface Tour {
   id: string;
@@ -85,7 +86,8 @@ function BookingPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const slug = params.slug as string;
-  const { t, tOr, list, locale } = useI18n();
+  const { t, tOr, list, locale, usdRate, formatPrice } = useI18n();
+  useTranslatedMeta(t('meta.booking'));
 
   // Prefill dari halaman /antar-jemput (form booking cepat): ?area=&direction=&pax=
   // State diinisialisasi langsung dari query string agar tidak perlu setState di useEffect.
@@ -521,7 +523,10 @@ function BookingPage() {
         customerName: formData.customerName,
         serviceLabel: tour.name,
         dateLabel: fmtDate(selectedDate),
-        totalLabel: formatCurrency(grandTotal),
+        totalLabel:
+          locale === 'en'
+            ? `${formatCurrency(grandTotal)} (≈ ${formatUsdFromIdr(grandTotal, usdRate)})`
+            : formatCurrency(grandTotal),
         paymentLabel,
         extraLines,
       },
@@ -569,7 +574,12 @@ function BookingPage() {
                 ? t('booking.step1Transfer')
                 : t('booking.step1Default')}
           </h2>
-          <p className="text-mist-dim text-sm mb-6">{tour.name} &bull; {tour.duration}</p>
+          <p className="text-mist-dim text-sm mb-6">
+            {tour.name} &bull;{' '}
+            {isCarRental
+              ? tOr(fleetCar?.price6h != null ? 'booking.durationTag6or12' : 'booking.durationTag12', tour.duration)
+              : tour.duration}
+          </p>
 
           {/* Calendar */}
           <div className="max-w-md mx-auto">
@@ -643,7 +653,7 @@ function BookingPage() {
                         </div>
                         {slotInfo.priceOverride && (
                           <span className="text-sm font-semibold text-gold-200 bg-gold-400/15 px-3 py-1 rounded-full">
-                            {formatCurrency(slotInfo.priceOverride)}
+                            {formatPrice(slotInfo.priceOverride)}
                           </span>
                         )}
                       </div>
@@ -697,7 +707,7 @@ function BookingPage() {
                           : 'border-ink-700 text-mist hover:border-ink-600'
                       }`}
                     >
-                      {t('booking.duration6', { price: formatCurrency(fleetCar.price6h) })}
+                      {t('booking.duration6', { price: formatPrice(fleetCar.price6h) })}
                     </button>
                     <button
                       type="button"
@@ -708,12 +718,12 @@ function BookingPage() {
                           : 'border-ink-700 text-mist hover:border-ink-600'
                       }`}
                     >
-                      {t('booking.duration12', { price: formatCurrency(fleetCar.price12h) })}
+                      {t('booking.duration12', { price: formatPrice(fleetCar.price12h) })}
                     </button>
                   </div>
                 ) : (
                   <p className="text-sm text-mist bg-ink-900 border border-ink-700 rounded-lg px-4 py-2.5">
-                    {t('booking.duration12', { price: formatCurrency(fleetCar?.price12h ?? tour.priceAdult) })}
+                    {t('booking.duration12', { price: formatPrice(fleetCar?.price12h ?? tour.priceAdult) })}
                   </p>
                 )}
                 <p className="text-xs text-mist-dim mt-1">
@@ -777,7 +787,7 @@ function BookingPage() {
                     <p className="text-xs text-gold-300 mt-1">
                       {t('booking.lateFeeNote', {
                         window: formatPickupWindow12h(),
-                        fee: formatCurrency(DRIVER_POLICY.latePickupFee),
+                        fee: formatPrice(DRIVER_POLICY.latePickupFee),
                       })}
                     </p>
                   ) : (
@@ -793,19 +803,22 @@ function BookingPage() {
                 <div className="bg-gold-400/10 border border-gold-500/20 rounded-xl p-4 space-y-1.5 text-sm">
                   <div className="flex justify-between">
                     <span className="text-mist">{t('booking.basePrice', { duration: rentalDuration })}</span>
-                    <span className="font-medium">{formatCurrency(carQuote?.base ?? 0)}</span>
+                    <span className="font-medium">{formatPrice(carQuote?.base ?? 0)}</span>
                   </div>
                   {(carQuote?.latePickupFee ?? 0) > 0 && (
                     <div className="flex justify-between">
                       <span className="text-mist">{t('booking.lateFee')}</span>
-                      <span className="font-medium text-gold-300">+{formatCurrency(carQuote?.latePickupFee ?? 0)}</span>
+                      <span className="font-medium text-gold-300">+{formatPrice(carQuote?.latePickupFee ?? 0)}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-bold pt-2 border-t border-gold-500/20">
                     <span>{t('booking.total')}</span>
-                    <span className="text-gold-200">{formatCurrency(carQuote?.total ?? 0)}</span>
+                    <span className="text-gold-200">{formatPrice(carQuote?.total ?? 0)}</span>
                   </div>
                 </div>
+              )}
+              {locale === 'en' && isValidPickupTime(pickupTime) && (
+                <p className="text-xs text-mist-dim mt-2">{t('currency.estimateNote')}</p>
               )}
             </div>
           )}
@@ -851,7 +864,7 @@ function BookingPage() {
                   <option value="">{t('booking.areaPlaceholder')}</option>
                   {AIRPORT_TRANSFER_RATES.map((r) => (
                     <option key={r.area} value={r.area}>
-                      {r.area} — {formatCurrency(r.priceSmall)}
+                      {r.area} — {formatPrice(r.priceSmall)}
                     </option>
                   ))}
                 </select>
@@ -912,15 +925,20 @@ function BookingPage() {
               </div>
 
               {transferArea && transferPrice !== null && transferPrice > 0 && (
-                <div className="bg-gold-400/10 border border-gold-500/20 rounded-xl p-4 flex items-center justify-between">
-                  <span className="text-sm text-gold-200">
-                    {t('booking.fareLabel', {
-                      range: formData.adults <= 5 ? t('booking.paxRangeSmall') : t('booking.paxRangeBig'),
-                      dir: direction === 'PICKUP' ? t('booking.dirPickup') : t('booking.dirDrop'),
-                    })}
-                  </span>
-                  <span className="text-xl font-bold text-gold-200">{formatCurrency(transferPrice)}</span>
-                </div>
+                <>
+                  <div className="bg-gold-400/10 border border-gold-500/20 rounded-xl p-4 flex items-center justify-between">
+                    <span className="text-sm text-gold-200">
+                      {t('booking.fareLabel', {
+                        range: formData.adults <= 5 ? t('booking.paxRangeSmall') : t('booking.paxRangeBig'),
+                        dir: direction === 'PICKUP' ? t('booking.dirPickup') : t('booking.dirDrop'),
+                      })}
+                    </span>
+                    <span className="text-xl font-bold text-gold-200">{formatPrice(transferPrice)}</span>
+                  </div>
+                  {locale === 'en' && (
+                    <p className="text-xs text-mist-dim mt-2">{t('currency.estimateNote')}</p>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -1028,7 +1046,7 @@ function BookingPage() {
                             {areas.map((area) => (
                               <li key={area.id} className="flex items-start justify-between gap-2">
                                 <span className="text-mist-dim">{area.label}</span>
-                                <span className="text-gold-300 whitespace-nowrap">+{formatCurrency(area.fee)}</span>
+                                <span className="text-gold-300 whitespace-nowrap">+{formatPrice(area.fee)}</span>
                               </li>
                             ))}
                           </ul>
@@ -1162,7 +1180,7 @@ function BookingPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-ivory">{t('booking.fullTitle')}</h3>
-                  <p className="text-sm text-mist-dim mt-0.5">{t('booking.fullDesc', { total: formatCurrency(grandTotal) })}</p>
+                  <p className="text-sm text-mist-dim mt-0.5">{t('booking.fullDesc', { total: formatPrice(grandTotal) })}</p>
                   {paymentGateway === 'midtrans' ? (
                     <p className="text-xs text-green-300 mt-1">{t('booking.fullMidtrans')}</p>
                   ) : (
@@ -1205,7 +1223,7 @@ function BookingPage() {
                     <p className="text-xs text-mist-dim mt-1">{t('booking.dpUnavailable')}</p>
                   )}
                   {installmentEnabled && !installmentThresholdMet && (
-                    <p className="text-xs text-gold-300 mt-1">{t('booking.dpMin', { min: formatCurrency(minInstallmentAmount) })}</p>
+                    <p className="text-xs text-gold-300 mt-1">{t('booking.dpMin', { min: formatPrice(minInstallmentAmount) })}</p>
                   )}
                 </div>
               </div>
@@ -1221,11 +1239,11 @@ function BookingPage() {
                           <h4 className="text-sm font-semibold text-mist">{t('booking.dpSimTitle')}</h4>
                           <div className="grid grid-cols-2 gap-y-1.5 text-sm">
                             <span className="text-mist-dim">{t('booking.dpSimTotal')}</span>
-                            <span className="text-right font-medium">{formatCurrency(grandTotal)}</span>
+                            <span className="text-right font-medium">{formatPrice(grandTotal)}</span>
                             <span className="text-mist-dim">{t('booking.dpSimNow', { pct: dpPercentage })}</span>
-                            <span className="text-right font-medium text-gold-300">{formatCurrency(dp)}</span>
+                            <span className="text-right font-medium text-gold-300">{formatPrice(dp)}</span>
                             <span className="text-mist-dim pt-2 border-t">{t('booking.dpSimRemaining')}</span>
-                            <span className="text-right font-bold text-gold-300 pt-2 border-t">{formatCurrency(remaining)}</span>
+                            <span className="text-right font-bold text-gold-300 pt-2 border-t">{formatPrice(remaining)}</span>
                           </div>
                         </div>
                       );
@@ -1234,6 +1252,10 @@ function BookingPage() {
                 )}
               </div>
           </div>
+
+          {locale === 'en' && (
+            <p className="text-xs text-mist-dim -mt-2 mb-4">{t('currency.estimateNote')}</p>
+          )}
 
           {paymentType === 'INSTALLMENT' && (
             <div className="mt-4 p-4 bg-gold-400/10 border border-gold-500/30 rounded-lg">
@@ -1378,8 +1400,8 @@ function BookingPage() {
                 <p className="text-xs text-gold-300 mt-1">
                   {t('booking.dpDetails', {
                     pct: dpPercentage,
-                    dp: formatCurrency(Math.round(grandTotal * (dpPercentage / 100))),
-                    rest: formatCurrency(grandTotal - Math.round(grandTotal * (dpPercentage / 100))),
+                    dp: formatPrice(Math.round(grandTotal * (dpPercentage / 100))),
+                    rest: formatPrice(grandTotal - Math.round(grandTotal * (dpPercentage / 100))),
                   })}
                 </p>
               </div>
@@ -1392,12 +1414,12 @@ function BookingPage() {
               <>
                 <div className="flex justify-between text-sm">
                   <span className="text-mist-dim">{t('booking.basePrice', { duration: rentalDuration })}</span>
-                  <span>{formatCurrency(carQuote?.base ?? 0)}</span>
+                  <span>{formatPrice(carQuote?.base ?? 0)}</span>
                 </div>
                 {(carQuote?.latePickupFee ?? 0) > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-mist-dim">{t('booking.lateFee')}</span>
-                    <span className="text-gold-300">+{formatCurrency(carQuote?.latePickupFee ?? 0)}</span>
+                    <span className="text-gold-300">+{formatPrice(carQuote?.latePickupFee ?? 0)}</span>
                   </div>
                 )}
               </>
@@ -1406,32 +1428,35 @@ function BookingPage() {
                 <span className="text-mist-dim">
                   {t('booking.transferFare', { range: formData.adults <= 5 ? '1-5' : '6-10', area: transferArea })}
                 </span>
-                <span>{formatCurrency(transferPrice ?? 0)}</span>
+                <span>{formatPrice(transferPrice ?? 0)}</span>
               </div>
             ) : (
               <>
                 <div className="flex justify-between text-sm">
-                  <span className="text-mist-dim">{t('booking.adultPrice', { n: formData.adults, price: formatCurrency(tour.priceAdult) })}</span>
-                  <span>{formatCurrency(tour.priceAdult * formData.adults)}</span>
+                  <span className="text-mist-dim">{t('booking.adultPrice', { n: formData.adults, price: formatPrice(tour.priceAdult) })}</span>
+                  <span>{formatPrice(tour.priceAdult * formData.adults)}</span>
                 </div>
                 {formData.children > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-mist-dim">{t('booking.childPrice', { n: formData.children, price: formatCurrency(tour.priceChild) })}</span>
-                    <span>{formatCurrency(tour.priceChild * formData.children)}</span>
+                    <span className="text-mist-dim">{t('booking.childPrice', { n: formData.children, price: formatPrice(tour.priceChild) })}</span>
+                    <span>{formatPrice(tour.priceChild * formData.children)}</span>
                   </div>
                 )}
                 {tour.discount > 0 && (
                   <div className="flex justify-between text-sm text-green-300">
                     <span>{t('booking.discount', { pct: tour.discount })}</span>
-                    <span>-{formatCurrency(total * (tour.discount / 100))}</span>
+                    <span>-{formatPrice(total * (tour.discount / 100))}</span>
                   </div>
                 )}
               </>
             )}
             <div className="flex justify-between font-bold text-lg pt-2 border-t">
               <span>{t('booking.total')}</span>
-              <span className="text-gold-300">{formatCurrency(grandTotal)}</span>
+              <span className="text-gold-300">{formatPrice(grandTotal)}</span>
             </div>
+            {locale === 'en' && (
+              <p className="text-xs text-mist-dim">{t('currency.estimateNote')}</p>
+            )}
           </div>
 
           {errors.submit && (

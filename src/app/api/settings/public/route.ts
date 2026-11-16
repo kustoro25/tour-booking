@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getPaymentGateway, normalizeWaNumber } from '@/lib/settings';
+import { getPaymentGateway, getUsdRate, normalizeWaNumber } from '@/lib/settings';
 import { WA_NUMBER } from '@/lib/haybali';
+import { DEFAULT_USD_RATE } from '@/lib/currency';
 
 export async function GET() {
   try {
     const settings = await prisma.setting.findMany();
     const paymentGateway = await getPaymentGateway();
+    const usdRate = await getUsdRate();
     const settingsMap: Record<string, unknown> = {};
 
     for (const s of settings) {
@@ -34,6 +36,8 @@ export async function GET() {
         ...settingsMap,
         // Gateway efektif (DB setting → env → default manual)
         paymentGateway,
+        // Kurs USD→IDR efektif untuk estimasi harga bahasa English
+        usdRate,
         // Legacy camelCase fields for existing components
         email,
         phone,
@@ -49,6 +53,7 @@ export async function GET() {
       success: true,
       data: {
         paymentGateway: 'manual',
+        usdRate: DEFAULT_USD_RATE,
         email: 'info@haybalitrans.com',
         phone: '+62 851-1933-4511',
         address: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361',

@@ -5,6 +5,7 @@ import { cache } from 'react';
 import { revalidateTag, unstable_cache } from 'next/cache';
 import { prisma } from './prisma';
 import { WA_NUMBER } from './haybali';
+import { DEFAULT_USD_RATE } from './currency';
 
 /** Tag cache untuk seluruh baris tabel Setting. Dipakai halaman admin agar
  *  perubahan pengaturan langsung tampil tanpa menunggu masa revalidate. */
@@ -96,4 +97,38 @@ export async function isWhatsAppEnabled(): Promise<boolean> {
   if (!process.env.WHATSAPP_ACCESS_TOKEN || !process.env.WHATSAPP_PHONE_NUMBER_ID) return false;
   const enabled = await getSetting<boolean>('whatsapp_enabled', true);
   return enabled !== false;
+}
+
+/** Kurs live USD→IDR dari API publik; di-cache 6 jam agar tidak spam sumber. */
+const fetchLiveUsdRate = unstable_cache(
+  async (): Promise<number | null> => {
+    try {
+      const res = await fetch('https://open.er-api.com/v6/latest/USD', {
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!res.ok) return null;
+      const data = (await res.json()) as { rates?: Record<string, number> };
+      const rate = Number(data?.rates?.IDR);
+      return Number.isFinite(rate) && rate > 1000 ? Math.round(rate) : null;
+    } catch {
+      return null;
+    }
+  },
+  ['usd-idr-live-rate-v1'],
+  { revalidate: 21600 }
+);
+
+/** Kurs USD→IDR efektif. Prioritas: setting admin `usd_rate` (manual) >
+ *  kurs live (cache 6 jam) > env USD_IDR_RATE > konstanta cadangan. */
+export async function getUsdRate(): Promise<number> {
+  const manual = Number(await getSetting<number | string>('usd_rate', 0));
+  if (Number.isFinite(manual) && manual > 1000) return Math.round(manual);
+
+  const live = await fetchLiveUsdRate();
+  if (live) return live;
+
+  const envRate = Number(process.env.USD_IDR_RATE);
+  if (Number.isFinite(envRate) && envRate > 1000) return Math.round(envRate);
+
+  return DEFAULT_USD_RATE;
 }

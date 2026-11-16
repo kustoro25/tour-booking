@@ -6,7 +6,6 @@
 // ============================================================================
 
 import Image from 'next/image';
-import { formatCurrency } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import {
   HAYBALI_BRAND,
@@ -43,7 +42,7 @@ const REGION_COLORS: Record<string, string> = {
 };
 
 export default function SewaMobilClient({ fleetTours, waNumber, gateway }: SewaMobilClientProps) {
-  const { t, tOr } = useI18n();
+  const { t, tOr, formatPrice } = useI18n();
   useTranslatedMeta(t('meta.sewa'), t('meta.sewaDesc'));
 
   const regionGroups = REMOTE_AREA_FEES.reduce<Record<string, typeof REMOTE_AREA_FEES>>((acc, area) => {
@@ -140,12 +139,12 @@ export default function SewaMobilClient({ fleetTours, waNumber, gateway }: SewaM
                   <div className="mb-2">
                     {fleet?.price6h != null && (
                       <p className="text-sm text-mist-dim">
-                        {formatCurrency(fleet.price6h)}
+                        {formatPrice(fleet.price6h)}
                         <span className="text-xs text-mist-dim"> {t('sewa.per6h')}</span>
                       </p>
                     )}
                     <p className="text-gold-300 font-bold text-2xl">
-                      {formatCurrency(fleet?.price12h ?? tour.priceAdult)}
+                      {formatPrice(fleet?.price12h ?? tour.priceAdult)}
                       <span className="text-mist-dim text-sm font-medium"> {t('sewa.per12h')}</span>
                     </p>
                   </div>
@@ -217,7 +216,7 @@ export default function SewaMobilClient({ fleetTours, waNumber, gateway }: SewaM
                   {areas.map((area) => (
                     <li key={area.id} className="flex items-start justify-between gap-3 text-sm">
                       <span className="text-mist">{area.label}</span>
-                      <span className="font-bold text-gold-300 whitespace-nowrap">+{formatCurrency(area.fee)}</span>
+                      <span className="font-bold text-gold-300 whitespace-nowrap">+{formatPrice(area.fee)}</span>
                     </li>
                   ))}
                 </ul>
@@ -268,13 +267,13 @@ export default function SewaMobilClient({ fleetTours, waNumber, gateway }: SewaM
                 {t('sewa.driver.line2a')}
                 {formatPickupWindow12h()}
                 {t('sewa.driver.line2b')}
-                <strong>{formatCurrency(DRIVER_POLICY.latePickupFee)}</strong>
+                <strong>{formatPrice(DRIVER_POLICY.latePickupFee)}</strong>
                 {t('sewa.driver.line2c')}
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-gold-400 mt-0.5">•</span>
                 {t('sewa.driver.line3a')}
-                <strong>{formatCurrency(DRIVER_POLICY.driverAccommodation)}</strong>
+                <strong>{formatPrice(DRIVER_POLICY.driverAccommodation)}</strong>
                 {t('sewa.driver.line3b')}
               </li>
             </ul>

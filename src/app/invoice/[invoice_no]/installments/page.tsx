@@ -4,11 +4,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';
+import { formatUsdFromIdr } from '@/lib/currency';
 import { Skeleton } from '@/components/ui/Skeleton';
 import CopyButton from '@/components/ui/CopyButton';
 import { InstallmentPaymentStatusColors, InstallmentPaymentStatusDots } from '@/types';
 import type { InstallmentPaymentStatus } from '@/types';
-import { useI18n } from '@/lib/i18n/client';
+import { useI18n, useTranslatedMeta } from '@/lib/i18n/client';
 
 // Halaman privat per invoice — jangan di-cache, datanya berubah tiap pembayaran.
 export const dynamic = 'force-dynamic';
@@ -56,7 +57,8 @@ interface BankAccount {
 }
 
 export default function InstallmentTrackingPage() {
-  const { t, tOr, locale } = useI18n();
+  const { t, tOr, locale, usdRate } = useI18n();
+  useTranslatedMeta(t('meta.invoice'));
   const dateLocale = locale === 'id' ? 'id-ID' : 'en-US';
   const params = useParams();
   const searchParams = useSearchParams();
@@ -229,6 +231,14 @@ export default function InstallmentTrackingPage() {
           <div>
             <span className="text-mist-dim text-xs">{t('installments.totalLabel')}</span>
             <p className="font-semibold">{formatCurrency(plan.totalAmount)}</p>
+            {locale === 'en' && (
+              <p className="text-[11px] text-mist-dim">
+                {t('currency.usdEstimate', {
+                  usd: formatUsdFromIdr(plan.totalAmount, usdRate),
+                  rate: usdRate.toLocaleString('en-US'),
+                })}
+              </p>
+            )}
           </div>
           <div>
             <span className="text-mist-dim text-xs">{t('installments.dpLabel', { pct: plan.dpPercentage })}</span>
@@ -254,6 +264,9 @@ export default function InstallmentTrackingPage() {
             </p>
           </div>
         </div>
+        {locale === 'en' && (
+          <p className="text-xs text-mist-dim mt-4 pt-4 border-t border-ink-700">{t('currency.idrNote')}</p>
+        )}
       </div>
 
       {/* Info pembayaran online */}

@@ -42,7 +42,7 @@ export default function InvoiceActions({
   const waNumber = companyPhone.replace(/[^0-9]/g, '');
   const payLabelText =
     payLabel ?? (paymentType === 'INSTALLMENT' ? t('invoiceActions.payDp') : t('invoiceActions.payOnline'));
-  const formattedTotal = total.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US');
+  const formattedTotal = `Rp ${total.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}`;
   const formattedTourDate = tourDate
     ? new Date(tourDate).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', {
         day: 'numeric',

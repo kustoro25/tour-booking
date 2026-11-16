@@ -7,7 +7,6 @@
 // ============================================================================
 
 import Image from 'next/image';
-import { formatCurrency } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import StarRating from '@/components/ui/StarRating';
 import DestinasiGallery from '@/components/tours/DestinasiGallery';
@@ -58,7 +57,7 @@ const DESTINATION_IMAGES: Record<string, string> = {
 };
 
 export default function HomeClient({ reviews, waNumber, gateway }: HomeClientProps) {
-  const { t, list } = useI18n();
+  const { t, list, formatPrice } = useI18n();
   useTranslatedMeta(t('meta.home'), t('meta.homeDesc'));
 
   const stats = list('home.stats') as { num: string; label: string }[];
@@ -197,12 +196,12 @@ export default function HomeClient({ reviews, waNumber, gateway }: HomeClientPro
                     <div className="mb-2">
                       {car.price6h !== null && (
                         <p className="text-sm text-mist-dim">
-                          {formatCurrency(car.price6h)}{' '}
+                          {formatPrice(car.price6h)}{' '}
                           <span className="text-xs text-mist-dim">{t('home.fleetSection.per6h')}</span>
                         </p>
                       )}
                       <p className="text-xl font-bold text-gold-300">
-                        {formatCurrency(car.price12h)}{' '}
+                        {formatPrice(car.price12h)}{' '}
                         <span className="text-sm font-normal text-mist-dim">{t('home.fleetSection.per12h')}</span>
                       </p>
                     </div>

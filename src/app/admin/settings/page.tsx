@@ -55,6 +55,7 @@ export default function AdminSettingsPage() {
     googleReviewsMinRating: 3,
     paymentGateway: 'manual' as 'manual' | 'midtrans',
     whatsappEnabled: true,
+    usdRate: 0,
   });
 
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>(DEFAULT_BANK_ACCOUNTS);
@@ -95,6 +96,7 @@ export default function AdminSettingsPage() {
               'manual',
             whatsappEnabled:
               data.data.whatsapp_enabled === false || data.data.whatsapp_enabled === 'false' ? false : true,
+            usdRate: Number(data.data.usd_rate) || 0,
           }));
           if (data.data.bank_accounts && Array.isArray(data.data.bank_accounts)) {
             setBankAccounts(data.data.bank_accounts);
@@ -139,6 +141,7 @@ export default function AdminSettingsPage() {
           google_reviews_min_rating: form.googleReviewsMinRating,
           payment_gateway: form.paymentGateway,
           whatsapp_enabled: form.whatsappEnabled,
+          usd_rate: form.usdRate,
           bank_accounts: bankAccounts,
         }),
       });
@@ -279,6 +282,21 @@ export default function AdminSettingsPage() {
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Kurs USD ke IDR (Rp per $1)</label>
+              <input
+                type="number"
+                min={0}
+                value={form.usdRate}
+                onChange={(e) => setForm({ ...form, usdRate: Number(e.target.value) || 0 })}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="16300"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Dipakai untuk harga estimasi USD saat pengunjung memilih bahasa English. Isi 0 untuk otomatis
+                mengikuti kurs harian (diperbarui tiap 6 jam). Pembayaran tetap dalam Rupiah.
+              </p>
             </div>
           </div>
         </div>

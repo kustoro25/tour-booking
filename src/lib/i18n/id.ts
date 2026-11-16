@@ -636,6 +636,8 @@ const id = {
     durationLabel: 'Durasi Sewa',
     duration6: '6 Jam — {price}',
     duration12: '12 Jam — {price}',
+    durationTag6or12: '6 / 12 Jam',
+    durationTag12: '12 Jam',
     overtimeNote: 'Lembur dikenakan {pct}% dari harga/jam.',
     pickupTimeLabel: 'Jam Penjemputan',
     pickupAria: 'Jam penjemputan',
@@ -826,7 +828,7 @@ const id = {
     orderName: '- Nama: {name}',
     orderPackage: '- Paket: {tour}',
     orderDate: '- Tanggal: {date}',
-    orderTotal: '- Total: Rp {total}',
+    orderTotal: '- Total: {total}',
     msgOnline: 'Halo, saya ingin bertanya mengenai pembayaran online untuk pesanan:\n{orderInfo}',
     msgPaid:
       'Halo, saya ingin bertanya mengenai pesanan saya:\n{orderInfo}\n\nPesanan sudah saya bayar, mohon informasi E-Ticket-nya.',
@@ -1226,6 +1228,8 @@ const id = {
     sewaDesc:
       'Sewa mobil mewah dengan supir di Bali. Supir berpengalaman, kendaraan prima, harga transparan, dan booking online cepat.',
     fleetDetail: 'Sewa {name} Bali + Supir | HAYBALI TRANS',
+    fleetDetailDesc:
+      'Sewa {name} dengan supir di Bali: harga transparan, armada prima, dan booking online cepat.',
     about: 'Tentang Kami | HAYBALI TRANS',
     aboutDesc: 'Kenali HAYBALI TRANS, mitra sewa mobil dan transportasi privat tepercaya di Bali.',
     testimonials: 'Testimoni | HAYBALI TRANS',
@@ -1236,6 +1240,13 @@ const id = {
     faqDesc: 'Pertanyaan yang sering diajukan seputar sewa mobil dan booking di HAYBALI TRANS.',
     terms: 'Syarat & Ketentuan | HAYBALI TRANS',
     privacy: 'Kebijakan Privasi | HAYBALI TRANS',
+    booking: 'Pemesanan | HAYBALI TRANS',
+    invoice: 'Invoice | HAYBALI TRANS',
+  },
+  currency: {
+    usdEstimate: '≈ {usd} (kurs Rp {rate}/USD)',
+    idrNote: 'Semua nominal di halaman ini dalam Rupiah (IDR).',
+    estimateNote: 'Harga USD adalah estimasi. Pembayaran diproses dalam Rupiah (IDR).',
   },
 };
 
