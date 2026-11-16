@@ -1,6 +1,0 @@
-style(header): perkecil lebar logo brand 2px
-
-Logo emblem di navbar kini memakai lebar eksplisit 38px (sebelumnya
-tinggi 40px, lebar efektif 40px) dengan tinggi auto sehingga rasio 1:1
-tetap terjaga. Ditambahkan komentar eslint-disable untuk <img> agar
-lint tetap bersih.
