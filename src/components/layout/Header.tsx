@@ -68,10 +68,11 @@ export default function Header({ brandName, brandIcon, brandEmblem }: { brandNam
             {isEmblemImage ? (
               // Emblem + nama brand berdampingan, seperti pola logo website profesional.
               <>
+                {/* eslint-disable-next-line @next/next/no-img-element -- logo bisa berupa URL eksternal/path dinamis dari pengaturan */}
                 <img
                   src={brandEmblem}
                   alt={brandName || 'HAYBALI TRANS'}
-                  className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                  className="w-[38px] h-auto object-contain group-hover:scale-105 transition-transform duration-300"
                 />
                 <span className="text-base sm:text-xl font-bold text-ivory">
                   <span className="gradient-text">{brandName || 'HAYBALI TRANS'}</span>
