@@ -135,15 +135,15 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
             <div className="flex items-center gap-2.5 mb-4">
               {isImageIcon(info.brandEmblem) ? (
                 // Emblem + nama brand berdampingan, seperti pola logo website profesional.
-                // eslint-disable-next-line @next/next/no-img-element -- logo bisa berupa URL eksternal/path dinamis dari pengaturan
                 <>
-                  <img src={info.brandEmblem} alt={info.brandName || 'HAYBALI TRANS'} className="h-12 w-auto object-contain" />
+                  {/* eslint-disable-next-line @next/next/no-img-element -- logo bisa berupa URL eksternal/path dinamis dari pengaturan */}
+                  <img src={info.brandEmblem} alt={info.brandName || 'HAYBALI TRANS'} className="w-[46px] h-auto object-contain" />
                   <span className="text-xl font-bold text-white">{info.brandName || 'HAYBALI TRANS'}</span>
                 </>
               ) : isImageIcon(info.brandIcon) ? (
                 // Logo gambar memuat tulisan brand di dalamnya, jadi teks di samping disembunyikan.
                 // eslint-disable-next-line @next/next/no-img-element -- logo bisa berupa URL eksternal/path dinamis dari pengaturan
-                <img src={info.brandIcon} alt={info.brandName || 'HAYBALI TRANS'} className="h-12 w-auto object-contain" />
+                <img src={info.brandIcon} alt={info.brandName || 'HAYBALI TRANS'} className="w-[46px] h-auto object-contain" />
               ) : (
                 <>
                   <div className="w-9 h-9 bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 rounded-xl flex items-center justify-center shadow-md shadow-gold-500/20">
