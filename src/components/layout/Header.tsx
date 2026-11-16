@@ -27,12 +27,14 @@ function isLinkActive(href: string, pathname: string): boolean {
   return href === '/' ? pathname === '/' : pathname.startsWith(href);
 }
 
-export default function Header({ brandName, brandIcon }: { brandName?: string; brandIcon?: string }) {
+export default function Header({ brandName, brandIcon, brandEmblem }: { brandName?: string; brandIcon?: string; brandEmblem?: string }) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   // Logo gambar (upload admin) ditampilkan apa adanya, tanpa tile gradien emas.
   const isLogoImage = !!brandIcon && (brandIcon.startsWith('http') || brandIcon.startsWith('/'));
+  // Emblem = logo mark tanpa teks, dipasang berdampingan dengan nama brand (pola umum website profesional).
+  const isEmblemImage = !!brandEmblem && (brandEmblem.startsWith('http') || brandEmblem.startsWith('/'));
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -60,7 +62,19 @@ export default function Header({ brandName, brandIcon }: { brandName?: string; b
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            {isLogoImage ? (
+            {isEmblemImage ? (
+              // Emblem + nama brand berdampingan, seperti pola logo website profesional.
+              <>
+                <img
+                  src={brandEmblem}
+                  alt={brandName || 'HAYBALI TRANS'}
+                  className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                />
+                <span className="text-base sm:text-xl font-bold text-ivory">
+                  <span className="gradient-text">{brandName || 'HAYBALI TRANS'}</span>
+                </span>
+              </>
+            ) : isLogoImage ? (
               // Logo gambar memuat tulisan brand di dalamnya, jadi teks di samping disembunyikan.
               // eslint-disable-next-line @next/next/no-img-element -- logo bisa berupa URL eksternal/path dinamis dari pengaturan
               <img

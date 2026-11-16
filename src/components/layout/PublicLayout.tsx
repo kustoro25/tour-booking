@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import Header from '@/components/layout/Header';
 import Footer, { type FooterCms } from '@/components/layout/Footer';
 
-export default function PublicLayout({ children, brandName, brandIcon, footerCms }: { children: React.ReactNode; brandName?: string; brandIcon?: string; footerCms?: FooterCms }) {
+export default function PublicLayout({ children, brandName, brandIcon, brandEmblem, footerCms }: { children: React.ReactNode; brandName?: string; brandIcon?: string; brandEmblem?: string; footerCms?: FooterCms }) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
@@ -25,7 +25,7 @@ export default function PublicLayout({ children, brandName, brandIcon, footerCms
 
   return (
     <>
-      <Header brandName={brandName} brandIcon={brandIcon} />
+      <Header brandName={brandName} brandIcon={brandIcon} brandEmblem={brandEmblem} />
       <main className="flex-1">{children}</main>
       <Footer footerCms={footerCms} />
     </>

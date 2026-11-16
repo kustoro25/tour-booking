@@ -42,6 +42,7 @@ export default function AdminSettingsPage() {
     companyPhone: '',
     companyAddress: '',
     companyIcon: '',
+    companyEmblem: '',
     invoiceTheme: 'premium' as InvoiceTheme,
     installmentEnabled: false,
     installmentOptions: '2',
@@ -75,6 +76,7 @@ export default function AdminSettingsPage() {
             companyPhone: data.data.company_phone || '',
             companyAddress: data.data.company_address || '',
             companyIcon: data.data.company_icon || '',
+            companyEmblem: data.data.company_emblem || '',
             invoiceTheme: (data.data.invoice_theme as InvoiceTheme) || 'premium',
             installmentEnabled: data.data.installment_enabled === true || data.data.installment_enabled === 'true',
             installmentOptions: Array.isArray(data.data.installment_options)
@@ -124,6 +126,7 @@ export default function AdminSettingsPage() {
           company_phone: form.companyPhone,
           company_address: form.companyAddress,
           company_icon: form.companyIcon,
+          company_emblem: form.companyEmblem,
           invoice_theme: form.invoiceTheme,
           installment_enabled: form.installmentEnabled,
           installment_options: form.installmentOptions.split(',').map((s) => Number(s.trim())).filter((n) => !isNaN(n) && n > 0),
@@ -230,6 +233,16 @@ export default function AdminSettingsPage() {
                 label=""
                 folder="tour-booking/brand"
                 placeholder="HB (teks) atau upload logo"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Emblem Navbar & Footer (logo mark tanpa teks, opsional)</label>
+              <ImageUpload
+                value={form.companyEmblem || ''}
+                onChange={(url) => setForm({ ...form, companyEmblem: url })}
+                label=""
+                folder="tour-booking/brand"
+                placeholder="Kosong = Icon Brand tampil apa adanya"
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

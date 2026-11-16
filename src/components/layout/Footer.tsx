@@ -18,7 +18,7 @@ function isImageIcon(icon?: string): boolean {
 }
 
 function useCompanyInfo() {
-  const [info, setInfo] = useState({ email: 'info@haybalitrans.com', phone: '+62 851-1933-4511', address: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361', brandName: 'HAYBALI TRANS', brandIcon: 'HB' });
+  const [info, setInfo] = useState({ email: 'info@haybalitrans.com', phone: '+62 851-1933-4511', address: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361', brandName: 'HAYBALI TRANS', brandIcon: 'HB', brandEmblem: '' });
   useEffect(() => {
     fetch('/api/settings/public')
       .then(r => r.json())
@@ -125,7 +125,14 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
           {/* Company Info */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
-              {isImageIcon(info.brandIcon) ? (
+              {isImageIcon(info.brandEmblem) ? (
+                // Emblem + nama brand berdampingan, seperti pola logo website profesional.
+                // eslint-disable-next-line @next/next/no-img-element -- logo bisa berupa URL eksternal/path dinamis dari pengaturan
+                <>
+                  <img src={info.brandEmblem} alt={info.brandName || 'HAYBALI TRANS'} className="h-12 w-auto object-contain" />
+                  <span className="text-xl font-bold text-white">{info.brandName || 'HAYBALI TRANS'}</span>
+                </>
+              ) : isImageIcon(info.brandIcon) ? (
                 // Logo gambar memuat tulisan brand di dalamnya, jadi teks di samping disembunyikan.
                 // eslint-disable-next-line @next/next/no-img-element -- logo bisa berupa URL eksternal/path dinamis dari pengaturan
                 <img src={info.brandIcon} alt={info.brandName || 'HAYBALI TRANS'} className="h-12 w-auto object-contain" />

@@ -16,6 +16,8 @@ async function updateSettings() {
     company_name: JSON.stringify('HAYBALI TRANS'),
     site_title: JSON.stringify('HAYBALI TRANS — Sewa Mobil & Tour Bali'),
     company_icon: JSON.stringify('/images/haybali/logo-lockup-v3.png'),
+    // Emblem = logo mark tanpa teks, tampil di navbar & footer berdampingan dengan nama brand.
+    company_emblem: JSON.stringify('/images/haybali/logo-emblem-v3.png'),
     company_email: JSON.stringify('info@haybalitrans.com'),
     company_phone: JSON.stringify('+6281234567890'),
     company_address: JSON.stringify('Denpasar / Kuta, Bali - Indonesia'),

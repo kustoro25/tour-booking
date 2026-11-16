@@ -33,3 +33,9 @@ export async function getBrandIcon(): Promise<string> {
   const icon = await getString('company_icon');
   return icon || DEFAULT_ICON;
 }
+
+export async function getBrandEmblem(): Promise<string> {
+  // Logo mark tanpa teks (mis. lingkaran H + van) untuk navbar/footer di samping nama brand.
+  // Kosong berarti tidak ada emblem terpisah — renderer memakai company_icon apa adanya.
+  return getString('company_emblem');
+}

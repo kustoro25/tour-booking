@@ -23,6 +23,8 @@ export async function GET() {
     const address = settingsMap['company_address'] || 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361';
     const brandName = settingsMap['company_name'] || 'HAYBALI TRANS';
     const brandIcon = settingsMap['company_icon'] || 'HB';
+    // Emblem = logo mark tanpa teks untuk navbar/footer di samping nama brand.
+    const brandEmblem = settingsMap['company_emblem'] || '';
     // Nomor WhatsApp bisnis (dari pengaturan admin) untuk link wa.me di komponen client
     const whatsappNumber = normalizeWaNumber(String(settingsMap['company_phone'] || '')) || WA_NUMBER;
 
@@ -38,6 +40,7 @@ export async function GET() {
         address,
         brandName,
         brandIcon,
+        brandEmblem,
         whatsappNumber,
       },
     });
@@ -51,6 +54,7 @@ export async function GET() {
         address: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361',
         brandName: 'HAYBALI TRANS',
         brandIcon: 'HB',
+        brandEmblem: '',
         whatsappNumber: WA_NUMBER,
       },
     });

@@ -5,7 +5,7 @@ import './globals.css';
 import { ToastProvider } from '@/components/ui/Toast';
 import FloatingActions from '@/components/ui/FloatingActions';
 import PublicLayout from '@/components/layout/PublicLayout';
-import { getBrandName, getBrandIcon, getSiteTitle } from '@/lib/brand';
+import { getBrandName, getBrandIcon, getBrandEmblem, getSiteTitle } from '@/lib/brand';
 import { getWhatsAppNumber } from '@/lib/settings';
 import { prisma } from '@/lib/prisma';
 
@@ -55,9 +55,10 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [brandName, brandIcon, waNumber, footerCms] = await Promise.all([
+  const [brandName, brandIcon, brandEmblem, waNumber, footerCms] = await Promise.all([
     getBrandName(),
     getBrandIcon(),
+    getBrandEmblem(),
     getWhatsAppNumber(),
     getFooterCms(),
   ]);
@@ -66,7 +67,7 @@ export default async function RootLayout({
     <html lang="id">
       <body className={`${inter.className} antialiased bg-ink-950 text-ivory min-h-screen flex flex-col selection:bg-gold-400/25 selection:text-gold-100`}>
         <ToastProvider>
-          <PublicLayout brandName={brandName} brandIcon={brandIcon} footerCms={footerCms}>{children}</PublicLayout>
+          <PublicLayout brandName={brandName} brandIcon={brandIcon} brandEmblem={brandEmblem} footerCms={footerCms}>{children}</PublicLayout>
           <FloatingActions waNumber={waNumber} />
         </ToastProvider>
       </body>
