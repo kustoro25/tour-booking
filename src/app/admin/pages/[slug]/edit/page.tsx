@@ -252,7 +252,7 @@ const defaultData: Record<string, PageData> = {
   },
   'footer': {
     text: 'Platform booking tour terpercaya untuk menjelajahi destinasi terbaik di Indonesia. Harga transparan, booking instan, dan guide profesional.',
-    copyright: `© ${new Date().getFullYear()} HAYBALI TRANS. All rights reserved.`,
+    copyright: `© 2022 HAYBALI TRANS. All rights reserved.`,
     socialLinks: [
       { platform: 'WhatsApp', url: 'https://wa.me/6285119334511', icon: 'whatsapp' },
       { platform: 'Instagram', url: 'https://instagram.com/haybalitrans', icon: 'instagram' },
@@ -838,7 +838,7 @@ export default function AdminPageEditPage({ params }: { params: Promise<{ slug: 
             <SectionCard icon="©️" title="Copyright">
               <input type="text" value={data.copyright || ''} onChange={e => update('copyright', e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="© 2026 HAYBALI TRANS. All rights reserved." />
+                placeholder="© 2022 HAYBALI TRANS. All rights reserved." />
             </SectionCard>
             <SectionCard icon="🔗" title="Social Media Links" addLabel="+ Tambah Medsos" onAdd={() => update('socialLinks', [...(data.socialLinks as Array<{platform:string;url:string;icon:string}> || []), { platform: '', url: '', icon: 'whatsapp' }])}>
               <div className="space-y-3">

@@ -224,7 +224,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
 
         {/* Bottom Bar */}
         <div className="border-t border-ink-700 mt-10 pt-6 text-center text-sm text-mist-dim">
-          {cms.copyright || `© ${new Date().getFullYear()} ${info.brandName || 'HAYBALI TRANS'}. All rights reserved.`}
+          {cms.copyright || `© 2022 ${info.brandName || 'HAYBALI TRANS'}. All rights reserved.`}
         </div>
       </div>
     </footer>

@@ -456,7 +456,7 @@ async function updateCmsPages() {
     },
     footer: {
       text: 'Mitra transportasi dan privat tur tepercaya di Bali. Mengutamakan keselamatan, kenyamanan, dan pelayanan VIP bagi seluruh pelanggan.',
-      copyright: `© ${new Date().getFullYear()} HAYBALI TRANS. All rights reserved.`,
+      copyright: `© 2022 HAYBALI TRANS. All rights reserved.`,
       socialLinks: [
         { platform: 'WhatsApp', url: 'https://wa.me/6281234567890', icon: 'whatsapp' },
         { platform: 'Instagram', url: 'https://instagram.com/haybalitrans', icon: 'instagram' },

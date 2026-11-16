@@ -184,7 +184,7 @@ async function main() {
         content: JSON.stringify({
           ...prev,
           text: 'Mitra sewa mobil dan transportasi privat tepercaya di Bali. Mengutamakan keselamatan, kenyamanan, dan pelayanan VIP bagi seluruh pelanggan.',
-          copyright: `© ${new Date().getFullYear()} HAYBALI TRANS. All rights reserved.`,
+          copyright: `© 2022 HAYBALI TRANS. All rights reserved.`,
         }),
       },
     });
