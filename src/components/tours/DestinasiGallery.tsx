@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import GalleryLightbox from './GalleryLightbox';
+import { useI18n } from '@/lib/i18n/client';
 
 export interface DestinasiItem {
   name: string;
@@ -15,6 +16,7 @@ export interface DestinasiItem {
 }
 
 export default function DestinasiGallery({ destinations }: { destinations: DestinasiItem[] }) {
+  const { t } = useI18n();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const images = destinations.map((d) => ({ url: d.imageUrl, alt: d.name }));
@@ -31,7 +33,7 @@ export default function DestinasiGallery({ destinations }: { destinations: Desti
               type="button"
               onClick={() => setLightboxIndex(i)}
               className="relative h-56 w-full overflow-hidden cursor-zoom-in"
-              aria-label={`Lihat foto ${dest.name}`}
+              aria-label={t('ui.gallery.viewPhoto', { name: dest.name })}
             >
               <Image
                 src={dest.imageUrl}

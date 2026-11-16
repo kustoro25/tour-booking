@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import Button from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useI18n } from '@/lib/i18n/client';
 
 interface ReviewInfo {
   customerName: string;
@@ -13,6 +14,7 @@ interface ReviewInfo {
 
 export default function ReviewPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = use(params);
+  const { t, locale } = useI18n();
   const [info, setInfo] = useState<ReviewInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -21,6 +23,7 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
   const [message, setMessage] = useState('');
+  const [messageKind, setMessageKind] = useState<'error' | 'success'>('error');
 
   useEffect(() => {
     fetch(`/api/reviews/${token}`)
@@ -29,21 +32,23 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
         if (data.success) {
           setInfo(data.data);
         } else {
-          setError(data.error || 'Link tidak valid');
+          setError(data.error || t('review.invalidLink'));
         }
       })
-      .catch(() => setError('Gagal memuat data review'))
+      .catch(() => setError(t('review.loadFailed')))
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (rating === 0) {
-      setMessage('Silakan pilih rating bintang');
+      setMessage(t('review.pickRating'));
+      setMessageKind('error');
       return;
     }
     if (reviewText.length < 10) {
-      setMessage('Ulasan minimal 10 karakter');
+      setMessage(t('review.minChars'));
+      setMessageKind('error');
       return;
     }
 
@@ -61,11 +66,14 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
       if (data.success) {
         setSubmitted(true);
         setMessage(data.message);
+        setMessageKind('success');
       } else {
-        setMessage(data.error || 'Gagal mengirim review');
+        setMessage(data.error || t('review.submitFailed'));
+        setMessageKind('error');
       }
     } catch {
-      setMessage('Gagal mengirim review. Silakan coba lagi.');
+      setMessage(t('review.submitFailedRetry'));
+      setMessageKind('error');
     } finally {
       setSubmitting(false);
     }
@@ -95,9 +103,9 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
         <div className="text-6xl mb-4">😔</div>
-        <h1 className="text-2xl font-bold text-ivory mb-2">Oops!</h1>
+        <h1 className="text-2xl font-bold text-ivory mb-2">{t('review.errorTitle')}</h1>
         <p className="text-mist mb-6">{error}</p>
-        <Button href="/" variant="outline">Kembali ke Beranda</Button>
+        <Button href="/" variant="outline">{t('review.backHome')}</Button>
       </div>
     );
   }
@@ -106,14 +114,14 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
         <div className="text-6xl mb-4">🎉</div>
-        <h1 className="text-2xl font-bold text-ivory mb-2">Terima Kasih!</h1>
+        <h1 className="text-2xl font-bold text-ivory mb-2">{t('review.thanksTitle')}</h1>
         <p className="text-mist mb-2">{message}</p>
         <p className="text-mist-dim text-sm mb-8">
-          Review Anda akan ditinjau oleh tim kami sebelum ditampilkan di halaman publik.
+          {t('review.thanksDesc')}
         </p>
         <div className="flex justify-center gap-3">
-          <Button href="/" variant="outline">Kembali ke Beranda</Button>
-          <Button href="/sewa-mobil" variant="primary">Lihat Armada Kami</Button>
+          <Button href="/" variant="outline">{t('review.backHome')}</Button>
+          <Button href="/sewa-mobil" variant="primary">{t('review.viewFleet')}</Button>
         </div>
       </div>
     );
@@ -122,17 +130,17 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 md:px-8 py-12">
       <h1 className="text-2xl sm:text-3xl font-bold text-ivory mb-6 text-center">
-        Bagaimana Pengalaman Liburan Anda?
+        {t('review.heading')}
       </h1>
 
       {info && (
         <div className="bg-gold-400/10 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
-          <p className="text-sm text-gold-200 mb-1">Hai, <strong>{info.customerName}</strong>!</p>
+          <p className="text-sm text-gold-200 mb-1">{t('review.hi')} <strong>{info.customerName}</strong>!</p>
           <p className="text-sm text-gold-300">
-            Ceritakan pengalaman Anda mengikuti tour{' '}
-            <strong>{info.tourName}</strong> ke{' '}
-            <strong>{info.destination}</strong> pada tanggal{' '}
-            {new Date(info.tourDate).toLocaleDateString('id-ID', {
+            {t('review.storyA')}{' '}
+            <strong>{info.tourName}</strong> {t('review.storyB')}{' '}
+            <strong>{info.destination}</strong> {t('review.storyC')}{' '}
+            {new Date(info.tourDate).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', {
               day: 'numeric',
               month: 'long',
               year: 'numeric',
@@ -146,7 +154,7 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
         {/* Star Rating */}
         <div>
           <label className="block text-sm font-semibold text-mist mb-3">
-            Rating Anda <span className="text-red-500">*</span>
+            {t('review.ratingLabel')} <span className="text-red-500">*</span>
           </label>
           <div className="flex items-center gap-1">
             {[1, 2, 3, 4, 5].map((star) => (
@@ -155,7 +163,7 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
                 type="button"
                 onClick={() => setRating(star)}
                 className="text-2xl sm:text-3xl transition-transform hover:scale-110 focus:outline-none"
-                aria-label={`${star} bintang`}
+                aria-label={t('review.starsLabel', { count: star })}
               >
                 <svg
                   className={`w-8 h-8 ${
@@ -169,7 +177,7 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
               </button>
             ))}
             <span className="ml-3 text-sm text-mist-dim">
-              {rating === 0 ? 'Pilih rating' : `${rating} / 5`}
+              {rating === 0 ? t('review.pickRatingHint') : `${rating} / 5`}
             </span>
           </div>
         </div>
@@ -177,20 +185,20 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
         {/* Review Text */}
         <div>
           <label htmlFor="review" className="block text-sm font-semibold text-mist mb-3">
-            Ceritakan Pengalaman Anda <span className="text-red-500">*</span>
+            {t('review.reviewLabel')} <span className="text-red-500">*</span>
           </label>
           <textarea
             id="review"
             rows={5}
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
-            placeholder="Ceritakan pengalaman seru Anda selama tour... (min. 10 karakter)"
+            placeholder={t('review.reviewPlaceholder')}
             className="w-full border border-ink-600 rounded-lg px-4 py-3 text-mist focus:ring-2 focus:ring-gold-400 focus:border-gold-400 outline-none transition resize-y"
             maxLength={1000}
           />
           <div className="flex justify-between mt-1">
             <span className="text-xs text-mist-dim">
-              {reviewText.length < 10 ? 'Minimal 10 karakter' : ''}
+              {reviewText.length < 10 ? t('review.minCharsHint') : ''}
             </span>
             <span className="text-xs text-mist-dim">{reviewText.length}/1000</span>
           </div>
@@ -200,7 +208,7 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
         {message && (
           <div
             className={`p-3 rounded-lg text-sm ${
-              message.includes('Terima kasih')
+              messageKind === 'success'
                 ? 'bg-green-500/10 text-green-300'
                 : 'bg-red-500/10 text-red-300'
             }`}
@@ -235,16 +243,16 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                 />
               </svg>
-              Mengirim...
+              {t('review.submitting')}
             </span>
           ) : (
-            '✍️ Kirim Review'
+            t('review.submit')
           )}
         </Button>
       </form>
 
       <p className="text-center text-xs text-mist-dim mt-6">
-        Review Anda akan dimoderasi oleh tim kami sebelum ditampilkan di halaman publik.
+        {t('review.moderateNote')}
       </p>
     </div>
   );

@@ -6,8 +6,9 @@ import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/Skeleton';
 import CopyButton from '@/components/ui/CopyButton';
-import { InstallmentPaymentStatusLabels, InstallmentPaymentStatusColors, InstallmentPaymentStatusDots } from '@/types';
+import { InstallmentPaymentStatusColors, InstallmentPaymentStatusDots } from '@/types';
 import type { InstallmentPaymentStatus } from '@/types';
+import { useI18n } from '@/lib/i18n/client';
 
 // Halaman privat per invoice — jangan di-cache, datanya berubah tiap pembayaran.
 export const dynamic = 'force-dynamic';
@@ -55,6 +56,8 @@ interface BankAccount {
 }
 
 export default function InstallmentTrackingPage() {
+  const { t, tOr, locale } = useI18n();
+  const dateLocale = locale === 'id' ? 'id-ID' : 'en-US';
   const params = useParams();
   const searchParams = useSearchParams();
   const invoiceNo = params.invoice_no as string;
@@ -75,10 +78,10 @@ export default function InstallmentTrackingPage() {
       .then((r) => r.json())
       .then((res) => {
         if (res.success) setData(res.data);
-        else setError(res.error || 'Gagal memuat data');
+        else setError(res.error || t('installments.loadFailed'));
       })
-      .catch(() => setError('Gagal menghubungi server'));
-  }, [invoiceNo]);
+      .catch(() => setError(t('installments.serverError')));
+  }, [invoiceNo, t]);
 
   useEffect(() => {
     fetchData().finally(() => setLoading(false));
@@ -106,11 +109,11 @@ export default function InstallmentTrackingPage() {
 
   const handleUploadProof = async (installmentNumber: number, file: File) => {
     if (!file.type.startsWith('image/')) {
-      setUploadMsg({ type: 'error', text: 'File harus berupa gambar (JPG, PNG, atau WebP).' });
+      setUploadMsg({ type: 'error', text: t('installments.uploadInvalidType') });
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      setUploadMsg({ type: 'error', text: 'Ukuran file maksimal 10MB.' });
+      setUploadMsg({ type: 'error', text: t('installments.uploadTooLarge') });
       return;
     }
     setUploadMsg(null);
@@ -121,7 +124,7 @@ export default function InstallmentTrackingPage() {
       fd.append('folder', 'tour-booking/installment-proofs');
       const up = await fetch('/api/upload', { method: 'POST', body: fd });
       const upRes = await up.json();
-      if (!upRes.success || !upRes.url) throw new Error(upRes.error || 'Gagal mengunggah gambar');
+      if (!upRes.success || !upRes.url) throw new Error(upRes.error || t('installments.uploadFailedImage'));
 
       const res = await fetch(`/api/installments/${invoiceNo}/pay/${installmentNumber}`, {
         method: 'POST',
@@ -129,12 +132,15 @@ export default function InstallmentTrackingPage() {
         body: JSON.stringify({ paymentProof: upRes.url }),
       });
       const result = await res.json();
-      if (!res.ok || !result.success) throw new Error(result.error || 'Gagal menyimpan bukti transfer');
+      if (!res.ok || !result.success) throw new Error(result.error || t('installments.saveFailed'));
 
-      setUploadMsg({ type: 'success', text: `Bukti pembayaran ${installmentNumber === 0 ? 'DP' : 'pelunasan'} berhasil diunggah. Menunggu konfirmasi admin.` });
+      setUploadMsg({
+        type: 'success',
+        text: installmentNumber === 0 ? t('installments.uploadSuccessDp') : t('installments.uploadSuccessSettlement'),
+      });
       await fetchData();
     } catch (e) {
-      setUploadMsg({ type: 'error', text: e instanceof Error ? e.message : 'Gagal mengunggah bukti transfer' });
+      setUploadMsg({ type: 'error', text: e instanceof Error ? e.message : t('installments.uploadErrorFallback') });
     } finally {
       setUploadingNum(null);
     }
@@ -155,8 +161,8 @@ export default function InstallmentTrackingPage() {
   if (error || !data) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-20 text-center">
-        <h2 className="text-2xl font-bold text-mist mb-2">{error || 'Data tidak ditemukan'}</h2>
-        <Link href="/" className="text-gold-300 hover:underline">Kembali ke Beranda</Link>
+        <h2 className="text-2xl font-bold text-mist mb-2">{error || t('installments.notFound')}</h2>
+        <Link href="/" className="text-gold-300 hover:underline">{t('installments.backHome')}</Link>
       </div>
     );
   }
@@ -167,20 +173,20 @@ export default function InstallmentTrackingPage() {
   const nextUnpaid = payments.find((p) => p.status === 'PENDING' || p.status === 'OVERDUE');
   const labelFor = (p: Payment) =>
     p.installmentNumber === 0
-      ? `DP ${plan.dpPercentage}% (Uang Muka)`
+      ? t('installments.dpFull', { pct: plan.dpPercentage })
       : plan.installmentCount === 1
-        ? 'Pelunasan'
-        : `Angsuran ke-${p.installmentNumber}`;
+        ? t('installments.settlementShort')
+        : t('installments.installmentNth', { n: p.installmentNumber });
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
       <Link href={`/invoice/${invoiceNo}`} className="text-gold-300 hover:underline text-sm mb-4 inline-block">
-        ← Kembali ke Invoice
+        ← {t('installments.backToInvoice')}
       </Link>
 
-      <h1 className="text-2xl font-bold text-ivory mb-1">Pembayaran DP & Pelunasan</h1>
+      <h1 className="text-2xl font-bold text-ivory mb-1">{t('installments.title')}</h1>
       <p className="text-mist-dim text-sm mb-6">
-        {order.tour.name} &bull; Invoice: {invoiceNo}
+        {order.tour.name} &bull; {t('installments.invoiceLabel')} {invoiceNo}
       </p>
 
       {/* Notifikasi hasil pembayaran online */}
@@ -194,8 +200,7 @@ export default function InstallmentTrackingPage() {
         >
           {payNotice === 'finish' ? (
             <span>
-              💳 Pembayaran Anda sedang diproses otomatis. Status akan diperbarui dalam beberapa saat —
-              klik{' '}
+              {t('installments.noticeProcessingA')}{' '}
               <button
                 onClick={() => {
                   fetchData();
@@ -204,14 +209,15 @@ export default function InstallmentTrackingPage() {
                 }}
                 className="font-semibold underline"
               >
-                muat ulang status
+                {t('installments.noticeProcessingB')}
               </button>{' '}
-              bila belum berubah.
+              {t('installments.noticeProcessingC')}
             </span>
           ) : (
             <span>
-              Pembayaran belum selesai atau dibatalkan. Silakan coba lagi melalui tombol{' '}
-              <strong>Bayar Online</strong> pada tabel di bawah.
+              {t('installments.noticeFailedA')}{' '}
+              <strong>{t('invoice.bayarOnline')}</strong>{' '}
+              {t('installments.noticeFailedC')}
             </span>
           )}
         </div>
@@ -221,26 +227,30 @@ export default function InstallmentTrackingPage() {
       <div className="bg-ink-850 rounded-xl shadow-sm p-6 mb-6">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
           <div>
-            <span className="text-mist-dim text-xs">Total</span>
+            <span className="text-mist-dim text-xs">{t('installments.totalLabel')}</span>
             <p className="font-semibold">{formatCurrency(plan.totalAmount)}</p>
           </div>
           <div>
-            <span className="text-mist-dim text-xs">DP ({plan.dpPercentage}%)</span>
+            <span className="text-mist-dim text-xs">{t('installments.dpLabel', { pct: plan.dpPercentage })}</span>
             <p className="font-semibold text-gold-300">{formatCurrency(plan.downPayment)}</p>
             {dpPayment && (
               <span className={`text-[10px] font-medium ${dpPayment.status === 'CONFIRMED' ? 'text-emerald-300' : 'text-gold-300'}`}>
-                {dpPayment.status === 'CONFIRMED' ? '✓ Lunas' : 'Menunggu'}
+                {dpPayment.status === 'CONFIRMED' ? t('invoice.paidMark') : t('invoice.waiting')}
               </span>
             )}
           </div>
           <div>
-            <span className="text-mist-dim text-xs">Pelunasan</span>
-            <p className="font-semibold">{plan.installmentCount === 1 ? `${formatCurrency(plan.amountPerInstallment)} (tunai ke sopir / transfer)` : `${plan.installmentCount}x @ ${formatCurrency(plan.amountPerInstallment)}`}</p>
+            <span className="text-mist-dim text-xs">{t('installments.settlementLabel')}</span>
+            <p className="font-semibold">
+              {plan.installmentCount === 1
+                ? `${formatCurrency(plan.amountPerInstallment)} ${t('installments.settlementSingle')}`
+                : t('installments.settlementMulti', { count: plan.installmentCount, amount: formatCurrency(plan.amountPerInstallment) })}
+            </p>
           </div>
           <div>
-            <span className="text-mist-dim text-xs">Status</span>
+            <span className="text-mist-dim text-xs">{t('installments.statusLabel')}</span>
             <p className={`font-semibold ${plan.status === 'COMPLETED' ? 'text-green-300' : plan.status === 'CANCELLED' ? 'text-red-300' : 'text-gold-300'}`}>
-              {plan.status === 'ACTIVE' ? 'Aktif' : plan.status === 'COMPLETED' ? 'Lunas' : 'Dibatalkan'}
+              {plan.status === 'ACTIVE' ? t('installments.planActive') : plan.status === 'COMPLETED' ? t('installments.planCompleted') : t('installments.planCancelled')}
             </p>
           </div>
         </div>
@@ -249,11 +259,10 @@ export default function InstallmentTrackingPage() {
       {/* Info pembayaran online */}
       {isOnline && (
         <div className="bg-gold-400/10 border border-gold-500/30 rounded-xl p-4 mb-6 text-sm text-gold-200">
-          <p className="font-semibold mb-1">💳 Pembayaran Online (Otomatis)</p>
+          <p className="font-semibold mb-1">{t('installments.onlineBoxTitle')}</p>
           <p className="text-xs text-gold-300 leading-relaxed">
-            Bayar melalui halaman pembayaran aman <strong>Midtrans</strong> — QRIS, Virtual Account berbagai bank,
-            e-wallet (GoPay, ShopeePay, DANA), atau kartu kredit/debit. Setiap pembayaran
-            <strong> terkonfirmasi otomatis</strong> — tidak perlu upload bukti atau konfirmasi admin.
+            {t('installments.onlineBoxA')} <strong>Midtrans</strong> {t('installments.onlineBoxB')}{' '}
+            <strong>{t('installments.onlineBoxC')}</strong> {t('installments.onlineBoxD')}
           </p>
         </div>
       )}
@@ -262,9 +271,9 @@ export default function InstallmentTrackingPage() {
       {!isOnline && banks.length > 0 && (
         <div className="bg-ink-850 rounded-xl shadow-sm overflow-hidden mb-6">
           <div className="px-5 py-3 bg-gold-400/10 border-b border-gold-500/20">
-            <h3 className="text-sm font-semibold text-gold-200">Rekening Pembayaran</h3>
+            <h3 className="text-sm font-semibold text-gold-200">{t('installments.bankTitle')}</h3>
             <p className="text-xs text-gold-300 mt-0.5">
-              Transfer ke salah satu rekening berikut, lalu unggah bukti transfer pada tabel di bawah.
+              {t('installments.bankDesc')}
             </p>
           </div>
           <div className="p-5 space-y-3">
@@ -302,17 +311,17 @@ export default function InstallmentTrackingPage() {
       {/* Payments Table */}
       <div className="bg-ink-850 rounded-xl shadow-sm overflow-hidden mb-6">
         <div className="px-5 py-3 bg-gold-400/10 border-b border-orange-100">
-          <h3 className="text-sm font-semibold text-orange-800">Jadwal Pembayaran</h3>
+          <h3 className="text-sm font-semibold text-orange-800">{t('installments.scheduleTitle')}</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-ink-900 text-mist-dim text-xs">
               <tr>
-                <th className="py-2.5 px-4 text-left font-medium">Tahapan</th>
-                <th className="py-2.5 px-4 text-right font-medium">Jumlah</th>
-                <th className="py-2.5 px-4 text-right font-medium">Jatuh Tempo</th>
-                <th className="py-2.5 px-4 text-center font-medium">Status</th>
-                <th className="py-2.5 px-4 text-center font-medium">{isOnline ? 'Pembayaran' : 'Bukti'}</th>
+                <th className="py-2.5 px-4 text-left font-medium">{t('installments.stage')}</th>
+                <th className="py-2.5 px-4 text-right font-medium">{t('installments.amount')}</th>
+                <th className="py-2.5 px-4 text-right font-medium">{t('installments.dueDate')}</th>
+                <th className="py-2.5 px-4 text-center font-medium">{t('installments.statusCol')}</th>
+                <th className="py-2.5 px-4 text-center font-medium">{isOnline ? t('installments.paymentCol') : t('installments.proofCol')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-ink-700">
@@ -326,38 +335,37 @@ export default function InstallmentTrackingPage() {
                   <tr key={p.id} className={isNextDue ? 'bg-gold-400/10' : ''}>
                     <td className="py-3 px-4 font-medium text-ivory">
                       {labelFor(p)}
-                      {isNextDue && <span className="ml-2 text-xs text-gold-400 font-normal">(Berikutnya)</span>}
+                      {isNextDue && <span className="ml-2 text-xs text-gold-400 font-normal">{t('installments.nextLabel')}</span>}
                     </td>
                     <td className="py-3 px-4 text-right text-mist">
                       {formatCurrency(p.amount)}
                     </td>
                     <td className="py-3 px-4 text-right text-mist">
-                      {new Date(p.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      {new Date(p.dueDate).toLocaleDateString(dateLocale, { day: 'numeric', month: 'long', year: 'numeric' })}
                     </td>
                     <td className="py-3 px-4 text-center">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${colors}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
-                        {InstallmentPaymentStatusLabels[st]}
+                        {tOr(`status.installment.${st}`, st)}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-center">
                       <div className="flex flex-col items-center gap-1">
                         {p.paymentProof && (
                           <a href={p.paymentProof} target="_blank" rel="noopener noreferrer" className="text-gold-300 hover:underline text-xs">
-                            Lihat Bukti
-                          </a>
-                        )}
+                            {t('installments.viewProof')}
+                          </a>                        )}
                         {isOnline ? (
                           p.status !== 'CONFIRMED' ? (
                             <a
                               href={`/api/installments/${invoiceNo}/pay/${p.installmentNumber}`}
                               className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gold-400 text-ink-950 text-xs font-semibold hover:bg-gold-300 transition-colors whitespace-nowrap"
                             >
-                              💳 Bayar Online
+                              {t('installments.payOnlineBtn')}
                             </a>
                           ) : (
                             <span className="text-[10px] text-mist-dim">
-                              {p.paymentMethod ? `via ${p.paymentMethod.replace(/_/g, ' ')}` : 'Online'}
+                              {p.paymentMethod ? `via ${p.paymentMethod.replace(/_/g, ' ')}` : t('installments.onlineVia')}
                             </span>
                           )
                         ) : (
@@ -370,10 +378,10 @@ export default function InstallmentTrackingPage() {
                               }`}
                             >
                               {uploadingNum === p.installmentNumber
-                                ? 'Mengunggah…'
+                                ? t('installments.uploading')
                                 : p.paymentProof
-                                  ? 'Ganti Bukti'
-                                  : 'Unggah Bukti'}
+                                  ? t('installments.changeProof')
+                                  : t('installments.uploadProof')}
                               <input
                                 type="file"
                                 accept="image/*"
@@ -402,33 +410,33 @@ export default function InstallmentTrackingPage() {
       <div className="bg-gold-400/10 border border-gold-500/30 rounded-xl p-5 text-sm text-gold-200">
         {isOnline ? (
           <>
-            <h3 className="font-semibold mb-2">💳 Cara Membayar (Online &amp; Otomatis)</h3>
+            <h3 className="font-semibold mb-2">{t('installments.howOnlineTitle')}</h3>
             <ol className="list-decimal list-inside space-y-1.5 ml-1">
-              <li>Klik tombol <strong>Bayar Online</strong> pada baris DP yang ingin dibayar.</li>
-              <li>Pilih metode pembayaran di halaman aman <strong>Midtrans</strong> — QRIS, Virtual Account, e-wallet, atau kartu.</li>
-              <li>Status pembayaran <strong>terkonfirmasi otomatis</strong> — tidak perlu upload bukti atau konfirmasi ke admin.</li>
+              <li>{t('installments.howOnline1A')} <strong>{t('invoice.bayarOnline')}</strong> {t('installments.howOnline1B')}</li>
+              <li>{t('installments.howOnline2A')} <strong>Midtrans</strong> {t('installments.howOnline2B')}</li>
+              <li>{t('installments.howOnline3A')} <strong>{t('installments.howOnline3B')}</strong> {t('installments.howOnline3C')}</li>
             </ol>
             <p className="mt-3 text-xs text-gold-300">
-              Pelunasan dapat dibayar tunai kepada sopir saat bertemu di lokasi penjemputan, atau transfer bank.
+              {t('installments.settlementNote')}
             </p>
             <p className="mt-3 text-xs text-gold-300">
-              Link pembayaran berlaku 24 jam dan dapat dibuat ulang kapan saja. Ada kendala? Hubungi WhatsApp{' '}
-              {companyPhone || 'admin'} atau email {companyEmail || 'yang tertera pada invoice'}.
+              {t('installments.linkValidityA')}{' '}
+              {companyPhone || 'admin'} {t('installments.linkValidityOr')} {companyEmail || t('installments.linkValidityFallback')}.
             </p>
           </>
         ) : (
           <>
-            <h3 className="font-semibold mb-2">📤 Cara Membayar &amp; Mengirim Bukti</h3>
+            <h3 className="font-semibold mb-2">{t('installments.howManualTitle')}</h3>
             <ol className="list-decimal list-inside space-y-1.5 ml-1">
-              <li>Transfer sesuai nominal DP ke salah satu <strong>rekening perusahaan</strong> di atas.</li>
-              <li>Unggah bukti transfer melalui tombol <strong>Unggah Bukti</strong> pada baris DP di tabel.</li>
-              <li>Admin akan memverifikasi dalam 1×24 jam — status berubah menjadi <strong>Terkonfirmasi</strong>.</li>
+              <li>{t('installments.howManual1A')} <strong>{t('installments.howManual1B')}</strong> {t('installments.howManual1C')}</li>
+              <li>{t('installments.howManual2A')} <strong>{t('installments.uploadProof')}</strong> {t('installments.howManual2B')}</li>
+              <li>{t('installments.howManual3A')} <strong>{t('installments.howManual3B')}</strong>{t('installments.howManual3C')}</li>
             </ol>
             <p className="mt-3 text-xs text-gold-300">
-              Pelunasan dapat dibayar tunai kepada sopir saat bertemu di lokasi penjemputan, atau transfer bank.
+              {t('installments.settlementNote')}
             </p>
             <p className="mt-3 text-xs text-gold-300">
-              Alternatif: kirim bukti melalui WhatsApp {companyPhone || 'admin'} atau email {companyEmail || 'yang tertera pada invoice'}.
+              {t('installments.manualAlt')} {companyPhone || 'admin'} {t('installments.linkValidityOr')} {companyEmail || t('installments.linkValidityFallback')}.
             </p>
           </>
         )}

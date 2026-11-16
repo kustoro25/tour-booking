@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useI18n } from '@/lib/i18n/client';
 
 export default function WhatsAppButton() {
+  const { t } = useI18n();
   const [showTooltip, setShowTooltip] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('6285119334511');
 
@@ -19,16 +21,14 @@ export default function WhatsAppButton() {
       .catch(() => {});
   }, []);
 
-  const message = encodeURIComponent(
-    'Halo HAYBALI TRANS, saya ingin bertanya tentang sewa mobil.'
-  );
+  const message = encodeURIComponent(t('floating.waMessage'));
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
       {/* Tooltip */}
       {showTooltip && (
         <div className="bg-ink-850 shadow-lg rounded-xl px-4 py-2.5 text-sm font-medium text-mist animate-fade-in whitespace-nowrap">
-          Chat via WhatsApp 💬
+          {t('floating.waTooltip')}
         </div>
       )}
 
@@ -40,7 +40,7 @@ export default function WhatsAppButton() {
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
         className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] shadow-lg shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40 hover:scale-110 active:scale-95 transition-all duration-200 animate-[pulse_2s_ease-in-out_infinite]"
-        aria-label="Chat via WhatsApp"
+        aria-label={t('floating.waAria')}
       >
         {/* WhatsApp SVG Icon */}
         <svg

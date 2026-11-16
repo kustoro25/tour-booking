@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Button from '../ui/Button';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useI18n } from '@/lib/i18n/client';
 
 function BrandIcon({ icon, className }: { icon?: string; className?: string }) {
   if (!icon) return <span className="text-ink-950 font-bold text-sm">HB</span>;
@@ -15,10 +17,10 @@ function BrandIcon({ icon, className }: { icon?: string; className?: string }) {
 }
 
 const navLinks = [
-  { href: '/', label: 'Beranda' },
-  { href: '/sewa-mobil', label: 'Sewa Mobil' },
+  { href: '/', labelKey: 'nav.home' },
+  { href: '/sewa-mobil', labelKey: 'nav.carRental' },
   // Anchor ke section galeri foto destinasi di halaman utama.
-  { href: '/#destinasi', label: 'Destinasi' },
+  { href: '/#destinasi', labelKey: 'nav.destinations' },
 ];
 
 /** Menu anchor (mis. /#destinasi) tidak punya segmen path, jadi tidak pernah "aktif". */
@@ -29,6 +31,7 @@ function isLinkActive(href: string, pathname: string): boolean {
 
 export default function Header({ brandName, brandIcon, brandEmblem }: { brandName?: string; brandIcon?: string; brandEmblem?: string }) {
   const pathname = usePathname();
+  const { t } = useI18n();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   // Logo gambar (upload admin) ditampilkan apa adanya, tanpa tile gradien emas.
@@ -107,7 +110,7 @@ export default function Header({ brandName, brandIcon, brandEmblem }: { brandNam
                     isActive ? 'text-gold-300' : 'text-mist hover:text-gold-300'
                   }`}
                 >
-                  {link.label}
+                  {t(link.labelKey)}
                   <span
                     className={`absolute bottom-1 left-3 right-3 h-0.5 bg-gold-400 rounded-full transition-transform origin-left ${
                       isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
@@ -118,32 +121,36 @@ export default function Header({ brandName, brandIcon, brandEmblem }: { brandNam
             })}
           </div>
 
-          {/* Desktop CTA */}
+          {/* Desktop CTA + Bahasa */}
           <div className="hidden lg:flex items-center gap-3">
+            <LanguageSwitcher />
             <Button href="/contact" variant="outline" size="sm">
-              Hubungi Kami
+              {t('nav.contactUs')}
             </Button>
             <Button href="/sewa-mobil" variant="primary" size="sm">
-              Booking Sekarang
+              {t('nav.bookNow')}
             </Button>
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            type="button"
-            className="lg:hidden p-2 rounded-lg text-mist hover:text-gold-300 hover:bg-gold-400/10 transition-colors"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-            aria-expanded={isMenuOpen}
-          >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              {isMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
+          {/* Baris kanan mobile: bahasa + tombol menu */}
+          <div className="lg:hidden flex items-center gap-1.5">
+            <LanguageSwitcher />
+            <button
+              type="button"
+              className="p-2 rounded-lg text-mist hover:text-gold-300 hover:bg-gold-400/10 transition-colors"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label={t('nav.toggleMenu')}
+              aria-expanded={isMenuOpen}
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {isMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Mobile Nav */}
@@ -160,16 +167,16 @@ export default function Header({ brandName, brandIcon, brandEmblem }: { brandNam
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  {link.label}
+                  {t(link.labelKey)}
                 </Link>
               );
             })}
             <div className="pt-3 flex gap-2">
               <Button href="/contact" variant="outline" size="sm" fullWidth>
-                Hubungi Kami
+                {t('nav.contactUs')}
               </Button>
               <Button href="/sewa-mobil" variant="primary" size="sm" fullWidth>
-                Booking
+                {t('nav.booking')}
               </Button>
             </div>
           </div>

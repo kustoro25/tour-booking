@@ -3,6 +3,7 @@ import { unstable_cache } from 'next/cache';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ToastProvider } from '@/components/ui/Toast';
+import { LanguageProvider } from '@/lib/i18n/client';
 import FloatingActions from '@/components/ui/FloatingActions';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { getBrandName, getBrandIcon, getBrandEmblem, getSiteTitle } from '@/lib/brand';
@@ -33,7 +34,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: {
       default: title,
-      template: `%s | ${title.split(' - ')[0] || title}`,
+      // Pemisah brand bisa hyphen atau em-dash (mis. "Brand — Tagline").
+      template: `%s | ${title.split(/\s*[-–—]\s*/)[0] || title}`,
     },
     description:
       'Sewa mobil mewah dengan supir di Bali. Armada prima, supir berpengalaman, harga transparan, dan booking online cepat.',
@@ -66,10 +68,12 @@ export default async function RootLayout({
   return (
     <html lang="id">
       <body className={`${inter.className} antialiased bg-ink-950 text-ivory min-h-screen flex flex-col selection:bg-gold-400/25 selection:text-gold-100`}>
-        <ToastProvider>
-          <PublicLayout brandName={brandName} brandIcon={brandIcon} brandEmblem={brandEmblem} footerCms={footerCms}>{children}</PublicLayout>
-          <FloatingActions waNumber={waNumber} />
-        </ToastProvider>
+        <LanguageProvider>
+          <ToastProvider>
+            <PublicLayout brandName={brandName} brandIcon={brandIcon} brandEmblem={brandEmblem} footerCms={footerCms}>{children}</PublicLayout>
+            <FloatingActions waNumber={waNumber} />
+          </ToastProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

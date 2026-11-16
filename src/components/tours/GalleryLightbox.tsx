@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useI18n } from '@/lib/i18n/client';
 
 interface GalleryLightboxProps {
   images: { url: string; alt: string }[];
@@ -15,6 +16,7 @@ export default function GalleryLightbox({
   isOpen,
   onClose,
 }: GalleryLightboxProps) {
+  const { t } = useI18n();
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [loaded, setLoaded] = useState(false);
   const thumbnailsRef = useRef<HTMLDivElement>(null);
@@ -97,7 +99,7 @@ export default function GalleryLightbox({
       className="fixed inset-0 z-[9999] flex flex-col bg-black animate-fade-in"
       role="dialog"
       aria-modal="true"
-      aria-label="Galeri foto"
+      aria-label={t('ui.gallery.ariaLabel')}
     >
       {/* ═══ TOP BAR ═══ */}
       <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 flex-shrink-0 bg-gradient-to-b from-black/60 to-transparent z-10">
@@ -109,7 +111,7 @@ export default function GalleryLightbox({
           <button
             onClick={onClose}
             className="w-10 h-10 rounded-full bg-ink-850/70 hover:bg-ink-700/90 border border-gold-500/25 text-gold-200 flex items-center justify-center transition-all"
-            aria-label="Tutup galeri"
+            aria-label={t('ui.gallery.close')}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -136,7 +138,7 @@ export default function GalleryLightbox({
           <button
             onClick={(e) => { e.stopPropagation(); goPrev(); }}
             className="absolute left-2 sm:left-4 z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-ink-850/70 hover:bg-ink-700/90 border border-gold-500/25 text-gold-200 flex items-center justify-center transition-all backdrop-blur-sm shadow-lg"
-            aria-label="Foto sebelumnya"
+            aria-label={t('ui.gallery.prev')}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -159,7 +161,7 @@ export default function GalleryLightbox({
           <button
             onClick={(e) => { e.stopPropagation(); goNext(); }}
             className="absolute right-2 sm:right-4 z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-ink-850/70 hover:bg-ink-700/90 border border-gold-500/25 text-gold-200 flex items-center justify-center transition-all backdrop-blur-sm shadow-lg"
-            aria-label="Foto berikutnya"
+            aria-label={t('ui.gallery.next')}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

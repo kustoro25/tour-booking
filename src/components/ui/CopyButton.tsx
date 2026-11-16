@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useI18n } from '@/lib/i18n/client';
 
 export default function CopyButton({ bankNumber }: { bankNumber: string }) {
+  const { t } = useI18n();
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -28,7 +30,7 @@ export default function CopyButton({ bankNumber }: { bankNumber: string }) {
       onClick={handleCopy}
       className="text-gold-300 text-sm hover:text-gold-200 font-medium transition-colors"
     >
-      {copied ? '✓ Tersalin' : 'Salin'}
+      {copied ? t('ui.copy.copied') : t('ui.copy.copy')}
     </button>
   );
 }

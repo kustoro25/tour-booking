@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useI18n } from '@/lib/i18n/client';
 
 /** Format tanggal lokal sebagai YYYY-MM-DD. Gunakan ini, bukan toISOString(),
  *  karena toISOString() menggeser satu hari untuk zona waktu positif (WIB/UTC+7). */
@@ -27,6 +28,7 @@ interface BookingCalendarProps {
 }
 
 export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: BookingCalendarProps) {
+  const { t, list } = useI18n();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,10 +102,8 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
   const startDay = firstDay.getDay();
   const daysInMonth = lastDay.getDate();
 
-  const monthNames = [
-    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
-  ];
+  const monthNames = list('calendar.months') as string[];
+  const weekdays = list('calendar.weekdays') as string[];
 
   return (
     <div className="bg-ink-850 rounded-xl shadow-sm p-4">
@@ -112,7 +112,7 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
           onClick={() => { setCurrentMonth(new Date(year, month - 1)); setLoading(true); }}
           className="w-9 h-9 flex items-center justify-center hover:bg-ink-800 rounded-lg text-mist hover:text-gold-300 transition-colors"
           disabled={loading}
-          aria-label="Bulan sebelumnya"
+          aria-label={t('calendar.prevMonth')}
         >
           ←
         </button>
@@ -123,7 +123,7 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
           onClick={() => { setCurrentMonth(new Date(year, month + 1)); setLoading(true); }}
           className="w-9 h-9 flex items-center justify-center hover:bg-ink-800 rounded-lg text-mist hover:text-gold-300 transition-colors"
           disabled={loading}
-          aria-label="Bulan berikutnya"
+          aria-label={t('calendar.nextMonth')}
         >
           →
         </button>
@@ -141,7 +141,7 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
       ) : (
         <>
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map((d) => (
+            {weekdays.map((d) => (
               <div key={d} className="text-center text-xs font-medium text-mist-dim py-1">
                 {d}
               </div>
@@ -161,7 +161,7 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
                   onClick={() => handleDateClick(date)}
                   disabled={getDayClass(date, true).includes('cursor-not-allowed')}
                   className={`h-9 sm:h-10 rounded text-xs font-medium flex flex-col items-center justify-center transition-colors ${getDayClass(date, true)}`}
-                  title={slot && remaining <= 3 && remaining > 0 ? `Tersisa ${remaining} seat` : ''}
+                  title={slot && remaining <= 3 && remaining > 0 ? t('calendar.remainingSeats', { n: remaining }) : ''}
                 >
                   {i + 1}
                   {slot && remaining <= 3 && remaining > 0 && (
@@ -174,15 +174,15 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
           <div className="mt-4 pt-3 border-t border-ink-700 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-mist">
             <div className="flex items-center gap-1.5">
               <div className="w-4 h-4 bg-green-500/15 border border-green-500/40 rounded flex-shrink-0" />
-              <span>Tersedia</span>
+              <span>{t('calendar.available')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-4 h-4 bg-gold-400/15 border border-gold-400/40 rounded flex-shrink-0" />
-              <span>Hampir Penuh</span>
+              <span>{t('calendar.almostFull')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-4 h-4 bg-red-500/15 border border-red-500/40 rounded flex-shrink-0" />
-              <span>Penuh</span>
+              <span>{t('calendar.full')}</span>
             </div>
           </div>
         </>

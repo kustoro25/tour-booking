@@ -1,5 +1,7 @@
 'use client';
 
+import { useI18n } from '@/lib/i18n/client';
+
 interface StarRatingProps {
   rating: number;
   maxStars?: number;
@@ -16,6 +18,7 @@ export default function StarRating({
   onChange,
 }: StarRatingProps) {
   const sizeClass = size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-2xl' : 'text-lg';
+  const { t } = useI18n();
 
   return (
     <div className="flex items-center gap-0.5">
@@ -31,7 +34,7 @@ export default function StarRating({
             disabled={!interactive}
             onClick={() => interactive && onChange?.(starValue)}
             className={`${sizeClass} ${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : 'cursor-default'}`}
-            aria-label={`${starValue} star`}
+            aria-label={t('review.starsLabel', { count: starValue })}
           >
             {filled ? (
               <span className="text-yellow-400">★</span>

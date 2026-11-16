@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useI18n } from '@/lib/i18n/client';
 
 export default function ScrollToTop() {
+  const { t } = useI18n();
   const [visible, setVisible] = useState(false);
 
   const handleScroll = useCallback(() => {
@@ -23,7 +25,7 @@ export default function ScrollToTop() {
     <button
       type="button"
       onClick={scrollToTop}
-      aria-label="Kembali ke atas"
+      aria-label={t('floating.backToTop')}
       className={`
         fixed bottom-24 right-6 z-50
         w-11 h-11 sm:w-12 sm:h-12

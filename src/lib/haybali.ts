@@ -9,6 +9,16 @@ export const HAYBALI_BRAND = 'HAYBALI TRANS';
 export const HAYBALI_TAGLINE = 'Sewa Mobil & Tour Bali';
 export const WA_NUMBER = '6285119334511'; // +62 851-1933-4511
 
+import idDict from './i18n/id';
+import enDict from './i18n/en';
+
+/** Interpolasi sederhana {var} → nilai (untuk pesan WhatsApp tanpa React). */
+function interp(template: string, vars?: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (match, key) =>
+    vars && key in vars ? String(vars[key]) : match
+  );
+}
+
 /** Buat link WhatsApp dengan teks prefill. Nomor bisa di-override dari pengaturan admin. */
 export function waLink(text?: string, phoneNumber?: string): string {
   const base = `https://wa.me/${phoneNumber || WA_NUMBER}`;
@@ -30,26 +40,29 @@ export interface BookingWaMessageData {
   invoiceUrl?: string; // link halaman invoice — otomatis bisa diklik di WhatsApp
 }
 
-export function buildBookingWaMessage(data: BookingWaMessageData): string {
+export type WaLang = 'id' | 'en';
+
+export function buildBookingWaMessage(data: BookingWaMessageData, lang: WaLang = 'id'): string {
+  const wa = lang === 'en' ? enDict.wa : idDict.wa;
   const lines = [
-    `Halo ${HAYBALI_BRAND}, saya baru saja melakukan booking:`,
+    interp(wa.greeting, { brand: HAYBALI_BRAND }),
     '',
-    `• Invoice: ${data.invoiceNo}`,
-    ...(data.invoiceUrl ? [`• Link Invoice: ${data.invoiceUrl}`] : []),
-    `• Nama: ${data.customerName}`,
-    `• Layanan: ${data.serviceLabel}`,
-    `• Tanggal: ${data.dateLabel}`,
-    `• Total: ${data.totalLabel}`,
+    interp(wa.invoice, { no: data.invoiceNo }),
+    ...(data.invoiceUrl ? [interp(wa.linkInvoice, { url: data.invoiceUrl })] : []),
+    interp(wa.name, { name: data.customerName }),
+    interp(wa.service, { service: data.serviceLabel }),
+    interp(wa.date, { date: data.dateLabel }),
+    interp(wa.total, { total: data.totalLabel }),
   ];
   if (data.extraLines?.length) lines.push('', ...data.extraLines);
-  if (data.paymentLabel) lines.push('', `• Metode: ${data.paymentLabel}`);
-  lines.push('', 'Mohon konfirmasi booking & info pembayarannya. Terima kasih.');
+  if (data.paymentLabel) lines.push('', interp(wa.method, { method: data.paymentLabel }));
+  lines.push('', wa.closing);
   return lines.join('\n');
 }
 
 /** Link wa.me berisi pesan booking lengkap + nomor invoice (prefill). */
-export function waBookingLink(data: BookingWaMessageData, phoneNumber?: string): string {
-  return waLink(buildBookingWaMessage(data), phoneNumber);
+export function waBookingLink(data: BookingWaMessageData, phoneNumber?: string, lang: WaLang = 'id'): string {
+  return waLink(buildBookingWaMessage(data, lang), phoneNumber);
 }
 
 // ----------------------------------------------------------------------------

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useToast } from '@/components/ui/Toast';
+import { useI18n } from '@/lib/i18n/client';
 
 export interface FooterCms {
   text?: string;
@@ -63,19 +64,25 @@ const socialIcons: Record<string, React.ReactNode> = {
   globe: <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>,
 };
 
-const footerLinks = {
-  Navigasi: [
-    { href: '/', label: 'Beranda' },
-    { href: '/sewa-mobil', label: 'Sewa Mobil' },
-    { href: '/about', label: 'Tentang Kami' },
-    { href: '/testimonials', label: 'Testimoni' },
-    { href: '/contact', label: 'Hubungi Kami' },
-  ],
-  Bantuan: [
-    { href: '/terms', label: 'Syarat & Ketentuan' },
-    { href: '/privacy', label: 'Kebijakan Privasi' },
-  ],
-};
+const footerLinks = [
+  {
+    categoryKey: 'footer.navigation',
+    links: [
+      { href: '/', labelKey: 'nav.home' },
+      { href: '/sewa-mobil', labelKey: 'nav.carRental' },
+      { href: '/about', labelKey: 'footer.aboutUs' },
+      { href: '/testimonials', labelKey: 'footer.testimonials' },
+      { href: '/contact', labelKey: 'nav.contactUs' },
+    ],
+  },
+  {
+    categoryKey: 'footer.help',
+    links: [
+      { href: '/terms', labelKey: 'footer.terms' },
+      { href: '/privacy', labelKey: 'footer.privacy' },
+    ],
+  },
+];
 
 function formatPhone(phone?: string) {
   const p = (phone || '').trim();
@@ -91,6 +98,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
   // Prefer server-provided data (instant), fallback to client fetch
   const cms: FooterCms = (serverCms && Object.keys(serverCms).length > 0) ? serverCms as FooterCms : clientCms;
   const { showToast } = useToast();
+  const { t, locale } = useI18n();
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribing, setSubscribing] = useState(false);
 
@@ -107,12 +115,12 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
       const data = await res.json();
       if (data.success) {
         setNewsletterEmail('');
-        showToast(data.message || 'Berhasil berlangganan!', 'success');
+        showToast(data.message || t('footer.subscribeSuccess'), 'success');
       } else {
-        showToast(data.error || 'Gagal berlangganan', 'error');
+        showToast(data.error || t('footer.subscribeFailed'), 'error');
       }
     } catch {
-      showToast('Gagal berlangganan. Silakan coba lagi.', 'error');
+      showToast(t('footer.subscribeFailedRetry'), 'error');
     } finally {
       setSubscribing(false);
     }
@@ -146,12 +154,12 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
               )}
             </div>
             <p className="text-mist-dim mb-4 max-w-md leading-relaxed">
-              {cms.text || 'Mitra sewa mobil dan transportasi privat tepercaya di Bali. Mengutamakan keselamatan, kenyamanan, dan pelayanan VIP bagi seluruh pelanggan.'}
+              {locale === 'id' ? (cms.text || t('footer.tagline')) : t('footer.tagline')}
             </p>
             <div className="space-y-1.5 text-sm text-mist-dim mb-4">
               <p className="flex items-start gap-2">
                 <span className="mt-0.5 flex-shrink-0">📍</span>
-                <span>{info.address || 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361'}</span>
+                <span>{info.address || t('footer.address')}</span>
               </p>
               <p className="flex items-center gap-2">
                 <span className="flex-shrink-0">📞</span>
@@ -184,17 +192,17 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
             {/* Newsletter */}
             <div className="mt-6 pt-6 border-t border-ink-700">
               <h4 className="text-white font-semibold text-sm mb-2">
-                Dapatkan Info Terbaru ✉️
+                {t('footer.newsletterTitle')}
               </h4>
               <p className="text-mist-dim text-xs mb-3">
-                Berlangganan newsletter untuk info promo & armada terbaru.
+                {t('footer.newsletterDesc')}
               </p>
               <form onSubmit={handleSubscribe} className="flex gap-2">
                 <input
                   type="email"
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
-                  placeholder="email@anda.com"
+                  placeholder={t('footer.newsletterPlaceholder')}
                   required
                   className="flex-1 min-w-0 h-11 px-4 bg-ink-800 border border-ink-600 rounded-xl text-sm text-ivory placeholder-mist-dim focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400 transition-shadow"
                 />
@@ -203,24 +211,24 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
                   disabled={subscribing}
                   className="h-11 px-5 inline-flex items-center bg-gold-400 hover:bg-gold-300 disabled:opacity-50 disabled:cursor-not-allowed text-ink-950 text-sm font-semibold rounded-xl transition-colors flex-shrink-0"
                 >
-                  {subscribing ? '...' : 'Berlangganan'}
+                  {subscribing ? '...' : t('footer.subscribe')}
                 </button>
               </form>
             </div>
           </div>
 
           {/* Nav Links */}
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
+          {footerLinks.map(({ categoryKey, links }) => (
+            <div key={categoryKey}>
               <h3 className="text-white font-semibold mb-4 relative inline-block">
-                {category}
+                {t(categoryKey)}
                 <span className="absolute -bottom-1 left-0 w-8 h-0.5 bg-gradient-to-r from-gold-300 to-gold-500 rounded-full" />
               </h3>
               <ul className="space-y-2.5">
                 {links.map((link) => (
                   <li key={link.href}>
                     <Link href={link.href} className="text-mist-dim hover:text-gold-200 transition-all duration-200 text-sm hover:translate-x-1 inline-block">
-                      {link.label}
+                      {t(link.labelKey)}
                     </Link>
                   </li>
                 ))}
@@ -231,7 +239,7 @@ export default function Footer({ footerCms: serverCms }: { footerCms?: FooterCms
 
         {/* Bottom Bar */}
         <div className="border-t border-ink-700 mt-10 pt-6 text-center text-sm text-mist-dim">
-          {cms.copyright || `© 2022 ${info.brandName || 'HAYBALI TRANS'}. All rights reserved.`}
+          {locale === 'id' ? (cms.copyright || `© 2022 ${info.brandName || 'HAYBALI TRANS'}. ${t('footer.copyright')}`) : `© 2022 ${info.brandName || 'HAYBALI TRANS'}. ${t('footer.copyright')}`}
         </div>
       </div>
     </footer>

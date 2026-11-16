@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useI18n } from '@/lib/i18n/client';
 
 interface PaginationProps {
   currentPage: number;
@@ -10,6 +11,8 @@ interface PaginationProps {
 }
 
 export default function Pagination({ currentPage, totalPages, basePath, searchParams = {} }: PaginationProps) {
+  const { t } = useI18n();
+
   if (totalPages <= 1) return null;
 
   const buildUrl = (page: number) => {
@@ -51,7 +54,7 @@ export default function Pagination({ currentPage, totalPages, basePath, searchPa
     'inline-flex items-center justify-center min-w-[2.25rem] h-9 px-2.5 text-sm font-medium rounded-lg transition-all duration-200';
 
   return (
-    <nav className="flex items-center justify-center gap-1 mt-12" aria-label="Pagination">
+    <nav className="flex items-center justify-center gap-1 mt-12" aria-label={t('ui.pagination.ariaLabel')}>
       {/* Previous */}
       {currentPage > 1 ? (
         <Link
@@ -61,14 +64,14 @@ export default function Pagination({ currentPage, totalPages, basePath, searchPa
           <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          <span className="hidden sm:inline">Prev</span>
+          <span className="hidden sm:inline">{t('ui.pagination.prev')}</span>
         </Link>
       ) : (
         <span className={`${btnBase} text-mist cursor-not-allowed`}>
           <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          <span className="hidden sm:inline">Prev</span>
+          <span className="hidden sm:inline">{t('ui.pagination.prev')}</span>
         </span>
       )}
 
@@ -104,14 +107,14 @@ export default function Pagination({ currentPage, totalPages, basePath, searchPa
           href={buildUrl(currentPage + 1)}
           className={`${btnBase} text-mist hover:text-gold-300 hover:bg-gold-400/10`}
         >
-          <span className="hidden sm:inline">Next</span>
+          <span className="hidden sm:inline">{t('ui.pagination.next')}</span>
           <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </Link>
       ) : (
         <span className={`${btnBase} text-mist cursor-not-allowed`}>
-          <span className="hidden sm:inline">Next</span>
+          <span className="hidden sm:inline">{t('ui.pagination.next')}</span>
           <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>

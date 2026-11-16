@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useI18n } from '@/lib/i18n/client';
 
 export default function FloatingActions({ waNumber: initialWaNumber }: { waNumber?: string }) {
+  const { t } = useI18n();
   const [scrolled, setScrolled] = useState(false);
   const [showWaTooltip, setShowWaTooltip] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState(initialWaNumber || '6285119334511');
@@ -32,9 +34,7 @@ export default function FloatingActions({ waNumber: initialWaNumber }: { waNumbe
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const waMessage = encodeURIComponent(
-    'Halo HAYBALI TRANS, saya ingin bertanya tentang sewa mobil.'
-  );
+  const waMessage = encodeURIComponent(t('floating.waMessage'));
 
   return (
     <div className="no-print fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
@@ -42,7 +42,7 @@ export default function FloatingActions({ waNumber: initialWaNumber }: { waNumbe
       <button
         type="button"
         onClick={scrollToTop}
-        aria-label="Kembali ke atas"
+        aria-label={t('floating.backToTop')}
         className={`
           w-11 h-11 sm:w-12 sm:h-12
           rounded-full
@@ -80,10 +80,9 @@ export default function FloatingActions({ waNumber: initialWaNumber }: { waNumbe
         {/* Tooltip */}
         {showWaTooltip && (
           <div className="bg-ink-850 shadow-lg rounded-xl px-4 py-2.5 text-sm font-medium text-mist animate-fade-in whitespace-nowrap">
-            Chat via WhatsApp 💬
+            {t('floating.waTooltip')}
           </div>
         )}
-
         <a
           href={`https://wa.me/${phoneNumber}?text=${waMessage}`}
           target="_blank"
@@ -91,7 +90,7 @@ export default function FloatingActions({ waNumber: initialWaNumber }: { waNumbe
           onMouseEnter={() => setShowWaTooltip(true)}
           onMouseLeave={() => setShowWaTooltip(false)}
           className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] shadow-lg shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40 hover:scale-110 active:scale-95 transition-all duration-200 animate-[pulse_2s_ease-in-out_infinite]"
-          aria-label="Chat via WhatsApp"
+          aria-label={t('floating.waAria')}
         >
           <svg
             viewBox="0 0 24 24"

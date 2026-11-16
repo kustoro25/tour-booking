@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useI18n } from '@/lib/i18n/client';
 
 const SUGGESTIONS = [
   { label: '🏝️ Bali', query: 'Bali' },
@@ -14,6 +15,7 @@ const SUGGESTIONS = [
 
 export default function HeroSearch() {
   const router = useRouter();
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -84,7 +86,7 @@ export default function HeroSearch() {
           }}
           onKeyDown={handleKeyDown}
           onFocus={() => setShowSuggestions(true)}
-          placeholder="Cari destinasi..."
+          placeholder={t('ui.heroSearch.placeholder')}
           className="flex-1 px-2 sm:px-4 py-2.5 sm:py-4 text-ivory placeholder-mist-dim bg-transparent outline-none text-sm sm:text-base min-w-0"
         />
 
@@ -93,12 +95,12 @@ export default function HeroSearch() {
           type="button"
           onClick={() => handleSearch(query)}
           className="mr-1 sm:mr-2 px-2.5 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-gold-300 to-gold-500 text-ink-950 font-semibold rounded-lg sm:rounded-xl text-xs sm:text-base hover:from-gold-400 hover:to-gold-600 shadow-md shadow-gold-500/20 hover:shadow-lg hover:shadow-gold-500/30 transition-all duration-200 active:scale-95 flex-shrink-0 flex items-center gap-1"
-          aria-label="Cari destinasi"
+          aria-label={t('ui.heroSearch.ariaLabel')}
         >
           <svg className="w-3.5 h-3.5 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <span className="hidden sm:inline">Cari</span>
+          <span className="hidden sm:inline">{t('ui.heroSearch.search')}</span>
         </button>
       </div>
 
@@ -108,7 +110,7 @@ export default function HeroSearch() {
           {filteredSuggestions.length > 0 ? (
             <div className="py-1.5">
               <p className="px-4 py-1.5 text-xs font-semibold text-mist-dim uppercase tracking-wider">
-                {query.trim() ? 'Hasil Pencarian' : 'Destinasi Populer'}
+                {query.trim() ? t('ui.heroSearch.results') : t('ui.heroSearch.popular')}
               </p>
               {filteredSuggestions.map((suggestion) => (
                 <button
@@ -127,7 +129,7 @@ export default function HeroSearch() {
             </div>
           ) : (
             <div className="px-4 py-3 text-sm text-mist-dim text-center">
-              Tidak ada destinasi yang cocok
+              {t('ui.heroSearch.noResults')}
             </div>
           )}
         </div>

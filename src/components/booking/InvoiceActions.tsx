@@ -1,6 +1,7 @@
 'use client';
 
 import Button from '@/components/ui/Button';
+import { useI18n } from '@/lib/i18n/client';
 
 interface InvoiceActionsProps {
   invoiceNo: string;
@@ -13,7 +14,9 @@ interface InvoiceActionsProps {
   payUrl?: string;
   /** Label tombol bayar online (mis. "Bayar DP / Angsuran" untuk cicilan) */
   payLabel?: string;
-  /** Tanggal perjalanan — ditambahkan ke pesan WhatsApp */
+  /** Jenis pembayaran order — menentukan label tombol bayar (DP vs pelunasan) */
+  paymentType?: string;
+  /** Tanggal perjalanan (ISO) — diformat sesuai locale lalu ditambahkan ke pesan WhatsApp */
   tourDate?: string;
   /** Link halaman invoice — ditambahkan ke pesan WhatsApp agar bisa diklik */
   invoiceUrl?: string;
@@ -29,34 +32,46 @@ export default function InvoiceActions({
   companyPhone,
   helpLink,
   payUrl,
-  payLabel = '💳 Bayar Online Sekarang',
+  payLabel,
+  paymentType,
   tourDate,
   invoiceUrl,
   paymentMode = 'transfer',
 }: InvoiceActionsProps) {
+  const { t, locale } = useI18n();
   const waNumber = companyPhone.replace(/[^0-9]/g, '');
+  const payLabelText =
+    payLabel ?? (paymentType === 'INSTALLMENT' ? t('invoiceActions.payDp') : t('invoiceActions.payOnline'));
+  const formattedTotal = total.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US');
+  const formattedTourDate = tourDate
+    ? new Date(tourDate).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : '';
   const orderInfo =
-    `- Invoice: ${invoiceNo}\n` +
-    (invoiceUrl ? `- Link Invoice: ${invoiceUrl}\n` : '') +
-    `- Nama: ${customerName}\n` +
-    `- Paket: ${tourName}\n` +
-    (tourDate ? `- Tanggal: ${tourDate}\n` : '') +
-    `- Total: Rp ${total.toLocaleString('id-ID')}`;
+    t('invoiceActions.orderInvoice', { no: invoiceNo }) + '\n' +
+    (invoiceUrl ? t('invoiceActions.orderLink', { url: invoiceUrl }) + '\n' : '') +
+    t('invoiceActions.orderName', { name: customerName }) + '\n' +
+    t('invoiceActions.orderPackage', { tour: tourName }) + '\n' +
+    (formattedTourDate ? t('invoiceActions.orderDate', { date: formattedTourDate }) + '\n' : '') +
+    t('invoiceActions.orderTotal', { total: formattedTotal });
 
   const waMessage = encodeURIComponent(
     paymentMode === 'online'
-      ? `Halo, saya ingin bertanya mengenai pembayaran online untuk pesanan:\n${orderInfo}`
+      ? t('invoiceActions.msgOnline', { orderInfo })
       : paymentMode === 'paid'
-        ? `Halo, saya ingin bertanya mengenai pesanan saya:\n${orderInfo}\n\nPesanan sudah saya bayar, mohon informasi E-Ticket-nya.`
-        : `Halo, saya ingin konfirmasi pembayaran untuk pesanan:\n${orderInfo}\n\nSaya sudah melakukan transfer. Berikut bukti pembayarannya.`
+        ? t('invoiceActions.msgPaid', { orderInfo })
+        : t('invoiceActions.msgTransfer', { orderInfo })
   );
 
   const waLabel =
     paymentMode === 'transfer'
-      ? '💬 Konfirmasi Transfer via WhatsApp'
+      ? t('invoiceActions.labelTransfer')
       : paymentMode === 'online'
-        ? '💬 Kendala Pembayaran?'
-        : '💬 Hubungi Kami';
+        ? t('invoiceActions.labelOnline')
+        : t('invoiceActions.labelOther');
 
   return (
     <div className="screen-only mt-6">
@@ -64,11 +79,11 @@ export default function InvoiceActions({
         {/* Aksi utama: bayar online (tampil penuh di atas bila tersedia) */}
         {payUrl && (
           <Button href={payUrl} variant="accent" size="lg" className="sm:col-span-2 w-full">
-            {payLabel}
+            {payLabelText}
           </Button>
         )}
         <Button onClick={() => window.print()} variant="secondary" className="w-full">
-          🖨️ Cetak / Simpan PDF
+          {t('invoiceActions.print')}
         </Button>
         <Button
           href={`https://wa.me/${waNumber}?text=${waMessage}`}
@@ -84,7 +99,7 @@ export default function InvoiceActions({
           variant="outline"
           className="w-full sm:col-span-2 sm:w-auto sm:justify-self-center sm:px-10"
         >
-          ❓ Butuh Bantuan?
+          ❓ {t('invoiceActions.help')}
         </Button>
       </div>
     </div>
