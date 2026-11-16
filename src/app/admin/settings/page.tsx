@@ -283,21 +283,6 @@ export default function AdminSettingsPage() {
                 placeholder="Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Kurs USD ke IDR (Rp per $1)</label>
-              <input
-                type="number"
-                min={0}
-                value={form.usdRate}
-                onChange={(e) => setForm({ ...form, usdRate: Number(e.target.value) || 0 })}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="16300"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Dipakai untuk harga estimasi USD saat pengunjung memilih bahasa English. Isi 0 untuk otomatis
-                mengikuti kurs harian (diperbarui tiap 6 jam). Pembayaran tetap dalam Rupiah.
-              </p>
-            </div>
           </div>
         </div>
 
@@ -492,6 +477,30 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Currency (USD estimate for English visitors) */}
+        <div className="border-t pt-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">💱 Mata Uang (USD)</h2>
+          <p className="text-xs text-gray-500 mb-4">
+            Saat pengunjung memilih bahasa English, semua harga publik tampil sebagai estimasi USD. Nominal
+            transaksi tetap dalam Rupiah.
+          </p>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Kurs USD ke IDR (Rp per $1)</label>
+            <input
+              type="number"
+              min={0}
+              value={form.usdRate}
+              onChange={(e) => setForm({ ...form, usdRate: Number(e.target.value) || 0 })}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="16300"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Isi manual (mis. 16500) untuk mengunci kurs. Isi 0 agar otomatis mengikuti kurs harian (diperbarui
+              tiap 6 jam). Pembayaran tetap diproses dalam Rupiah.
+            </p>
           </div>
         </div>
 
