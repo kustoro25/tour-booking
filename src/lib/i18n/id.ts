@@ -349,7 +349,6 @@ const id = {
       payOnline: '• Pembayaran online via QRIS, Virtual Account, e-wallet, atau kartu kredit/debit — status terkonfirmasi otomatis.',
       payBank: '• Transfer bank {banks} ke rekening perusahaan — detail rekening tercantum di invoice.',
       payProof: '• Kirim bukti transfer via WhatsApp atau email, status pembayaran diaktifkan manual oleh admin.',
-      payInstallments: '• Tersedia opsi cicilan 2x untuk layanan tertentu.',
       payDeadline: '• Batas pembayaran 24 jam sejak invoice terbit.',
       driverTitle: 'Jam Kerja Pengemudi',
       driverHours: '• Jam kerja {start}–{end} WITA.',

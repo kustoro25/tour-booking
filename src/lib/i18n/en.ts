@@ -349,7 +349,6 @@ const en: Dictionary = {
       payOnline: '• Online payment via QRIS, Virtual Account, e-wallets, or credit/debit cards — status confirmed automatically.',
       payBank: '• Bank transfer {banks} to the company account — account details are on the invoice.',
       payProof: '• Send your transfer receipt via WhatsApp or email; payment status is activated manually by admin.',
-      payInstallments: '• A 2-installment option is available for selected services.',
       payDeadline: '• Payment deadline is 24 hours after the invoice is issued.',
       driverTitle: 'Driver Working Hours',
       driverHours: '• Working hours {start}–{end} WITA.',

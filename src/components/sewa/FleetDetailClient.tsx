@@ -291,7 +291,6 @@ export default function FleetDetailClient({ fleet, detail, waNumber, gateway, ba
                   <li>{t('fleetDetail.common.payProof')}</li>
                 </>
               )}
-              <li>{t('fleetDetail.common.payInstallments')}</li>
               <li>{t('fleetDetail.common.payDeadline')}</li>
             </ul>
           </div>
