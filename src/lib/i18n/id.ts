@@ -107,16 +107,16 @@ const id = {
       { num: '6/12', label: 'Jam Sewa Fleksibel' },
     ],
     about: {
-      eyebrow: 'About HAYBALI TRANS',
-      title: 'Your Trusted Travel Partner in Bali',
-      subtitle: 'Explore Bali with Comfort, Safety & Exceptional Service.',
+      eyebrow: 'Tentang HAYBALI TRANS',
+      title: 'Mitra Perjalanan Terpercaya Anda di Bali',
+      subtitle: 'Jelajahi Bali dengan Kenyamanan, Keamanan & Layanan Istimewa.',
       paragraphs: [
         'HAYBALI TRANS hadir untuk memberikan pengalaman perjalanan terbaik selama Anda berada di Bali.',
         'Kami menyediakan layanan transportasi pribadi dengan pilihan kendaraan yang bersih, nyaman, dan terawat, didukung oleh pengemudi profesional, ramah, berpengalaman, serta memahami berbagai destinasi wisata di Bali.',
         'Baik untuk perjalanan wisata, liburan keluarga, antar-jemput bandara, maupun perjalanan bisnis, kami berkomitmen memberikan pelayanan yang aman, tepat waktu, dan menyenangkan.',
         'Bagi kami, setiap perjalanan bukan sekadar menuju destinasi, tetapi menciptakan pengalaman dan kenangan yang tak terlupakan.',
       ],
-      closing: 'HAYBALI TRANS — Your Comfort, Our Priority.',
+      closing: 'HAYBALI TRANS — Kenyamanan Anda, Prioritas Kami.',
     },
     why: {
       eyebrow: 'Mengapa Memilih Kami?',
