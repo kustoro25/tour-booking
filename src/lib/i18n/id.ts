@@ -159,7 +159,6 @@ const id = {
         midtrans: '• Booking online aman — tersedia QRIS, Virtual Account, e-wallet (GoPay, ShopeePay, DANA), dan kartu kredit/debit.',
         manual: '• Pembayaran via transfer bank ke rekening perusahaan yang tercantum di invoice, lalu konfirmasi bukti transfer via WhatsApp.',
         deposit: '• Pemesanan memerlukan deposit 50% terlebih dahulu untuk mengamankan jadwal & pengemudi Anda. Pelunasan sisa pembayaran dapat dilakukan tunai saat bertemu dengan driver.',
-        installments: '• Tersedia opsi DP 50% dengan cicilan 2x untuk layanan tertentu.',
         deadline: '• Batas pembayaran 24 jam sejak invoice terbit; pesanan melewati batas waktu otomatis dibatalkan.',
       },
       termsTitle: 'Syarat & Ketentuan',

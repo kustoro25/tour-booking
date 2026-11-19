@@ -264,7 +264,6 @@ export default function HomeClient({ reviews, waNumber, gateway }: HomeClientPro
               <ul className="space-y-3 text-sm text-mist leading-relaxed">
                 <li>{gateway === 'midtrans' ? t('home.policy.paymentItems.midtrans') : t('home.policy.paymentItems.manual')}</li>
                 <li>{t('home.policy.paymentItems.deposit')}</li>
-                <li>{t('home.policy.paymentItems.installments')}</li>
                 <li>{t('home.policy.paymentItems.deadline')}</li>
               </ul>
             </div>

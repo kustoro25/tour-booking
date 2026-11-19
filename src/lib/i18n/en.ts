@@ -159,7 +159,6 @@ const en: Dictionary = {
         midtrans: '• Secure online booking — QRIS, Virtual Account, e-wallets (GoPay, ShopeePay, DANA), and credit/debit cards available.',
         manual: '• Pay by bank transfer to the company account listed on your invoice, then confirm your transfer receipt via WhatsApp.',
         deposit: '• A 50% deposit is required to secure your schedule & driver. The remaining balance can be paid in cash when you meet your driver.',
-        installments: '• A 50% down payment with 2 installments is available for selected services.',
         deadline: '• Payment deadline is 24 hours after the invoice is issued; orders past the deadline are automatically cancelled.',
       },
       termsTitle: 'Terms & Conditions',
