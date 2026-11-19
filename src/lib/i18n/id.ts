@@ -195,7 +195,7 @@ const id = {
       waConsultMessage: 'Halo HAYBALI TRANS, saya ingin konsultasi layanan',
       address: '📍 Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Bali',
       phone: '📞 +62 851-1933-4511',
-      email: '📧 info@haybalitrans.com',
+      email: '📧 Haybalitrans@gmail.com',
     },
   },
   sewa: {
@@ -955,11 +955,11 @@ const id = {
   },
   terms: {
     title: 'Syarat & Ketentuan',
-    bodyHtml: '<h2>1. Umum</h2><p>Dengan menggunakan layanan Kami, Anda menyetujui seluruh syarat dan ketentuan.</p><h2>2. Pemesanan</h2><p>Booking sah setelah menerima nomor invoice. Data diri wajib diisi lengkap.</p><h2>3. Pembayaran</h2><p>Pembayaran dalam 24 jam sejak invoice. Jika tidak, pesanan otomatis dibatalkan.</p><h2>4. Pembatalan & Refund</h2><table><tr><th>Waktu</th><th>Refund</th></tr><tr><td>H-14+</td><td>80%</td></tr><tr><td>H-7~13</td><td>50%</td></tr><tr><td>H-3~6</td><td>25%</td></tr><tr><td>&lt;H-3</td><td>0%</td></tr></table><p>Refund diproses 7-14 hari kerja.</p><h2>5. Hubungi Kami</h2><p>Email: support@haybalitrans.com</p>',
+    bodyHtml: '<h2>1. Umum</h2><p>Dengan menggunakan layanan Kami, Anda menyetujui seluruh syarat dan ketentuan.</p><h2>2. Pemesanan</h2><p>Booking sah setelah menerima nomor invoice. Data diri wajib diisi lengkap.</p><h2>3. Pembayaran</h2><p>Pembayaran dalam 24 jam sejak invoice. Jika tidak, pesanan otomatis dibatalkan.</p><h2>4. Pembatalan & Refund</h2><table><tr><th>Waktu</th><th>Refund</th></tr><tr><td>H-14+</td><td>80%</td></tr><tr><td>H-7~13</td><td>50%</td></tr><tr><td>H-3~6</td><td>25%</td></tr><tr><td>&lt;H-3</td><td>0%</td></tr></table><p>Refund diproses 7-14 hari kerja.</p><h2>5. Hubungi Kami</h2><p>Email: Haybalitrans@gmail.com</p>',
   },
   privacy: {
     title: 'Kebijakan Privasi',
-    bodyHtml: '<h2>1. Informasi yang Kami Kumpulkan</h2><p>Saat Anda menggunakan layanan HAYBALI TRANS, kami mengumpulkan: nama, email, telepon, data pemesanan, data pembayaran (diproses via payment gateway), dan data teknis (IP, browser).</p><h2>2. Penggunaan Informasi</h2><p>Untuk memproses pemesanan, mengirim invoice & e-ticket, update jadwal, dan meningkatkan layanan.</p><h2>3. Perlindungan Data</h2><p>Kami menerapkan enkripsi, firewall, dan kontrol akses ketat.</p><h2>4. Hubungi Kami</h2><p>Email: privacy@haybalitrans.com</p>',
+    bodyHtml: '<h2>1. Informasi yang Kami Kumpulkan</h2><p>Saat Anda menggunakan layanan HAYBALI TRANS, kami mengumpulkan: nama, email, telepon, data pemesanan, data pembayaran (diproses via payment gateway), dan data teknis (IP, browser).</p><h2>2. Penggunaan Informasi</h2><p>Untuk memproses pemesanan, mengirim invoice & e-ticket, update jadwal, dan meningkatkan layanan.</p><h2>3. Perlindungan Data</h2><p>Kami menerapkan enkripsi, firewall, dan kontrol akses ketat.</p><h2>4. Hubungi Kami</h2><p>Email: Haybalitrans@gmail.com</p>',
   },
   status: {
     order: {

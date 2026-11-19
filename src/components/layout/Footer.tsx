@@ -19,7 +19,7 @@ function isImageIcon(icon?: string): boolean {
 }
 
 function useCompanyInfo() {
-  const [info, setInfo] = useState({ email: 'info@haybalitrans.com', phone: '+62 851-1933-4511', address: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361', brandName: 'HAYBALI TRANS', brandIcon: 'HB', brandEmblem: '' });
+  const [info, setInfo] = useState({ email: 'Haybalitrans@gmail.com', phone: '+62 851-1933-4511', address: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361', brandName: 'HAYBALI TRANS', brandIcon: 'HB', brandEmblem: '' });
   useEffect(() => {
     fetch('/api/settings/public')
       .then(r => r.json())

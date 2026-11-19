@@ -17,7 +17,7 @@ const FALLBACK: ContactData = {
   subheading: 'Punya pertanyaan atau butuh bantuan memilih paket? Tim kami siap membantu!',
   infoCards: [
     { icon: '📞', title: 'WhatsApp', detail: '+62 851-1933-4511', color: 'from-gold-300 to-gold-500' },
-    { icon: '📧', title: 'Email', detail: 'info@haybalitrans.com', color: 'from-gold-500 to-gold-600' },
+    { icon: '📧', title: 'Email', detail: 'Haybalitrans@gmail.com', color: 'from-gold-500 to-gold-600' },
     { icon: '🕐', title: 'Jam Operasional', detail: 'Setiap hari, 7:00 AM–11:00 PM WITA', color: 'from-gold-400 to-gold-600' },
     { icon: '📍', title: 'Alamat', detail: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361', color: 'from-gold-400 to-gold-600' },
   ],

@@ -140,7 +140,7 @@ const defaultData: Record<string, PageData> = {
 <p>Kami dapat memperbarui Kebijakan Privasi ini sewaktu-waktu. Perubahan akan diumumkan melalui website dan, untuk perubahan signifikan, kami akan mengirimkan pemberitahuan melalui email.</p>
 
 <h2>9. Hubungi Kami</h2>
-<p>Jika Anda memiliki pertanyaan terkait Kebijakan Privasi ini, silakan hubungi kami melalui halaman Hubungi Kami atau kirim email ke privacy@haybalitrans.com.</p>`
+<p>Jika Anda memiliki pertanyaan terkait Kebijakan Privasi ini, silakan hubungi kami melalui halaman Hubungi Kami atau kirim email ke Haybalitrans@gmail.com.</p>`
   },
   'terms': {
     html: `<h2>1. Umum</h2>
@@ -185,7 +185,7 @@ const defaultData: Record<string, PageData> = {
 <p>Kami berhak mengubah syarat dan ketentuan ini sewaktu-waktu. Perubahan berlaku efektif sejak publikasi.</p>
 
 <h2>9. Hubungi Kami</h2>
-<p>Jika ada pertanyaan, hubungi kami melalui halaman Hubungi Kami atau email support@haybalitrans.com.</p>`
+<p>Jika ada pertanyaan, hubungi kami melalui halaman Hubungi Kami atau email Haybalitrans@gmail.com.</p>`
   },
   'about': {
     label: 'Tentang',
@@ -214,7 +214,7 @@ const defaultData: Record<string, PageData> = {
     subheading: 'Punya pertanyaan atau butuh bantuan memilih paket? Tim kami siap membantu!',
     infoCards: [
       { icon: '📞', title: 'WhatsApp', detail: '+62 851-1933-4511', color: 'from-green-500 to-green-600' },
-      { icon: '📧', title: 'Email', detail: 'info@haybalitrans.com', color: 'from-blue-500 to-blue-600' },
+      { icon: '📧', title: 'Email', detail: 'Haybalitrans@gmail.com', color: 'from-blue-500 to-blue-600' },
       { icon: '🕐', title: 'Jam Operasional', detail: 'Senin – Minggu, 07.00 – 23.59 WITA', color: 'from-purple-500 to-purple-600' },
       { icon: '📍', title: 'Alamat', detail: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361', color: 'from-orange-500 to-orange-600' },
     ],
@@ -256,7 +256,7 @@ const defaultData: Record<string, PageData> = {
     socialLinks: [
       { platform: 'WhatsApp', url: 'https://wa.me/6285119334511', icon: 'whatsapp' },
       { platform: 'Instagram', url: 'https://instagram.com/haybalitrans', icon: 'instagram' },
-      { platform: 'Email', url: 'mailto:info@haybalitrans.com', icon: 'email' },
+      { platform: 'Email', url: 'mailto:Haybalitrans@gmail.com', icon: 'email' },
     ],
   },
   'invoice-premium': {

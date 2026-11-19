@@ -195,7 +195,7 @@ const en: Dictionary = {
       waConsultMessage: 'Hello HAYBALI TRANS, I would like a service consultation',
       address: '📍 Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Bali',
       phone: '📞 +62 851-1933-4511',
-      email: '📧 info@haybalitrans.com',
+      email: '📧 Haybalitrans@gmail.com',
     },
   },
   sewa: {
@@ -956,11 +956,11 @@ const en: Dictionary = {
   },
   terms: {
     title: 'Terms & Conditions',
-    bodyHtml: '<h2>1. General</h2><p>By using our services, you agree to all terms and conditions.</p><h2>2. Booking</h2><p>Bookings are valid after receiving an invoice number. Personal data must be filled in completely.</p><h2>3. Payment</h2><p>Payment is due within 24 hours of the invoice. Otherwise, the order is cancelled automatically.</p><h2>4. Cancellation & Refund</h2><table><tr><th>Time</th><th>Refund</th></tr><tr><td>D-14+</td><td>80%</td></tr><tr><td>D-7~13</td><td>50%</td></tr><tr><td>D-3~6</td><td>25%</td></tr><tr><td>&lt;D-3</td><td>0%</td></tr></table><p>Refunds are processed within 7-14 business days.</p><h2>5. Contact Us</h2><p>Email: support@haybalitrans.com</p>',
+    bodyHtml: '<h2>1. General</h2><p>By using our services, you agree to all terms and conditions.</p><h2>2. Booking</h2><p>Bookings are valid after receiving an invoice number. Personal data must be filled in completely.</p><h2>3. Payment</h2><p>Payment is due within 24 hours of the invoice. Otherwise, the order is cancelled automatically.</p><h2>4. Cancellation & Refund</h2><table><tr><th>Time</th><th>Refund</th></tr><tr><td>D-14+</td><td>80%</td></tr><tr><td>D-7~13</td><td>50%</td></tr><tr><td>D-3~6</td><td>25%</td></tr><tr><td>&lt;D-3</td><td>0%</td></tr></table><p>Refunds are processed within 7-14 business days.</p><h2>5. Contact Us</h2><p>Email: Haybalitrans@gmail.com</p>',
   },
   privacy: {
     title: 'Privacy Policy',
-    bodyHtml: '<h2>1. Information We Collect</h2><p>When you use HAYBALI TRANS services, we collect: name, email, phone, booking data, payment data (processed via the payment gateway), and technical data (IP, browser).</p><h2>2. Use of Information</h2><p>To process bookings, send invoices & e-tickets, update schedules, and improve our services.</p><h2>3. Data Protection</h2><p>We apply encryption, firewalls, and strict access controls.</p><h2>4. Contact Us</h2><p>Email: privacy@haybalitrans.com</p>',
+    bodyHtml: '<h2>1. Information We Collect</h2><p>When you use HAYBALI TRANS services, we collect: name, email, phone, booking data, payment data (processed via the payment gateway), and technical data (IP, browser).</p><h2>2. Use of Information</h2><p>To process bookings, send invoices & e-tickets, update schedules, and improve our services.</p><h2>3. Data Protection</h2><p>We apply encryption, firewalls, and strict access controls.</p><h2>4. Contact Us</h2><p>Email: Haybalitrans@gmail.com</p>',
   },
   status: {
     order: {

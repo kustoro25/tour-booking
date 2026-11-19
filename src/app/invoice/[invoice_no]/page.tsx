@@ -142,7 +142,7 @@ export default async function InvoicePage({ params }: PageProps) {
 
   // Read company details from settings
   let companyPhone = '+62 851-1933-4511';
-  let companyEmail = 'info@haybalitrans.com';
+  let companyEmail = 'Haybalitrans@gmail.com';
   let companyAddress = 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361';
   try {
     const phoneSetting = await prisma.setting.findUnique({ where: { key: 'company_phone' } });
