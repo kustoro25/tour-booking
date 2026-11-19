@@ -8,6 +8,7 @@ import FloatingActions from '@/components/ui/FloatingActions';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { getBrandName, getBrandIcon, getBrandEmblem, getSiteTitle } from '@/lib/brand';
 import { getWhatsAppNumber } from '@/lib/settings';
+import { SITE_URL } from '@/lib/seo';
 import { prisma } from '@/lib/prisma';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -31,15 +32,35 @@ const getFooterCms = unstable_cache(
 
 export async function generateMetadata(): Promise<Metadata> {
   const title = await getSiteTitle();
+  const baseTitle = title.split(/\s*[-–—]\s*/)[0] || title;
   return {
+    metadataBase: new URL(SITE_URL),
     title: {
       default: title,
       // Pemisah brand bisa hyphen atau em-dash (mis. "Brand — Tagline").
-      template: `%s | ${title.split(/\s*[-–—]\s*/)[0] || title}`,
+      template: `%s | ${baseTitle}`,
     },
     description:
       'Sewa mobil mewah dengan supir di Bali. Armada prima, supir berpengalaman, harga transparan, dan booking online cepat.',
     keywords: ['sewa mobil bali', 'rental mobil bali', 'sewa mobil dengan supir', 'haybali trans', 'supir pribadi bali', 'sewa alphard bali'],
+    // Verifikasi Google Search Console (meta tag) — melengkapi verifikasi TXT DNS
+    // untuk property domain haybalitrans.com dan property URL prefix.
+    verification: {
+      google: 'taFKYIil2fMb64C_1KL-ewBA34_PhhWG-Y7yPJO3WnE',
+    },
+    openGraph: {
+      type: 'website',
+      locale: 'id_ID',
+      siteName: baseTitle,
+      url: SITE_URL,
+    },
+    twitter: {
+      card: 'summary_large_image',
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
     icons: {
       // Akhiran -v4 memaksa browser memuat ulang favicon baru (cache favicon membandel).
       icon: [
@@ -65,9 +86,39 @@ export default async function RootLayout({
     getFooterCms(),
   ]);
 
+  // Structured data JSON-LD: identitas situs + bisnis rental mobil untuk rich results.
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        name: brandName,
+        url: `${SITE_URL}/`,
+      },
+      {
+        '@type': 'AutoRental',
+        name: brandName,
+        url: `${SITE_URL}/`,
+        logo: `${SITE_URL}/images/haybali/logo-lockup-v4.png`,
+        image: `${SITE_URL}/images/haybali/hero-banner-v2.jpg`,
+        telephone: `+${waNumber}`,
+        areaServed: { '@type': 'Place', name: 'Bali, Indonesia' },
+        address: {
+          '@type': 'PostalAddress',
+          addressRegion: 'Bali',
+          addressCountry: 'ID',
+        },
+      },
+    ],
+  };
+
   return (
     <html lang="id">
       <body className={`${inter.className} antialiased bg-ink-950 text-ivory min-h-screen flex flex-col selection:bg-gold-400/25 selection:text-gold-100`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <LanguageProvider>
           <ToastProvider>
             <PublicLayout brandName={brandName} brandIcon={brandIcon} brandEmblem={brandEmblem} footerCms={footerCms}>{children}</PublicLayout>

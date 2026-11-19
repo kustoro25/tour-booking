@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
+import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import InvoiceActions from '@/components/booking/InvoiceActions';
 import InvoiceClient from '@/components/pages/InvoiceClient';
@@ -8,6 +9,12 @@ import { getBrandName, getBrandIcon } from '@/lib/brand';
 import { getPaymentGateway } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
+
+// Invoice berisi data pribadi pelanggan → tidak untuk mesin pencari.
+export const metadata: Metadata = {
+  title: 'Invoice',
+  robots: { index: false, follow: false },
+};
 
 interface PageProps {
   params: Promise<{ invoice_no: string }>;

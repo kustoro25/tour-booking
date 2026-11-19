@@ -5,5 +5,25 @@
       "path": "/api/cron/expire-orders",
       "schedule": "0 0 * * *"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "haybalitrans.com" }],
+      "destination": "https://www.haybalitrans.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "demowebsitetraveling.my.id" }],
+      "destination": "https://www.haybalitrans.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.demowebsitetraveling.my.id" }],
+      "destination": "https://www.haybalitrans.com/:path*",
+      "permanent": true
+    }
   ]
 }
