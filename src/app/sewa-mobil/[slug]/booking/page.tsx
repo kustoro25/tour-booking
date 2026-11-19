@@ -508,6 +508,7 @@ function BookingPage() {
           : t('booking.wa.participantsNoChild', { adults: formData.adults })
       );
     }
+    if (formData.notes) extraLines.push(t('booking.wa.notes', { notes: formData.notes }));
     const paymentLabel =
       paymentType === 'INSTALLMENT'
         ? t('booking.wa.dpLabel', { pct: dpPercentage })

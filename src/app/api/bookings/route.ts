@@ -4,7 +4,7 @@ import { generateInvoiceNo, calculateTotal, getExpiryDate, generateReviewToken }
 import { validateBookingForm } from '@/lib/validators';
 import { sendEmail, invoiceEmailTemplate, installmentBillingTemplate, adminOrderNotificationTemplate } from '@/lib/email';
 import { generateInstallmentDates } from '@/lib/agreement';
-import { getOwnerEmail } from '@/lib/settings';
+import { getOwnerEmail, getCompanyName, getWhatsAppNumber } from '@/lib/settings';
 import { notifyCustomerNewBooking, notifyAdminNewOrder } from '@/lib/whatsapp';
 import {
   getFleetBySlug,
@@ -347,11 +347,16 @@ export async function POST(request: NextRequest) {
 
     // ==== Email & WhatsApp (di luar transaksi, non-blocking) ====
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
+    // Nama brand dari setting admin (company_name), bukan env lama.
+    const companyName = await getCompanyName();
+    const waNumber = await getWhatsAppNumber();
     const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
     const dateLabel = new Date(tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
     const tourDateLabel = pickupTime ? `${dateLabel}, pukul ${formatTime12h(String(pickupTime))} WITA` : dateLabel;
     const expiryDate = getExpiryDate(24);
+    const expiryLabel = `${expiryDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} pukul ${expiryDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
+    // Link WhatsApp dengan pesan siap kirim — pelanggan tinggal lampirkan bukti transfer.
+    const whatsappLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(`Halo ${companyName}, saya ingin konfirmasi pembayaran untuk invoice ${result.invoiceNo}. Berikut saya lampirkan bukti transfernya.`)}`;
 
     // 1. Email ke pembeli
     try {
@@ -366,7 +371,7 @@ export async function POST(request: NextRequest) {
           if (bankSetting) bankAccounts = JSON.parse(bankSetting.value);
         } catch { /* default */ }
 
-        // Email penagihan DP (uang muka) — tombol menuju halaman jadwal & bayar (upload bukti transfer)
+        // Email penagihan DP (uang muka) — transfer manual, bukti dikirim via WhatsApp/email ke admin
         await sendEmail({
           to: customerEmail,
           subject: `Pembayaran DP (Uang Muka) - ${tour.name}`,
@@ -379,7 +384,9 @@ export async function POST(request: NextRequest) {
             amount: formatCur(ipd.dpAmount),
             dueDate: expiryDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
             paymentUrl: installmentUrl,
+            whatsappLink,
             bankAccounts,
+            notes,
             companyName,
           }),
         });
@@ -394,8 +401,10 @@ export async function POST(request: NextRequest) {
             invoiceNo: result.invoiceNo,
             tourDate: tourDateLabel,
             total: formatCur(result.total),
-            expiryDate: expiryDate.toLocaleString('id-ID'),
+            expiryDate: expiryLabel,
             invoiceUrl: invoicePageUrl,
+            whatsappLink,
+            notes,
             companyName,
           }),
         });
@@ -420,6 +429,7 @@ export async function POST(request: NextRequest) {
           total: formatCur(result.total),
           paymentType: result.isInstallment ? `Angsuran ${result.installmentPlanData?.installmentCount ?? ''}x` : 'Pembayaran Lunas',
           adminUrl: `${siteUrl}/admin/bookings/${result.order.id}`,
+          notes,
           companyName,
         }),
       });
@@ -435,7 +445,7 @@ export async function POST(request: NextRequest) {
       tourDateLabel,
       invoiceNo: result.invoiceNo,
       totalLabel: formatCur(result.total),
-      expiryLabel: expiryDate.toLocaleString('id-ID'),
+      expiryLabel,
     };
     notifyCustomerNewBooking(waData).catch((err) => console.error('WA customer notify failed:', err));
     notifyAdminNewOrder(waData).catch((err) => console.error('WA admin notify failed:', err));

@@ -566,8 +566,8 @@ export default function AdminSettingsPage() {
         <div className="border-t pt-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-2">💳 Pembayaran & Notifikasi</h2>
           <p className="text-xs text-gray-500 mb-4">
-            Metode pembayaran aktif: transfer manual — pelanggan transfer ke rekening bank lalu mengunggah
-            bukti, dan admin mengonfirmasi pembayaran secara manual.
+            Metode pembayaran aktif: transfer manual — pelanggan transfer ke rekening bank lalu mengirim
+            bukti transfer ke admin via WhatsApp/email, dan admin mengonfirmasi pembayaran secara manual.
             WhatsApp Cloud API diatur melalui environment variables (WHATSAPP_ACCESS_TOKEN, dll.).
           </p>
 

@@ -1,10 +1,11 @@
-fix(invoice): perbaiki cetak invoice yang kosong
+fix(pembayaran): bukti transfer via WA/email, brand email dari DB, catatan khusus tampil
 
-Penyebab: CSS print menyembunyikan semua anak <body> kecuali
-.invoice-document, padahal konten halaman berada di dalam <main>
-(layout Next.js) sehingga ikut tersembunyi dan hasil cetak kosong.
-
-- Print CSS kini hanya menyembunyikan chrome situs (header/footer/
-  nav/.no-print/.screen-only) dan menetralkan wrapper halaman
-- Tambah class invoice-page pada wrapper invoice & no-print pada
-  tombol mengambang agar tidak ikut tercetak
+- Bukti transfer tidak lagi diunggah di website: hapus API upload pembayaran
+  dan UI upload di halaman jadwal angsuran; ganti tombol WhatsApp + email admin
+- Email selalu memakai nama brand aktif (setting admin company_name) lewat
+  getCompanyName(), bukan env COMPANY_NAME lama "Jelajah Nusantara Tour"
+- Catatan Khusus kini tampil di email pelanggan, email notifikasi admin,
+  pesan WhatsApp booking, dan halaman invoice
+- Perbaiki format Batas Pembayaran di email (tanggal panjang, bukan angka)
+- Perbarui copy di invoice, FAQ, perjanjian angsuran, panel admin, dan
+  pengaturan agar konsisten dengan alur transfer manual (WA/email)

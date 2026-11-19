@@ -51,7 +51,7 @@ const themeDefaults: Record<string, InvoiceCustomConfig> = {
     headingTerms: 'Syarat & Ketentuan',
     deadlineText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan.',
     termsText: 'Pembayaran harus dilakukan sebelum batas waktu yang ditentukan. Pesanan yang tidak dibayar dalam jangka waktu tersebut akan otomatis dibatalkan. E-Ticket akan dikirim setelah pembayaran terkonfirmasi. Tidak ada pengembalian dana untuk pembatalan mendadak.',
-    paymentInstructionsText: 'Silakan lakukan transfer ke salah satu rekening bank di bawah ini. Pastikan jumlah yang ditransfer sesuai dengan total invoice. Setelah transfer, mohon unggah bukti transfer melalui halaman Jadwal & Bayar DP / Pelunasan (khusus pembayaran DP) atau kirim melalui WhatsApp/email agar pembayaran dapat segera kami verifikasi.',
+    paymentInstructionsText: 'Silakan lakukan transfer ke salah satu rekening bank di bawah ini. Pastikan jumlah yang ditransfer sesuai dengan total invoice. Setelah transfer, kirim bukti transfer ke admin via WhatsApp/email agar pembayaran dapat segera kami verifikasi.',
     labelInvoiceNo: 'No. Invoice',
     labelInvoiceDate: 'Tanggal',
     labelPaymentDeadline: 'Batas Pembayaran',

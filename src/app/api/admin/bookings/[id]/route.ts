@@ -5,6 +5,7 @@ import { sendEmail, reviewRequestTemplate, paymentConfirmationTemplate } from '@
 import { notifyCustomerPaymentReceived } from '@/lib/whatsapp';
 import { sendOrderTicketEmail } from '@/lib/eticket';
 import { generateReviewToken } from '@/lib/utils';
+import { getCompanyName } from '@/lib/settings';
 
 // Notifikasi pasca-response dijalankan via after() agar serverless tetap
 // mengerjakannya sampai selesai (waitUntil), tidak dibekukan setelah response.
@@ -113,7 +114,7 @@ export async function PUT(
 
     // Notifikasi pembayaran dikonfirmasi (email + WA) saat status berubah ke CONFIRMED
     if (newStatus === 'CONFIRMED' && currentOrder.status !== 'CONFIRMED' && currentOrder.status !== 'COMPLETED') {
-      const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
+      const companyName = await getCompanyName();
       const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 
       after(() =>
@@ -148,7 +149,7 @@ export async function PUT(
     // Auto-send review request when status changes to COMPLETED
     if (newStatus === 'COMPLETED' && currentOrder.status !== 'COMPLETED' && !currentOrder.reviewSentAt) {
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-      const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
+      const companyName = await getCompanyName();
 
       // Order lama bisa saja punya reviewToken null — pastikan ada sebelum
       // menyusun link agar customer tidak menerima link /review/null.

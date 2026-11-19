@@ -75,6 +75,15 @@ export async function getWhatsAppNumber(): Promise<string> {
   return normalized || WA_NUMBER;
 }
 
+/** Nama brand aktif untuk email & notifikasi.
+ *  Prioritas: setting admin `company_name` (DB) > env COMPANY_NAME > 'HAYBALI TRANS'.
+ *  Dipakai supaya email selalu memakai nama brand terkini dari panel admin,
+ *  bukan nama lama yang masih tersimpan di environment variable. */
+export async function getCompanyName(): Promise<string> {
+  const fromDb = await getSetting<string>('company_name', '');
+  return (fromDb || process.env.COMPANY_NAME || 'HAYBALI TRANS').trim();
+}
+
 /** Email pemilik bisnis untuk notifikasi (pesanan baru & contact form).
  *  Prioritas: env OWNER_EMAIL > setting company_email > env ADMIN_EMAIL. */
 export async function getOwnerEmail(): Promise<string> {

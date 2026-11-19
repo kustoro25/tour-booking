@@ -69,8 +69,6 @@ export default function InstallmentTrackingPage() {
   const [banks, setBanks] = useState<BankAccount[]>([]);
   const [companyPhone, setCompanyPhone] = useState('');
   const [companyEmail, setCompanyEmail] = useState('');
-  const [uploadingNum, setUploadingNum] = useState<number | null>(null);
-  const [uploadMsg, setUploadMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const fetchData = useCallback(() => {
     return fetch(`/api/installments/${invoiceNo}`)
@@ -99,45 +97,6 @@ export default function InstallmentTrackingPage() {
       })
       .catch(() => {});
   }, []);
-
-  const handleUploadProof = async (installmentNumber: number, file: File) => {
-    if (!file.type.startsWith('image/')) {
-      setUploadMsg({ type: 'error', text: t('installments.uploadInvalidType') });
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      setUploadMsg({ type: 'error', text: t('installments.uploadTooLarge') });
-      return;
-    }
-    setUploadMsg(null);
-    setUploadingNum(installmentNumber);
-    try {
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('folder', 'tour-booking/installment-proofs');
-      const up = await fetch('/api/upload', { method: 'POST', body: fd });
-      const upRes = await up.json();
-      if (!upRes.success || !upRes.url) throw new Error(upRes.error || t('installments.uploadFailedImage'));
-
-      const res = await fetch(`/api/installments/${invoiceNo}/pay/${installmentNumber}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentProof: upRes.url }),
-      });
-      const result = await res.json();
-      if (!res.ok || !result.success) throw new Error(result.error || t('installments.saveFailed'));
-
-      setUploadMsg({
-        type: 'success',
-        text: installmentNumber === 0 ? t('installments.uploadSuccessDp') : t('installments.uploadSuccessSettlement'),
-      });
-      await fetchData();
-    } catch (e) {
-      setUploadMsg({ type: 'error', text: e instanceof Error ? e.message : t('installments.uploadErrorFallback') });
-    } finally {
-      setUploadingNum(null);
-    }
-  };
 
   if (loading) {
     return (
@@ -169,6 +128,10 @@ export default function InstallmentTrackingPage() {
       : plan.installmentCount === 1
         ? t('installments.settlementShort')
         : t('installments.installmentNth', { n: p.installmentNumber });
+
+  // Bukti transfer TIDAK diunggah di website — pelanggan kirim via WhatsApp/email ke admin.
+  const waDigits = companyPhone.replace(/\D/g, '');
+  const waLink = `https://wa.me/${waDigits}?text=${encodeURIComponent(`Halo admin, saya ingin konfirmasi pembayaran untuk invoice ${invoiceNo} (${order.customerName}). Berikut saya lampirkan bukti transfernya.`)}`;
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
@@ -253,18 +216,28 @@ export default function InstallmentTrackingPage() {
         </div>
       )}
 
-      {/* Pesan upload */}
-      {uploadMsg && (
-        <div
-          className={`rounded-xl p-4 mb-4 text-sm border ${
-            uploadMsg.type === 'success'
-              ? 'bg-green-500/10 border-green-500/30 text-green-300'
-              : 'bg-red-500/10 border-red-500/30 text-red-300'
-          }`}
-        >
-          {uploadMsg.text}
+      {/* Kirim Bukti Transfer (WA/email — bukan upload di website) */}
+      <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-5 mb-6">
+        <h3 className="text-sm font-semibold text-emerald-300 mb-1">{t('installments.sendProofTitle')}</h3>
+        <p className="text-xs text-emerald-200/80 mb-3">{t('installments.sendProofDesc')}</p>
+        <div className="flex flex-wrap items-center gap-3">
+          {waDigits && (
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-400 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+            >
+              {t('installments.sendProofWaBtn')}
+            </a>
+          )}
+          {companyEmail && (
+            <a href={`mailto:${companyEmail}`} className="text-xs text-emerald-300 hover:underline">
+              {t('installments.sendProofEmail', { email: companyEmail })}
+            </a>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Payments Table */}
       <div className="bg-ink-850 rounded-xl shadow-sm overflow-hidden mb-6">
@@ -279,7 +252,6 @@ export default function InstallmentTrackingPage() {
                 <th className="py-2.5 px-4 text-right font-medium">{t('installments.amount')}</th>
                 <th className="py-2.5 px-4 text-right font-medium">{t('installments.dueDate')}</th>
                 <th className="py-2.5 px-4 text-center font-medium">{t('installments.statusCol')}</th>
-                <th className="py-2.5 px-4 text-center font-medium">{t('installments.proofCol')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-ink-700">
@@ -307,40 +279,6 @@ export default function InstallmentTrackingPage() {
                         {tOr(`status.installment.${st}`, st)}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-center">
-                      <div className="flex flex-col items-center gap-1">
-                        {p.paymentProof && (
-                          <a href={p.paymentProof} target="_blank" rel="noopener noreferrer" className="text-gold-300 hover:underline text-xs">
-                            {t('installments.viewProof')}
-                          </a>                        )}
-                        {p.status !== 'CONFIRMED' && (
-                          <label
-                            className={`text-xs font-medium transition-colors ${
-                              uploadingNum === p.installmentNumber
-                                ? 'text-mist-dim cursor-wait'
-                                : 'text-gold-300 hover:text-gold-300 hover:underline cursor-pointer'
-                            }`}
-                          >
-                            {uploadingNum === p.installmentNumber
-                              ? t('installments.uploading')
-                              : p.paymentProof
-                                ? t('installments.changeProof')
-                                : t('installments.uploadProof')}
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              disabled={uploadingNum !== null}
-                              onChange={(e) => {
-                                const f = e.target.files?.[0];
-                                if (f) handleUploadProof(p.installmentNumber, f);
-                                e.target.value = '';
-                              }}
-                            />
-                          </label>
-                        )}
-                      </div>
-                    </td>
                   </tr>
                 );
               })}
@@ -353,15 +291,12 @@ export default function InstallmentTrackingPage() {
       <div className="bg-gold-400/10 border border-gold-500/30 rounded-xl p-5 text-sm text-gold-200">
         <h3 className="font-semibold mb-2">{t('installments.howManualTitle')}</h3>
         <ol className="list-decimal list-inside space-y-1.5 ml-1">
-          <li>{t('installments.howManual1A')} <strong>{t('installments.howManual1B')}</strong> {t('installments.howManual1C')}</li>
-          <li>{t('installments.howManual2A')} <strong>{t('installments.uploadProof')}</strong> {t('installments.howManual2B')}</li>
+          <li>{t('installments.howManual1')}</li>
+          <li>{t('installments.howManual2')}</li>
           <li>{t('installments.howManual3A')} <strong>{t('installments.howManual3B')}</strong>{t('installments.howManual3C')}</li>
         </ol>
         <p className="mt-3 text-xs text-gold-300">
           {t('installments.settlementNote')}
-        </p>
-        <p className="mt-3 text-xs text-gold-300">
-          {t('installments.manualAlt')} {companyPhone || 'admin'} {t('installments.linkValidityOr')} {companyEmail || t('installments.linkValidityFallback')}.
         </p>
       </div>
     </div>

@@ -2,6 +2,7 @@
 // Falls back to console logging in development when no SMTP config is set
 
 import nodemailer from 'nodemailer';
+import { getCompanyName } from './settings';
 
 interface EmailPayload {
   to: string;
@@ -21,12 +22,14 @@ const smtpTransport = nodemailer.createTransport({
 
 export async function sendEmail(payload: EmailPayload): Promise<boolean> {
   const from = process.env.EMAIL_FROM || 'booking@tourbooking.com';
+  // Nama pengirim mengikuti brand aktif (setting admin company_name) — bukan env lama.
+  const companyName = await getCompanyName();
 
   // If SMTP credentials are configured, send real email
   if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
     try {
       await smtpTransport.sendMail({
-        from: `"${process.env.COMPANY_NAME || 'HAYBALI TRANS'}" <${from}>`,
+        from: `"${companyName}" <${from}>`,
         to: payload.to,
         subject: payload.subject,
         html: payload.html,
@@ -57,8 +60,14 @@ export function invoiceEmailTemplate(data: {
   total: string;
   expiryDate: string;
   invoiceUrl: string;
+  whatsappLink: string;
+  notes?: string | null;
   companyName: string;
 }): string {
+  const notesRow = data.notes
+    ? `<tr><td style="padding-top: 12px;"><strong>Catatan Khusus</strong></td><td style="padding-top: 12px;">${data.notes}</td></tr>`
+    : '';
+
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #2563EB;">Booking Berhasil!</h2>
@@ -70,10 +79,13 @@ export function invoiceEmailTemplate(data: {
         <tr><td><strong>Tanggal</strong></td><td>${data.tourDate}</td></tr>
         <tr><td><strong>Total</strong></td><td style="font-size: 18px; font-weight: bold;">${data.total}</td></tr>
         <tr><td><strong>Batas Pembayaran</strong></td><td style="color: #F97316;">${data.expiryDate}</td></tr>
+        ${notesRow}
       </table>
       <br/>
       <a href="${data.invoiceUrl}" style="background: #2563EB; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">💳 Lihat Invoice &amp; Panduan Transfer</a>
-      <p style="margin-top: 20px; font-size: 12px; color: #666;">Mohon lakukan transfer ke rekening yang tertera pada invoice dan unggah bukti transfer sebelum batas waktu agar pesanan tidak otomatis dibatalkan.</p>
+      <br/>
+      <a href="${data.whatsappLink}" style="background: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 8px;">📱 Konfirmasi Transfer via WhatsApp</a>
+      <p style="margin-top: 20px; font-size: 12px; color: #666;">Mohon lakukan transfer ke rekening yang tertera pada invoice, lalu kirim bukti transfer ke admin via WhatsApp/email sebelum batas waktu agar pesanan tidak otomatis dibatalkan.</p>
     </div>
   `;
 }
@@ -212,8 +224,13 @@ export function adminOrderNotificationTemplate(data: {
   total: string;
   paymentType: string;
   adminUrl: string;
+  notes?: string | null;
   companyName: string;
 }): string {
+  const notesRow = data.notes
+    ? `<tr><td style="padding: 6px 0;"><strong>Catatan Khusus</strong></td><td style="background: #FEF9C3; padding: 8px; border-radius: 6px;">${data.notes}</td></tr>`
+    : '';
+
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #2563EB;">Pesanan Baru Masuk</h2>
@@ -227,6 +244,7 @@ export function adminOrderNotificationTemplate(data: {
         <tr><td style="padding: 6px 0;"><strong>Tanggal Tour</strong></td><td>${data.tourDate}</td></tr>
         <tr><td style="padding: 6px 0;"><strong>Total</strong></td><td style="font-weight: bold;">${data.total}</td></tr>
         <tr><td style="padding: 6px 0;"><strong>Metode</strong></td><td>${data.paymentType}</td></tr>
+        ${notesRow}
       </table>
       <a href="${data.adminUrl}" style="background: #2563EB; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">Buka di Panel Admin</a>
     </div>
@@ -340,7 +358,9 @@ export function installmentBillingTemplate(data: {
   amount: string;
   dueDate: string;
   paymentUrl: string;
+  whatsappLink: string;
   bankAccounts: { bank: string; number: string; name: string }[];
+  notes?: string | null;
   companyName: string;
 }): string {
   const isDp = data.installmentNumber === 0;
@@ -361,9 +381,14 @@ export function installmentBillingTemplate(data: {
         ${bankRows}
       </table>`;
 
-  const buttonLabel = '💳 Upload Bukti Transfer';
+  const notesSection = data.notes
+    ? `<div style="background: #FEF9C3; border: 1px solid #FDE68A; border-radius: 8px; padding: 12px 16px; margin: 16px 0;">
+        <p style="margin: 0 0 4px; font-size: 12px; font-weight: bold; color: #92400E;">Catatan Khusus Anda:</p>
+        <p style="margin: 0; font-size: 13px; color: #78350F;">${data.notes}</p>
+      </div>`
+    : '';
 
-  const footerNote = `Mohon lakukan pembayaran sebelum tanggal jatuh tempo dan upload bukti transfer melalui link di atas. Bukti transfer akan diverifikasi admin dan status pembayaran diperbarui setelah diverifikasi. Keterlambatan pembayaran dapat mengakibatkan pembatalan pesanan.`;
+  const footerNote = `Mohon lakukan transfer sebelum jatuh tempo, lalu kirim bukti transfer ke admin via WhatsApp atau email. Status pembayaran diperbarui oleh admin setelah bukti diterima. Keterlambatan pembayaran dapat mengakibatkan pembatalan pesanan.`;
 
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -385,38 +410,14 @@ export function installmentBillingTemplate(data: {
       </div>
 
       ${paymentSection}
+      ${notesSection}
 
       <br/>
-      <a href="${data.paymentUrl}" style="background: #E59800; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">${buttonLabel}</a>
+      <a href="${data.whatsappLink}" style="background: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">📱 Kirim Bukti Transfer via WhatsApp</a>
+      <br/>
+      <a href="${data.paymentUrl}" style="background: #E59800; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 8px;">💳 Lihat Jadwal Pembayaran</a>
       <p style="margin-top: 20px; font-size: 12px; color: #666;">${footerNote}</p>
       <p>Salam,<br/><strong>${data.companyName}</strong></p>
-    </div>
-  `;
-}
-
-export function installmentProofUploadedTemplate(data: {
-  customerName: string;
-  invoiceNo: string;
-  paymentLabel: string; // 'DP (Uang Muka)' / 'Pelunasan' / 'Angsuran ke-N'
-  amountLabel: string;
-  proofUrl: string;
-  adminUrl: string;
-  companyName: string;
-}): string {
-  return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #2563EB;">📩 Bukti Transfer Baru — Perlu Verifikasi</h2>
-      <p>Pelanggan <strong>${data.customerName}</strong> baru saja mengunggah bukti transfer untuk <strong>${data.paymentLabel}</strong>.</p>
-      <table style="width: 100%; border-collapse: collapse; background: #F9FAFB; border-radius: 8px; overflow: hidden;">
-        <tr><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;"><strong>Invoice</strong></td><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;">${data.invoiceNo}</td></tr>
-        <tr><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;"><strong>Pembayaran</strong></td><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;">${data.paymentLabel}</td></tr>
-        <tr><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;"><strong>Jumlah</strong></td><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;">${data.amountLabel}</td></tr>
-      </table>
-      <br/>
-      <a href="${data.proofUrl}" style="background: #2563EB; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">🖼 Lihat Bukti Transfer</a>
-      <a href="${data.adminUrl}" style="background: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin-left: 8px;">✅ Buka Panel Angsuran</a>
-      <p style="margin-top: 20px; font-size: 12px; color: #666;">Verifikasi bukti transfer di panel admin, lalu klik Konfirmasi agar status pembayaran pelanggan berubah menjadi Terkonfirmasi.</p>
-      <p style="margin-top: 10px;">Salam,<br/><strong>${data.companyName}</strong></p>
     </div>
   `;
 }

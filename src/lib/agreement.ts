@@ -154,8 +154,8 @@ export function generateAgreementHtml(data: AgreementData): string {
     <div class="terms">
       <ol>
         <li><strong>Kewajiban Pembayaran:</strong> PIHAK KEDUA wajib melakukan pembayaran angsuran sesuai jadwal yang telah disepakati di atas. Keterlambatan pembayaran dapat mengakibatkan pembatalan pesanan.</li>
-        <li><strong>Batas Waktu Pembayaran:</strong> Setiap angsuran harus dibayar paling lambat pada tanggal jatuh tempo yang tertera pada jadwal. PIHAK KEDUA wajib mengunggah bukti transfer melalui halaman invoice.</li>
-        <li><strong>Konfirmasi Pembayaran:</strong> PIHAK PERTAMA akan mengkonfirmasi setiap pembayaran angsuran dalam waktu 1x24 jam setelah bukti transfer diunggah. Status pembayaran dapat dipantau melalui halaman invoice.</li>
+        <li><strong>Batas Waktu Pembayaran:</strong> Setiap angsuran harus dibayar paling lambat pada tanggal jatuh tempo yang tertera pada jadwal. PIHAK KEDUA wajib mengirim bukti transfer kepada PIHAK PERTAMA melalui WhatsApp atau email.</li>
+        <li><strong>Konfirmasi Pembayaran:</strong> PIHAK PERTAMA akan mengkonfirmasi setiap pembayaran angsuran dalam waktu 1x24 jam setelah bukti transfer diterima. Status pembayaran dapat dipantau melalui halaman invoice.</li>
         <li><strong>Pembatalan:</strong> Apabila PIHAK KEDUA tidak melakukan pembayaran angsuran sesuai jadwal selama lebih dari 7 hari setelah jatuh tempo, PIHAK PERTAMA berhak membatalkan pesanan. Uang muka dan angsuran yang telah dibayarkan tidak dapat dikembalikan.</li>
         <li><strong>Pelunasan:</strong> Seluruh angsuran harus dilunasi paling lambat H-7 sebelum tanggal keberangkatan. Apabila belum lunas, PIHAK PERTAMA berhak menunda keberangkatan atau membatalkan pesanan.</li>
         <li><strong>Perubahan Jadwal:</strong> Perubahan jadwal angsuran hanya dapat dilakukan atas persetujuan tertulis dari kedua belah pihak.</li>

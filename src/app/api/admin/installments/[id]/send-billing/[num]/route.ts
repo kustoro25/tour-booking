@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { sendEmail, installmentBillingTemplate } from '@/lib/email';
+import { getCompanyName, getWhatsAppNumber } from '@/lib/settings';
 
 export async function POST(
   _request: NextRequest,
@@ -43,7 +44,8 @@ export async function POST(
 
     // Send billing email
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
+    const companyName = await getCompanyName();
+    const waNumber = await getWhatsAppNumber();
     const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 
     // Read bank accounts
@@ -53,8 +55,10 @@ export async function POST(
       if (bankSetting) bankAccounts = JSON.parse(bankSetting.value);
     } catch { /* default */ }
 
-    // Tombol email menuju halaman jadwal & bayar angsuran (upload bukti transfer)
+    // Tombol email menuju halaman jadwal pembayaran; bukti transfer dikirim
+    // pelanggan via WhatsApp/email ke admin (tidak ada upload di website).
     const installmentsPageUrl = `${siteUrl}/invoice/${plan.order.invoiceNo}/installments`;
+    const whatsappLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(`Halo ${companyName}, saya ingin konfirmasi pembayaran ${installmentNumber === 0 ? 'DP (uang muka)' : `angsuran ke-${installmentNumber}`} untuk invoice ${plan.order.invoiceNo}. Berikut saya lampirkan bukti transfernya.`)}`;
     const dueDateStr = new Date(payment.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
     await sendEmail({
@@ -72,7 +76,9 @@ export async function POST(
         amount: formatCur(payment.amount),
         dueDate: dueDateStr,
         paymentUrl: installmentsPageUrl,
+        whatsappLink,
         bankAccounts,
+        notes: plan.order.notes,
         companyName,
       }),
     });

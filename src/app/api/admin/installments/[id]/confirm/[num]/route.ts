@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/auth';
 import { sendEmail, installmentConfirmationTemplate } from '@/lib/email';
 import { notifyCustomerPaymentReceived } from '@/lib/whatsapp';
 import { sendOrderTicketEmail } from '@/lib/eticket';
+import { getCompanyName } from '@/lib/settings';
 
 // Notifikasi pasca-response dijalankan via after() agar serverless tetap
 // mengerjakannya sampai selesai (waitUntil), tidak dibekukan setelah response.
@@ -74,7 +75,7 @@ export async function POST(
     }
 
     // Send confirmation email
-    const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
+    const companyName = await getCompanyName();
     const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 
     const remaining = updatedPayments.filter((p) => p.status !== 'CONFIRMED').length;

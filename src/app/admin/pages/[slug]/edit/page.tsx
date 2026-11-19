@@ -92,7 +92,7 @@ const defaultData: Record<string, PageData> = {
     subheading: 'Temukan jawaban untuk pertanyaan-pertanyaan umum seputar pemesanan, pembayaran, dan perjalanan Anda bersama HAYBALI TRANS.',
     faqs: [
       { question: 'Bagaimana cara melakukan booking?', answer: 'Caranya sangat mudah! Pilih paket tour yang Anda inginkan, tentukan tanggal keberangkatan dari kalender interaktif, isi data diri dan jumlah peserta, lalu klik "Booking Sekarang". Invoice akan langsung terbit dan dikirim ke email Anda.' },
-      { question: 'Metode pembayaran apa saja yang tersedia?', answer: 'Pembayaran dilakukan melalui transfer bank ke rekening perusahaan yang tercantum di invoice. Setelah transfer, unggah atau kirim bukti transfer agar admin memverifikasi dan mengonfirmasi pembayaran Anda. Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan. Jika melebihi batas waktu, pesanan akan otomatis dibatalkan.' },
+      { question: 'Metode pembayaran apa saja yang tersedia?', answer: 'Pembayaran dilakukan melalui transfer bank ke rekening perusahaan yang tercantum di invoice. Setelah transfer, kirim bukti transfer ke admin via WhatsApp/email agar admin memverifikasi dan mengonfirmasi pembayaran Anda. Batas waktu pembayaran adalah 24 jam sejak invoice diterbitkan. Jika melebihi batas waktu, pesanan akan otomatis dibatalkan.' },
       { question: 'Bagaimana kebijakan pembatalan dan refund?', answer: 'Pembatalan H-14: refund 80%. H-7: refund 50%. H-3: refund 25%. Kurang dari H-3: tidak ada refund. Jika tour dibatalkan oleh kami karena force majeure atau kuota minimal tidak terpenuhi, Anda mendapat refund 100%.' },
       { question: 'Apakah ada minimal peserta untuk setiap tour?', answer: 'Ya, setiap paket tour memiliki minimal peserta (umumnya 2 orang). Informasi ini tercantum di halaman detail masing-masing paket. Jika kuota minimal tidak terpenuhi, tim kami akan menghubungi Anda untuk opsi alternatif.' },
     ],
@@ -102,7 +102,7 @@ const defaultData: Record<string, PageData> = {
 <p>Saat Anda menggunakan layanan HAYBALI TRANS, kami dapat mengumpulkan informasi berikut:</p>
 <ul><li><strong>Data Pribadi:</strong> Nama lengkap, alamat email, nomor telepon, dan informasi kontak lainnya yang Anda berikan saat booking.</li>
 <li><strong>Data Pemesanan:</strong> Detail paket tour yang dipesan, tanggal perjalanan, jumlah peserta, dan preferensi khusus.</li>
-<li><strong>Data Pembayaran:</strong> Pembayaran dilakukan melalui transfer bank manual ke rekening resmi kami. Kami tidak menyimpan kredensial perbankan Anda; bukti transfer yang diunggah hanya digunakan untuk verifikasi pembayaran.</li>
+<li><strong>Data Pembayaran:</strong> Pembayaran dilakukan melalui transfer bank manual ke rekening resmi kami. Kami tidak menyimpan kredensial perbankan Anda; bukti transfer yang dikirim ke admin via WhatsApp/email hanya digunakan untuk verifikasi pembayaran.</li>
 <li><strong>Data Teknis:</strong> Alamat IP, tipe browser, sistem operasi, dan halaman yang dikunjungi untuk keperluan analitik.</li></ul>
 
 <h2>2. Penggunaan Informasi</h2>
@@ -119,7 +119,7 @@ const defaultData: Record<string, PageData> = {
 
 <h2>4. Berbagi Data dengan Pihak Ketiga</h2>
 <p>Kami tidak menjual, memperdagangkan, atau menyewakan data pribadi Anda kepada pihak ketiga. Kami dapat membagikan data Anda dalam kondisi berikut:</p>
-<ul><li><strong>Pembayaran:</strong> Bukti transfer yang Anda unggah diverifikasi manual oleh tim kami dan tidak dibagikan kepada pihak lain.</li>
+<ul><li><strong>Pembayaran:</strong> Bukti transfer yang Anda kirim via WhatsApp/email diverifikasi manual oleh tim kami dan tidak dibagikan kepada pihak lain.</li>
 <li><strong>Partner Tour:</strong> Data peserta (nama) dibagikan kepada guide dan operator tour untuk keperluan operasional.</li>
 <li><strong>Kewajiban Hukum:</strong> Jika diwajibkan oleh hukum atau perintah pengadilan yang sah.</li></ul>
 

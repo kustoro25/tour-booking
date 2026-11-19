@@ -314,6 +314,12 @@ export default function InvoiceClient({
               <p className="text-sm font-semibold text-gray-900">{order.customerName}</p>
               <p className="text-xs text-gray-500">{order.customerEmail}</p>
               <p className="text-xs text-gray-500">{order.customerPhone}</p>
+              {order.notes ? (
+                <p className="text-xs text-gray-600 pt-2">
+                  <span className="font-semibold text-gray-400">{t('invoice.notesLabel')}:</span>{' '}
+                  <span className="whitespace-pre-wrap">{String(order.notes)}</span>
+                </p>
+              ) : null}
             </div>
           </div>
           <div className="sm:text-right">

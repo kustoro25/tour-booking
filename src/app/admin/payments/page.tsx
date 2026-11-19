@@ -20,22 +20,30 @@ export default function AdminPaymentsPage() {
         </div>
 
         <p className="text-sm text-gray-600 mb-3">
-          Customer transfer ke rekening bank, lalu mengunggah bukti transfer. Status pembayaran
-          diaktifkan manual oleh admin setelah bukti diverifikasi.
+          Customer transfer ke rekening bank, lalu mengirim bukti transfer ke admin via
+          WhatsApp/email. Status pembayaran diaktifkan manual oleh admin setelah bukti diverifikasi.
         </p>
 
         <ul className="space-y-1.5">
           <li className="flex items-start gap-2 text-xs text-gray-500">
             <span className="text-gray-400 mt-0.5">•</span>
             <span>
-              Customer mengunggah bukti transfer — admin otomatis mendapat notifikasi email baru
+              Tidak ada fitur upload bukti di website — customer kirim bukti transfer langsung
+              ke admin via WhatsApp/email
             </span>
           </li>
           <li className="flex items-start gap-2 text-xs text-gray-500">
             <span className="text-gray-400 mt-0.5">•</span>
             <span>
-              Admin mengecek bukti transfer lalu klik <strong>Konfirmasi</strong> di detail
+              Admin mengecek bukti transfer (WA/email) lalu klik <strong>Konfirmasi</strong> di detail
               booking/angsuran — barulah status di website berubah menjadi terkonfirmasi
+            </span>
+          </li>
+          <li className="flex items-start gap-2 text-xs text-gray-500">
+            <span className="text-gray-400 mt-0.5">•</span>
+            <span>
+              Jika perlu, admin bisa menyimpan link bukti transfer ke data angsuran lewat kolom
+              <code> Upload Bukti</code> di detail cicilan (opsional, untuk arsip)
             </span>
           </li>
           <li className="flex items-start gap-2 text-xs text-gray-500">
