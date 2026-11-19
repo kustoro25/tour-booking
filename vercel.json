@@ -9,38 +9,38 @@
   "redirects": [
     {
       "source": "/",
-      "has": [{ "type": "host", "value": "haybalitrans.com" }],
-      "destination": "https://www.haybalitrans.com/",
+      "has": [{ "type": "host", "value": "www.haybalitrans.com" }],
+      "destination": "https://haybalitrans.com/",
       "permanent": true
     },
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "haybalitrans.com" }],
-      "destination": "https://www.haybalitrans.com/:path*",
+      "has": [{ "type": "host", "value": "www.haybalitrans.com" }],
+      "destination": "https://haybalitrans.com/:path*",
       "permanent": true
     },
     {
       "source": "/",
       "has": [{ "type": "host", "value": "demowebsitetraveling.my.id" }],
-      "destination": "https://www.haybalitrans.com/",
+      "destination": "https://haybalitrans.com/",
       "permanent": true
     },
     {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "demowebsitetraveling.my.id" }],
-      "destination": "https://www.haybalitrans.com/:path*",
+      "destination": "https://haybalitrans.com/:path*",
       "permanent": true
     },
     {
       "source": "/",
       "has": [{ "type": "host", "value": "www.demowebsitetraveling.my.id" }],
-      "destination": "https://www.haybalitrans.com/",
+      "destination": "https://haybalitrans.com/",
       "permanent": true
     },
     {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "www.demowebsitetraveling.my.id" }],
-      "destination": "https://www.haybalitrans.com/:path*",
+      "destination": "https://haybalitrans.com/:path*",
       "permanent": true
     }
   ]

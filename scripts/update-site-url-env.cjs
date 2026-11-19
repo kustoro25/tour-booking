@@ -7,7 +7,7 @@ const path = require('path');
 const AUTH_PATH = path.join(process.env.APPDATA, 'xdg.data', 'com.vercel.cli', 'auth.json');
 const PROJECT_ID = 'prj_XSl4XbLkkzaAE0PG0d5F323VTh8L';
 const TEAM_ID = 'team_Lq0ESefBtG6RRUJyx5WwqWFr';
-const NEW_VALUE = 'https://www.haybalitrans.com';
+const NEW_VALUE = 'https://haybalitrans.com';
 
 async function main() {
   const { token } = JSON.parse(fs.readFileSync(AUTH_PATH, 'utf8'));
