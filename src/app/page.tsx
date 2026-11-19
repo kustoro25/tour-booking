@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
-import { getPaymentGateway, getWhatsAppNumber } from '@/lib/settings';
+import { getWhatsAppNumber } from '@/lib/settings';
 import { getSiteTitle } from '@/lib/brand';
 import HomeClient from '@/components/home/HomeClient';
 
@@ -47,11 +47,10 @@ async function getLatestReviews() {
 }
 
 export default async function HomePage() {
-  const [reviews, waNumber, gateway] = await Promise.all([
+  const [reviews, waNumber] = await Promise.all([
     getLatestReviews(),
     getWhatsAppNumber(),
-    getPaymentGateway(),
   ]);
 
-  return <HomeClient reviews={reviews} waNumber={waNumber} gateway={gateway} />;
+  return <HomeClient reviews={reviews} waNumber={waNumber} />;
 }

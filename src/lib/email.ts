@@ -56,7 +56,7 @@ export function invoiceEmailTemplate(data: {
   tourDate: string;
   total: string;
   expiryDate: string;
-  paymentUrl: string;
+  invoiceUrl: string;
   companyName: string;
 }): string {
   return `
@@ -72,8 +72,8 @@ export function invoiceEmailTemplate(data: {
         <tr><td><strong>Batas Pembayaran</strong></td><td style="color: #F97316;">${data.expiryDate}</td></tr>
       </table>
       <br/>
-      <a href="${data.paymentUrl}" style="background: #2563EB; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">Bayar Sekarang</a>
-      <p style="margin-top: 20px; font-size: 12px; color: #666;">Mohon lakukan pembayaran sebelum batas waktu agar pesanan tidak otomatis dibatalkan.</p>
+      <a href="${data.invoiceUrl}" style="background: #2563EB; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">💳 Lihat Invoice &amp; Panduan Transfer</a>
+      <p style="margin-top: 20px; font-size: 12px; color: #666;">Mohon lakukan transfer ke rekening yang tertera pada invoice dan unggah bukti transfer sebelum batas waktu agar pesanan tidak otomatis dibatalkan.</p>
     </div>
   `;
 }
@@ -342,7 +342,6 @@ export function installmentBillingTemplate(data: {
   paymentUrl: string;
   bankAccounts: { bank: string; number: string; name: string }[];
   companyName: string;
-  onlineMode?: boolean; // true = bayar online (Midtrans), false = transfer manual
 }): string {
   const isDp = data.installmentNumber === 0;
   // Skema DP: totalInstallments = 1 berarti DP + pelunasan (tunai ke sopir / transfer)
@@ -357,27 +356,14 @@ export function installmentBillingTemplate(data: {
     )
     .join('');
 
-  const paymentSection = data.onlineMode
-    ? `<h3 style="font-size: 14px; color: #374151;">Pembayaran Online (Otomatis)</h3>
-      <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 16px;">
-        <p style="margin: 0; font-size: 13px; color: #1E40AF;">
-          Bayar melalui halaman pembayaran aman <strong>Midtrans</strong> — mendukung <strong>QRIS, Virtual Account</strong> berbagai bank,
-          <strong>e-wallet</strong> (GoPay, ShopeePay, DANA), dan <strong>kartu kredit/debit</strong>.
-          Status pembayaran terkonfirmasi <strong>otomatis</strong> — tidak perlu upload bukti transfer.
-        </p>
-      </div>`
-    : `<h3 style="font-size: 14px; color: #374151;">Informasi Rekening</h3>
+  const paymentSection = `<h3 style="font-size: 14px; color: #374151;">Informasi Rekening</h3>
       <table style="width: 100%; border-collapse: collapse; background: #F9FAFB; border-radius: 8px; overflow: hidden;">
         ${bankRows}
       </table>`;
 
-  const buttonLabel = data.onlineMode
-    ? `💳 Bayar ${isDp ? 'DP' : isPelunasan ? 'Pelunasan' : 'Angsuran'} Online`
-    : '💳 Upload Bukti Transfer';
+  const buttonLabel = '💳 Upload Bukti Transfer';
 
-  const footerNote = data.onlineMode
-    ? `Mohon lakukan pembayaran sebelum ${dueDateLabel.toLowerCase()} melalui tombol di atas. Pembayaran terkonfirmasi otomatis oleh sistem dan Anda akan menerima email konfirmasi.`
-    : `Mohon lakukan pembayaran sebelum tanggal jatuh tempo dan upload bukti transfer melalui link di atas. Keterlambatan pembayaran dapat mengakibatkan pembatalan pesanan.`;
+  const footerNote = `Mohon lakukan pembayaran sebelum tanggal jatuh tempo dan upload bukti transfer melalui link di atas. Bukti transfer akan diverifikasi admin dan status pembayaran diperbarui setelah diverifikasi. Keterlambatan pembayaran dapat mengakibatkan pembatalan pesanan.`;
 
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -404,6 +390,33 @@ export function installmentBillingTemplate(data: {
       <a href="${data.paymentUrl}" style="background: #E59800; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">${buttonLabel}</a>
       <p style="margin-top: 20px; font-size: 12px; color: #666;">${footerNote}</p>
       <p>Salam,<br/><strong>${data.companyName}</strong></p>
+    </div>
+  `;
+}
+
+export function installmentProofUploadedTemplate(data: {
+  customerName: string;
+  invoiceNo: string;
+  paymentLabel: string; // 'DP (Uang Muka)' / 'Pelunasan' / 'Angsuran ke-N'
+  amountLabel: string;
+  proofUrl: string;
+  adminUrl: string;
+  companyName: string;
+}): string {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #2563EB;">📩 Bukti Transfer Baru — Perlu Verifikasi</h2>
+      <p>Pelanggan <strong>${data.customerName}</strong> baru saja mengunggah bukti transfer untuk <strong>${data.paymentLabel}</strong>.</p>
+      <table style="width: 100%; border-collapse: collapse; background: #F9FAFB; border-radius: 8px; overflow: hidden;">
+        <tr><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;"><strong>Invoice</strong></td><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;">${data.invoiceNo}</td></tr>
+        <tr><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;"><strong>Pembayaran</strong></td><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;">${data.paymentLabel}</td></tr>
+        <tr><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;"><strong>Jumlah</strong></td><td style="padding: 10px 16px; border-bottom: 1px solid #E5E7EB;">${data.amountLabel}</td></tr>
+      </table>
+      <br/>
+      <a href="${data.proofUrl}" style="background: #2563EB; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">🖼 Lihat Bukti Transfer</a>
+      <a href="${data.adminUrl}" style="background: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin-left: 8px;">✅ Buka Panel Angsuran</a>
+      <p style="margin-top: 20px; font-size: 12px; color: #666;">Verifikasi bukti transfer di panel admin, lalu klik Konfirmasi agar status pembayaran pelanggan berubah menjadi Terkonfirmasi.</p>
+      <p style="margin-top: 10px;">Salam,<br/><strong>${data.companyName}</strong></p>
     </div>
   `;
 }

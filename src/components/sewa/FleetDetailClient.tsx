@@ -27,7 +27,6 @@ interface FleetDetailClientProps {
   fleet: FleetItem;
   detail: FleetDetail;
   waNumber: string;
-  gateway: 'midtrans' | 'manual';
   bankLabel: string;
 }
 
@@ -38,7 +37,7 @@ const REGION_COLORS: Record<string, string> = {
   'Bali Barat': 'bg-rose-500/15 text-rose-200 border border-rose-500/30',
 };
 
-export default function FleetDetailClient({ fleet, detail, waNumber, gateway, bankLabel }: FleetDetailClientProps) {
+export default function FleetDetailClient({ fleet, detail, waNumber, bankLabel }: FleetDetailClientProps) {
   const { t, tOr, listOr, formatPrice } = useI18n();
   useTranslatedMeta(t('meta.fleetDetail', { name: detail.fullName }), t('meta.fleetDetailDesc', { name: detail.fullName }));
 
@@ -281,16 +280,10 @@ export default function FleetDetailClient({ fleet, detail, waNumber, gateway, ba
             <ul className="space-y-2 text-sm text-mist leading-relaxed">
               <li>{t('fleetDetail.common.payDeposit')}</li>
               <li>{t('fleetDetail.common.payCash')}</li>
-              {gateway === 'midtrans' ? (
-                <li>{t('fleetDetail.common.payOnline')}</li>
-              ) : (
-                <>
-                  <li>
-                    {t('fleetDetail.common.payBank', { banks: bankLabel ? ` (${bankLabel})` : '' })}
-                  </li>
-                  <li>{t('fleetDetail.common.payProof')}</li>
-                </>
-              )}
+              <li>
+                {t('fleetDetail.common.payBank', { banks: bankLabel ? ` (${bankLabel})` : '' })}
+              </li>
+              <li>{t('fleetDetail.common.payProof')}</li>
               <li>{t('fleetDetail.common.payDeadline')}</li>
             </ul>
           </div>

@@ -20,8 +20,8 @@ import {
 } from '@/types';
 import type { InstallmentPaymentStatus, OrderStatus } from '@/types';
 
-/** Mode tampilan blok informasi pembayaran (gateway-aware). */
-export type PaymentMode = 'online' | 'transfer' | 'paid' | 'cancelled';
+/** Mode tampilan blok informasi pembayaran (transfer manual / sudah dibayar / dibatalkan). */
+export type PaymentMode = 'transfer' | 'paid' | 'cancelled';
 
 interface StatusBadgeConfig {
   bg: string;
@@ -216,7 +216,7 @@ export default function InvoiceClient({
   const logoBg = isLight ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.2)';
   const isIconUrl = brandIcon && (brandIcon.startsWith('http://') || brandIcon.startsWith('https://') || brandIcon.startsWith('/'));
 
-  // Label ramah metode pembayaran dari webhook/DB (Midtrans).
+  // Label ramah metode pembayaran (transfer manual) dari DB.
   const methodLabel = order.paymentMethod
     ? tOr(`status.paymentMethods.${order.paymentMethod}`, order.paymentMethod)
     : t('status.paymentMethods.manual');
@@ -322,7 +322,7 @@ export default function InvoiceClient({
               {[
                 { label: T.L.invoiceNo, value: order.invoiceNo },
                 { label: T.L.invoiceDate, value: fmtDate(order.createdAt) },
-                ...(paymentMode === 'online' || paymentMode === 'transfer'
+                ...(paymentMode === 'transfer'
                   ? [{ label: T.L.paymentDeadline, value: fmtDate(order.expiryAt) }]
                   : []),
               ].map((row) => (
@@ -631,43 +631,11 @@ export default function InvoiceClient({
           </div>
         </div>
 
-        {/* ── Payment Instructions (gateway-aware) ── */}
+        {/* ── Payment Instructions (transfer manual) ── */}
         <div className="mt-6">
           <h4 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">
             {T.paymentInfo}
           </h4>
-
-          {paymentMode === 'online' && (
-            <div className="rounded-xl p-4 mb-4" style={{ backgroundColor: accentBg, border: `1px solid ${accent}40` }}>
-              <p className="text-xs text-gray-700 leading-relaxed">
-                <span className="font-semibold" style={{ color: accent }}>{t('invoice.onlineTitle')}</span>{' '}
-                {order.paymentType === 'INSTALLMENT' ? (
-                  <>
-                    {t('invoice.onlineInstA')} <strong>{t('invoice.bayarDp')}</strong> {t('invoice.onlineInstB')}{' '}
-                    <strong>Midtrans</strong> {t('invoice.onlineInstC')}
-                  </>
-                ) : (
-                  <>
-                    {t('invoice.onlineFullA')} <strong>{t('invoice.bayarOnline')}</strong> {t('invoice.onlineFullB')}{' '}
-                    <strong>Midtrans</strong> {t('invoice.onlineFullC')}
-                  </>
-                )}
-              </p>
-              <p className="text-[10px] text-gray-500 mt-2 leading-relaxed">
-                {order.paymentType === 'INSTALLMENT' ? (
-                  <>
-                    {t('invoice.onlineInstNoteA')} <strong>{t('invoice.onlineInstNoteB')}</strong>{' '}
-                    {t('invoice.onlineInstNoteC')}
-                  </>
-                ) : (
-                  <>
-                    {t('invoice.onlineFullNoteA')} <strong>{t('invoice.onlineFullNoteB')}</strong>{' '}
-                    {t('invoice.onlineFullNoteC')}
-                  </>
-                )}
-              </p>
-            </div>
-          )}
 
           {paymentMode === 'transfer' && (
             <>
@@ -738,7 +706,7 @@ export default function InvoiceClient({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {/* Left: Deadline + Terms */}
             <div>
-              {c.showDeadline !== false && (paymentMode === 'online' || paymentMode === 'transfer') && (
+              {c.showDeadline !== false && paymentMode === 'transfer' && (
                 <div className="rounded-xl px-3 py-2 text-[10px] mb-4" style={{ backgroundColor: accentBg, border: `1px solid ${accent}40` }}>
                   <span className="font-semibold" style={{ color: accent }}>{T.deadline}: </span>
                   <span className="text-gray-600">{fmtDateTime(order.expiryAt)}</span>

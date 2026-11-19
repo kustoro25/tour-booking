@@ -6,7 +6,6 @@ import InvoiceActions from '@/components/booking/InvoiceActions';
 import InvoiceClient from '@/components/pages/InvoiceClient';
 import type { PaymentMode, InvoiceCustomConfig } from '@/components/pages/InvoiceClient';
 import { getBrandName, getBrandIcon } from '@/lib/brand';
-import { getPaymentGateway } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -127,25 +126,15 @@ export default async function InvoicePage({ params }: PageProps) {
   const brandName = await getBrandName();
   const brandIcon = await getBrandIcon();
 
-  // Pembayaran online (Midtrans):
-  // - FULL PENDING → direct ke halaman Snap; INSTALLMENT PENDING → halaman jadwal & bayar angsuran
-  const gateway = await getPaymentGateway();
-  const payUrl =
-    gateway === 'midtrans' && order.status === 'PENDING'
-      ? order.paymentType === 'INSTALLMENT'
-        ? `/invoice/${order.invoiceNo}/installments`
-        : order.paymentUrl || `/api/invoice/${order.invoiceNo}/pay`
-      : undefined;
-
-  // Mode tampilan informasi pembayaran pada invoice
+  // Pembayaran: transfer manual ke rekening bank + verifikasi admin.
+  // Order INSTALLMENT yang belum lunas selalu ditawarkan link halaman jadwal & bayar DP/angsuran
+  // (sudah dirender di InvoiceClient lewat tombol "Lihat Jadwal Pembayaran").
   const isPaid = order.status === 'CONFIRMED' || order.status === 'COMPLETED';
   const paymentMode: PaymentMode = isPaid
     ? 'paid'
     : order.status === 'CANCELLED'
       ? 'cancelled'
-      : payUrl
-        ? 'online'
-        : 'transfer';
+      : 'transfer';
 
   // Read company details from settings
   let companyPhone = '+62 851-1933-4511';
@@ -199,8 +188,6 @@ export default async function InvoicePage({ params }: PageProps) {
           total={order.total}
           companyPhone={companyPhone}
           helpLink={config.helpLink}
-          payUrl={payUrl}
-          paymentType={order.paymentType}
           tourDate={order.tourDate instanceof Date ? order.tourDate.toISOString() : String(order.tourDate)}
           invoiceUrl={invoiceUrl}
           paymentMode={paymentMode}

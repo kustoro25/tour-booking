@@ -1,93 +1,17 @@
-// Pembayaran angsuran:
-// - GET  : buat/pakai ulang transaksi Midtrans Snap untuk satu angsuran (0 = DP), lalu redirect.
-// - POST : unggah bukti transfer manual (hanya saat gateway = manual).
+// Pembayaran angsuran (mode transfer manual):
+// - POST : unggah bukti transfer untuk satu angsuran (0 = DP).
+//   Status berubah menjadi PAID ("Menunggu Konfirmasi") — admin memverifikasi
+//   bukti lalu mengonfirmasi secara manual dari panel admin.
+//   Admin mendapat notifikasi email setiap kali bukti transfer diunggah.
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getPaymentGateway } from '@/lib/settings';
-import { createSnapTransaction, isMidtransConfigured } from '@/lib/midtrans';
+import { sendEmail, installmentProofUploadedTemplate } from '@/lib/email';
+import { getOwnerEmail } from '@/lib/settings';
 
-const SNAP_EXPIRY_HOURS = 24;
-
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ invoiceNo: string; num: string }> }
-) {
-  const { invoiceNo, num } = await params;
-  const installmentNumber = parseInt(num);
-  const installmentsUrl = new URL(`/invoice/${invoiceNo}/installments`, request.url);
-  const failUrl = new URL(`/invoice/${invoiceNo}/installments?pay=failed`, request.url);
-
-  try {
-    if (!Number.isInteger(installmentNumber) || installmentNumber < 0) {
-      return NextResponse.redirect(installmentsUrl);
-    }
-    if (!isMidtransConfigured()) {
-      return NextResponse.redirect(installmentsUrl);
-    }
-    const gateway = await getPaymentGateway();
-    if (gateway !== 'midtrans') {
-      return NextResponse.redirect(installmentsUrl);
-    }
-
-    const order = await prisma.order.findUnique({
-      where: { invoiceNo },
-      include: {
-        tour: { select: { name: true } },
-        installmentPlan: { include: { payments: true } },
-      },
-    });
-
-    if (!order || !order.installmentPlan || order.status === 'CANCELLED') {
-      return NextResponse.redirect(installmentsUrl);
-    }
-
-    const payment = order.installmentPlan.payments.find(
-      (p) => p.installmentNumber === installmentNumber
-    );
-    if (!payment || payment.status === 'CONFIRMED') {
-      return NextResponse.redirect(installmentsUrl);
-    }
-
-    // Pakai kembali link Snap yang masih berlaku
-    if (payment.paymentUrl && payment.paymentExpiryAt && payment.paymentExpiryAt.getTime() > Date.now()) {
-      return NextResponse.redirect(payment.paymentUrl);
-    }
-
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || request.nextUrl.origin;
-    const label =
-      installmentNumber === 0
-        ? `DP ${order.installmentPlan.dpPercentage}%`
-        : `Angsuran ke-${installmentNumber}`;
-
-    const snap = await createSnapTransaction({
-      orderId: `${order.invoiceNo}-INST-${installmentNumber}`,
-      grossAmount: payment.amount,
-      itemName: `${label} - ${order.tour.name}`,
-      customer: { name: order.customerName, email: order.customerEmail, phone: order.customerPhone },
-      expiryHours: SNAP_EXPIRY_HOURS,
-      finishUrl: `${siteUrl}/invoice/${order.invoiceNo}/installments?pay=finish`,
-    });
-
-    if (!snap) {
-      return NextResponse.redirect(failUrl);
-    }
-
-    await prisma.installmentPayment.update({
-      where: { id: payment.id },
-      data: {
-        snapToken: snap.token,
-        paymentUrl: snap.redirectUrl,
-        paymentExpiryAt: new Date(Date.now() + SNAP_EXPIRY_HOURS * 60 * 60 * 1000),
-      },
-    });
-
-    return NextResponse.redirect(snap.redirectUrl);
-  } catch (error) {
-    console.error('Pay installment error:', error);
-    return NextResponse.redirect(installmentsUrl);
-  }
-}
+// Notifikasi pasca-response dijalankan via after() agar serverless tetap
+// mengerjakannya sampai selesai (waitUntil), tidak dibekukan setelah response.
+export const maxDuration = 60;
 
 export async function POST(
   request: NextRequest,
@@ -99,13 +23,8 @@ export async function POST(
     const body = await request.json();
     const { paymentProof } = body;
 
-    // Mode online aktif → pembayaran hanya via Midtrans (terkonfirmasi otomatis)
-    const gateway = await getPaymentGateway();
-    if (gateway === 'midtrans') {
-      return NextResponse.json(
-        { success: false, error: 'Pembayaran online aktif — silakan gunakan tombol "Bayar Online" pada tabel angsuran.' },
-        { status: 400 }
-      );
+    if (!Number.isInteger(installmentNumber) || installmentNumber < 0) {
+      return NextResponse.json({ success: false, error: 'Nomor angsuran tidak valid' }, { status: 400 });
     }
 
     if (!paymentProof || typeof paymentProof !== 'string') {
@@ -141,7 +60,7 @@ export async function POST(
       return NextResponse.json({ success: false, error: 'Angsuran ini sudah dikonfirmasi' }, { status: 400 });
     }
 
-    // Update payment proof and status
+    // Update payment proof and status → menunggu konfirmasi admin
     await prisma.installmentPayment.update({
       where: { id: payment.id },
       data: {
@@ -150,6 +69,33 @@ export async function POST(
         paidAt: new Date(),
       },
     });
+
+    // Notifikasi email ke admin: bukti transfer baru perlu diverifikasi
+    const label = installmentNumber === 0 ? 'DP (Uang Muka)' : `Angsuran ke-${installmentNumber}`;
+    after(() =>
+      (async () => {
+        try {
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+          const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
+          const adminEmail = await getOwnerEmail();
+          await sendEmail({
+            to: adminEmail,
+            subject: `Bukti Transfer Baru: ${invoiceNo} - ${label}`,
+            html: installmentProofUploadedTemplate({
+              customerName: order.customerName,
+              invoiceNo,
+              paymentLabel: label,
+              amountLabel: `Rp ${payment.amount.toLocaleString('id-ID')}`,
+              proofUrl: paymentProof,
+              adminUrl: `${siteUrl}/admin/installments/${plan.id}`,
+              companyName,
+            }),
+          });
+        } catch (err) {
+          console.error('Failed to send admin proof notification:', err);
+        }
+      })()
+    );
 
     return NextResponse.json({
       success: true,

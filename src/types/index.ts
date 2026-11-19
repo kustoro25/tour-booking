@@ -216,9 +216,6 @@ export interface InstallmentPayment {
   paymentProof: string | null;
   paymentMethod: string | null;
   paymentRef: string | null;
-  snapToken: string | null;
-  paymentUrl: string | null;
-  paymentExpiryAt: string | null;
   adminConfirmedBy: string | null;
   adminConfirmedAt: string | null;
   notes: string | null;
@@ -302,9 +299,6 @@ export interface AppSettings {
   companyAddress: string;
   paymentDeadline: number; // hours
   bankAccounts: BankAccount[];
-  paymentGateway: 'manual' | 'midtrans' | 'xendit';
-  midtransServerKey: string;
-  midtransClientKey: string;
   // Installment settings
   installmentEnabled: boolean;
   installmentOptions: number[];

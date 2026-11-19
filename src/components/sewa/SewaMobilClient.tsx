@@ -31,7 +31,6 @@ interface FleetTour {
 interface SewaMobilClientProps {
   fleetTours: FleetTour[];
   waNumber: string;
-  gateway: 'midtrans' | 'manual';
 }
 
 const REGION_COLORS: Record<string, string> = {
@@ -41,7 +40,7 @@ const REGION_COLORS: Record<string, string> = {
   'Bali Barat': 'bg-gold-400/15 text-gold-300',
 };
 
-export default function SewaMobilClient({ fleetTours, waNumber, gateway }: SewaMobilClientProps) {
+export default function SewaMobilClient({ fleetTours, waNumber }: SewaMobilClientProps) {
   const { t, tOr, formatPrice } = useI18n();
   useTranslatedMeta(t('meta.sewa'), t('meta.sewaDesc'));
 
@@ -289,7 +288,7 @@ export default function SewaMobilClient({ fleetTours, waNumber, gateway }: SewaM
             <ul className="space-y-2 text-sm text-gold-200/80">
               <li>{t('sewa.payment.deposit')}</li>
               <li>{t('sewa.payment.cash')}</li>
-              <li>{gateway === 'midtrans' ? t('sewa.payment.online') : t('sewa.payment.transfer')}</li>
+              <li>{t('sewa.payment.transfer')}</li>
             </ul>
           </div>
           <div className="bg-gold-400/10 border border-gold-500/20 rounded-2xl p-6">

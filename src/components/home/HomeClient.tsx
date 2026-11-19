@@ -37,7 +37,6 @@ function parsePhotos(photos: string): string[] {
 interface HomeClientProps {
   reviews: HomeReview[];
   waNumber: string;
-  gateway: 'midtrans' | 'manual';
 }
 
 // Ikon & warna kartu nilai (data visual, bukan teks — tidak perlu diterjemahkan).
@@ -69,7 +68,7 @@ const DESTINATION_IMAGES: Record<string, string> = {
   Uluwatu: '/images/haybali/destinasi-uluwatu.jpg',
 };
 
-export default function HomeClient({ reviews, waNumber, gateway }: HomeClientProps) {
+export default function HomeClient({ reviews, waNumber }: HomeClientProps) {
   const { t, list, formatPrice } = useI18n();
   useTranslatedMeta(t('meta.home'), t('meta.homeDesc'));
 
@@ -275,7 +274,7 @@ export default function HomeClient({ reviews, waNumber, gateway }: HomeClientPro
                 {t('home.policy.paymentTitle')}
               </h3>
               <ul className="space-y-3 text-sm text-mist leading-relaxed">
-                <li>{gateway === 'midtrans' ? t('home.policy.paymentItems.midtrans') : t('home.policy.paymentItems.manual')}</li>
+                <li>{t('home.policy.paymentItems.manual')}</li>
                 <li>{t('home.policy.paymentItems.deposit')}</li>
                 <li>{t('home.policy.paymentItems.deadline')}</li>
               </ul>

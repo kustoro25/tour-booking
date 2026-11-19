@@ -4,7 +4,6 @@ import { requireAdmin } from '@/lib/auth';
 import { sendEmail, reviewRequestTemplate, paymentConfirmationTemplate } from '@/lib/email';
 import { notifyCustomerPaymentReceived } from '@/lib/whatsapp';
 import { sendOrderTicketEmail } from '@/lib/eticket';
-import { getPaymentGateway } from '@/lib/settings';
 import { generateReviewToken } from '@/lib/utils';
 
 // Notifikasi pasca-response dijalankan via after() agar serverless tetap
@@ -96,15 +95,14 @@ export async function PUT(
     const newStatus = status || currentOrder.status;
 
     // Konfirmasi pembayaran manual oleh admin: catat waktu bayar & metode pembayaran
-    // bila belum ada (gateway-aware: mode manual → "manual_transfer").
+    // bila belum ada (semua pembayaran = transfer manual).
     if (
       (newStatus === 'CONFIRMED' || newStatus === 'COMPLETED') &&
       currentOrder.status !== newStatus
     ) {
       if (!currentOrder.paidAt) updateData.paidAt = new Date();
       if (!currentOrder.paymentMethod) {
-        const gateway = await getPaymentGateway();
-        updateData.paymentMethod = gateway === 'manual' ? 'manual_transfer' : 'manual';
+        updateData.paymentMethod = 'manual_transfer';
       }
     }
 

@@ -48,7 +48,6 @@ export default function AdminSettingsPage() {
     installmentOptions: '2',
     dpPercentage: 50,
     minAmountForInstallment: 1000000,
-    paymentGateway: 'manual' as 'manual' | 'midtrans',
     whatsappEnabled: true,
     usdRate: 0,
   });
@@ -80,10 +79,6 @@ export default function AdminSettingsPage() {
               : (data.data.installment_options as string) || '2',
             dpPercentage: Number(data.data.dp_percentage) || 50,
             minAmountForInstallment: Number(data.data.min_amount_for_installment) || 1000000,
-            paymentGateway:
-              (data.data.payment_gateway_effective as 'manual' | 'midtrans') ||
-              (data.data.payment_gateway as 'manual' | 'midtrans') ||
-              'manual',
             whatsappEnabled:
               data.data.whatsapp_enabled === false || data.data.whatsapp_enabled === 'false' ? false : true,
             usdRate: Number(data.data.usd_rate) || 0,
@@ -124,7 +119,6 @@ export default function AdminSettingsPage() {
           installment_options: form.installmentOptions.split(',').map((s) => Number(s.trim())).filter((n) => !isNaN(n) && n > 0),
           dp_percentage: form.dpPercentage,
           min_amount_for_installment: form.minAmountForInstallment,
-          payment_gateway: form.paymentGateway,
           whatsapp_enabled: form.whatsappEnabled,
           usd_rate: form.usdRate,
           bank_accounts: bankAccounts,
@@ -568,35 +562,16 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        {/* ═══════════ Pembayaran Online & Notifikasi ═══════════ */}
+        {/* ═══════════ Pembayaran & Notifikasi ═══════════ */}
         <div className="border-t pt-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">💳 Pembayaran Online & Notifikasi</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">💳 Pembayaran & Notifikasi</h2>
           <p className="text-xs text-gray-500 mb-4">
-            Pilih metode pembayaran dan atur notifikasi otomatis untuk pesanan baru & pembayaran.
-            Kredensial gateway (Midtrans) dan WhatsApp Cloud API diatur melalui environment variables
-            (MIDTRANS_SERVER_KEY, WHATSAPP_ACCESS_TOKEN, dll.).
+            Metode pembayaran aktif: transfer manual — pelanggan transfer ke rekening bank lalu mengunggah
+            bukti, dan admin mengonfirmasi pembayaran secara manual.
+            WhatsApp Cloud API diatur melalui environment variables (WHATSAPP_ACCESS_TOKEN, dll.).
           </p>
 
           <div className="space-y-4">
-            {/* Payment Gateway */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Metode Pembayaran</label>
-              <select
-                value={form.paymentGateway}
-                onChange={(e) => setForm({ ...form, paymentGateway: e.target.value as 'manual' | 'midtrans' })}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="manual">Manual — transfer bank (konfirmasi manual)</option>
-                <option value="midtrans">Midtrans — QRIS, Virtual Account, E-Wallet (otomatis)</option>
-              </select>
-              <p className="text-xs text-gray-400 mt-1">
-                Mode Midtrans mengikuti env MIDTRANS_IS_PRODUCTION (false = sandbox, true = production).{' '}
-                <Link href="/admin/payments" className="text-blue-600 hover:underline font-medium">
-                  Kelola metode pembayaran di menu Pembayaran →
-                </Link>
-              </p>
-            </div>
-
             {/* WhatsApp Notification Toggle */}
             <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-200">
               <div>

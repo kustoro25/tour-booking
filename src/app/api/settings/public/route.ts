@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getPaymentGateway, getUsdRate, normalizeWaNumber } from '@/lib/settings';
+import { getUsdRate, normalizeWaNumber } from '@/lib/settings';
 import { WA_NUMBER } from '@/lib/haybali';
 import { DEFAULT_USD_RATE } from '@/lib/currency';
 
 export async function GET() {
   try {
     const settings = await prisma.setting.findMany();
-    const paymentGateway = await getPaymentGateway();
     const usdRate = await getUsdRate();
     const settingsMap: Record<string, unknown> = {};
 
@@ -34,8 +33,6 @@ export async function GET() {
       success: true,
       data: {
         ...settingsMap,
-        // Gateway efektif (DB setting → env → default manual)
-        paymentGateway,
         // Kurs USD→IDR efektif untuk estimasi harga bahasa English
         usdRate,
         // Legacy camelCase fields for existing components
@@ -52,7 +49,6 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       data: {
-        paymentGateway: 'manual',
         usdRate: DEFAULT_USD_RATE,
         email: 'Haybalitrans@gmail.com',
         phone: '+62 851-1933-4511',

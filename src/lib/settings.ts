@@ -75,15 +75,6 @@ export async function getWhatsAppNumber(): Promise<string> {
   return normalized || WA_NUMBER;
 }
 
-export type PaymentGatewayMode = 'manual' | 'midtrans';
-
-/** Setting DB `payment_gateway` menang atas env PAYMENT_GATEWAY; default manual. */
-export async function getPaymentGateway(): Promise<PaymentGatewayMode> {
-  const fromDb = await getSetting<string | null>('payment_gateway', null);
-  const mode = (fromDb || process.env.PAYMENT_GATEWAY || 'manual').toLowerCase();
-  return mode === 'midtrans' ? 'midtrans' : 'manual';
-}
-
 /** Email pemilik bisnis untuk notifikasi (pesanan baru & contact form).
  *  Prioritas: env OWNER_EMAIL > setting company_email > env ADMIN_EMAIL. */
 export async function getOwnerEmail(): Promise<string> {

@@ -1,5 +1,5 @@
 // Pengiriman E-Ticket otomatis ke pelanggan setelah pembayaran LUNAS.
-// Dipanggil dari webhook Midtrans, konfirmasi admin, dan konfirmasi angsuran.
+// Dipanggil dari konfirmasi admin dan konfirmasi angsuran (verifikasi transfer manual).
 // Anti-duplikat: penanda Order.eticketSentAt.
 
 import { prisma } from '@/lib/prisma';

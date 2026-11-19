@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import type { Metadata } from 'next';
-import { getPaymentGateway, getWhatsAppNumber } from '@/lib/settings';
+import { getWhatsAppNumber } from '@/lib/settings';
 import SewaMobilClient from '@/components/sewa/SewaMobilClient';
 
 export const revalidate = 300;
@@ -31,11 +31,10 @@ async function getFleetTours() {
 }
 
 export default async function SewaMobilPage() {
-  const [fleetTours, waNumber, gateway] = await Promise.all([
+  const [fleetTours, waNumber] = await Promise.all([
     getFleetTours(),
     getWhatsAppNumber(),
-    getPaymentGateway(),
   ]);
 
-  return <SewaMobilClient fleetTours={fleetTours} waNumber={waNumber} gateway={gateway} />;
+  return <SewaMobilClient fleetTours={fleetTours} waNumber={waNumber} />;
 }

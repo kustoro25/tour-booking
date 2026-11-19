@@ -1,22 +1,17 @@
 'use client';
 
 // ============================================================================
-// FaqClient — renderer klien halaman /faq. Teks dari kamus i18n (id/en);
-// jawaban metode pembayaran menyesuaikan mode gateway dari server.
+// FaqClient — renderer klien halaman /faq. Teks dari kamus i18n (id/en).
 // ============================================================================
 
 import { useI18n, useTranslatedMeta } from '@/lib/i18n/client';
 
-interface FaqClientProps {
-  gateway: 'midtrans' | 'manual';
-}
-
-export default function FaqClient({ gateway }: FaqClientProps) {
+export default function FaqClient() {
   const { t, list } = useI18n();
   useTranslatedMeta(t('meta.faq'), t('meta.faqDesc'));
   const faqs = (list('faq.items') as { q: string; a: string }[]).map((faq, index) =>
     index === 2
-      ? { ...faq, a: gateway === 'midtrans' ? t('faq.paymentMidtrans') : t('faq.paymentManual') }
+      ? { ...faq, a: t('faq.paymentManual') }
       : faq
   );
 

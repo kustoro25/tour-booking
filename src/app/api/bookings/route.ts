@@ -4,8 +4,7 @@ import { generateInvoiceNo, calculateTotal, getExpiryDate, generateReviewToken }
 import { validateBookingForm } from '@/lib/validators';
 import { sendEmail, invoiceEmailTemplate, installmentBillingTemplate, adminOrderNotificationTemplate } from '@/lib/email';
 import { generateInstallmentDates } from '@/lib/agreement';
-import { getOwnerEmail, getPaymentGateway } from '@/lib/settings';
-import { createSnapTransaction, isMidtransConfigured } from '@/lib/midtrans';
+import { getOwnerEmail } from '@/lib/settings';
 import { notifyCustomerNewBooking, notifyAdminNewOrder } from '@/lib/whatsapp';
 import {
   getFleetBySlug,
@@ -346,7 +345,7 @@ export async function POST(request: NextRequest) {
       timeout: 10000, // max transaction duration (ms)
     });
 
-    // ==== Pembayaran online, email & WhatsApp (di luar transaksi, non-blocking) ====
+    // ==== Email & WhatsApp (di luar transaksi, non-blocking) ====
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
     const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
     const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
@@ -354,67 +353,7 @@ export async function POST(request: NextRequest) {
     const tourDateLabel = pickupTime ? `${dateLabel}, pukul ${formatTime12h(String(pickupTime))} WITA` : dateLabel;
     const expiryDate = getExpiryDate(24);
 
-    // 1. Buat transaksi Midtrans Snap (FULL) atau Snap DP (INSTALLMENT) jika gateway midtrans aktif
-    let paymentUrl: string | null = null;
-    if (!result.isInstallment) {
-      try {
-        const gateway = await getPaymentGateway();
-        if (gateway === 'midtrans' && isMidtransConfigured()) {
-          const snap = await createSnapTransaction({
-            orderId: result.invoiceNo,
-            grossAmount: result.total,
-            itemName: tour.name,
-            customer: { name: customerName, email: customerEmail, phone: customerPhone },
-            expiryHours: 24,
-            finishUrl: `${siteUrl}/invoice/${result.invoiceNo}`,
-          });
-          if (snap) {
-            paymentUrl = snap.redirectUrl;
-            await prisma.order.update({
-              where: { id: result.order.id },
-              data: { snapToken: snap.token, paymentUrl: snap.redirectUrl },
-            });
-          }
-        }
-      } catch (payErr) {
-        console.error('Failed to create Midtrans transaction:', payErr);
-      }
-    } else if (result.installmentPlanData && result.installmentPlanData.dpAmount > 0) {
-      // DP dibayar online — terkonfirmasi otomatis lewat webhook (pola order_id: {invoiceNo}-INST-0)
-      try {
-        const gateway = await getPaymentGateway();
-        if (gateway === 'midtrans' && isMidtransConfigured()) {
-          const ipd = result.installmentPlanData;
-          const snap = await createSnapTransaction({
-            orderId: `${result.invoiceNo}-INST-0`,
-            grossAmount: ipd.dpAmount,
-            itemName: `DP ${ipd.dpPercentage}% - ${tour.name}`,
-            customer: { name: customerName, email: customerEmail, phone: customerPhone },
-            expiryHours: 24,
-            finishUrl: `${siteUrl}/invoice/${result.invoiceNo}/installments?pay=finish`,
-          });
-          if (snap) {
-            paymentUrl = snap.redirectUrl;
-            await prisma.installmentPayment.update({
-              where: { id: ipd.dpPaymentId },
-              data: {
-                snapToken: snap.token,
-                paymentUrl: snap.redirectUrl,
-                paymentExpiryAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-              },
-            });
-            await prisma.order.update({
-              where: { id: result.order.id },
-              data: { snapToken: snap.token, paymentUrl: snap.redirectUrl },
-            });
-          }
-        }
-      } catch (payErr) {
-        console.error('Failed to create Midtrans DP transaction:', payErr);
-      }
-    }
-
-    // 2. Email ke pembeli
+    // 1. Email ke pembeli
     try {
       if (result.isInstallment && result.installmentPlanData) {
         const ipd = result.installmentPlanData;
@@ -427,7 +366,7 @@ export async function POST(request: NextRequest) {
           if (bankSetting) bankAccounts = JSON.parse(bankSetting.value);
         } catch { /* default */ }
 
-        // Email penagihan DP (uang muka) — tombol bayar online bila gateway aktif
+        // Email penagihan DP (uang muka) — tombol menuju halaman jadwal & bayar (upload bukti transfer)
         await sendEmail({
           to: customerEmail,
           subject: `Pembayaran DP (Uang Muka) - ${tour.name}`,
@@ -439,10 +378,9 @@ export async function POST(request: NextRequest) {
             totalInstallments: ipd.installmentCount,
             amount: formatCur(ipd.dpAmount),
             dueDate: expiryDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
-            paymentUrl: paymentUrl || installmentUrl,
+            paymentUrl: installmentUrl,
             bankAccounts,
             companyName,
-            onlineMode: Boolean(paymentUrl),
           }),
         });
       } else {
@@ -457,7 +395,7 @@ export async function POST(request: NextRequest) {
             tourDate: tourDateLabel,
             total: formatCur(result.total),
             expiryDate: expiryDate.toLocaleString('id-ID'),
-            paymentUrl: invoicePageUrl,
+            invoiceUrl: invoicePageUrl,
             companyName,
           }),
         });
@@ -504,7 +442,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: { invoiceNo: result.invoiceNo, orderId: result.order.id, paymentUrl },
+      data: { invoiceNo: result.invoiceNo, orderId: result.order.id },
     }, { status: 201 });
   } catch (error) {
     if (error instanceof Error) {

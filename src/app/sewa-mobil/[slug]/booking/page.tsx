@@ -118,10 +118,9 @@ function BookingPage() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [bookingResult, setBookingResult] = useState<{ invoiceNo: string; paymentUrl?: string | null } | null>(null);
+  const [bookingResult, setBookingResult] = useState<{ invoiceNo: string } | null>(null);
   const [slotInfo, setSlotInfo] = useState<SlotInfo | null>(null);
   const [slotLoading, setSlotLoading] = useState(false);
-  const [paymentGateway, setPaymentGateway] = useState<'midtrans' | 'manual'>('manual');
   const [waNumber, setWaNumber] = useState<string>(WA_NUMBER); // nomor WA bisnis dari pengaturan admin
 
   // --- State layanan khusus HAYBALI TRANS ---
@@ -164,9 +163,6 @@ function BookingPage() {
       .then((data) => {
         if (data.success && data.data) {
           setInstallmentEnabled(data.data.installment_enabled === true);
-          if (data.data.paymentGateway === 'midtrans') {
-            setPaymentGateway('midtrans');
-          }
           if (typeof data.data.whatsappNumber === 'string' && data.data.whatsappNumber) {
             setWaNumber(data.data.whatsappNumber);
           }
@@ -415,9 +411,9 @@ function BookingPage() {
       if (data.success) {
         setBookingResult(data.data);
         setStep(5);
-        // Pembayaran manual: langsung alihkan ke WhatsApp dengan info booking
+        // Pembayaran transfer manual: langsung alihkan ke WhatsApp dengan info booking
         // lengkap + nomor invoice (layar "Booking Berhasil!" tidak ditampilkan)
-        if (paymentGateway === 'manual' && tour) {
+        if (tour) {
           const waUrl = buildManualWaLink(data.data.invoiceNo);
           if (waUrl) window.location.assign(waUrl);
         }
@@ -535,7 +531,7 @@ function BookingPage() {
     );
   };
   const manualWaUrl =
-    step === 5 && bookingResult && paymentGateway === 'manual'
+    step === 5 && bookingResult
       ? buildManualWaLink(bookingResult.invoiceNo)
       : '';
 
@@ -1181,11 +1177,7 @@ function BookingPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-ivory">{t('booking.fullTitle')}</h3>
                   <p className="text-sm text-mist-dim mt-0.5">{t('booking.fullDesc', { total: formatPrice(grandTotal) })}</p>
-                  {paymentGateway === 'midtrans' ? (
-                    <p className="text-xs text-green-300 mt-1">{t('booking.fullMidtrans')}</p>
-                  ) : (
-                    <p className="text-xs text-mist-dim mt-1">{t('booking.fullManual')}</p>
-                  )}
+                  <p className="text-xs text-mist-dim mt-1">{t('booking.fullManual')}</p>
                 </div>
               </div>
             </div>
@@ -1214,11 +1206,7 @@ function BookingPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-ivory">{t('booking.dpTitle')}</h3>
                   <p className="text-sm text-mist-dim mt-0.5">{t('booking.dpDesc', { dpPct: dpPercentage, restPct: 100 - dpPercentage })}</p>
-                  {paymentGateway === 'midtrans' ? (
-                    <p className="text-xs text-green-300 mt-1">{t('booking.dpMidtrans')}</p>
-                  ) : (
-                    <p className="text-xs text-mist-dim mt-1">{t('booking.dpManual')}</p>
-                  )}
+                  <p className="text-xs text-mist-dim mt-1">{t('booking.dpManual')}</p>
                   {!installmentEnabled && (
                     <p className="text-xs text-mist-dim mt-1">{t('booking.dpUnavailable')}</p>
                   )}
@@ -1264,11 +1252,7 @@ function BookingPage() {
                 <li>{t('booking.terms1', { dpPct: dpPercentage, restPct: 100 - dpPercentage })}</li>
                 <li>{t('booking.terms2')}</li>
                 <li>{t('booking.terms3')}</li>
-                <li>
-                  {paymentGateway === 'midtrans'
-                    ? <>{t('booking.terms4Midtrans')}</>
-                    : <>{t('booking.terms4Manual')}</>}
-                </li>
+                <li>{t('booking.terms4Manual')}</li>
               </ol>
               <label className="flex items-start gap-2 mt-3 cursor-pointer">
                 <input
@@ -1385,12 +1369,10 @@ function BookingPage() {
               <span className="text-sm text-mist-dim">{t('booking.paymentMethodLabel')}</span>
               <p className="font-medium">
                 {paymentType === 'FULL'
-                  ? paymentGateway === 'midtrans'
-                    ? t('booking.payFullOnline')
-                    : t('booking.payFullTransfer')
+                  ? t('booking.payFullTransfer')
                   : t('booking.payDpSummary', {
                       pct: dpPercentage,
-                      mode: paymentGateway === 'midtrans' ? t('booking.payDpModeOnline') : t('booking.payDpModeTransfer'),
+                      mode: t('booking.payDpModeTransfer'),
                     })}
               </p>
             </div>
@@ -1479,25 +1461,11 @@ function BookingPage() {
         <div className="bg-ink-850 rounded-xl shadow-sm p-6 text-center">
           <div className="text-6xl mb-4">🎉</div>
           <h2 className="text-2xl font-bold text-ivory mb-2">{t('booking.successTitle')}</h2>
-          {bookingResult.paymentUrl ? (
-            <p className="text-mist-dim mb-6">
-              {paymentType === 'INSTALLMENT' ? (
-                <>{t('booking.successDp')}</>
-              ) : (
-                <>{t('booking.successFull')}</>
-              )}
-            </p>
-          ) : paymentGateway === 'midtrans' ? (
-            <p className="text-mist-dim mb-6">
-              {t('booking.successInvoiceMidtrans')}
-            </p>
-          ) : (
-            <p className="text-mist-dim mb-6">
-              {paymentType === 'INSTALLMENT'
-                ? <>{t('booking.successManualDp')}</>
-                : <>{t('booking.successManualFull')}</>}
-            </p>
-          )}
+          <p className="text-mist-dim mb-6">
+            {paymentType === 'INSTALLMENT'
+              ? <>{t('booking.successManualDp')}</>
+              : <>{t('booking.successManualFull')}</>}
+          </p>
 
           <div className="bg-ink-900 rounded-lg p-6 mb-6">
             <p className="text-sm text-mist-dim mb-1">{t('booking.invoiceNoLabel')}</p>
@@ -1505,7 +1473,7 @@ function BookingPage() {
           </div>
 
           <div className="flex flex-wrap justify-center gap-3">
-            {paymentGateway === 'manual' && manualWaUrl && (
+            {manualWaUrl && (
               <Button
                 href={manualWaUrl}
                 target="_blank"
@@ -1514,11 +1482,6 @@ function BookingPage() {
                 size="lg"
               >
                 {t('booking.waSend')}
-              </Button>
-            )}
-            {bookingResult.paymentUrl && (
-              <Button href={bookingResult.paymentUrl} variant="accent" size="lg">
-                {paymentType === 'INSTALLMENT' ? t('booking.payDpOnline') : t('booking.payOnlineNow')}
               </Button>
             )}
             <Button href={`/invoice/${bookingResult.invoiceNo}`} variant="primary">

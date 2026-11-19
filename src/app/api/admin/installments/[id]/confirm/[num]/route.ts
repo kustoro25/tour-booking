@@ -39,7 +39,7 @@ export async function POST(
       return NextResponse.json({ success: false, error: 'Installment payment not found' }, { status: 404 });
     }
 
-    // Sudah terkonfirmasi (mis. otomatis via Midtrans) — tidak perlu diproses ulang
+    // Sudah terkonfirmasi — tidak perlu diproses ulang
     if (payment.status === 'CONFIRMED') {
       return NextResponse.json(
         { success: false, error: `Angsuran ke-${installmentNumber} sudah terkonfirmasi` },

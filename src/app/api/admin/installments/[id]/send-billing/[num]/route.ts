@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { sendEmail, installmentBillingTemplate } from '@/lib/email';
-import { getPaymentGateway } from '@/lib/settings';
 
 export async function POST(
   _request: NextRequest,
@@ -54,13 +53,8 @@ export async function POST(
       if (bankSetting) bankAccounts = JSON.parse(bankSetting.value);
     } catch { /* default */ }
 
-    // Mode online (Midtrans): tombol email langsung ke halaman pembayaran Snap angsuran ini
-    const gateway = await getPaymentGateway();
-    const onlineMode = gateway === 'midtrans';
+    // Tombol email menuju halaman jadwal & bayar angsuran (upload bukti transfer)
     const installmentsPageUrl = `${siteUrl}/invoice/${plan.order.invoiceNo}/installments`;
-    const paymentUrl = onlineMode
-      ? `${siteUrl}/api/installments/${plan.order.invoiceNo}/pay/${installmentNumber}`
-      : installmentsPageUrl;
     const dueDateStr = new Date(payment.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
     await sendEmail({
@@ -77,10 +71,9 @@ export async function POST(
         totalInstallments: plan.installmentCount,
         amount: formatCur(payment.amount),
         dueDate: dueDateStr,
-        paymentUrl,
+        paymentUrl: installmentsPageUrl,
         bankAccounts,
         companyName,
-        onlineMode,
       }),
     });
 

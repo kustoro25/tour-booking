@@ -7,7 +7,7 @@ import {
   getFleetBySlug,
 } from '@/lib/haybali';
 import { getFleetDetail } from '@/lib/fleet-detail';
-import { getPaymentGateway, getSetting, getWhatsAppNumber } from '@/lib/settings';
+import { getSetting, getWhatsAppNumber } from '@/lib/settings';
 import FleetDetailClient from '@/components/sewa/FleetDetailClient';
 
 export const revalidate = 300;
@@ -54,9 +54,8 @@ export default async function FleetDetailPage({ params }: PageProps) {
 
   if (!fleet || !detail) notFound();
 
-  const [waNumber, gateway, bankAccounts] = await Promise.all([
+  const [waNumber, bankAccounts] = await Promise.all([
     getWhatsAppNumber(),
-    getPaymentGateway(),
     getSetting<{ bank: string; number: string; name: string }[]>('bank_accounts', []),
   ]);
   const bankLabel = bankAccounts
@@ -69,7 +68,6 @@ export default async function FleetDetailPage({ params }: PageProps) {
       fleet={fleet}
       detail={detail}
       waNumber={waNumber}
-      gateway={gateway}
       bankLabel={bankLabel}
     />
   );
