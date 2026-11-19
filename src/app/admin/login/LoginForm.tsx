@@ -46,11 +46,10 @@ export default function LoginForm({ brandName, brandIcon }: Props) {
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
         <div className="text-center mb-8">
           {(brandIcon.startsWith('http') || brandIcon.startsWith('/')) ? (
-            // Logo brand bertekstur putih di atas latar transparan, jadi wajib diberi alas gelap
-            // agar tidak hilang di kartu putih (kontras terang-di-gelap seperti navbar situs).
+            // Logo baru berlatar putih — tampil sebagai tile rounded di atas alas gelap.
             <div className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-br from-ink-900 via-ink-950 to-ink-900 ring-1 ring-gold-500/25 px-6 py-4 mb-4 shadow-md shadow-ink-950/10">
               {/* eslint-disable-next-line @next/next/no-img-element -- ikon brand bisa berupa URL eksternal/path dinamis dari pengaturan */}
-              <img src={brandIcon} alt={brandName} className="h-16 w-auto object-contain" />
+              <img src={brandIcon} alt={brandName} className="h-16 w-auto object-contain rounded-xl" />
             </div>
           ) : (
             <div className="w-14 h-14 bg-gradient-to-br from-gold-200 via-gold-400 to-gold-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-md shadow-gold-500/20">

@@ -9,7 +9,7 @@ function BrandIcon({ icon, className }: { icon: string; className?: string }) {
   if (!icon) return <div className={`${className} bg-blue-600 flex items-center justify-center text-sm font-bold text-white`}>HB</div>;
   if (icon.startsWith('http') || icon.startsWith('/')) {
     // eslint-disable-next-line @next/next/no-img-element -- ikon brand bisa berupa URL eksternal/path dinamis dari pengaturan, tidak bisa dioptimasi next/image
-    return <img src={icon} alt="brand" className={`${className} object-contain`} />;
+    return <img src={icon} alt="brand" className={`${className} object-contain rounded-lg`} />;
   }
   return <div className={`${className} bg-blue-600 flex items-center justify-center text-sm font-bold text-white`}>{icon.substring(0, 2).toUpperCase()}</div>;
 }
