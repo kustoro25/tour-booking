@@ -287,12 +287,13 @@ export function reviewRequestTemplate(data: {
 }): string {
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #F97316;">⭐ Bagaimana Liburan Anda?</h2>
+      <h2 style="color: #F97316;">⭐ Bagaimana Pengalaman Perjalanan Anda?</h2>
       <p>Halo <strong>${data.customerName}</strong>,</p>
       <p>Semoga Anda menikmati perjalanan <strong>${data.tourName}</strong> bersama kami!</p>
       <p>Bagikan pengalaman Anda untuk membantu wisatawan lain menemukan liburan impian mereka.</p>
       <a href="${data.reviewUrl}" style="background: #F97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">✍️ Tulis Review (2 Menit)</a>
-      <p style="margin-top: 20px; font-size: 12px; color: #666;">Link ini hanya bisa digunakan sekali dan berlaku 7 hari.</p>
+      <p style="margin-top: 20px; font-size: 12px; color: #666;">Link ini hanya bisa digunakan satu kali untuk pesanan Anda.</p>
+      <p style="margin-top: 20px;">Salam hangat,<br/><strong>Tim ${data.companyName}</strong></p>
     </div>
   `;
 }

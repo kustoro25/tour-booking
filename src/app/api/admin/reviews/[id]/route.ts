@@ -26,7 +26,17 @@ export async function PUT(
 
     const updateData: Record<string, unknown> = {};
     if (status) updateData.status = status;
-    if (adminReply !== undefined) updateData.adminReply = adminReply;
+    if (adminReply !== undefined) {
+      if (typeof adminReply !== 'string') {
+        return NextResponse.json({ success: false, error: 'Balasan admin harus berupa teks' }, { status: 400 });
+      }
+      updateData.adminReply = adminReply.trim() || null;
+    }
+
+    // Tolak update kosong agar tidak melempar error Prisma yang membingungkan.
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ success: false, error: 'Tidak ada perubahan yang dikirim' }, { status: 400 });
+    }
 
     const review = await prisma.review.update({
       where: { id },

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
 import Button from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useI18n } from '@/lib/i18n/client';
@@ -22,6 +22,9 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
   const [submitting, setSubmitting] = useState(false);
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState('');
   const [messageKind, setMessageKind] = useState<'error' | 'success'>('error');
 
@@ -38,6 +41,33 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
       .catch(() => setError(t('review.loadFailed')))
       .finally(() => setLoading(false));
   }, [token, t]);
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const remaining = Math.max(0, 3 - photos.length);
+    if (remaining === 0) return;
+
+    const selected = Array.from(files).slice(0, remaining);
+    setUploadingPhoto(true);
+    try {
+      for (const file of selected) {
+        const fd = new FormData();
+        fd.append('file', file);
+        fd.append('folder', 'tour-booking/review-photos');
+        const res = await fetch('/api/upload', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!data.success || !data.url) throw new Error(data.error || 'upload failed');
+        setPhotos((prev) => (prev.length >= 3 ? prev : [...prev, data.url]));
+      }
+    } catch {
+      setMessage(t('review.photosUploadFailed'));
+      setMessageKind('error');
+    } finally {
+      setUploadingPhoto(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +89,7 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
       const res = await fetch(`/api/reviews/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rating, reviewText, photos: [] }),
+        body: JSON.stringify({ rating, reviewText, photos }),
       });
       const data = await res.json();
 
@@ -204,6 +234,56 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
           </div>
         </div>
 
+        {/* Photos */}
+        <div>
+          <label className="block text-sm font-semibold text-mist mb-3">
+            {t('review.photosLabel')}
+          </label>
+          {photos.length > 0 && (
+            <div className="flex flex-wrap gap-3 mb-3">
+              {photos.map((url, i) => (
+                <div key={url} className="relative w-20 h-20">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- URL foto berasal dari upload dinamis Cloudinary */}
+                  <img
+                    src={url}
+                    alt={`Foto ${i + 1}`}
+                    className="w-20 h-20 object-cover rounded-lg border border-ink-600"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setPhotos((prev) => prev.filter((_, idx) => idx !== i))}
+                    aria-label={t('review.photosRemove')}
+                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white text-xs flex items-center justify-center hover:bg-red-600 transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+            multiple
+            onChange={handlePhotoUpload}
+            className="hidden"
+            id="review-photos"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingPhoto || photos.length >= 3}
+            className="px-4 py-2 border border-ink-600 rounded-lg text-sm text-mist hover:border-gold-400 hover:text-gold-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {uploadingPhoto
+              ? t('review.photosUploading')
+              : photos.length >= 3
+                ? '✓ 3/3'
+                : `+ ${t('review.photosHint')}`}
+          </button>
+        </div>
+
         {/* Message */}
         {message && (
           <div
@@ -223,7 +303,7 @@ export default function ReviewPage({ params }: { params: Promise<{ token: string
           variant="primary"
           size="lg"
           fullWidth
-          disabled={submitting}
+          disabled={submitting || uploadingPhoto}
         >
           {submitting ? (
             <span className="flex items-center justify-center gap-2">

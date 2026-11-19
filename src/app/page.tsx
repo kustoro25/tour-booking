@@ -41,6 +41,8 @@ async function getLatestReviews() {
     rating: review.rating,
     customerName: review.order.customerName,
     tourName: review.tour.name,
+    adminReply: review.adminReply,
+    photos: review.photos,
   }));
 }
 

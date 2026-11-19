@@ -45,7 +45,7 @@ interface PageProps {
 async function getReviews(page: number, limit: number) {
   const skip = (page - 1) * limit;
 
-  const [reviews, total, allRatings] = await Promise.all([
+  const [reviews, allRatings] = await Promise.all([
     prisma.review.findMany({
       where: { status: 'APPROVED' },
       orderBy: { createdAt: 'desc' },
@@ -56,7 +56,6 @@ async function getReviews(page: number, limit: number) {
         tour: { select: { name: true, slug: true } },
       },
     }),
-    prisma.review.count({ where: { status: 'APPROVED' } }),
     prisma.review.findMany({
       where: { status: 'APPROVED' },
       select: { rating: true },
@@ -68,15 +67,22 @@ async function getReviews(page: number, limit: number) {
       ? allRatings.reduce((sum, r) => sum + r.rating, 0) / allRatings.length
       : 0;
 
-  return { reviews, total, avgRating: Math.round(avgRating * 10) / 10, allRatings };
+  return { reviews, avgRating: Math.round(avgRating * 10) / 10, allRatings };
 }
 
 export default async function TestimonialsPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const page = typeof params.page === 'string' ? Math.max(1, parseInt(params.page) || 1) : 1;
-  const { reviews, total, avgRating, allRatings } = await getReviews(page, PER_PAGE);
+  const requestedPage = typeof params.page === 'string' ? Math.max(1, parseInt(params.page) || 1) : 1;
   const cms = await getTestimonialsPageData();
-  const totalPages = Math.ceil(total / PER_PAGE);
+
+  // Hitung total terlebih dulu lalu klamp halaman, sehingga halaman di luar
+  // rentang tetap menampilkan data halaman terakhir yang valid — bukan pesan
+  // "Belum ada testimoni" yang keliru.
+  const total = await prisma.review.count({ where: { status: 'APPROVED' } });
+  const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+  const page = Math.min(requestedPage, totalPages);
+
+  const { reviews, avgRating, allRatings } = await getReviews(page, PER_PAGE);
 
   const distribution = [5, 4, 3, 2, 1].map((star) => {
     const count = allRatings.filter((r) => r.rating === star).length;
@@ -90,6 +96,8 @@ export default async function TestimonialsPage({ searchParams }: PageProps) {
     customerName: review.order.customerName,
     tourName: review.tour.name,
     createdAt: review.createdAt.toISOString(),
+    adminReply: review.adminReply,
+    photos: review.photos,
   }));
 
   return (

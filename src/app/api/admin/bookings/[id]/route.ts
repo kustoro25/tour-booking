@@ -5,6 +5,7 @@ import { sendEmail, reviewRequestTemplate, paymentConfirmationTemplate } from '@
 import { notifyCustomerPaymentReceived } from '@/lib/whatsapp';
 import { sendOrderTicketEmail } from '@/lib/eticket';
 import { getPaymentGateway } from '@/lib/settings';
+import { generateReviewToken } from '@/lib/utils';
 
 // Notifikasi pasca-response dijalankan via after() agar serverless tetap
 // mengerjakannya sampai selesai (waitUntil), tidak dibekukan setelah response.
@@ -151,15 +152,26 @@ export async function PUT(
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
       const companyName = process.env.COMPANY_NAME || 'HAYBALI TRANS';
 
+      // Order lama bisa saja punya reviewToken null — pastikan ada sebelum
+      // menyusun link agar customer tidak menerima link /review/null.
+      let reviewToken = currentOrder.reviewToken;
+      if (!reviewToken) {
+        reviewToken = generateReviewToken();
+        await prisma.order.update({
+          where: { id },
+          data: { reviewToken },
+        });
+      }
+
       // Send review email (non-blocking, tetap jalan via after())
       after(() =>
         sendEmail({
           to: currentOrder.customerEmail,
-          subject: `Bagaimana Pengalaman Tour ${currentOrder.tour.name} Anda?`,
+          subject: `Bagaimana Pengalaman Perjalanan Anda dengan ${currentOrder.tour.name}?`,
           html: reviewRequestTemplate({
             customerName: currentOrder.customerName,
             tourName: currentOrder.tour.name,
-            reviewUrl: `${siteUrl}/review/${currentOrder.reviewToken}`,
+            reviewUrl: `${siteUrl}/review/${reviewToken}`,
             companyName,
           }),
         }).then(async (sent) => {

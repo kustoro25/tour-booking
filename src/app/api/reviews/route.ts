@@ -8,7 +8,14 @@ export async function GET(request: NextRequest) {
     const tourId = searchParams.get('tourId');
 
     const where: Record<string, unknown> = { status: 'APPROVED' };
-    if (rating) where.rating = parseInt(rating);
+    if (rating) {
+      // Hanya terapkan filter bila rating valid (1-5); abaikan nilai kacau
+      // seperti "abc" agar Prisma tidak menerima NaN.
+      const parsed = parseInt(rating, 10);
+      if (Number.isInteger(parsed) && parsed >= 1 && parsed <= 5) {
+        where.rating = parsed;
+      }
+    }
     if (tourId) where.tourId = tourId;
 
     const reviews = await prisma.review.findMany({

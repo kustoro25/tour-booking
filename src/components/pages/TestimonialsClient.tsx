@@ -18,6 +18,19 @@ interface TestimonialReview {
   customerName: string;
   tourName: string;
   createdAt: string;
+  adminReply: string | null;
+  photos: string;
+}
+
+/** Parse kolom photos (JSON string) menjadi array URL yang aman. */
+function parsePhotos(photos: string): string[] {
+  try {
+    const parsed = JSON.parse(photos);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((p): p is string => typeof p === 'string' && p.length > 0);
+  } catch {
+    return [];
+  }
 }
 
 interface Distribution {
@@ -103,22 +116,49 @@ export default function TestimonialsClient({
             {t('testimonials.showing', { count: reviews.length, total })}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {reviews.map((review) => (
-              <div key={review.id} className="bg-ink-850 rounded-xl shadow-card p-6 border border-ink-700 hover-lift">
-                <div className="text-4xl text-gold-200 mb-2 leading-none">&ldquo;</div>
-                <StarRating rating={review.rating} size="sm" />
-                <p className="text-mist mt-3 text-sm leading-relaxed">
-                  {review.reviewText}
-                </p>
-                <div className="mt-4 pt-4 border-t border-ink-700">
-                  <p className="font-semibold text-ivory text-sm">{review.customerName}</p>
-                  <p className="text-xs text-mist-dim">{review.tourName}</p>
-                  <p className="text-xs text-mist-dim mt-1">
-                    {new Date(review.createdAt).toLocaleDateString(dateLocale)}
+            {reviews.map((review) => {
+              const photos = parsePhotos(review.photos);
+              return (
+                <div key={review.id} className="bg-ink-850 rounded-xl shadow-card p-6 border border-ink-700 hover-lift">
+                  <div className="text-4xl text-gold-200 mb-2 leading-none">&ldquo;</div>
+                  <StarRating rating={review.rating} size="sm" />
+                  <p className="text-mist mt-3 text-sm leading-relaxed">
+                    {review.reviewText}
                   </p>
+
+                  {photos.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {photos.map((url) => (
+                        <a key={url} href={url} target="_blank" rel="noreferrer" title={t('testimonials.viewPhoto')}>
+                          {/* eslint-disable-next-line @next/next/no-img-element -- foto review dari upload Cloudinary */}
+                          <img
+                            src={url}
+                            alt={t('testimonials.photoAlt')}
+                            className="w-16 h-16 object-cover rounded-lg border border-ink-600 hover:opacity-80 transition-opacity"
+                            loading="lazy"
+                          />
+                        </a>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="mt-4 pt-4 border-t border-ink-700">
+                    <p className="font-semibold text-ivory text-sm">{review.customerName}</p>
+                    <p className="text-xs text-mist-dim">{review.tourName}</p>
+                    <p className="text-xs text-mist-dim mt-1">
+                      {new Date(review.createdAt).toLocaleDateString(dateLocale)}
+                    </p>
+                  </div>
+
+                  {review.adminReply ? (
+                    <div className="mt-3 bg-ink-800 border border-gold-500/20 rounded-lg p-3">
+                      <p className="text-xs font-semibold text-gold-300 mb-1">↩️ {t('testimonials.adminReply')}</p>
+                      <p className="text-sm text-mist">{review.adminReply}</p>
+                    </div>
+                  ) : null}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <Pagination

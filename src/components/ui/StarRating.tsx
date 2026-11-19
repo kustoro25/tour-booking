@@ -39,7 +39,12 @@ export default function StarRating({
             {filled ? (
               <span className="text-yellow-400">★</span>
             ) : halfFilled ? (
-              <span className="text-yellow-400">★</span>
+              // Bintang setengah: bintang kosong sebagai dasar, separuh kiri
+              // ditimpa bintang penuh yang dipotong lewat overflow-hidden.
+              <span className="relative inline-block text-mist">
+                ★
+                <span className="absolute inset-0 w-1/2 overflow-hidden text-yellow-400 pointer-events-none">★</span>
+              </span>
             ) : (
               <span className="text-mist">★</span>
             )}

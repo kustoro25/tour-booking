@@ -19,6 +19,19 @@ interface HomeReview {
   rating: number;
   customerName: string;
   tourName: string;
+  adminReply: string | null;
+  photos: string;
+}
+
+/** Parse kolom photos (JSON string) menjadi array URL yang aman. */
+function parsePhotos(photos: string): string[] {
+  try {
+    const parsed = JSON.parse(photos);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((p): p is string => typeof p === 'string' && p.length > 0);
+  } catch {
+    return [];
+  }
 }
 
 interface HomeClientProps {
@@ -295,19 +308,46 @@ export default function HomeClient({ reviews, waNumber, gateway }: HomeClientPro
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {reviews.map((review) => (
-                <div key={review.id} className="bg-ink-850 rounded-xl p-6 shadow-card hover-lift border border-ink-700">
-                  <div className="text-4xl text-gold-600/60 mb-2 leading-none">&ldquo;</div>
-                  <StarRating rating={review.rating} size="sm" />
-                  <p className="text-mist mt-3 text-sm leading-relaxed line-clamp-4">
-                    {review.reviewText}
-                  </p>
-                  <div className="mt-4 pt-4 border-t border-ink-700">
-                    <p className="font-semibold text-ivory text-sm">{review.customerName}</p>
-                    <p className="text-xs text-mist-dim">{review.tourName}</p>
+              {reviews.map((review) => {
+                const photos = parsePhotos(review.photos);
+                return (
+                  <div key={review.id} className="bg-ink-850 rounded-xl p-6 shadow-card hover-lift border border-ink-700">
+                    <div className="text-4xl text-gold-600/60 mb-2 leading-none">&ldquo;</div>
+                    <StarRating rating={review.rating} size="sm" />
+                    <p className="text-mist mt-3 text-sm leading-relaxed line-clamp-4">
+                      {review.reviewText}
+                    </p>
+
+                    {photos.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {photos.map((url) => (
+                          <a key={url} href={url} target="_blank" rel="noreferrer" title={t('testimonials.viewPhoto')}>
+                            {/* eslint-disable-next-line @next/next/no-img-element -- foto review dari upload Cloudinary */}
+                            <img
+                              src={url}
+                              alt={t('testimonials.photoAlt')}
+                              className="w-14 h-14 object-cover rounded-lg border border-ink-600 hover:opacity-80 transition-opacity"
+                              loading="lazy"
+                            />
+                          </a>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="mt-4 pt-4 border-t border-ink-700">
+                      <p className="font-semibold text-ivory text-sm">{review.customerName}</p>
+                      <p className="text-xs text-mist-dim">{review.tourName}</p>
+                    </div>
+
+                    {review.adminReply ? (
+                      <div className="mt-3 bg-ink-800 border border-gold-500/20 rounded-lg p-3">
+                        <p className="text-xs font-semibold text-gold-300 mb-1">↩️ {t('home.testimonials.adminReply')}</p>
+                        <p className="text-sm text-mist line-clamp-3">{review.adminReply}</p>
+                      </div>
+                    ) : null}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="text-center mt-10">
               <Button href="/testimonials" variant="outline">

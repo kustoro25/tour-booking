@@ -109,6 +109,21 @@ export async function DELETE(
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
+    // Prisma P2003: relasi (Order/Review) masih menunjuk armada ini —
+    // beri pesan jelas alih-alih "Internal server error" yang samar.
+    const code = error && typeof error === 'object' && 'code' in error ? (error as { code?: string }).code : undefined;
+    if (code === 'P2003') {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Armada ini masih memiliki booking atau review terkait. Nonaktifkan armada (toggle Aktif) alih-alih menghapus.',
+        },
+        { status: 409 }
+      );
+    }
+    if (code === 'P2025') {
+      return NextResponse.json({ success: false, error: 'Armada tidak ditemukan. Mungkin sudah dihapus.' }, { status: 404 });
+    }
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
