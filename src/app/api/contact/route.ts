@@ -7,7 +7,10 @@ import { validateEmail } from '@/lib/validators';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, subject, message } = body;
+    const { name, email, subject, message, locale } = body;
+
+    // Bahasa auto-reply mengikuti bahasa pengunjung saat mengisi form (id default)
+    const replyLang = locale === 'en' ? 'en' : 'id';
 
     if (!name || !email || !message) {
       return NextResponse.json({ success: false, error: 'Name, email, and message are required' }, { status: 400 });
@@ -63,12 +66,16 @@ export async function POST(request: NextRequest) {
     try {
       await sendEmail({
         to: email.trim(),
-        subject: `Terima kasih telah menghubungi ${companyName}`,
+        subject:
+          replyLang === 'en'
+            ? `Thank you for contacting ${companyName}`
+            : `Terima kasih telah menghubungi ${companyName}`,
         html: contactAutoReplyTemplate({
           name: name.trim(),
           companyName,
           companyEmail,
           companyPhone,
+          lang: replyLang,
         }),
       });
     } catch (emailErr) {

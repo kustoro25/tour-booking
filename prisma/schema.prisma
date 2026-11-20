@@ -99,6 +99,7 @@ model Order {
   paymentMethod String?  @map("payment_method")
   paymentProof  String?  @map("payment_proof")
   paymentType   String   @default("FULL") @map("payment_type") // FULL, INSTALLMENT
+  locale        String   @default("id") @map("locale") // bahasa pengunjung saat booking: id | en
   paymentRef    String?  @map("payment_ref") // Midtrans transaction_id
   snapToken     String?  @map("snap_token") // Midtrans Snap token
   paymentUrl    String?  @map("payment_url") // Midtrans Snap redirect URL

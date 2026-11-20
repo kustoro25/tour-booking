@@ -48,6 +48,9 @@ export async function POST(
     const waNumber = await getWhatsAppNumber();
     const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 
+    // Bahasa email ke pembeli mengikuti bahasa saat mereka memesan (id default)
+    const orderLocale = plan.order.locale === 'en' ? 'en' : 'id';
+
     // Read bank accounts
     let bankAccounts = [{ bank: 'BCA', number: '1234567890', name: companyName }];
     try {
@@ -55,18 +58,30 @@ export async function POST(
       if (bankSetting) bankAccounts = JSON.parse(bankSetting.value);
     } catch { /* default */ }
 
-    // Tombol email menuju halaman jadwal pembayaran; bukti transfer dikirim
-    // pelanggan via WhatsApp/email ke admin (tidak ada upload di website).
+    // Tombol email menuju halaman jadwal pembayaran; bukti transfer diunggah
+    // admin di panel angsuran atau dikirim pelanggan via WhatsApp/email ke admin.
     const installmentsPageUrl = `${siteUrl}/invoice/${plan.order.invoiceNo}/installments`;
-    const whatsappLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(`Halo ${companyName}, saya ingin konfirmasi pembayaran ${installmentNumber === 0 ? 'DP (uang muka)' : `angsuran ke-${installmentNumber}`} untuk invoice ${plan.order.invoiceNo}. Berikut saya lampirkan bukti transfernya.`)}`;
-    const dueDateStr = new Date(payment.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const whatsappLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(
+      installmentNumber === 0
+        ? orderLocale === 'en'
+          ? `Hello ${companyName}, I would like to confirm my down payment (DP) for invoice ${plan.order.invoiceNo}. I have attached the proof of transfer below.`
+          : `Halo ${companyName}, saya ingin konfirmasi pembayaran DP (uang muka) untuk invoice ${plan.order.invoiceNo}. Berikut saya lampirkan bukti transfernya.`
+        : orderLocale === 'en'
+          ? `Hello ${companyName}, I would like to confirm my installment #${installmentNumber} payment for invoice ${plan.order.invoiceNo}. I have attached the proof of transfer below.`
+          : `Halo ${companyName}, saya ingin konfirmasi pembayaran angsuran ke-${installmentNumber} untuk invoice ${plan.order.invoiceNo}. Berikut saya lampirkan bukti transfernya.`
+    )}`;
+    const dueDateStr = new Date(payment.dueDate).toLocaleDateString(orderLocale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
     await sendEmail({
       to: plan.order.customerEmail,
       subject:
         installmentNumber === 0
-          ? `Pembayaran DP (Uang Muka) - ${plan.order.tour.name}`
-          : `Penagihan Angsuran ke-${installmentNumber} - ${plan.order.tour.name}`,
+          ? orderLocale === 'en'
+            ? `Down Payment (DP) Payment - ${plan.order.tour.name}`
+            : `Pembayaran DP (Uang Muka) - ${plan.order.tour.name}`
+          : orderLocale === 'en'
+            ? `Installment #${installmentNumber} Billing - ${plan.order.tour.name}`
+            : `Penagihan Angsuran ke-${installmentNumber} - ${plan.order.tour.name}`,
       html: installmentBillingTemplate({
         customerName: plan.order.customerName,
         tourName: plan.order.tour.name,
@@ -80,6 +95,7 @@ export async function POST(
         bankAccounts,
         notes: plan.order.notes,
         companyName,
+        lang: orderLocale,
       }),
     });
 

@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useToast } from '@/components/ui/Toast';
+import GalleryLightbox from '@/components/tours/GalleryLightbox';
 import {
   InstallmentPlanStatusLabels,
   InstallmentPlanStatusColors,
@@ -23,10 +24,19 @@ export default function AdminInstallmentDetailPage() {
   const [plan, setPlan] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
-  const [proofUrl, setProofUrl] = useState('');
   const [uploadingProof, setUploadingProof] = useState<number | null>(null);
   const [editingDueDate, setEditingDueDate] = useState<number | null>(null);
   const [dueDateValue, setDueDateValue] = useState('');
+
+  // Upload bukti transfer: file langsung (bukan URL), seperti unggah foto review.
+  const proofFileInputsRef = useRef<Record<number, HTMLInputElement | null>>({});
+  const [proofLightboxImages, setProofLightboxImages] = useState<{ url: string; alt: string }[]>([]);
+  const [proofLightboxIndex, setProofLightboxIndex] = useState<number | null>(null);
+
+  const openProofLightbox = (url: string) => {
+    setProofLightboxImages([{ url, alt: 'Bukti transfer' }]);
+    setProofLightboxIndex(0);
+  };
 
   const fetchPlan = useCallback(() => {
     fetch(`/api/admin/installments/${id}`)
@@ -101,31 +111,51 @@ export default function AdminInstallmentDetailPage() {
     }
   };
 
-  const handleUploadProof = async (installmentNumber: number) => {
-    if (!proofUrl.trim()) {
-      showToast('Masukkan URL bukti transfer', 'error');
+  const uploadProofFile = async (installmentNumber: number, file: File) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      showToast('Format file tidak didukung. Gunakan JPG, PNG, WebP, atau GIF.', 'error');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('Ukuran file maksimal 10MB', 'error');
       return;
     }
     setUploadingProof(installmentNumber);
     try {
+      // 1) Upload file ke Cloudinary (folder khusus bukti transfer)
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('folder', 'tour-booking/payment-proofs');
+      const uploadRes = await fetch('/api/upload', { method: 'POST', body: fd });
+      const uploadData = await uploadRes.json();
+      if (!uploadData.success || !uploadData.url) {
+        showToast(uploadData.error || 'Gagal mengunggah file', 'error');
+        return;
+      }
+
+      // 2) Simpan URL gambar ke angsuran terkait
       const res = await fetch(`/api/admin/installments/${id}/upload-proof/${installmentNumber}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentProof: proofUrl }),
+        body: JSON.stringify({ paymentProof: uploadData.url }),
       });
       const data = await res.json();
       if (data.success) {
         showToast(data.message || 'Bukti transfer berhasil diunggah', 'success');
-        setProofUrl('');
         fetchPlan();
       } else {
-        showToast(data.error || 'Gagal mengunggah', 'error');
+        showToast(data.error || 'Gagal mengunggah bukti', 'error');
       }
     } catch {
       showToast('Gagal menghubungi server', 'error');
     } finally {
       setUploadingProof(null);
     }
+  };
+
+  const pickProofFile = (installmentNumber: number) => {
+    proofFileInputsRef.current[installmentNumber]?.click();
   };
 
   const handleUpdateDueDate = async (installmentNumber: number) => {
@@ -282,16 +312,9 @@ export default function AdminInstallmentDetailPage() {
 
         {/* Upload Proof Section */}
         <div className="px-4 sm:px-6 py-3 bg-gray-50 border-b border-gray-100">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-gray-600 whitespace-nowrap">Upload Bukti:</span>
-            <input
-              type="url"
-              value={proofUrl}
-              onChange={(e) => setProofUrl(e.target.value)}
-              placeholder="URL bukti transfer (Google Drive, Imgur, dll)"
-              className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+          <p className="text-xs text-gray-500">
+            Upload bukti transfer berupa gambar (JPG/PNG/WebP) langsung dari perangkat — bukan URL.
+          </p>
         </div>
 
         {/* Mobile Cards */}
@@ -361,23 +384,41 @@ export default function AdminInstallmentDetailPage() {
                   </div>
                 </div>
                 {Boolean(payment.paymentProof) && (
-                  <a
-                    href={payment.paymentProof as string}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block text-xs text-blue-600 hover:underline"
-                  >
-                    Lihat Bukti Transfer ↗
-                  </a>
+                  <div>
+                    <button
+                      type="button"
+                      className="cursor-zoom-in"
+                      onClick={() => openProofLightbox(payment.paymentProof as string)}
+                    >
+                      <img
+                        src={payment.paymentProof as string}
+                        alt="Bukti transfer"
+                        className="w-16 h-16 object-cover rounded-lg border border-gray-200 hover:opacity-80 transition-opacity"
+                        draggable={false}
+                        onContextMenu={(e) => e.preventDefault()}
+                      />
+                    </button>
+                  </div>
                 )}
+                <input
+                  ref={(el) => { proofFileInputsRef.current[num] = el; }}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) uploadProofFile(num, f);
+                    e.target.value = '';
+                  }}
+                />
                 <div className="flex gap-2 pt-1">
                   {(status === 'PENDING' || status === 'OVERDUE') && (
                     <button
-                      onClick={() => handleUploadProof(num)}
+                      onClick={() => pickProofFile(num)}
                       disabled={uploadingProof === num}
                       className="flex-1 bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-orange-700 disabled:opacity-50"
                     >
-                      {uploadingProof === num ? '...' : 'Upload Bukti'}
+                      {uploadingProof === num ? 'Mengunggah...' : 'Upload Bukti'}
                     </button>
                   )}
                   {(status === 'PAID') && (
@@ -482,27 +523,43 @@ export default function AdminInstallmentDetailPage() {
                     </td>
                     <td className="px-4 py-3">
                       {payment.paymentProof ? (
-                        <a
-                          href={payment.paymentProof as string}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline text-xs"
+                        <button
+                          type="button"
+                          className="cursor-zoom-in"
+                          onClick={() => openProofLightbox(payment.paymentProof as string)}
                         >
-                          Lihat Bukti ↗
-                        </a>
+                          <img
+                            src={payment.paymentProof as string}
+                            alt="Bukti transfer"
+                            className="w-16 h-16 object-cover rounded-lg border border-gray-200 hover:opacity-80 transition-opacity"
+                            draggable={false}
+                            onContextMenu={(e) => e.preventDefault()}
+                          />
+                        </button>
                       ) : (
                         <span className="text-gray-400 text-xs">-</span>
                       )}
                     </td>
                     <td className="px-4 py-3">
+                      <input
+                        ref={(el) => { proofFileInputsRef.current[num] = el; }}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) uploadProofFile(num, f);
+                          e.target.value = '';
+                        }}
+                      />
                       <div className="flex items-center justify-center gap-2">
                         {(status === 'PENDING' || status === 'OVERDUE') && (
                           <button
-                            onClick={() => handleUploadProof(num)}
+                            onClick={() => pickProofFile(num)}
                             disabled={uploadingProof === num}
                             className="bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-orange-700 disabled:opacity-50 whitespace-nowrap"
                           >
-                            {uploadingProof === num ? '...' : 'Upload Bukti'}
+                            {uploadingProof === num ? 'Mengunggah...' : 'Upload Bukti'}
                           </button>
                         )}
                         {(status === 'PAID') && (
@@ -540,6 +597,15 @@ export default function AdminInstallmentDetailPage() {
           </table>
         </div>
       </div>
+
+      {/* Viewer bukti transfer (lightbox) — klik thumbnail tidak membuka URL asli */}
+      <GalleryLightbox
+        images={proofLightboxImages}
+        initialIndex={proofLightboxIndex ?? 0}
+        isOpen={proofLightboxIndex !== null}
+        onClose={() => setProofLightboxIndex(null)}
+        disableContextMenu
+      />
     </div>
   );
 }

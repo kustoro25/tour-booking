@@ -95,6 +95,9 @@ export async function PUT(
 
     const newStatus = status || currentOrder.status;
 
+    // Bahasa email ke pembeli mengikuti bahasa saat mereka memesan (id default)
+    const orderLocale = currentOrder.locale === 'en' ? 'en' : 'id';
+
     // Konfirmasi pembayaran manual oleh admin: catat waktu bayar & metode pembayaran
     // bila belum ada (semua pembayaran = transfer manual).
     if (
@@ -120,13 +123,17 @@ export async function PUT(
       after(() =>
         sendEmail({
           to: currentOrder.customerEmail,
-          subject: `Pembayaran Dikonfirmasi - ${currentOrder.tour.name}`,
+          subject:
+            orderLocale === 'en'
+              ? `Payment Confirmed - ${currentOrder.tour.name}`
+              : `Pembayaran Dikonfirmasi - ${currentOrder.tour.name}`,
           html: paymentConfirmationTemplate({
             customerName: currentOrder.customerName,
             tourName: currentOrder.tour.name,
             invoiceNo: currentOrder.invoiceNo,
-            tourDate: new Date(currentOrder.tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+            tourDate: new Date(currentOrder.tourDate).toLocaleDateString(orderLocale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
             companyName,
+            lang: orderLocale,
           }),
         }).catch((err) => console.error('Payment confirmation email failed:', err))
       );
@@ -166,12 +173,16 @@ export async function PUT(
       after(() =>
         sendEmail({
           to: currentOrder.customerEmail,
-          subject: `Bagaimana Pengalaman Perjalanan Anda dengan ${currentOrder.tour.name}?`,
+          subject:
+            orderLocale === 'en'
+              ? `How Was Your Travel Experience with ${currentOrder.tour.name}?`
+              : `Bagaimana Pengalaman Perjalanan Anda dengan ${currentOrder.tour.name}?`,
           html: reviewRequestTemplate({
             customerName: currentOrder.customerName,
             tourName: currentOrder.tour.name,
             reviewUrl: `${siteUrl}/review/${reviewToken}`,
             companyName,
+            lang: orderLocale,
           }),
         }).then(async (sent) => {
           if (sent) {

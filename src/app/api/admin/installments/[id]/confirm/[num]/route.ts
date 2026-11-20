@@ -78,16 +78,26 @@ export async function POST(
     const companyName = await getCompanyName();
     const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
 
+    // Bahasa email ke pembeli mengikuti bahasa saat mereka memesan (id default)
+    const orderLocale = plan.order.locale === 'en' ? 'en' : 'id';
+
     const remaining = updatedPayments.filter((p) => p.status !== 'CONFIRMED').length;
     const nextPayment = updatedPayments.find((p) => p.status === 'PENDING');
     const nextDueDate = nextPayment
-      ? new Date(nextPayment.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+      ? new Date(nextPayment.dueDate).toLocaleDateString(orderLocale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
       : '-';
 
     after(() =>
       sendEmail({
         to: plan.order.customerEmail,
-        subject: `Pembayaran Angsuran ke-${installmentNumber} Dikonfirmasi - ${plan.order.tour.name}`,
+        subject:
+          installmentNumber === 0
+            ? orderLocale === 'en'
+              ? `Down Payment (DP) Confirmed - ${plan.order.tour.name}`
+              : `Pembayaran DP (Uang Muka) Dikonfirmasi - ${plan.order.tour.name}`
+            : orderLocale === 'en'
+              ? `Installment #${installmentNumber} Payment Confirmed - ${plan.order.tour.name}`
+              : `Pembayaran Angsuran ke-${installmentNumber} Dikonfirmasi - ${plan.order.tour.name}`,
         html: installmentConfirmationTemplate({
           customerName: plan.order.customerName,
           tourName: plan.order.tour.name,
@@ -97,6 +107,7 @@ export async function POST(
           remainingInstallments: remaining,
           nextDueDate,
           companyName,
+          lang: orderLocale,
         }),
       }).catch((err) => console.error('Confirmation email failed:', err))
     );

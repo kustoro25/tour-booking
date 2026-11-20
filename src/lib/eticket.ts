@@ -44,14 +44,20 @@ export async function sendOrderTicketEmail(orderId: string): Promise<boolean> {
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
+    // Bahasa email ke pembeli mengikuti bahasa saat mereka memesan (id default)
+    const orderLocale = order.locale === 'en' ? 'en' : 'id';
+
     const sent = await sendEmail({
       to: order.customerEmail,
-      subject: `E-Ticket Anda - ${order.tour.name} (${order.invoiceNo})`,
+      subject:
+        orderLocale === 'en'
+          ? `Your E-Ticket - ${order.tour.name} (${order.invoiceNo})`
+          : `E-Ticket Anda - ${order.tour.name} (${order.invoiceNo})`,
       html: eTicketTemplate({
         customerName: order.customerName,
         invoiceNo: order.invoiceNo,
         tourName: order.tour.name,
-        tourDate: new Date(order.tourDate).toLocaleDateString('id-ID', {
+        tourDate: new Date(order.tourDate).toLocaleDateString(orderLocale === 'en' ? 'en-US' : 'id-ID', {
           day: 'numeric',
           month: 'long',
           year: 'numeric',
@@ -69,6 +75,7 @@ export async function sendOrderTicketEmail(orderId: string): Promise<boolean> {
         companyEmail,
         companyAddress,
         invoiceUrl: `${siteUrl}/invoice/${order.invoiceNo}`,
+        lang: orderLocale,
       }),
     });
 

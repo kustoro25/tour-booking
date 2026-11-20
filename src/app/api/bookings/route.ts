@@ -30,6 +30,8 @@ export async function POST(request: NextRequest) {
       notes,
       paymentType,
       installmentCount,
+      // Bahasa aktif pengunjung — dipakai untuk email yang menyesuaikan pembeli
+      locale,
       // Layanan HAYBALI TRANS (sewa mobil & antar-jemput bandara)
       pickupArea,
       dropoffArea,
@@ -47,6 +49,8 @@ export async function POST(request: NextRequest) {
     }
 
     const isInstallment = paymentType === 'INSTALLMENT';
+    // Bahasa pesanan: dipakai untuk email ke pembeli (id default).
+    const orderLocale = locale === 'en' ? 'en' : 'id';
     // Skema DP: nilai 1 berarti DP di muka + 1 pelunasan (tunai ke sopir).
     const installmentNum = isInstallment ? (parseInt(String(installmentCount)) || 1) : 0;
 
@@ -233,6 +237,7 @@ export async function POST(request: NextRequest) {
           total,
           status: 'PENDING',
           paymentType: isInstallment ? 'INSTALLMENT' : 'FULL',
+          locale: orderLocale,
           notes: notes || null,
           reviewToken: generateReviewToken(),
           expiryAt,
@@ -351,12 +356,20 @@ export async function POST(request: NextRequest) {
     const companyName = await getCompanyName();
     const waNumber = await getWhatsAppNumber();
     const formatCur = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
-    const dateLabel = new Date(tourDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-    const tourDateLabel = pickupTime ? `${dateLabel}, pukul ${formatTime12h(String(pickupTime))} WITA` : dateLabel;
+    const dateLabel = new Date(tourDate).toLocaleDateString(orderLocale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const tourDateLabel = pickupTime
+      ? orderLocale === 'en'
+        ? `${dateLabel}, at ${formatTime12h(String(pickupTime))} WITA`
+        : `${dateLabel}, pukul ${formatTime12h(String(pickupTime))} WITA`
+      : dateLabel;
     const expiryDate = getExpiryDate(24);
-    const expiryLabel = `${expiryDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} pukul ${expiryDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
+    const expiryLabel = `${expiryDate.toLocaleDateString(orderLocale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} ${orderLocale === 'en' ? 'at' : 'pukul'} ${expiryDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
     // Link WhatsApp dengan pesan siap kirim — pelanggan tinggal lampirkan bukti transfer.
-    const whatsappLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(`Halo ${companyName}, saya ingin konfirmasi pembayaran untuk invoice ${result.invoiceNo}. Berikut saya lampirkan bukti transfernya.`)}`;
+    const whatsappLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(
+      orderLocale === 'en'
+        ? `Hello ${companyName}, I would like to confirm my payment for invoice ${result.invoiceNo}. I have attached the proof of transfer below.`
+        : `Halo ${companyName}, saya ingin konfirmasi pembayaran untuk invoice ${result.invoiceNo}. Berikut saya lampirkan bukti transfernya.`
+    )}`;
 
     // 1. Email ke pembeli
     try {
@@ -374,7 +387,9 @@ export async function POST(request: NextRequest) {
         // Email penagihan DP (uang muka) — transfer manual, bukti dikirim via WhatsApp/email ke admin
         await sendEmail({
           to: customerEmail,
-          subject: `Pembayaran DP (Uang Muka) - ${tour.name}`,
+          subject: orderLocale === 'en'
+            ? `Down Payment (DP) Invoice - ${tour.name}`
+            : `Pembayaran DP (Uang Muka) - ${tour.name}`,
           html: installmentBillingTemplate({
             customerName,
             tourName: tour.name,
@@ -382,19 +397,22 @@ export async function POST(request: NextRequest) {
             installmentNumber: 0,
             totalInstallments: ipd.installmentCount,
             amount: formatCur(ipd.dpAmount),
-            dueDate: expiryDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+            dueDate: expiryDate.toLocaleDateString(orderLocale === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
             paymentUrl: installmentUrl,
             whatsappLink,
             bankAccounts,
             notes,
             companyName,
+            lang: orderLocale,
           }),
         });
       } else {
         const invoicePageUrl = `${siteUrl}/invoice/${result.invoiceNo}`;
         await sendEmail({
           to: customerEmail,
-          subject: `Invoice Pesanan Anda - ${tour.name}`,
+          subject: orderLocale === 'en'
+            ? `Your Invoice - ${tour.name}`
+            : `Invoice Pesanan Anda - ${tour.name}`,
           html: invoiceEmailTemplate({
             customerName,
             tourName: tour.name,
@@ -406,6 +424,7 @@ export async function POST(request: NextRequest) {
             whatsappLink,
             notes,
             companyName,
+            lang: orderLocale,
           }),
         });
       }

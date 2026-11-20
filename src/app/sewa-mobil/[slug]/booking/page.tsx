@@ -395,6 +395,8 @@ function BookingPage() {
           tourDate: selectedDate,
           ...formData,
           paymentType,
+          // Bahasa aktif pengunjung — dipakai untuk email agar menyesuaikan pembeli
+          locale,
           // Skema pembayaran DP: DP di muka + 1 pelunasan (tunai ke sopir atau transfer bank)
           installmentCount: paymentType === 'INSTALLMENT' ? 1 : undefined,
           // Layanan khusus HAYBALI TRANS

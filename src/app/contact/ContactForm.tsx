@@ -37,7 +37,8 @@ export default function ContactForm({ data }: { data: ContactData }) {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        // Sertakan bahasa aktif agar email balasan otomatis mengikuti pengunjung
+        body: JSON.stringify({ ...form, locale }),
       });
       const result = await res.json();
       if (result.success) {
