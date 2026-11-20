@@ -5,6 +5,7 @@ import StarRating from '@/components/ui/StarRating';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useToast } from '@/components/ui/Toast';
 import { useAdminRole } from '@/lib/useAdminRole';
+import GalleryLightbox from '@/components/tours/GalleryLightbox';
 
 interface Review {
   id: string;
@@ -50,7 +51,16 @@ export default function AdminReviewsPage() {
   // Hapus review (modal konfirmasi)
   const [deleteTarget, setDeleteTarget] = useState<Review | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Foto review dibuka via lightbox internal — tanpa link langsung ke URL Cloudinary
+  const [photoLightboxImages, setPhotoLightboxImages] = useState<{ url: string; alt: string }[]>([]);
+  const [photoLightboxIndex, setPhotoLightboxIndex] = useState<number | null>(null);
   const { showToast } = useToast();
+
+  const openPhotoLightbox = (photos: string[], url: string) => {
+    setPhotoLightboxImages(photos.map((p) => ({ url: p, alt: 'Foto review' })));
+    setPhotoLightboxIndex(photos.indexOf(url));
+  };
 
   const handleBlocked = () => {
     setShowBlocked(true);
@@ -235,14 +245,20 @@ export default function AdminReviewsPage() {
                     </div>
                     <p className="text-gray-600 text-sm mb-2">{review.reviewText}</p>
 
-                    {/* Foto review */}
+                    {/* Foto review — thumbnail saja, dibuka via lightbox (bukan link URL) */}
                     {photos.length > 0 && (
                       <div className="flex flex-wrap gap-2 mb-2">
                         {photos.map((url) => (
-                          <a key={url} href={url} target="_blank" rel="noreferrer" title="Buka foto">
+                          <button
+                            key={url}
+                            type="button"
+                            className="cursor-zoom-in"
+                            onClick={() => openPhotoLightbox(photos, url)}
+                            title="Lihat foto"
+                          >
                             {/* eslint-disable-next-line @next/next/no-img-element -- foto review dari upload Cloudinary */}
-                            <img src={url} alt="Foto review" className="w-16 h-16 object-cover rounded-lg border border-gray-200 hover:opacity-80 transition-opacity" loading="lazy" />
-                          </a>
+                            <img src={url} alt="Foto review" className="w-16 h-16 object-cover rounded-lg border border-gray-200 hover:opacity-80 transition-opacity" loading="lazy" draggable={false} onContextMenu={(e) => e.preventDefault()} />
+                          </button>
                         ))}
                       </div>
                     )}
@@ -350,6 +366,14 @@ export default function AdminReviewsPage() {
           </div>
         </div>
       )}
+      {/* Lightbox foto review — gambar saja tanpa membuka URL */}
+      <GalleryLightbox
+        images={photoLightboxImages}
+        initialIndex={photoLightboxIndex ?? 0}
+        isOpen={photoLightboxIndex !== null}
+        onClose={() => setPhotoLightboxIndex(null)}
+        disableContextMenu
+      />
     </div>
   );
 }
