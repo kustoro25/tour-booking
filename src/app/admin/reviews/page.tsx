@@ -46,6 +46,10 @@ export default function AdminReviewsPage() {
   const [replyTarget, setReplyTarget] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
   const [replySaving, setReplySaving] = useState(false);
+
+  // Hapus review (modal konfirmasi)
+  const [deleteTarget, setDeleteTarget] = useState<Review | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const { showToast } = useToast();
 
   const handleBlocked = () => {
@@ -124,6 +128,26 @@ export default function AdminReviewsPage() {
       }
     } catch {
       showToast('Gagal menyembunyikan review', 'error');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/reviews/${deleteTarget.id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Review dihapus permanen', 'success');
+        setDeleteTarget(null);
+        refreshReviews();
+      } else {
+        showToast(data.error || 'Gagal menghapus review', 'error');
+      }
+    } catch {
+      showToast('Gagal menghapus review', 'error');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -237,6 +261,7 @@ export default function AdminReviewsPage() {
                     {review.status !== 'HIDDEN' && (
                       <button onClick={canManageReviews ? () => handleHide(review.id) : handleBlocked} className="text-gray-500 hover:text-gray-700 text-xs font-medium">Sembunyikan</button>
                     )}
+                    <button onClick={canManageReviews ? () => setDeleteTarget(review) : handleBlocked} className="text-red-600 hover:text-red-700 text-xs font-medium">Hapus</button>
                   </div>
                 </div>
 
@@ -299,6 +324,30 @@ export default function AdminReviewsPage() {
           >
             Selanjutnya →
           </button>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDeleteTarget(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4 animate-[scaleIn_0.2s_ease]">
+            <div className="w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 text-center mb-1">Hapus Review?</h3>
+            <p className="text-sm text-gray-500 text-center mb-6">
+              Review dari &quot;{deleteTarget.order.customerName}&quot; akan dihapus permanen{parsePhotos(deleteTarget.photos).length > 0 ? ' beserta foto-fotonya' : ''}. Tindakan ini tidak dapat dibatalkan.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteTarget(null)} className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">Batal</button>
+              <button onClick={handleDelete} disabled={deleting} className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 transition-colors">
+                {deleting ? 'Menghapus...' : 'Ya, Hapus'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
