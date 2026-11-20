@@ -6,10 +6,12 @@
 // Data (review, nomor WA, gateway) diambil server-side oleh page.tsx (ISR).
 // ============================================================================
 
+import { useState } from 'react';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import StarRating from '@/components/ui/StarRating';
 import DestinasiGallery from '@/components/tours/DestinasiGallery';
+import GalleryLightbox from '@/components/tours/GalleryLightbox';
 import { HAYBALI_BRAND, FLEET, waLink } from '@/lib/haybali';
 import { useI18n, useTranslatedMeta } from '@/lib/i18n/client';
 
@@ -71,6 +73,10 @@ const DESTINATION_IMAGES: Record<string, string> = {
 export default function HomeClient({ reviews, waNumber }: HomeClientProps) {
   const { t, list, formatPrice } = useI18n();
   useTranslatedMeta(t('meta.home'), t('meta.homeDesc'));
+
+  // Lightbox foto review: klik thumbnail membuka viewer internal, bukan URL asli.
+  const [lightboxPhotos, setLightboxPhotos] = useState<{ url: string; alt: string }[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const stats = list('home.stats') as { num: string; label: string }[];
   const aboutParagraphs = list('home.about.paragraphs') as string[];
@@ -319,16 +325,27 @@ export default function HomeClient({ reviews, waNumber }: HomeClientProps) {
 
                     {photos.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-3">
-                        {photos.map((url) => (
-                          <a key={url} href={url} target="_blank" rel="noreferrer" title={t('testimonials.viewPhoto')}>
+                        {photos.map((url, idx) => (
+                          <button
+                            key={url}
+                            type="button"
+                            className="cursor-zoom-in"
+                            title={t('testimonials.viewPhoto')}
+                            onClick={() => {
+                              setLightboxPhotos(photos.map((p) => ({ url: p, alt: t('testimonials.photoAlt') })));
+                              setLightboxIndex(idx);
+                            }}
+                          >
                             {/* eslint-disable-next-line @next/next/no-img-element -- foto review dari upload Cloudinary */}
                             <img
                               src={url}
                               alt={t('testimonials.photoAlt')}
                               className="w-14 h-14 object-cover rounded-lg border border-ink-600 hover:opacity-80 transition-opacity"
                               loading="lazy"
+                              draggable={false}
+                              onContextMenu={(e) => e.preventDefault()}
                             />
-                          </a>
+                          </button>
                         ))}
                       </div>
                     )}
@@ -431,6 +448,15 @@ export default function HomeClient({ reviews, waNumber }: HomeClientProps) {
           </div>
         </div>
       </section>
+
+      {/* Viewer foto review (lightbox) — klik thumbnail tidak lagi membuka URL asli */}
+      <GalleryLightbox
+        images={lightboxPhotos}
+        initialIndex={lightboxIndex ?? 0}
+        isOpen={lightboxIndex !== null}
+        onClose={() => setLightboxIndex(null)}
+        disableContextMenu
+      />
     </>
   );
 }

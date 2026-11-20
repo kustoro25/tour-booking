@@ -8,6 +8,8 @@ interface GalleryLightboxProps {
   initialIndex?: number;
   isOpen: boolean;
   onClose: () => void;
+  /** Blokir klik kanan pada gambar (dipakai foto review agar sumbernya tidak gampang diketahui). */
+  disableContextMenu?: boolean;
 }
 
 export default function GalleryLightbox({
@@ -15,6 +17,7 @@ export default function GalleryLightbox({
   initialIndex = 0,
   isOpen,
   onClose,
+  disableContextMenu = false,
 }: GalleryLightboxProps) {
   const { t } = useI18n();
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
@@ -154,6 +157,7 @@ export default function GalleryLightbox({
           onLoad={() => setLoaded(true)}
           className={`max-w-full max-h-full object-contain rounded-lg transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
           draggable={false}
+          onContextMenu={disableContextMenu ? (e) => e.preventDefault() : undefined}
         />
 
         {/* Next button */}
@@ -193,6 +197,8 @@ export default function GalleryLightbox({
                   alt={img.alt}
                   className="w-full h-full object-cover"
                   loading="lazy"
+                  draggable={false}
+                  onContextMenu={disableContextMenu ? (e) => e.preventDefault() : undefined}
                 />
               </button>
             ))}
