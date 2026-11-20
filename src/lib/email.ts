@@ -2,12 +2,15 @@
 // Falls back to console logging in development when no SMTP config is set
 
 import nodemailer from 'nodemailer';
-import { getCompanyName } from './settings';
+import { getCompanyName, getSetting } from './settings';
 
 interface EmailPayload {
   to: string;
   subject: string;
   html: string;
+  /** Versi teks polos (opsional) — bila kosong digenerate dari html agar
+   *  email tidak dianggap "HTML-only" oleh filter spam (terutama iCloud). */
+  text?: string;
 }
 
 const smtpTransport = nodemailer.createTransport({
@@ -24,6 +27,16 @@ export async function sendEmail(payload: EmailPayload): Promise<boolean> {
   const from = process.env.EMAIL_FROM || 'booking@tourbooking.com';
   // Nama pengirim mengikuti brand aktif (setting admin company_name) — bukan env lama.
   const companyName = await getCompanyName();
+  // Reply-To & header unsubscribe memakai email perusahaan agar email terlihat tepercaya.
+  const companyEmail = (await getSetting<string>('company_email', '')).trim() || from;
+
+  const headers: Record<string, string> = {
+    'Reply-To': companyEmail,
+    // One-click unsubscribe (mailto) — Gmail & iCloud memberi penilaian lebih baik
+    // pada email yang memilikinya, mengurangi risiko masuk spam.
+    'List-Unsubscribe': `<mailto:${companyEmail}>`,
+    'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+  };
 
   // If SMTP credentials are configured, send real email
   if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
@@ -33,6 +46,8 @@ export async function sendEmail(payload: EmailPayload): Promise<boolean> {
         to: payload.to,
         subject: payload.subject,
         html: payload.html,
+        text: payload.text || htmlToText(payload.html),
+        headers,
       });
       console.log(`✅ Email sent to ${payload.to} — "${payload.subject}"`);
       return true;
@@ -50,6 +65,26 @@ export async function sendEmail(payload: EmailPayload): Promise<boolean> {
   console.log(`Body: ${payload.html}`);
   console.log('==========================================');
   return true;
+}
+
+/** Ubah HTML email menjadi teks polos untuk bagian `text` nodemailer.
+ *  Link diubah menjadi "label (url)" supaya tautan tetap terbaca di teks polos. */
+function htmlToText(html: string): string {
+  return html
+    .replace(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, '$2 ($1)')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|tr|h[1-6]|li|table)>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '- ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&middot;/g, '·')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 // ============ HELPER BAHASA EMAIL ============
@@ -96,6 +131,7 @@ export function invoiceEmailTemplate(data: {
       <a href="${data.invoiceUrl}" style="background: #2563EB; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">💳 ${tr(lang, 'Lihat Invoice & Panduan Transfer', 'View Invoice & Payment Instructions')}</a>
       <br/>
       <a href="${data.whatsappLink}" style="background: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 8px;">📱 ${tr(lang, 'Konfirmasi Transfer via WhatsApp', 'Confirm Transfer via WhatsApp')}</a>
+      <p style="margin-top: 12px; font-size: 12px; color: #666;">${tr(lang, 'Jika tombol tidak berfungsi, salin tautan invoice ini:', 'If the button does not work, copy this invoice link:')}<br/><a href="${data.invoiceUrl}" style="color: #2563EB; word-break: break-all;">${data.invoiceUrl}</a></p>
       <p style="margin-top: 20px; font-size: 12px; color: #666;">${tr(lang, 'Mohon lakukan transfer ke rekening yang tertera pada invoice, lalu kirim bukti transfer ke admin via WhatsApp/email sebelum batas waktu agar pesanan tidak otomatis dibatalkan.', 'Please transfer to the bank account shown on the invoice, then send your proof of transfer to our admin via WhatsApp/email before the deadline so your booking is not automatically cancelled.')}</p>
     </div>
   `;
@@ -223,6 +259,7 @@ export function eTicketTemplate(data: {
           ${tr(lang, 'Simpan email ini dan tunjukkan kepada admin/guide saat keberangkatan. Detail pesanan juga dapat dilihat di', 'Keep this email and show it to our admin/guide at departure. Booking details are also available on the')}
           <a href="${data.invoiceUrl}" style="color: #2563EB;">${tr(lang, 'halaman invoice', 'invoice page')}</a>.
         </div>
+        <p style="margin: 12px 0 0; font-size: 12px; color: #6B7280;">${tr(lang, 'Tautan invoice:', 'Invoice link:')} <a href="${data.invoiceUrl}" style="color: #2563EB; word-break: break-all;">${data.invoiceUrl}</a></p>
         ${contactLines ? `<p style="margin: 18px 0 0; font-size: 13px; color: #6B7280;">${tr(lang, 'Butuh bantuan? Hubungi kami:', 'Need help? Contact us:')} ${contactLines}</p>` : ''}
         <p style="margin: 20px 0 0;">${tr(lang, 'Sampai jumpa di hari keberangkatan!', 'See you on departure day!')}</p>
         <p style="margin: 12px 0 0;">${tr(lang, 'Salam,', 'Best regards,')}<br/><strong>${data.companyName}</strong></p>
@@ -331,6 +368,7 @@ export function reviewRequestTemplate(data: {
       <p>${tr(lang, `Semoga Anda menikmati perjalanan <strong>${data.tourName}</strong> bersama kami!`, `We hope you enjoyed your <strong>${data.tourName}</strong> trip with us!`)}</p>
       <p>${tr(lang, 'Bagikan pengalaman Anda untuk membantu wisatawan lain menemukan liburan impian mereka.', 'Share your experience to help other travelers find their dream vacation.')}</p>
       <a href="${data.reviewUrl}" style="background: #F97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">✍️ ${tr(lang, 'Tulis Review (2 Menit)', 'Write a Review (2 Minutes)')}</a>
+      <p style="margin-top: 12px; font-size: 12px; color: #666;">${tr(lang, 'Jika tombol di atas tidak berfungsi, salin tautan ini ke browser:', 'If the button above does not work, copy this link into your browser:')}<br/><a href="${data.reviewUrl}" style="color: #2563EB; word-break: break-all;">${data.reviewUrl}</a></p>
       <p style="margin-top: 20px; font-size: 12px; color: #666;">${tr(lang, 'Link ini hanya bisa digunakan satu kali untuk pesanan Anda.', 'This link can only be used once for your booking.')}</p>
       <p style="margin-top: 20px;">${tr(lang, 'Salam hangat,', 'Warm regards,')}<br/><strong>${tr(lang, `Tim ${data.companyName}`, `The ${data.companyName} Team`)}</strong></p>
     </div>
@@ -467,6 +505,7 @@ export function installmentBillingTemplate(data: {
       <a href="${data.whatsappLink}" style="background: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">📱 ${tr(lang, 'Kirim Bukti Transfer via WhatsApp', 'Send Proof of Transfer via WhatsApp')}</a>
       <br/>
       <a href="${data.paymentUrl}" style="background: #E59800; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 8px;">💳 ${tr(lang, 'Lihat Jadwal Pembayaran', 'View Payment Schedule')}</a>
+      <p style="margin-top: 12px; font-size: 12px; color: #666;">${tr(lang, 'Jika tombol tidak berfungsi, salin tautan jadwal pembayaran ini:', 'If the button does not work, copy this payment schedule link:')}<br/><a href="${data.paymentUrl}" style="color: #2563EB; word-break: break-all;">${data.paymentUrl}</a></p>
       <p style="margin-top: 20px; font-size: 12px; color: #666;">${footerNote}</p>
       <p>${tr(lang, 'Salam,', 'Best regards,')}<br/><strong>${data.companyName}</strong></p>
     </div>
