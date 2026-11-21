@@ -4,6 +4,9 @@ import { getUsdRate, normalizeWaNumber } from '@/lib/settings';
 import { WA_NUMBER } from '@/lib/haybali';
 import { DEFAULT_USD_RATE } from '@/lib/currency';
 
+// Kurs & pengaturan harus selalu segar setelah admin menyimpan perubahan.
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const settings = await prisma.setting.findMany();
@@ -44,6 +47,8 @@ export async function GET() {
         brandEmblem,
         whatsappNumber,
       },
+    }, {
+      headers: { 'Cache-Control': 'no-store, max-age=0' },
     });
   } catch {
     return NextResponse.json({
@@ -58,6 +63,8 @@ export async function GET() {
         brandEmblem: '',
         whatsappNumber: WA_NUMBER,
       },
+    }, {
+      headers: { 'Cache-Control': 'no-store, max-age=0' },
     });
   }
 }

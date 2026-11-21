@@ -307,6 +307,12 @@ export const AIRPORT_TRANSFER_RATES: TransferRate[] = [
 
 export const TRANSFER_MAX_PAX = 10;
 
+/** Kategori tanpa kuota harian: sewa mobil boleh dipesan berkali-kali pada
+ *  tanggal yang sama karena jumlah armada tidak dibatasi slot. */
+export function isUnlimitedQuota(category?: string | null): boolean {
+  return category === 'CAR_RENTAL';
+}
+
 export function getTransferRate(area: string): TransferRate | undefined {
   return AIRPORT_TRANSFER_RATES.find((r) => r.area === area);
 }

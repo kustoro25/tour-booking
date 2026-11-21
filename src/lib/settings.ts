@@ -118,11 +118,30 @@ const fetchLiveUsdRate = unstable_cache(
   { revalidate: 21600 }
 );
 
+/** Kurs manual dari panel admin. Dibaca langsung dari DB (tanpa cache 5 menit)
+ *  supaya angka yang baru disimpan langsung terpakai di halaman publik. */
+async function getManualUsdRate(): Promise<number | null> {
+  try {
+    const row = await prisma.setting.findUnique({ where: { key: 'usd_rate' }, select: { value: true } });
+    if (!row) return null;
+    let parsed: unknown = row.value;
+    try {
+      parsed = JSON.parse(row.value);
+    } catch {
+      // nilai tersimpan sebagai teks mentah
+    }
+    const rate = Number(parsed);
+    return Number.isFinite(rate) && rate > 1000 ? Math.round(rate) : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Kurs USD→IDR efektif. Prioritas: setting admin `usd_rate` (manual) >
  *  kurs live (cache 6 jam) > env USD_IDR_RATE > konstanta cadangan. */
 export async function getUsdRate(): Promise<number> {
-  const manual = Number(await getSetting<number | string>('usd_rate', 0));
-  if (Number.isFinite(manual) && manual > 1000) return Math.round(manual);
+  const manual = await getManualUsdRate();
+  if (manual) return manual;
 
   const live = await fetchLiveUsdRate();
   if (live) return live;

@@ -25,9 +25,11 @@ interface BookingCalendarProps {
   tourId: string;
   onDateSelect?: (date: string) => void;
   selectedDate?: string;
+  /** Sewa mobil: tanpa batas kuota, tanggal penuh tetap bisa dipilih. */
+  unlimited?: boolean;
 }
 
-export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: BookingCalendarProps) {
+export default function BookingCalendar({ tourId, onDateSelect, selectedDate, unlimited = false }: BookingCalendarProps) {
   const { t, list } = useI18n();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [slots, setSlots] = useState<Slot[]>([]);
@@ -75,11 +77,11 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
     const isSelected = selectedDate === dateStr;
 
     if (slot?.isBlackout) return 'bg-red-500/15 text-red-500 cursor-not-allowed';
-    if (slot && slot.bookedCount >= slot.quota) return 'bg-red-500/15 text-red-500 cursor-not-allowed';
+    if (!unlimited && slot && slot.bookedCount >= slot.quota) return 'bg-red-500/15 text-red-500 cursor-not-allowed';
     if (isSelected) return 'bg-gold-400 text-ink-950 font-bold cursor-pointer shadow-md ring-2 ring-gold-400';
 
     const remaining = slot ? slot.quota - slot.bookedCount : 15;
-    if (remaining <= 3 && remaining > 0) return 'bg-gold-400/15 text-gold-200 font-semibold cursor-pointer hover:bg-gold-400/25 hover:text-gold-200';
+    if (!unlimited && remaining <= 3 && remaining > 0) return 'bg-gold-400/15 text-gold-200 font-semibold cursor-pointer hover:bg-gold-400/25 hover:text-gold-200';
 
     return 'bg-green-500/15 text-green-200 font-medium cursor-pointer hover:bg-green-500/25 hover:text-green-200';
   };
@@ -91,7 +93,7 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
 
     const slot = getSlotForDate(date);
     if (slot?.isBlackout) return;
-    if (slot && slot.bookedCount >= slot.quota) return;
+    if (!unlimited && slot && slot.bookedCount >= slot.quota) return;
 
     const dateStr = toLocalDateStr(date);
     onDateSelect?.(dateStr);
@@ -161,10 +163,10 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
                   onClick={() => handleDateClick(date)}
                   disabled={getDayClass(date, true).includes('cursor-not-allowed')}
                   className={`h-9 sm:h-10 rounded text-xs font-medium flex flex-col items-center justify-center transition-colors ${getDayClass(date, true)}`}
-                  title={slot && remaining <= 3 && remaining > 0 ? t('calendar.remainingSeats', { n: remaining }) : ''}
+                  title={!unlimited && slot && remaining <= 3 && remaining > 0 ? t('calendar.remainingSeats', { n: remaining }) : ''}
                 >
                   {i + 1}
-                  {slot && remaining <= 3 && remaining > 0 && (
+                  {!unlimited && slot && remaining <= 3 && remaining > 0 && (
                     <span className="text-[9px] leading-tight">{remaining}</span>
                   )}
                 </button>
@@ -176,14 +178,23 @@ export default function BookingCalendar({ tourId, onDateSelect, selectedDate }: 
               <div className="w-4 h-4 bg-green-500/15 border border-green-500/40 rounded flex-shrink-0" />
               <span>{t('calendar.available')}</span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-4 h-4 bg-gold-400/15 border border-gold-400/40 rounded flex-shrink-0" />
-              <span>{t('calendar.almostFull')}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-4 h-4 bg-red-500/15 border border-red-500/40 rounded flex-shrink-0" />
-              <span>{t('calendar.full')}</span>
-            </div>
+            {unlimited ? (
+              <div className="flex items-center gap-1.5">
+                <div className="w-4 h-4 bg-red-500/15 border border-red-500/40 rounded flex-shrink-0" />
+                <span>{t('calendar.unavailable')}</span>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-4 h-4 bg-gold-400/15 border border-gold-400/40 rounded flex-shrink-0" />
+                  <span>{t('calendar.almostFull')}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-4 h-4 bg-red-500/15 border border-red-500/40 rounded flex-shrink-0" />
+                  <span>{t('calendar.full')}</span>
+                </div>
+              </>
+            )}
           </div>
         </>
       )}

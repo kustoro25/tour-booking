@@ -7,7 +7,7 @@ import { LanguageProvider } from '@/lib/i18n/client';
 import FloatingActions from '@/components/ui/FloatingActions';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { getBrandName, getBrandIcon, getBrandEmblem, getSiteTitle } from '@/lib/brand';
-import { getWhatsAppNumber } from '@/lib/settings';
+import { getUsdRate, getWhatsAppNumber } from '@/lib/settings';
 import { SITE_URL } from '@/lib/seo';
 import { prisma } from '@/lib/prisma';
 
@@ -78,12 +78,15 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [brandName, brandIcon, brandEmblem, waNumber, footerCms] = await Promise.all([
+  const [brandName, brandIcon, brandEmblem, waNumber, footerCms, usdRate] = await Promise.all([
     getBrandName(),
     getBrandIcon(),
     getBrandEmblem(),
     getWhatsAppNumber(),
     getFooterCms(),
+    // Kurs dikirim dari server agar harga English langsung benar pada paint
+    // pertama (tanpa kedip ke kurs cadangan sebelum fetch klien selesai).
+    getUsdRate(),
   ]);
 
   // Structured data JSON-LD: identitas situs + bisnis rental mobil untuk rich results.
@@ -119,7 +122,7 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <LanguageProvider>
+        <LanguageProvider initialUsdRate={usdRate}>
           <ToastProvider>
             <PublicLayout brandName={brandName} brandIcon={brandIcon} brandEmblem={brandEmblem} footerCms={footerCms}>{children}</PublicLayout>
             <FloatingActions waNumber={waNumber} />

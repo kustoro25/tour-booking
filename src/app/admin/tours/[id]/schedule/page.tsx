@@ -19,6 +19,8 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
   const { id: tourId } = use(params);
   const [slots, setSlots] = useState<TourSlot[]>([]);
   const [tourName, setTourName] = useState('');
+  // Sewa mobil tidak memakai kuota: jumlah booking hanya informasi, bukan batas.
+  const [isCarRental, setIsCarRental] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
@@ -38,7 +40,12 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
   useEffect(() => {
     fetch('/api/admin/tours/' + tourId)
       .then(r => r.json())
-      .then(d => { if (d.success) setTourName(d.data.name); });
+      .then(d => {
+        if (d.success) {
+          setTourName(d.data.name);
+          setIsCarRental(d.data.category === 'CAR_RENTAL');
+        }
+      });
   }, [tourId]);
 
   const fetchSlots = useCallback(async (): Promise<TourSlot[] | null> => {
@@ -248,7 +255,7 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Jadwal & Kuota</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{isCarRental ? 'Jadwal & Ketersediaan' : 'Jadwal & Kuota'}</h1>
           {tourName && <p className="text-sm text-gray-500 mt-1">{tourName}</p>}
         </div>
         <Link href="/admin/tours" className="text-sm text-blue-600 hover:text-blue-700">
@@ -325,13 +332,13 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
                     bgClass = 'bg-gray-100';
                     textClass = 'text-gray-500';
                     indicator = <div className="w-2 h-2 rounded-full bg-gray-400 mx-auto mt-0.5" />;
-                  } else if (slot && slot.bookedCount >= slot.quota) {
+                  } else if (!isCarRental && slot && slot.bookedCount >= slot.quota) {
                     bgClass = 'bg-red-50';
                     textClass = 'text-red-600';
                     indicator = <div className="w-2 h-2 rounded-full bg-red-400 mx-auto mt-0.5" />;
                   } else if (slot) {
                     const remaining = slot.quota - slot.bookedCount;
-                    if (remaining <= 3) {
+                    if (!isCarRental && remaining <= 3) {
                       bgClass = 'bg-amber-50';
                       textClass = 'text-amber-700';
                       indicator = <div className="w-2 h-2 rounded-full bg-amber-400 mx-auto mt-0.5" />;
@@ -362,14 +369,18 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
                         {indicator}
                         {slot && !slot.isBlackout && (
                           <span className="text-[10px] text-gray-500 mt-0.5">
-                            {slot.bookedCount}/{slot.quota}
+                            {isCarRental ? `${slot.bookedCount} booking` : `${slot.bookedCount}/${slot.quota}`}
                           </span>
                         )}
                       </div>
                       {/* Hover tooltip */}
                       {slot && (
                         <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-20">
-                          {slot.isBlackout ? 'Blackout' : `${slot.bookedCount}/${slot.quota} terbooking`}
+                          {slot.isBlackout
+                            ? 'Blackout'
+                            : isCarRental
+                              ? `${slot.bookedCount} booking`
+                              : `${slot.bookedCount}/${slot.quota} terbooking`}
                           {slot.priceOverride ? ` · Rp${slot.priceOverride.toLocaleString('id-ID')}` : ''}
                         </div>
                       )}
@@ -381,9 +392,13 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
 
             {/* Legend */}
             <div className="flex flex-wrap items-center gap-4 px-5 py-3 border-t border-gray-100 text-xs text-gray-500">
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-green-400 inline-block" /> Tersedia</span>
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-amber-400 inline-block" /> Hampir Penuh</span>
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-red-400 inline-block" /> Penuh</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-green-400 inline-block" /> {isCarRental ? 'Ada booking' : 'Tersedia'}</span>
+              {!isCarRental && (
+                <>
+                  <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-amber-400 inline-block" /> Hampir Penuh</span>
+                  <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-red-400 inline-block" /> Penuh</span>
+                </>
+              )}
               <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-gray-400 inline-block" /> Blackout</span>
             </div>
           </div>
@@ -435,16 +450,18 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
                 </div>
               )}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Kuota</label>
-                <input
-                  type="number"
-                  value={formQuota}
-                  onChange={e => setFormQuota(e.target.value)}
-                  min="1"
-                  className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                />
-              </div>
+              {!isCarRental && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Kuota</label>
+                  <input
+                    type="number"
+                    value={formQuota}
+                    onChange={e => setFormQuota(e.target.value)}
+                    min="1"
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Harga Khusus (Rp)</label>
@@ -501,7 +518,7 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
                   <thead className="bg-gray-50 text-gray-500">
                     <tr>
                       <th className="px-3 py-2 text-left">Tanggal</th>
-                      <th className="px-3 py-2 text-center">Sisa</th>
+                      <th className="px-3 py-2 text-center">{isCarRental ? 'Booking' : 'Sisa'}</th>
                       <th className="px-3 py-2 text-center">Aksi</th>
                     </tr>
                   </thead>
@@ -518,11 +535,13 @@ export default function AdminSchedulePage({ params }: { params: Promise<{ id: st
                           </td>
                           <td className="px-3 py-2 text-center">
                             <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${
-                              isFull ? 'bg-red-100 text-red-700' :
+                              isCarRental
+                                ? 'bg-green-100 text-green-700'
+                                : isFull ? 'bg-red-100 text-red-700' :
                               remaining <= 3 ? 'bg-orange-100 text-orange-700' :
                               'bg-green-100 text-green-700'
                             }`}>
-                              {remaining}/{slot.quota}
+                              {isCarRental ? `${slot.bookedCount} booking` : `${remaining}/${slot.quota}`}
                             </span>
                           </td>
                           <td className="px-3 py-2 text-center">

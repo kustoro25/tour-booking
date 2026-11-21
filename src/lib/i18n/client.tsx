@@ -7,10 +7,11 @@
 // ============================================================================
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { usePathname } from 'next/navigation';
 import id from './id';
 import en from './en';
 import type { Dictionary } from './id';
-import { DEFAULT_USD_RATE, formatUsdFromIdr } from '@/lib/currency';
+import { DEFAULT_USD_RATE, formatUsdFromIdr, isValidUsdRate } from '@/lib/currency';
 import { formatCurrency } from '@/lib/utils';
 
 export type Locale = 'id' | 'en';
@@ -18,6 +19,9 @@ export type Locale = 'id' | 'en';
 export const LOCALES: readonly Locale[] = ['id', 'en'] as const;
 
 const STORAGE_KEY = 'haybali-locale';
+// Kurs terakhir yang dipakai, supaya halaman English tidak sempat memakai
+// kurs cadangan saat pengambilan kurs berikutnya belum selesai.
+const RATE_STORAGE_KEY = 'haybali-usd-rate';
 
 // ----------------------------------------------------------------------------
 // Store eksternal sederhana untuk preferensi bahasa (localStorage). Snapshot
@@ -133,29 +137,71 @@ const fallbackValue: I18nValue = {
 
 const I18nContext = createContext<I18nValue>(fallbackValue);
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
+export function LanguageProvider({
+  children,
+  initialUsdRate,
+}: {
+  children: React.ReactNode;
+  /** Kurs dari server (root layout) agar harga English benar sejak paint pertama. */
+  initialUsdRate?: number;
+}) {
   // Snapshot server selalu 'id'; klien membaca preferensi tersimpan dari
   // localStorage. React me-render ulang setelah hidrasi bila berbeda.
   const locale = useSyncExternalStore(subscribeLocale, getStoredLocale, () => 'id' as Locale);
 
-  // Kurs USD→IDR diambil sekali per mount dari API publik (sudah di-cache server).
-  // Hanya perlu saat bahasa English aktif — hemat satu request untuk pengunjung ID.
-  const [usdRate, setUsdRate] = useState(DEFAULT_USD_RATE);
+  // Kurs USD→IDR diambil dari API publik (sudah di-cache server). Diperbarui
+  // setiap pindah halaman dan saat tab kembali aktif, sehingga perubahan kurs
+  // dari panel admin langsung terpakai tanpa perlu reload manual.
+  const pathname = usePathname();
+  const [usdRate, setUsdRate] = useState(
+    isValidUsdRate(initialUsdRate ?? 0) ? (initialUsdRate as number) : DEFAULT_USD_RATE
+  );
+
+  // Pakai kurs terakhir yang tersimpan agar tidak berkedip ke kurs cadangan.
+  // Hanya dipakai bila server tidak mengirim kurs valid (mis. halaman admin
+  // yang tidak memakai layout publik).
+  useEffect(() => {
+    if (isValidUsdRate(initialUsdRate ?? 0)) return;
+    try {
+      const stored = Number(window.localStorage.getItem(RATE_STORAGE_KEY));
+      if (Number.isFinite(stored) && stored > 1000) setUsdRate(stored);
+    } catch {
+      // localStorage diblokir — biarkan kurs default
+    }
+  }, [initialUsdRate]);
 
   useEffect(() => {
     if (locale !== 'en') return;
     let active = true;
-    fetch('/api/settings/public')
-      .then((r) => r.json())
-      .then((data) => {
-        const rate = Number(data?.data?.usdRate);
-        if (active && Number.isFinite(rate) && rate > 1000) setUsdRate(rate);
-      })
-      .catch(() => {});
+
+    const loadRate = () => {
+      fetch('/api/settings/public', { cache: 'no-store' })
+        .then((r) => r.json())
+        .then((data) => {
+          const rate = Number(data?.data?.usdRate);
+          if (!active || !Number.isFinite(rate) || rate <= 1000) return;
+          setUsdRate(rate);
+          try {
+            window.localStorage.setItem(RATE_STORAGE_KEY, String(rate));
+          } catch {
+            // abaikan bila localStorage penuh/diblokir
+          }
+        })
+        .catch(() => {});
+    };
+
+    loadRate();
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') loadRate();
+    };
+    window.addEventListener('focus', loadRate);
+    document.addEventListener('visibilitychange', onVisible);
     return () => {
       active = false;
+      window.removeEventListener('focus', loadRate);
+      document.removeEventListener('visibilitychange', onVisible);
     };
-  }, [locale]);
+  }, [locale, pathname]);
 
   useEffect(() => {
     document.documentElement.lang = locale;

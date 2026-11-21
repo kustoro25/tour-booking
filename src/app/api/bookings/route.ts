@@ -13,6 +13,7 @@ import {
   formatTime12h,
   getCarRentalBasePrice,
   calcCarRentalTotal,
+  isUnlimitedQuota,
   TRANSFER_MAX_PAX,
 } from '@/lib/haybali';
 
@@ -184,6 +185,9 @@ export async function POST(request: NextRequest) {
 
     const bookingDate = new Date(tourDate);
     const totalPax = finalAdults + finalChildren;
+    // Sewa mobil tanpa batas kuota: berapa pun pesanan di tanggal yang sama
+    // tetap diterima (armada tidak dihitung per slot). Tanggal blackout tetap ditolak.
+    const unlimitedQuota = isUnlimitedQuota(tour.category);
 
     // Run booking creation inside a transaction to prevent race conditions
     const result = await prisma.$transaction(async (tx) => {
@@ -198,12 +202,14 @@ export async function POST(request: NextRequest) {
         throw new Error('BLACKOUT');
       }
 
-      // Check quota availability
-      const maxQuota = existingSlot?.quota || tour.maxSlot;
-      const currentBooked = existingSlot?.bookedCount || 0;
+      // Check quota availability (dilewati untuk sewa mobil — tanpa batas kuota)
+      if (!unlimitedQuota) {
+        const maxQuota = existingSlot?.quota || tour.maxSlot;
+        const currentBooked = existingSlot?.bookedCount || 0;
 
-      if (currentBooked + totalPax > maxQuota) {
-        throw new Error('SLOT_FULL');
+        if (currentBooked + totalPax > maxQuota) {
+          throw new Error('SLOT_FULL');
+        }
       }
 
       // Calculate total price

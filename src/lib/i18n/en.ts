@@ -620,6 +620,8 @@ const en: Dictionary = {
     seatsLeft: '{left} of {quota} seats left',
     defaultQuota: 'Default Quota',
     defaultQuotaDesc: '{maxSlot} seats available — no bookings yet for this date.',
+    unlimitedTitle: 'Date Available',
+    unlimitedDesc: 'No quota limit — multiple customers can book this date at the same time.',
     step1Car: 'Choose Date & Trip Details',
     step1Transfer: 'Choose Date & Destination',
     step1Default: 'Choose Departure Date',
@@ -792,6 +794,7 @@ const en: Dictionary = {
     available: 'Available',
     almostFull: 'Almost Full',
     full: 'Full',
+    unavailable: 'Unavailable',
   },
   wa: {
     greeting: 'Hello {brand}, I have just made a booking:',

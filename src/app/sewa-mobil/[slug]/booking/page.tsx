@@ -586,6 +586,7 @@ function BookingPage() {
               tourId={tour.id}
               selectedDate={selectedDate}
               onDateSelect={handleDateSelect}
+              unlimited={isCarRental}
             />
           </div>
 
@@ -602,6 +603,8 @@ function BookingPage() {
                   className={`rounded-xl p-4 border ${
                     slotInfo?.isBlackout
                       ? 'bg-red-500/10 border-red-500/30'
+                      : isCarRental
+                      ? 'bg-green-500/10 border-green-500/30'
                       : slotInfo && slotInfo.bookedCount >= slotInfo.quota
                       ? 'bg-red-500/10 border-red-500/30'
                       : slotInfo && slotInfo.quota - slotInfo.bookedCount <= 3
@@ -617,6 +620,16 @@ function BookingPage() {
                       </div>
                       <p className="text-sm text-red-300">
                         {t('booking.blackoutDesc')}
+                      </p>
+                    </>
+                  ) : isCarRental ? (
+                    <>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xl">✅</span>
+                        <span className="font-semibold text-green-300">{t('booking.unlimitedTitle')}</span>
+                      </div>
+                      <p className="text-sm text-green-300">
+                        {t('booking.unlimitedDesc')}
                       </p>
                     </>
                   ) : slotInfo && slotInfo.bookedCount >= slotInfo.quota ? (

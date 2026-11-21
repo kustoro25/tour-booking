@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/Skeleton';
 import ImageUpload from '@/components/ui/ImageUpload';
 import { useAdminRole } from '@/lib/useAdminRole';
+import { formatUsdFromIdr } from '@/lib/currency';
+import { formatCurrency } from '@/lib/utils';
 
 type InvoiceTheme = 'premium';
 
@@ -52,11 +54,25 @@ export default function AdminSettingsPage() {
   });
 
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>(DEFAULT_BANK_ACCOUNTS);
+  // Kurs yang benar-benar dipakai situs publik (manual dari DB atau kurs harian).
+  const [effectiveRate, setEffectiveRate] = useState(0);
   const [editingBank, setEditingBank] = useState<BankAccount>({ bank: '', number: '', name: '' });
   const [editBankIndex, setEditBankIndex] = useState<number | null>(null);
   const [showBankForm, setShowBankForm] = useState(false);
 
+  // Kurs efektif diambil dari endpoint publik — sumber yang sama dengan harga English.
+  const refreshEffectiveRate = useCallback(() => {
+    fetch('/api/settings/public', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((data) => {
+        const rate = Number(data?.data?.usdRate);
+        if (Number.isFinite(rate) && rate > 0) setEffectiveRate(rate);
+      })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
+    refreshEffectiveRate();
     fetch('/api/admin/settings')
       .then((r) => r.json())
       .then((data) => {
@@ -89,7 +105,7 @@ export default function AdminSettingsPage() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [refreshEffectiveRate]);
 
   const handleSave = async () => {
     if (!isSuperAdmin) {
@@ -126,6 +142,8 @@ export default function AdminSettingsPage() {
       const data = await res.json();
       if (data.success) {
         setSaved(true);
+        // Tampilkan kurs yang benar-benar aktif setelah disimpan.
+        refreshEffectiveRate();
         setTimeout(() => setSaved(false), 3000);
       } else {
         setError(data.error || 'Gagal menyimpan');
@@ -471,7 +489,9 @@ export default function AdminSettingsPage() {
               type="number"
               min={0}
               value={form.usdRate}
-              onChange={(e) => setForm({ ...form, usdRate: Number(e.target.value) || 0 })}
+              onChange={(e) =>
+                setForm({ ...form, usdRate: Math.round(Number(e.target.value.replace(/[^\d]/g, ''))) || 0 })
+              }
               className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="16300"
             />
@@ -479,6 +499,21 @@ export default function AdminSettingsPage() {
               Isi manual (mis. 16500) untuk mengunci kurs. Isi 0 agar otomatis mengikuti kurs harian (diperbarui
               tiap 6 jam). Pembayaran tetap diproses dalam Rupiah.
             </p>
+            <div className="mt-2 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2 text-xs text-blue-800 space-y-0.5">
+              <p>
+                Kurs aktif di situs publik:{' '}
+                <strong>Rp {effectiveRate > 0 ? effectiveRate.toLocaleString('id-ID') : '—'}/USD</strong>
+                {form.usdRate > 1000 && effectiveRate > 0 && form.usdRate !== effectiveRate
+                  ? ' — angka baru belum disimpan'
+                  : form.usdRate > 1000
+                    ? ' — kurs manual'
+                    : ' — kurs harian otomatis'}
+              </p>
+              <p>
+                Contoh: {formatCurrency(1000000)} &asymp;{' '}
+                {formatUsdFromIdr(1000000, form.usdRate > 1000 ? form.usdRate : effectiveRate)}
+              </p>
+            </div>
           </div>
         </div>
 

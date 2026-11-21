@@ -29,8 +29,16 @@ export async function PUT(request: NextRequest) {
     await requireSuperAdmin();
     const body = await request.json();
 
-    // Update semua key sekaligus dalam satu transaksi (1 round-trip, bukan N).
-    const entries = Object.entries(body) as [string, unknown][];
+    // Update semua key sekaligus dalam satu transaksi (1 round-trip, bukan N). 
+    // usd_rate dinormalkan ke angka bulat; nilai tidak wajar (=0/kosong) berarti
+    // ikut kurs harian, bukan angka aneh seperti 16.5 karena salah ketik.
+    const entries = Object.entries(body).map(([key, value]) => {
+      if (key === 'usd_rate') {
+        const rate = Math.round(Number(value));
+        return [key, Number.isFinite(rate) && rate > 1000 ? rate : 0] as [string, unknown];
+      }
+      return [key, value] as [string, unknown];
+    });
     await prisma.$transaction(
       entries.map(([key, value]) => {
         const serialized = JSON.stringify(value);

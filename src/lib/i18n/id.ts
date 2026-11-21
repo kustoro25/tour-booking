@@ -620,6 +620,8 @@ const id = {
     seatsLeft: '{left} dari {quota} kursi tersisa',
     defaultQuota: 'Kuota Default',
     defaultQuotaDesc: '{maxSlot} kursi tersedia — belum ada pemesanan untuk tanggal ini.',
+    unlimitedTitle: 'Tanggal Tersedia',
+    unlimitedDesc: 'Tanpa batas kuota — beberapa pelanggan bisa memesan di tanggal yang sama.',
     step1Car: 'Pilih Tanggal & Detail Perjalanan',
     step1Transfer: 'Pilih Tanggal & Tujuan',
     step1Default: 'Pilih Tanggal Keberangkatan',
@@ -791,6 +793,7 @@ const id = {
     available: 'Tersedia',
     almostFull: 'Hampir Penuh',
     full: 'Penuh',
+    unavailable: 'Tidak tersedia',
   },
   wa: {
     greeting: 'Halo {brand}, saya baru saja melakukan booking:',
