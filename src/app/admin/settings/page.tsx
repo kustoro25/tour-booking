@@ -15,8 +15,7 @@ interface BankAccount {
 }
 
 const DEFAULT_BANK_ACCOUNTS: BankAccount[] = [
-  { bank: 'BCA', number: '1234567890', name: 'HAYBALI TRANS' },
-  { bank: 'Mandiri', number: '0987654321', name: 'HAYBALI TRANS' },
+  { bank: 'BCA', number: '0402946260', name: 'Ni KADEK DESY MAHADEWI' },
 ];
 
 export default function AdminSettingsPage() {

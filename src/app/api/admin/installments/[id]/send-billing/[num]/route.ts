@@ -52,7 +52,7 @@ export async function POST(
     const orderLocale = plan.order.locale === 'en' ? 'en' : 'id';
 
     // Read bank accounts
-    let bankAccounts = [{ bank: 'BCA', number: '1234567890', name: companyName }];
+    let bankAccounts = [{ bank: 'BCA', number: '0402946260', name: 'Ni KADEK DESY MAHADEWI' }];
     try {
       const bankSetting = await prisma.setting.findUnique({ where: { key: 'bank_accounts' } });
       if (bankSetting) bankAccounts = JSON.parse(bankSetting.value);

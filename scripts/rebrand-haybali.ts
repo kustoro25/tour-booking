@@ -22,8 +22,7 @@ async function updateSettings() {
     company_phone: JSON.stringify('+6281234567890'),
     company_address: JSON.stringify('Denpasar / Kuta, Bali - Indonesia'),
     bank_accounts: JSON.stringify([
-      { bank: 'BCA', number: '1234567890', name: 'HAYBALI TRANS' },
-      { bank: 'Mandiri', number: '0987654321', name: 'HAYBALI TRANS' },
+      { bank: 'BCA', number: '0402946260', name: 'Ni KADEK DESY MAHADEWI' },
     ]),
   };
 

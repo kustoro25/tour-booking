@@ -10,6 +10,7 @@ import { formatCurrency } from '@/lib/utils';
 import { formatUsdFromIdr } from '@/lib/currency';
 import { formatTime12h } from '@/lib/haybali';
 import CopyButton from '@/components/ui/CopyButton';
+import BankLogo, { getBankLogo } from '@/components/ui/BankLogo';
 import { useI18n, useTranslatedMeta } from '@/lib/i18n/client';
 import {
   OrderStatusColors,
@@ -648,12 +649,23 @@ export default function InvoiceClient({
               <p className="text-xs text-gray-600 leading-relaxed mb-4">
                 {T.paymentInstructions}
               </p>
-              <div className="space-y-2 mb-4">
+              <div className="space-y-3 mb-4">
                 {bankAccounts.map((bank) => (
-                  <div key={bank.bank} className="grid grid-cols-[100px_1fr_1fr_auto] items-center gap-x-3 text-xs">
-                    <span className="font-semibold text-gray-700">{T.L.bank} {bank.bank}</span>
-                    <span className="font-mono text-gray-600">{bank.number}</span>
-                    <span className="text-gray-400">{T.L.accountName} {bank.name}</span>
+                  <div
+                    key={`${bank.bank}-${bank.number}`}
+                    className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs"
+                  >
+                    {getBankLogo(bank.bank) ? (
+                      <BankLogo bank={bank.bank} />
+                    ) : (
+                      <span className="font-semibold text-gray-700">
+                        {T.L.bank} {bank.bank}
+                      </span>
+                    )}
+                    <span className="font-mono font-semibold tracking-wide text-gray-700">{bank.number}</span>
+                    <span className="text-gray-400">
+                      {T.L.accountName} {bank.name}
+                    </span>
                     <CopyButton bankNumber={bank.number} />
                   </div>
                 ))}

@@ -378,7 +378,7 @@ export async function POST(request: NextRequest) {
         const installmentUrl = `${siteUrl}/invoice/${result.invoiceNo}/installments`;
 
         // Read bank accounts (dipakai hanya saat mode transfer manual)
-        let bankAccounts = [{ bank: 'BCA', number: '1234567890', name: companyName }];
+        let bankAccounts = [{ bank: 'BCA', number: '0402946260', name: 'Ni KADEK DESY MAHADEWI' }];
         try {
           const bankSetting = await prisma.setting.findUnique({ where: { key: 'bank_accounts' } });
           if (bankSetting) bankAccounts = JSON.parse(bankSetting.value);

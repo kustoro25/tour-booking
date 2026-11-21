@@ -7,6 +7,7 @@ import { formatCurrency } from '@/lib/utils';
 import { formatUsdFromIdr } from '@/lib/currency';
 import { Skeleton } from '@/components/ui/Skeleton';
 import CopyButton from '@/components/ui/CopyButton';
+import BankLogo, { getBankLogo } from '@/components/ui/BankLogo';
 import { InstallmentPaymentStatusColors, InstallmentPaymentStatusDots } from '@/types';
 import type { InstallmentPaymentStatus } from '@/types';
 import { useI18n, useTranslatedMeta } from '@/lib/i18n/client';
@@ -204,10 +205,15 @@ export default function InstallmentTrackingPage() {
                 className="flex flex-wrap items-center justify-between gap-2 text-sm border border-ink-700 rounded-lg px-4 py-3"
               >
                 <div>
-                  <span className="font-semibold text-ivory">{b.bank}</span>
-                  <span className="text-mist mx-2">•</span>
-                  <span className="font-mono text-mist">{b.number}</span>
-                  <p className="text-xs text-mist-dim mt-0.5">{b.name}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {getBankLogo(b.bank) ? (
+                      <BankLogo bank={b.bank} />
+                    ) : (
+                      <span className="font-semibold text-ivory">{b.bank}</span>
+                    )}
+                    <span className="font-mono text-mist">{b.number}</span>
+                  </div>
+                  <p className="text-xs text-mist-dim mt-1">{b.name}</p>
                 </div>
                 <CopyButton bankNumber={b.number} />
               </div>
