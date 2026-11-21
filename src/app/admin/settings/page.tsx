@@ -56,6 +56,8 @@ export default function AdminSettingsPage() {
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>(DEFAULT_BANK_ACCOUNTS);
   // Kurs yang benar-benar dipakai situs publik (manual dari DB atau kurs harian).
   const [effectiveRate, setEffectiveRate] = useState(0);
+  // Kurs harian otomatis (tanpa setting manual) sebagai pembanding saat mengunci kurs.
+  const [autoRate, setAutoRate] = useState(0);
   const [editingBank, setEditingBank] = useState<BankAccount>({ bank: '', number: '', name: '' });
   const [editBankIndex, setEditBankIndex] = useState<number | null>(null);
   const [showBankForm, setShowBankForm] = useState(false);
@@ -67,6 +69,8 @@ export default function AdminSettingsPage() {
       .then((data) => {
         const rate = Number(data?.data?.usdRate);
         if (Number.isFinite(rate) && rate > 0) setEffectiveRate(rate);
+        const auto = Number(data?.data?.autoUsdRate);
+        if (Number.isFinite(auto) && auto > 0) setAutoRate(auto);
       })
       .catch(() => {});
   }, []);
@@ -167,6 +171,10 @@ export default function AdminSettingsPage() {
       </div>
     );
   }
+
+  // Kurs yang dipakai untuk pratinjau: angka yang sedang diketik bila valid,
+  // jika tidak pakai kurs aktif di situs publik.
+  const previewRate = form.usdRate > 1000 ? form.usdRate : effectiveRate > 0 ? effectiveRate : autoRate;
 
   return (
     <div className="max-w-2xl">
@@ -484,22 +492,38 @@ export default function AdminSettingsPage() {
             transaksi tetap dalam Rupiah.
           </p>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Kurs USD ke IDR (Rp per $1)</label>
-            <input
-              type="number"
-              min={0}
-              value={form.usdRate}
-              onChange={(e) =>
-                setForm({ ...form, usdRate: Math.round(Number(e.target.value.replace(/[^\d]/g, ''))) || 0 })
-              }
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="16300"
-            />
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Kurs USD ke IDR — nilai Rupiah untuk US$1
+            </label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">
+                Rp
+              </span>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={form.usdRate > 0 ? form.usdRate.toLocaleString('id-ID') : ''}
+                onChange={(e) =>
+                  setForm({ ...form, usdRate: Number(e.target.value.replace(/\D/g, '')) || 0 })
+                }
+                className="w-full pl-11 pr-16 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="16.300"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-400 pointer-events-none">
+                /USD
+              </span>
+            </div>
             <p className="text-xs text-gray-500 mt-1">
-              Isi manual (mis. 16500) untuk mengunci kurs. Isi 0 agar otomatis mengikuti kurs harian (diperbarui
-              tiap 6 jam). Pembayaran tetap diproses dalam Rupiah.
+              Isi angka Rupiah untuk 1 US$: contoh benar <strong>16.300</strong> (artinya US$1 = Rp 16.300),
+              bukan 0,00006. Isi <strong>0</strong> agar otomatis mengikuti kurs harian. Pembayaran tetap dalam
+              Rupiah.
             </p>
-            <div className="mt-2 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2 text-xs text-blue-800 space-y-0.5">
+            {form.usdRate > 0 && form.usdRate <= 1000 && (
+              <p className="text-xs text-red-600 mt-1">
+                Nilai terlalu kecil. Kurs di bawah Rp 1.000 diabaikan dan situs kembali ke kurs harian otomatis.
+              </p>
+            )}
+            <div className="mt-2 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2 text-xs text-blue-800 space-y-1">
               <p>
                 Kurs aktif di situs publik:{' '}
                 <strong>Rp {effectiveRate > 0 ? effectiveRate.toLocaleString('id-ID') : '—'}/USD</strong>
@@ -507,11 +531,19 @@ export default function AdminSettingsPage() {
                   ? ' — angka baru belum disimpan'
                   : form.usdRate > 1000
                     ? ' — kurs manual'
-                    : ' — kurs harian otomatis'}
+                    : form.usdRate > 0
+                      ? ' — nilai tidak valid, simpan akan kembali ke kurs harian otomatis'
+                      : ' — kurs harian otomatis'}
               </p>
               <p>
-                Contoh: {formatCurrency(1000000)} &asymp;{' '}
-                {formatUsdFromIdr(1000000, form.usdRate > 1000 ? form.usdRate : effectiveRate)}
+                Kurs harian otomatis saat ini:{' '}
+                <strong>Rp {autoRate > 0 ? autoRate.toLocaleString('id-ID') : '—'}/USD</strong>
+                {form.usdRate > 1000 ? ' (dipakai bila kamu isi 0)' : ''}
+              </p>
+              <p>
+                Rumus: harga USD = harga Rupiah ÷ kurs. Contoh {formatCurrency(1600000)} ÷{' '}
+                {previewRate.toLocaleString('id-ID')} ={' '}
+                <strong>{formatUsdFromIdr(1600000, previewRate)}</strong> (sewa 12 jam Innova Zenix).
               </p>
             </div>
           </div>

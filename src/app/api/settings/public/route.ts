@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getUsdRate, normalizeWaNumber } from '@/lib/settings';
+import { getAutoUsdRate, getUsdRate, normalizeWaNumber } from '@/lib/settings';
 import { WA_NUMBER } from '@/lib/haybali';
 import { DEFAULT_USD_RATE } from '@/lib/currency';
 
@@ -11,6 +11,8 @@ export async function GET() {
   try {
     const settings = await prisma.setting.findMany();
     const usdRate = await getUsdRate();
+    // Kurs harian (otomatis) untuk pembanding di panel admin saat kurs dikunci.
+    const autoUsdRate = await getAutoUsdRate();
     const settingsMap: Record<string, unknown> = {};
 
     for (const s of settings) {
@@ -38,6 +40,8 @@ export async function GET() {
         ...settingsMap,
         // Kurs USD→IDR efektif untuk estimasi harga bahasa English
         usdRate,
+        // Kurs harian (tanpa setting manual) sebagai pembanding di panel admin
+        autoUsdRate,
         // Legacy camelCase fields for existing components
         email,
         phone,
@@ -55,6 +59,7 @@ export async function GET() {
       success: true,
       data: {
         usdRate: DEFAULT_USD_RATE,
+        autoUsdRate: DEFAULT_USD_RATE,
         email: 'Haybalitrans@gmail.com',
         phone: '+62 851-1933-4511',
         address: 'Jl. Bypass Ngurah Rai, Kedonganan, Kec. Kuta, Kabupaten Badung, Bali 80361',

@@ -137,12 +137,9 @@ async function getManualUsdRate(): Promise<number | null> {
   }
 }
 
-/** Kurs USD→IDR efektif. Prioritas: setting admin `usd_rate` (manual) >
- *  kurs live (cache 6 jam) > env USD_IDR_RATE > konstanta cadangan. */
-export async function getUsdRate(): Promise<number> {
-  const manual = await getManualUsdRate();
-  if (manual) return manual;
-
+/** Kurs otomatis (live → env → konstanta cadangan), mengabaikan setting manual.
+ *  Dipakai panel admin sebagai pembanding "kurs harian" sebelum mengunci kurs. */
+export async function getAutoUsdRate(): Promise<number> {
   const live = await fetchLiveUsdRate();
   if (live) return live;
 
@@ -150,4 +147,12 @@ export async function getUsdRate(): Promise<number> {
   if (Number.isFinite(envRate) && envRate > 1000) return Math.round(envRate);
 
   return DEFAULT_USD_RATE;
+}
+
+/** Kurs USD→IDR efektif. Prioritas: setting admin `usd_rate` (manual) >
+ *  kurs live (cache 6 jam) > env USD_IDR_RATE > konstanta cadangan. */
+export async function getUsdRate(): Promise<number> {
+  const manual = await getManualUsdRate();
+  if (manual) return manual;
+  return getAutoUsdRate();
 }
