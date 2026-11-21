@@ -621,7 +621,7 @@ const id = {
     defaultQuota: 'Kuota Default',
     defaultQuotaDesc: '{maxSlot} kursi tersedia — belum ada pemesanan untuk tanggal ini.',
     unlimitedTitle: 'Tanggal Tersedia',
-    unlimitedDesc: 'Tanpa batas kuota — beberapa pelanggan bisa memesan di tanggal yang sama.',
+    unlimitedDesc: 'Jadwal penjemputan untuk tanggal ini tersedia. Silakan lanjutkan untuk melengkapi data pemesanan.',
     step1Car: 'Pilih Tanggal & Detail Perjalanan',
     step1Transfer: 'Pilih Tanggal & Tujuan',
     step1Default: 'Pilih Tanggal Keberangkatan',

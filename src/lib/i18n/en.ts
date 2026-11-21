@@ -621,7 +621,7 @@ const en: Dictionary = {
     defaultQuota: 'Default Quota',
     defaultQuotaDesc: '{maxSlot} seats available — no bookings yet for this date.',
     unlimitedTitle: 'Date Available',
-    unlimitedDesc: 'No quota limit — multiple customers can book this date at the same time.',
+    unlimitedDesc: 'The pickup schedule for this date is available. Please continue to complete your booking details.',
     step1Car: 'Choose Date & Trip Details',
     step1Transfer: 'Choose Date & Destination',
     step1Default: 'Choose Departure Date',
